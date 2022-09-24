@@ -1,0 +1,72 @@
+# configuration file for lf
+# --------------------------------------------
+# Basic vars
+set shellopts '-eu'
+set ifs "\n"
+set scrolloff 10
+set icons
+set period 1
+set cleaner '~/.config/lf/cleaner'
+set previewer '~/.config/lf/scope'
+# --------------------------------------------
+
+# cmds/functions
+# --------------------------------------------
+# open files
+cmd open ${{
+    case $(file --mime-type "$(readlink -f $f)" -b) in
+    	text/*|application/json|inode/x-empty) $EDITOR $fx;;
+    	image/svg+xml) display -- $f ;;
+    	audio/*) mpv --audio-display=no $f ;;
+		video/*) setsid -f vlc $f > /dev/null 2>&1 ;;
+    	*) for f in $fx; do setsid -f $OPENER $f >/dev/null 2>&1; done;;
+    esac
+}}
+
+# extract current file
+cmd extract ${{
+    set -f
+    case $f in
+        *.tar.bz|*.tar.bz2|*.tbz|*.tbz2) tar xjvf $f;;
+        *.tar.gz|*.tgz) tar xzvf $f;;
+        *.tar.xz|*.txz) tar xJvf $f;;
+        *.zip) unzip $f;;
+        *.rar) unrar x $f;;
+        *.7z) 7z x $f;;
+    esac
+}}
+
+# delete files
+cmd delete ${{
+	/home/jetblack/Development/MyScript/lf/cowDelete.sh $fx	
+}}
+
+# set picture as wallpaper
+cmd wallpaper ${{
+	feh --bg-fill -z $f &
+}}
+
+# bulkrename (using vidir)
+cmd bulkrename $vidir
+
+
+# key bind
+# --------------------------------------------
+map D delete
+map E extract
+map <enter> shell
+
+# set current image as wallpaper
+map W wallpaper
+
+# execute current file (must be executable)
+map x $$f   
+map X !$f
+
+# dedicated keys for file opener actions
+map o &mimeopen $f
+map O $mimeopen --ask $f
+
+map V push :!nvim<space>
+map M push :$mkdir<space>
+map B bulkrename

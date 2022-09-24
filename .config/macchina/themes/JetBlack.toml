@@ -1,0 +1,59 @@
+# JetBlack's personal theme
+
+spacing         = 2
+padding         = 0
+hide_ascii      = true #false
+separator       = ""
+key_color       = "#689d69"
+# separator_color = "White"
+# prefer_small_ascii = true
+
+[palette]
+glyph           = " " #"⚫ ○ "
+type = "Dark"
+visible = true
+
+[bar]
+glyph           = "○" #⭘○
+symbol_open     = '['
+symbol_close    = ']'
+hide_delimiters = true
+visible         = true
+
+[box]
+# title = "" #
+border          = "rounded"
+visible         = true
+
+[box.inner_margin]
+x               = 1
+y               = 0
+
+[randomize]
+key_color       = false
+separator_color = false
+
+[custom_ascii]
+color = "#F692B2" #"#B48EAD" #"#90B28C"
+path = "~/Pictures/asciiArt/archLogo.txt" # Alternative path ~/~/Pictures/asciiArt/archLogo.txt ~/Pictures/asciiArt/animeGirlAscii.txt ~/Pictures/asciiArt/smileAnimeGirlAsciiArt.txt creeperAscii.txt
+
+[keys]
+host            = "" #"Host"
+WindowManager   = "AwesomeWM"
+kernel          = "" #"Kernel"
+battery         = "Battery"
+os              = "OS"
+de              = "" #"DE"
+wm              = "WM"
+distro          = "" #"Distro"
+terminal        = "" #"Terminal"
+shell           = "ﮟ" #"Shell"
+packages        = "" #"Packages"
+uptime          = "Uptime"
+memory          = "" #"Memory"
+machine         = "Machine"
+local_ip        = "Local IP"
+backlight       = "Brightness"
+resolution      = "Resolution"
+cpu_load        = "" #"CPU Load"
+cpu             = "" #"CPU"
