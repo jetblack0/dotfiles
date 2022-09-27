@@ -67,6 +67,13 @@ map X !$f
 map o &mimeopen $f
 map O $mimeopen --ask $f
 
+# rename (not quite sure how does it work)
+#map A rename # at the very end
+#map c push A<c-u> # new rename
+#map I push A<c-a> # at the very beginning
+#map i push A<a-b><a-b><a-f> # before extension
+#map a push A<a-b> # after extension
+
 map V push :!nvim<space>
 map M push :$mkdir<space>
 map B bulkrename

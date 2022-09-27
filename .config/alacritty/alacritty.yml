@@ -37,6 +37,7 @@ colors:
   cursor:
     text: '0x1d2021'
     cursor: '0xd5c4a1'
+    blinking: Never
   vi_mode_cursor:
     text: CellBackground
     cursor: CellForeground

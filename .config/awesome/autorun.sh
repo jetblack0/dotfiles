@@ -8,4 +8,5 @@ run() {
   fi
 }
 
-# run some nice programs when start awesomewm (use .xinitrc instead)
+# run some nice programs when start awesomewm (use xinitrc instrad)
+# feh --bg-fill -r -z ~/Pictures/Wallpaper/Randomized

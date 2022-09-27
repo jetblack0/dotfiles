@@ -266,10 +266,6 @@ globalkeys = gears.table.join(
 		awful.spawn(browser)
 	end, { description = "open firefox", group = "launcher" }),
 
-	awful.key({ modkey }, "#88", function()
-		awful.spawn.with_shell("/home/jetblack/Resources/Software/ToolsForGFW/Clash/cfw")
-	end, { description = "open clash", group = "launcher" }),
-
 	awful.key({}, "#107", function()
 		awful.spawn.with_shell("flameshot gui")
 	end, { description = "open flameshot gui", group = "launcher" }),

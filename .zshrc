@@ -30,6 +30,7 @@ export GROFF_NO_SGR=1                  # for konsole and gnome-terminal
 # fpath+=($HOME/.oh-my-zsh/custom/themes/pure)
 # autoload -U promptinit; promptinit
 # prompt pure
+# ------------------------------------------------------------------------------
 
 # Other basic setting
 # ------------------------------------------------------------------------------
@@ -109,10 +110,10 @@ export LANG=en_US.UTF-8
 # or set a custom format using the strftime function format specifications,
 # see 'man strftime' for details.
 # HIST_STAMPS="mm/dd/yyyy"
+# ------------------------------------------------------------------------------
 
 # Plug-in part
 # ------------------------------------------------------------------------------
-
 plugins=(
     git 
     zsh-autosuggestions
@@ -120,10 +121,10 @@ plugins=(
 )
 
 source $ZSH/oh-my-zsh.sh
+# ------------------------------------------------------------------------------
 
 # Custom functionality
 # ------------------------------------------------------------------------------
-
 # use lf to switch directories
 lfcd () {
     tmp="$(mktemp -uq)"
@@ -135,11 +136,38 @@ lfcd () {
     fi
 }
 
-# Key bind and alias
+# use vi mode
+bindkey -v
+export KEYTIMEOUT=1
+
+# use hjkl in tab complete menu 
+bindkey -M menuselect 'h' vi-backward-char
+bindkey -M menuselect 'k' vi-up-line-or-history
+bindkey -M menuselect 'l' vi-forward-char
+bindkey -M menuselect 'j' vi-down-line-or-history
+
+# change cursor in vi mode
+function zle-keymap-select {
+  if [[ ${KEYMAP} == vicmd ]] ||
+     [[ $1 = 'block' ]]; then
+    echo -ne '\e[2 q'
+  elif [[ ${KEYMAP} == main ]] ||
+       [[ ${KEYMAP} == viins ]] ||
+       [[ ${KEYMAP} = '' ]] ||
+       [[ $1 = 'beam' ]]; then
+    echo -ne '\e[6 q'
+  fi
+}
+zle -N zle-keymap-select
+zle-line-init() {
+    zle -K viins # initiate `vi insert` as keymap (can be removed if `bindkey -V` has been set elsewhere)
+    echo -ne "\e[6 q"
+}
+zle -N zle-line-init
+echo -ne '\e[6 q' # Use beam shape cursor on startup.
+preexec() { echo -ne '\e[6 q' ;} # Use beam shape cursor for each new prompt.
 # ------------------------------------------------------------------------------
 
-bindkey -s '^o' '^ulfcd\n'
-bindkey -s '^y' '/home/jetblack/Development/MyScript/fzfConfig.sh\n'
 alias lf="lfcd"
 alias vim="nvim"
 alias ls="exa --icons"
@@ -148,6 +176,9 @@ alias pacmanfzfRemove="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xar
 
 source /usr/share/fzf/key-bindings.zsh
 source /usr/share/fzf/completion.zsh
+
+bindkey -s '^o' '^ulfcd\n'
+bindkey -s '^y' '^usource /home/jetblack/Development/MyScript/fzfConfig.sh\n'
 
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"

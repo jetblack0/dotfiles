@@ -9,7 +9,7 @@
 call plug#begin()
     Plug 'vim-airline/vim-airline'
     Plug 'vim-airline/vim-airline-themes'
-	Plug 'vim-autoformat/vim-autoformat'
+	" Plug 'vim-autoformat/vim-autoformat'
 	Plug 'dense-analysis/ale'
 	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 	Plug 'junegunn/fzf.vim'
@@ -65,10 +65,8 @@ call plug#end()
 	let g:airline_powerline_fonts = 1 
 " Set airline theme:
 	let g:airline_theme='zenburn' 
-	" Airline buffer indicator
+" Airline buffer indicator
 	" let g:airline#extensions#tabline#enabled = 1
-" Set formatter for different language (vim-autofomat plug-in)
-	let g:formatterpath = ['/usr/bin/stylua']
 " Set linter for different language (ale plug-in)
 	let g:ale_linters = {'lua': ['luacheck'], 'sh': ['shellcheck']}
 " Only run linters named in ale_linters settings. (ale plug-in)
@@ -83,7 +81,6 @@ call plug#end()
 " Cancel hightlight of warn message (ale plug-in)
 	" highlight clear ALEWarningSign
 " --------------------------------------------------------
-
 
 " Advanced function
 " --------------------------------------------------------
@@ -118,13 +115,13 @@ endfunction
 function! UnComment()
     exe line("'<")."normal dd" | exe line("'>")."normal dd"   
 endfunction
-" --------------------------------------------------------
 
+" TODO: make a simple autoformatter according to the suffix, for example, if the suffix is foo.lua, the run stylua foo.lua
+
+" --------------------------------------------------------
 
 " Key bind
 " --------------------------------------------------------
-" Open Goyo
-	nmap <silent> <C-G> :Goyo<CR>
 " Moving between errors (ale plug-in)
 	nmap <silent> <C-k> <Plug>(ale_previous_wrap)
 	nmap <silent> <C-j> <Plug>(ale_next_wrap)
@@ -154,5 +151,7 @@ endfunction
 	" map <C-j> <C-w>j
 	" map <C-k> <C-w>k
 	" map <C-l> <C-w>l
+" To search for visually selected text
+vnoremap // y/\V<C-R>=escape(@",'/\')<CR><CR>
 " --------------------------------------------------------
 
