@@ -1,2 +1,2 @@
 @import "/home/jetblack/.config/rofi/theme/shared/colors/everforest.rasi"
-* { font: "JetBrains Mono Nerd Font 12"; }
+* { font: "Iosevka 15"; }

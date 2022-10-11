@@ -10,7 +10,7 @@ local powerButton = wibox.widget{
 
 powerButton:buttons(gears.table.join(
 	awful.button({}, 1, function()
-		awful.spawn.with_shell("/home/jetblack/.config/rofi/powermenu/type-2/powermenuForLauncher.sh")
+		awful.spawn.with_shell("/home/jetblack/.config/rofi/powermenu.sh 2 4 everforest JetBrains\\ Mono\\ Nerd\\ Font 12")
 	end)
 ))
 

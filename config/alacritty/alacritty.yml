@@ -14,7 +14,7 @@ window:
 scrolling:
   history: 5000
 
-font: # Cascadia Code
+font: # CaskaydiaCove Nerd Font
   normal:
     family: CaskaydiaCove Nerd Font
     style: Regular

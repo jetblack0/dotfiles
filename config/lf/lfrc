@@ -43,7 +43,7 @@ cmd delete ${{
 
 # set picture as wallpaper
 cmd wallpaper ${{
-	feh --bg-fill -z $f &
+	feh --bg-fill --no-fehbg -z $f &
 }}
 
 # bulkrename (using vidir)
