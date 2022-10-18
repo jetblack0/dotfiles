@@ -13,6 +13,9 @@
 # $5: font size of this rofi popup
 # for example: ./picker.sh 2 2 yousai Iosevka 15
 
+# NOTE: some of these nerdfont icon don't show properly, should be rofi's problem
+# for example, echo "ﯙ	github face" to rofi, and rofi shows them as "github face	ﯙ". I have no idea how to fix that, but only a small part of them got this problem, just delete them from data file
+
 makeColorAndFont() {
 	colorFile="$rofiHome/theme/shared/colorAndfont.rasi"
 	echo "@import \"$rofiHome/theme/shared/colors/$color.rasi\"" > "$colorFile"

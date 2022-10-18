@@ -177,7 +177,7 @@
 ⛰	Mountain
 ⛱	Umbrella on ground
 ⛲	Fountain
-	⛳ flag in hole
+⛳	flag in hole
 ⛴	Ferry
 ⛵	Sailboat
 ⛷	Skier

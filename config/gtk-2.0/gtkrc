@@ -2,7 +2,7 @@
 # Any customization should be done in ~/.gtkrc-2.0.mine instead.
 
 include "/home/jetblack/.gtkrc-2.0.mine"
-gtk-theme-name="gruvbox-dark-gtk"
+gtk-theme-name="Catppuccin-Macchiato-Green"
 gtk-icon-theme-name="Adwaita"
 gtk-font-name="CaskaydiaCove Nerd Font 11"
 gtk-cursor-theme-name="miniature"

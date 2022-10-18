@@ -16,6 +16,8 @@ local theme = {}
 local lightBlue = "#88a2b1"
 local lightGreen = "#689d6a"
 
+local layoutIconPath = "/home/jetblack/.config/awesome/images/wibar/layout/"
+
 -- Iosevka Nerd Font 10
 theme.font          = "Iosevka Nerd Font 10"
 
@@ -110,11 +112,11 @@ theme.menu_width  = dpi(105)
 
 -- You can use your own layout icons like this:
 --theme.layout_fairh = themes_path.."default/layouts/fairhw.png"
-theme.layout_fairv = "~/.config/awesome/icons/layout/fair.png"
-theme.layout_tile = "~/.config/awesome/icons/layout/tile.png"
-theme.layout_tilebottom = "~/.config/awesome/icons/layout/tileBottom.png"
-theme.layout_dwindle = "~/.config/awesome/icons/layout/spiralDwindle.png"
-theme.layout_magnifier = "~/.config/awesome/icons/layout/magnifier.png"
+theme.layout_fairv = layoutIconPath .. "fair-outline.svg"
+theme.layout_tile = layoutIconPath .. "tile.svg"
+theme.layout_tilebottom = layoutIconPath .. "tileBottom-outline.svg"
+theme.layout_dwindle = layoutIconPath .. "spiralDwindle-outline.svg"
+theme.layout_magnifier = layoutIconPath .. "magnifier-outline.svg"
 
 --[[ theme.layout_floating  = themes_path.."default/layouts/floatingw.png"
 theme.layout_max = themes_path.."default/layouts/maxw.png"

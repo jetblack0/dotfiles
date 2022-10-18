@@ -1,0 +1,42 @@
+#! /bin/bash
+
+# $1: operator
+# $2: newBrightness
+check() {
+	if [ "$1" != "+" ] && [ "$1" != "-" ]
+	then
+		echo -e "Usage: +|-step, no space between them, step in percentage\nFor example: $0 +20"
+		exit 1
+	elif [ "$2" -gt "$brightnessMax" ] || [ "$2" -lt "$brightnessMin" ]
+	then
+		echo "invalid value"
+		exit 1
+	fi
+}
+
+# $1: +|-step, for example +5
+changeBrightness() {
+	operator=${1:0:1}
+	step=$(echo "scale=2; ${1:1} / 100" | bc)
+
+	newBrightness=$(echo "($brightnessCur $operator $brightnessMax * $step) / 1" | bc)
+
+	check "$operator" "$newBrightness"
+
+	# setuid doesn't work for shell script, run this as sudo instead (change sudoer file for nopasswd)
+	# echo "$newBrightness" > /sys/class/backlight/intel_backlight/brightness
+	echo "$newBrightness" | sudo tee /sys/class/backlight/intel_backlight/brightness > /dev/null
+}
+
+brightnessMax=$(cat /sys/class/backlight/intel_backlight/max_brightness)
+brightnessCur=$(cat /sys/class/backlight/intel_backlight/brightness)
+# brightness can not lower than this value, otherwise i can't see anything
+brightnessMin=100
+
+if [[ "$*" =~ [+-][0-9]+$ ]]
+then
+	changeBrightness "$@"
+else
+	echo -e "Usage: +|-step, no space between them, step in percentage\nFor example: $0 +20"
+	exit 1
+fi

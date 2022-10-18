@@ -3601,6 +3601,7 @@
 	book
 	octoface
 	git pull request
+ﯙ	github face
 	mark github
 	cloud download
 	cloud upload

@@ -1,5 +1,7 @@
 #! /bin/bash
 
+# TODO: eDP + HDMI (right) and HDMI + eDP (left) are same... fix it
+
 # display all the layout on the rofi menu, i usually just use two monitors, need to change code if need more
 getLayout() {
 	for primary in "${monitors[@]}"; do
@@ -27,7 +29,8 @@ keepAlive() {
 
 # I need to change the picom config when use external monitors because i'm in nvidia, you don't need this
 tune() {
-	echo "foo"
+	pkill picom
+	picom -b --config "$HOME"/.config/picom/picomMultihead.conf
 }
 
 # get connected monitor
@@ -46,7 +49,18 @@ else
 	then
 		keepAlive "${options[1]}"
 		xrandr --output "${options[1]}" --auto
+
+		# if [ "${options[1]}" != "eDP-1" ]
+		# then
+		# 	tune
+		# else
+		# 	pkill picom
+		# 	picom -b
+		# fi
+
 	else
 		xrandr --output "${options[0]}" --auto --output "${options[1]}" --auto --"${options[2]}"-of "${options[0]}"
+		# tune
 	fi
 fi
+

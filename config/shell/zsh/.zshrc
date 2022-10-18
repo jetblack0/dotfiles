@@ -73,7 +73,7 @@
 # ------------------------------------------------------------------------------
 	bindkey -s '^o' '^ulfcd\n'
 	bindkey -s '^y' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfConfig.sh\n'
-	bindkey -s '^e' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfCd.sh\n'
+	bindkey -s '^e' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfCd.sh && lfcd\n'
 # ------------------------------------------------------------------------------
 
 
@@ -85,10 +85,9 @@
 	source $pluginPath/zsh-autosuggestions/zsh-autosuggestions.zsh
 	source $pluginPath/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 	source $pluginPath/zsh-completion/completion.zsh
+	# source $pluginPath/catppuccin-zsh-syntax-highlighting/catppuccin_macchiato-zsh-syntax-highlighting.zsh
 	# source $pluginPath/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 
-# TODO: tab completion doesn't show dot files
-	# source $pluginPath/fzf-tab/fzf-tab.plugin.zsh
 # ------------------------------------------------------------------------------
 
 
@@ -107,8 +106,8 @@
 	alias yay="paru"
 	# exa for ls
 	alias ls="exa"
-	alias ll="ls -l"
-	alias lla="ls -la"
+	alias ll="ls -lHg"
+	alias lla="ll -a"
 	alias lsa="ls -a"
 	alias tree="exa -TL"
 	# ripgrep for grep
@@ -117,4 +116,6 @@
 	alias cat="bat"
 	# dua for du
 	# alias du="dua"
+	# benchmark tool
+	alias timer="hyperfine"
 # ------------------------------------------------------------------------------
