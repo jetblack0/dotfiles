@@ -1,0 +1,13 @@
+require("plugins")
+require("plugin_config.catppuccin")
+require("plugin_config.lsp")
+require("plugin_config.nvimtree")
+require("plugin_config.lualine")
+require("plugin_config.cmp")
+require("plugin_config.null-ls")
+require("plugin_config.comment")
+
+require("core.colorscheme")
+require("core.options")
+require("core.autocmd")
+require("core.keybindings")

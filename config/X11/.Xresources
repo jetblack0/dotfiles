@@ -9,6 +9,7 @@ Xft.hintstyle: hintfull
 Xft.lcdfilter: lcdfilter
 
 
+! Catppuccin: https://github.com/catppuccin/xresources/
 *background: #24273A
 *foreground: #CAD3F5
 

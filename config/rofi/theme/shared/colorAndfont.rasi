@@ -1,2 +1,2 @@
 @import "/home/jetblack/.config/rofi/theme/shared/colors/yousai.rasi"
-* { font: "Grape Nuts 15"; }
+* { font: "Iosevka 14"; }

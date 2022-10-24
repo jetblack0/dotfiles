@@ -39,6 +39,12 @@ export SAVEHIST=9223372036854775807
 	export FZF_CTRL_T_COMMAND='rg --files --hidden .'
 	# export FZF_ALT_C_COMMAND='rg --files --hidden --null . | xargs -0 dirname | sort -u'
 	export FZF_ALT_C_COMMAND='rg --hidden --sort-files --files --null 2> /dev/null | xargs -0 dirname | uniq'
+
+# qt
+	export QT_QPA_PLATFORMTHEME=qt5ct
+
+# pfetch
+	export PF_SOURCE="$XDG_CONFIG_HOME/pfetch/pfetch.sh"
 # ------------------------------------------------------------------------------------------------------------------
 
 # ---------- poor stuff ----------------

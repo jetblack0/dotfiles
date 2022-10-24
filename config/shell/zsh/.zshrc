@@ -73,7 +73,7 @@
 # ------------------------------------------------------------------------------
 	bindkey -s '^o' '^ulfcd\n'
 	bindkey -s '^y' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfConfig.sh\n'
-	bindkey -s '^e' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfCd.sh && lfcd\n'
+	bindkey -s '^p' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfCd.sh && lfcd\n'
 # ------------------------------------------------------------------------------
 
 
@@ -84,6 +84,7 @@
 
 	source $pluginPath/zsh-autosuggestions/zsh-autosuggestions.zsh
 	source $pluginPath/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+	# TODO: works not good, changethe the Keybindings
 	source $pluginPath/zsh-completion/completion.zsh
 	# source $pluginPath/catppuccin-zsh-syntax-highlighting/catppuccin_macchiato-zsh-syntax-highlighting.zsh
 	# source $pluginPath/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
@@ -97,6 +98,7 @@
 	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
 	alias lf="lfcd"
 	alias vim="nvim"
+	alias nivm="nvim"
 	alias diff="diff --color"
 	alias pacmanfzfInstall="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
 	alias pacmanfzfRemove="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns"

@@ -3,19 +3,16 @@
 "  /  \/ / _ \/ _ \ \ / / | '_ ` _ \ 
 " / /\  /  __/ (_) \ V /| | | | | | |
 " \_\ \/ \___|\___/ \_/ |_|_| |_| |_|
-                                   
+"
 " Plug-in
 " -------------------------------------------------------- 
-call plug#begin()
-    Plug 'junegunn/goyo.vim'
-	Plug 'dense-analysis/ale'
-	Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-	Plug 'junegunn/fzf.vim'
-	Plug 'preservim/nerdtree'
-	Plug 'ryanoasis/vim-devicons'
-	Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
-	Plug 'nvim-lualine/lualine.nvim'
-call plug#end()
+lua << EOF
+require('plugins')
+require("plugin_config.catppuccin")
+require("plugin_config.nvimtree")
+require("plugin_config.lsp")
+require("plugin_config.lualine")
+EOF
 " -------------------------------------------------------- 
 
 
@@ -35,19 +32,22 @@ call plug#end()
 	map <S-ScrollWheelRight> <nop>
 	map <C-ScrollWheelRight> <nop>
 	set mouse=
+" Copy indent from current line when starting a new line
+	set smartindent
+" Columns used for the line number
+	set numberwidth=4
 " Copy to system clipboard
 	set clipboard+=unnamedplus
 " Color scheme
-	" let g:gruvbox_italic=1
-	" colorscheme catppuccin_macchiato
+	colorscheme catppuccin
 " Turn on syntax highlighting:
 	syntax enable 			
 	filetype plugin indent on
 " Enables relative line number
 	set number relativenumber 	
 " hide statu line
-	set laststatus=0 		
-	set noshowmode
+	" set laststatus=0 		
+	" set noshowmode
 " Enable autocompletion:
 	set wildmode=longest,list,full
 " Disables automatic commenting on newline:
@@ -60,6 +60,9 @@ call plug#end()
     set softtabstop=4
 " Indents will have a width of 4
 	set shiftwidth=4    
+" case insensitive search unless capital letters are used
+	set ignorecase
+	set smartcase
 " Save and load view automatically
 	augroup remember_folds
 	  autocmd!
@@ -73,24 +76,20 @@ call plug#end()
 
 " Plug-in related
 " --------------------------------------------------------
-" Nerdtree:
-" Exit Vim if NERDTree is the only window remaining in the only tab.
-	autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
-
 " Ale:
 " Set linter for different language (ale plug-in)
-	let g:ale_linters = {'lua': ['luacheck'], 'sh': ['shellcheck'], 'rust': ['rustc']}
+	" let g:ale_linters = {'lua': ['luacheck'], 'sh': ['shellcheck'], 'rust': ['rustc']}
 " Only run linters named in ale_linters settings. (ale plug-in)
-	let g:ale_linters_explicit = 1
+	" let g:ale_linters_explicit = 1
 " Specify what text should be used for signs(ale plug-in)
-	let g:ale_sign_error = ''
-	let g:ale_sign_warning = '' "
+	" let g:ale_sign_error = ''
+	" let g:ale_sign_warning = '' "
 " Set this. Airline will handle the rest.(ale plug-in)
-	let g:airline#extensions#ale#enabled = 1
+	" let g:airline#extensions#ale#enabled = 1
 " Set this in your vimrc file to disabling highlighting (ale plug-in)
 	" let g:ale_set_highlights = 0
 " Cancel hightlight of warn message (ale plug-in)
-	highlight clear ALEWarningSign
+	" highlight clear ALEWarningSign
 " --------------------------------------------------------
 
 " Advanced function
@@ -132,12 +131,9 @@ endfunction
 
 " Key bind
 " --------------------------------------------------------
-" TODO: change nerd tree keybings same as fzf
-" Toggle goyo
-	map <silent> <C-g> :Goyo<CR>
 " Moving between errors (ale plug-in)
-	nmap <silent> <S-j> <Plug>(ale_next_wrap)
-	nmap <silent> <S-k> <Plug>(ale_previous_wrap)
+	" nmap <silent> <S-j> <Plug>(ale_next_wrap)
+	" nmap <silent> <S-k> <Plug>(ale_previous_wrap)
 " Toggle linters (ale plug-in)
 	nmap <silent> <C-,> :ALEToggle<CR>
 " Hide search highlighting
@@ -145,12 +141,6 @@ endfunction
 " Comment/uncomment code in multiple line
 	vnoremap ,m :<c-w><c-w><c-w><c-w><c-w>call Comment()<CR>
 	vnoremap m, :<c-w><c-w><c-w><c-w><c-w>call UnComment()<CR>
-" Better way to switch buffer (same as firefox)
-	nmap <silent> <C-PageDown> :bn<CR>
-	nmap <silent> <C-PageUp> :bp<CR>
-" Open fzf finder
-	nmap <silent> <C-[> :Files<CR>
-	nmap <silent> <C-]> :Buffers<CR>
 " Spell checker for english
 	map <silent> <F6> :set spell!<CR>
 " Resize split TODO: kinda confused, make it like my WM
@@ -166,119 +156,8 @@ endfunction
 	nnoremap <C-A-h> <C-w><S-h>
 	nnoremap <C-A-k> <C-w><S-k>
 	nnoremap <C-A-j> <C-w><S-j>
-" Toggle nerdtree
-	nnoremap <silent> <C-b> :NERDTreeToggle<CR>
-" Nerdtree keybind that same as fzf
-	let NERDTreeMapOpenInTab  = "<C-t>"
-	let NERDTreeMapOpenVSplit = "<C-v>"
-	let NERDTreeMapOpenSplit  = "<C-x>"
-" Quit and save
-	nmap <silent> <C-q> :wq<CR>
+" Toggle nvimtree
+	nnoremap <silent> <C-b> :NvimTreeToggle<CR>
 " --------------------------------------------------------
 
-lua << EOF
-vim.g.catppuccin_flavour = "macchiato"
-require("catppuccin").setup({
-	-- use command :CatppuccinCompile to compile this config into cache
-	compile_path = vim.fn.stdpath("cache") .. "/catppuccin",
-	transparent_background = true,
-	term_colors = false,
-	dim_inactive = {
-		enabled = false,
-		shade = "dark",
-		percentage = 0.15,
-	},
-	styles = {
-		comments = { "italic" },
-		conditionals = { "italic" },
-		conditionals = {},
-		loops = {},
-		functions = {},
-		keywords = {},
-		strings = {},
-		variables = {},
-		numbers = {},
-		booleans = {},
-		properties = {},
-		types = {},
-		operators = {},
-	},
-	integrations = {
-		cmp = true,
-		gitsigns = true,
-		nvimtree = true,
-		telescope = true,
-		treesitter = true,
-	},
-	color_overrides = {},
-	custom_highlights = {},
-	vim.cmd [[colorscheme catppuccin]]
-})
-
--- lualine
-local colors = {
-  blue     = '#8AADF4',
-  cyan     = '#8BD5CA',
-  black    = '#080808',
-  white    = '#CAD3F5',
-  red      = '#ED8796',
-  violet   = '#D183E8',
-  grey     = '#303030',
-  magenta  = "#F5BDE6",
-  lavender = "#B7BDF8",
-  green    = "#A6DA95",
-}
-
-local bubbles_theme = {
-  normal = {
-    a = { fg = colors.black, bg = colors.magenta },
-    b = { fg = colors.black, bg = colors.lavender },
-    c = { fg = colors.black, bg = nil },
-  },
-
-  insert = { a = { fg = colors.black, bg = colors.blue } },
-  visual = { a = { fg = colors.black, bg = colors.cyan } },
-  replace = { a = { fg = colors.black, bg = colors.red } },
-  command = { a = { fg = colors.black, bg = colors.green } },
-
-  inactive = {
-    a = { fg = colors.white, bg = colors.black },
-    b = { fg = colors.white, bg = colors.black },
-    c = { fg = colors.black, bg = colors.black },
-  },
-}
-
-require('lualine').setup {
-  options = {
-	globalstatus = true,
-    always_divide_middle = true,
-    theme = bubbles_theme,
-    component_separators = '|',
-    section_separators = { left = '', right = '' },
-	ignore_focus = { 'nerdtree' },
-    extensions = {}
-  },
-  sections = {
-    lualine_a = {
-      { 'mode', separator = { left = '' }, right_padding = 2 },
-    },
-    lualine_b = { 'filename', 'branch', 'encoding' },
-    lualine_c = {},
-    lualine_x = {},
-    lualine_y = { 'filetype', 'progress' },
-    lualine_z = {
-      { 'location', separator = { right = '' }, left_padding = 2 },
-    },
-  },
-  inactive_sections = {
-    lualine_a = { 'filename' },
-    lualine_b = {},
-    lualine_c = {},
-    lualine_x = {},
-    lualine_y = {},
-    lualine_z = { 'location' },
-  },
-  tabline = {},
-  extensions = {},
-}
-EOF
+" TODO: switch to lua.init completely

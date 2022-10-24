@@ -4,7 +4,7 @@
 ## Github: https://github.com/adi1090x/rofi
 ## Author : Aditya Shakya (adi1090x)
 
-# I use it to select emoji, nerd font icon and colors that i use most. The last two are not done yet
+# I use it to select emoji, nerd font icon and colors that i use most. The last one are not done yet
 
 # $1: type of this rofi popup
 # $2: style of this rofi popup

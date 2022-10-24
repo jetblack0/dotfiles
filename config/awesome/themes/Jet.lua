@@ -13,6 +13,9 @@ local shape = require("gears.shape")
 local theme = {}
 
 -- A bunch of color
+local colors = {
+    lightBlue = "#88a2b1"
+}
 local lightBlue = "#88a2b1"
 local lightGreen = "#689d6a"
 
