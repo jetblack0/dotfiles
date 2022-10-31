@@ -1,79 +1,61 @@
 local wibox = require("wibox")
+local beautiful = require("beautiful")
 
 -- Return table which contains the widget itself, and functions to change the text
 local M = {}
 
-local function getPercentage(brightnessCur, brightnessMax)
-	local brightnessMin = 100
-	return math.modf(brightnessCur / (brightnessMax - brightnessMin) * 100)
+local function get_percentage(brightness_cur, brightness_max)
+	local brightness_min = 100
+	return math.modf(brightness_cur / (brightness_max - brightness_min) * 100)
 end
 
--- I don't wanna show percentage for aesthetics, just uncomment them to enable
-local function getWibarIcon(percentage)
-	local iconPath = "/home/jetblack/.config/awesome/images/wibar/brightness/"
+local function get_wibar_icon(percentage)
 	if percentage > 90 then
-		return iconPath .. "light-on-100.svg"
+		return beautiful.brightness.icon_100
 	elseif percentage > 80 then
-		return iconPath .. "light-on-90.svg"
+		return beautiful.brightness.icon_90
 	elseif percentage > 70 then
-		return iconPath .. "light-on-80.svg"
+		return beautiful.brightness.icon_80
 	elseif percentage > 60 then
-		return iconPath .. "light-on-70.svg"
+		return beautiful.brightness.icon_70
 	elseif percentage > 50 then
-		return iconPath .. "light-on-60.svg"
+		return beautiful.brightness.icon_60
 	elseif percentage > 40 then
-		return iconPath .. "light-on-50.svg"
+		return beautiful.brightness.icon_50
 	elseif percentage > 30 then
-		return iconPath .. "light-on-40.svg"
+		return beautiful.brightness.icon_40
 	elseif percentage > 20 then
-		return iconPath .. "light-on-30.svg"
+		return beautiful.brightness.icon_30
 	elseif percentage > 10 then
-		return iconPath .. "light-on-20.svg"
+		return beautiful.brightness.icon_20
 	else
-		return iconPath .. "light-on-10.svg"
+		return beautiful.brightness.icon_10
 	end
 end
 
 -- Just read these files once when starting awesomewm
-local brightnessCur = assert(io.open("/sys/class/backlight/intel_backlight/brightness", "r")):read("n")
-local brightnessMax = assert(io.open("/sys/class/backlight/intel_backlight/max_brightness", "r")):read("n")
-local initialPercentage = getPercentage(brightnessCur, brightnessMax)
+local brightness_cur = assert(io.open("/sys/class/backlight/intel_backlight/brightness", "r")):read("n")
+local brightness_max = assert(io.open("/sys/class/backlight/intel_backlight/max_brightness", "r")):read("n")
+local initial_percentage = get_percentage(brightness_cur, brightness_max)
 
-local iconWidget = wibox.widget.imagebox()
-
---[[
-local brightnessWidget = wibox.widget({
-	{
-		image = getWibarIcon(initialPercentage),
-		resize = true,
-		-- widget = wibox.widget.imagebox
-		widget = iconWidget
-	},
-	{
-		text = " ",
-		widget = wibox.widget.textbox
-	},
-	layout = wibox.layout.fixed.horizontal,
-})
---]]
-
-local brightnessWidget = wibox.widget{
-	image = getWibarIcon(initialPercentage),
+local brightness_widget = wibox.widget{
+	image = get_wibar_icon(initial_percentage),
 	resize = true,
-	widget = iconWidget
+	widget = wibox.widget.imagebox()
 }
 
-function M.updateIcon(operator, step)
+-- I change my brightness only though keyboard shortcuts, so it makes sense to only update this widget when i press these keys
+function M.update_icon(operator, step)
 	if operator == "+" then
-		initialPercentage = initialPercentage + step
-		iconWidget:set_image(getWibarIcon(initialPercentage))
+		initial_percentage = initial_percentage + step
+		brightness_widget:set_image(get_wibar_icon(initial_percentage))
 	elseif operator == "-" then
-		initialPercentage = initialPercentage - step
-		iconWidget:set_image(getWibarIcon(initialPercentage))
+		initial_percentage = initial_percentage - step
+		brightness_widget:set_image(get_wibar_icon(initial_percentage))
 	end
 end
 
-M.brightnessWidgetContainer = wibox.container.background(brightnessWidget)
-M.brightnessWidgetContainer.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_green3.png"
+M.brightness_widget_container = wibox.container.background(brightness_widget)
+M.brightness_widget_container.bgimage = beautiful.brightness.background_image
 
 return M

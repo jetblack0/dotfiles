@@ -1,21 +1,22 @@
 local wibox = require("wibox")
 local gears = require("gears")
 local awful = require("awful")
+local beautiful = require("beautiful")
 
-local powerButton = wibox.widget{
-	image = "/home/jetblack/.config/awesome/images/wibar/power/power-button.svg",
+local power_button = wibox.widget{
+	image = beautiful.power.icon,
 	resize = true,
 	widget = wibox.widget.imagebox
 }
 
-powerButton:buttons(gears.table.join(
+power_button:buttons(gears.table.join(
 	awful.button({}, 1, function()
 		awful.spawn.with_shell("/home/jetblack/.config/rofi/powermenu.sh 2 4 everforest JetBrains\\ Mono\\ Nerd\\ Font 12")
 	end)
 ))
 
 -- add some nice little background
-_G.powerButtonContainer = wibox.container.background(powerButton)
-_G.powerButtonContainer.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_pink2.png"
+local power_button_container = wibox.container.background(power_button)
+power_button_container.bgimage = beautiful.power.background_image
 
-return _G.powerButtonContainer
+return power_button_container

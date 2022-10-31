@@ -1,45 +1,63 @@
 local wibox = require("wibox")
-local M = {}
+local awful = require("awful")
+local beautiful = require("beautiful")
 
-local function getWibarimage(curVolume, isMute)
-	if isMute then
-		return "/home/jetblack/.config/awesome/images/wibar/volume/volume-mute.svg"
-	elseif curVolume > 70 then
-		return "/home/jetblack/.config/awesome/images/wibar/volume/volume-high.svg"
-	elseif curVolume > 30 then
-		return "/home/jetblack/.config/awesome/images/wibar/volume/volume-medium.svg"
+local function get_wibar_image(cur_volume, is_mute)
+	if is_mute then
+		return beautiful.volume.icon_mute
+	elseif cur_volume > 70 then
+		return beautiful.volume.icon_high
+	elseif cur_volume > 30 then
+		return beautiful.volume.icon_medium
 	else
-		return "/home/jetblack/.config/awesome/images/wibar/volume/volume-low.svg"
+		return beautiful.volume.icon_low
 	end
 end
 
--- pamixer --get-volume command doesn't output anything when first start up computer
-local curVolume
-repeat
-	curVolume = assert(io.popen("pamixer --get-volume", "r")):read("n")
-until curVolume ~= nil
+local function update(volume_widget)
+	--[[ local cur_volume = assert(io.popen("pamixer --get-volume", "r")):read("n")
+	local is_mute = assert(io.popen("pamixer --get-mute", "r")):read("l") == "true" ]]
 
-local isMute = assert(io.popen("pamixer --get-mute", "r")):read("l") == "true"
+	-- Get the current volume info asynchronously, avoid using something like io.popen() !
+	awful.spawn.easy_async_with_shell("pamixer --get-volume ; pamixer --get-mute", function(stdout)
+		local lines = {}
+		for s in stdout:gmatch("[^\n]+") do
+			table.insert(lines, s)
+		end
 
-local volumeWidget = wibox.widget{
-	image = getWibarimage(curVolume, isMute),
+		local cur_volume = tonumber(lines[1])
+		local is_mute = lines[2] == "true"
+
+		volume_widget:set_image(get_wibar_image(cur_volume, is_mute))
+	end)
+end
+
+local volume_widget = wibox.widget({
 	resize = true,
-    widget = wibox.widget.imagebox
-}
+	widget = wibox.widget.imagebox,
+})
 
-function M.updateIcon(state)
-	if state == "raise" then
-		curVolume = curVolume + 5
-	elseif state == "lower" then
-		curVolume = curVolume - 5
-	elseif state == "mute" then
-		isMute = not isMute
-	end
-	volumeWidget:set_image(getWibarimage(curVolume, isMute))
-end
+-- initialize
+update(volume_widget)
 
-M.volumeWidgetContainer = wibox.container.background(volumeWidget)
-M.volumeWidgetContainer.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_green3.png"
--- M.volumeWidgetContainer.fg = "black"
+-- TODO: why there are two pactl subscribe processes?
+local pactl_subscribe = [[
+bash -c "pactl subscribe 2>/dev/null"]]
 
-return M
+-- Kill all the pactl subscribe processes before running this callback function
+awful.spawn.easy_async_with_shell('kill $(pgrep -f "pactl subscribe")', function()
+	-- Update this widget asynchronously when pactl subscribe print something new
+	awful.spawn.with_line_callback(pactl_subscribe, {
+		-- Function that is called with each line of output on stdout
+		stdout = function(line)
+			if string.find(line, "Event 'change' on sink #") then
+				update(volume_widget)
+			end
+		end,
+	})
+end)
+
+local volume_widget_container = wibox.container.background(volume_widget)
+volume_widget_container.bgimage = beautiful.volume.background_image
+
+return volume_widget_container

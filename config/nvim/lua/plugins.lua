@@ -47,6 +47,8 @@ return require("packer").startup(function(use)
 	use({ "nvim-lua/plenary.nvim" })
 	-- easy way to comment things out (make one myself when got sometimes)
 	use({ "numToStr/Comment.nvim" })
+	-- Show color when type color code
+	use({ "norcalli/nvim-colorizer.lua" })
 
 -- Ui enhancement
 	use({ "nvim-lualine/lualine.nvim" })

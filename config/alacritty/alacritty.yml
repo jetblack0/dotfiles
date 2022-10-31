@@ -33,11 +33,7 @@ custom_cursor_colors: true
 import:
   # catppuccin color scheme: https://github.com/catppuccin/alacritty
 
-  # - ~/.config/alacritty/colorScheme/gruvbox/gruvboxDark.yml
-  # - ~/.config/alacritty/colorScheme/catppuccin/catppuccin-frappe.yml
   - ~/.config/alacritty/colorScheme/catppuccin/catppuccin-macchiato.yml
-  # - ~/.config/alacritty/colorScheme/catppuccin/catppuccin-mocha.yml
-  # - ~/.config/alacritty/colorScheme/catppuccin/catppuccin-latte.yml
 
 draw_bold_text_with_bright_colors: false
 

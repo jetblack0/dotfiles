@@ -1,20 +1,19 @@
 local awful = require("awful")
 local gears = require("gears")
 local hotkeys_popup = require("awful.hotkeys_popup")
-local brightness = require("widgets/wibar/brightness")
-local volume = require("widgets/wibar/volume")
+local brightness = require("widgets.wibar.brightness")
 
 -- TODO: add rofi theme selector
 -- TODO: add keybindings to switch to these layout that i use most
 
 -- step for adjust brightness in percentage
-local brightnessStep = 3
+local brightness_step = 3
 local favoriteWallpaper = "$HOME/Pictures/Wallpaper/people/wallhaven-z8e8qy.jpg"
 
 globalkeys = gears.table.join(
 
 	-- Launch programs (launcher group)
-	awful.key({ modkey }, "#87", function()
+	awful.key({ modkey }, "#34", function()
 		awful.spawn.with_shell("/home/jetblack/.config/rofi/picker.sh 1 1 yousai Grape\\ Nuts 15")
 	end, { description = "open rofi picker", group = "launcher" }),
 
@@ -30,11 +29,11 @@ globalkeys = gears.table.join(
 		awful.spawn(terminal)
 	end, { description = "open a terminal", group = "launcher" }),
 
-	awful.key({ modkey }, "#90", function()
+	awful.key({ modkey }, "#20", function()
 		awful.spawn.with_shell("feh --bg-fill --no-fehbg -r -z ~/Pictures/Wallpaper/")
 	end, { description = "change wallpaper by feh", group = "launcher" }),
 
-	awful.key({ modkey }, "#91", function()
+	awful.key({ modkey }, "#21", function()
 		awful.spawn.with_shell("feh --bg-fill --no-fehbg -z " .. favoriteWallpaper)
 	end, { description = "change wallpaper to my favorite one", group = "launcher" }),
 
@@ -57,28 +56,25 @@ globalkeys = gears.table.join(
 
 	-- awesome group
 	awful.key({}, "XF86MonBrightnessUp", function()
-		awful.spawn.with_shell("sudo brightness +" .. brightnessStep)
-		brightness.updateIcon("+" ,brightnessStep)
-	end, { description = "increase brightness by " .. brightnessStep .. "%", group = "awesome" }),
+		awful.spawn.with_shell("sudo brightness +" .. brightness_step)
+		brightness.update_icon("+", brightness_step)
+	end, { description = "increase brightness by " .. brightness_step .. "%", group = "awesome" }),
 
 	awful.key({}, "XF86MonBrightnessDown", function()
-		awful.spawn.with_shell("sudo brightness -" .. brightnessStep)
-		brightness.updateIcon("-" ,brightnessStep)
-	end, { description = "decrease brightness by " .. brightnessStep .. "%", group = "awesome" }),
+		awful.spawn.with_shell("sudo brightness -" .. brightness_step)
+		brightness.update_icon("-", brightness_step)
+	end, { description = "decrease brightness by " .. brightness_step .. "%", group = "awesome" }),
 
 	awful.key({}, "XF86AudioRaiseVolume", function()
 		awful.spawn.with_shell("pamixer -i 5")
-		volume.updateIcon("raise")
 	end, { description = "increase volume by 5%", group = "awesome" }),
 
 	awful.key({}, "XF86AudioLowerVolume", function()
 		awful.spawn.with_shell("pamixer -d 5")
-		volume.updateIcon("lower")
 	end, { description = "decrease volume by 5%", group = "awesome" }),
 
 	awful.key({}, "XF86AudioMute", function()
 		awful.spawn.with_shell("pamixer -t")
-		volume.updateIcon("mute")
 	end, { description = "toggle mute", group = "awesome" }),
 
 	awful.key({ modkey }, "s", hotkeys_popup.show_help, { description = "show help", group = "awesome" }),
@@ -89,7 +85,7 @@ globalkeys = gears.table.join(
 	end, { description = "toggle wibox", group = "awesome" }),
 
 	awful.key({ modkey }, "Escape", function()
-		awful.spawn.with_shell('betterlockscreen --lock')
+		awful.spawn.with_shell("betterlockscreen --lock")
 	end, { description = "go back", group = "tag" }),
 
 	awful.key({ modkey }, "Left", awful.tag.viewprev, { description = "view previous", group = "tag" }),

@@ -22,7 +22,7 @@ physical_cores = false
 #  if theme path is /home/foo/.config/macchina/themes/Sodium.toml
 #  theme should be uncommented and set to "Sodium"
 #
-theme = "JetBlack"
+theme = "kitty"
 
 # Displays only the specified readouts.
 # Accepted values (case-sensitive):
@@ -46,4 +46,4 @@ theme = "JetBlack"
 #   - Battery
 # Example:
 #   show = ["Battery", "Memory", ...]
-show = ["Distribution", "WindowManager", "Packages", "Shell", "Terminal", "Processor", "Memory", "ProcessorLoad"]
+show = ["Distribution", "WindowManager", "DesktopEnvironment", "Packages", "Shell", "Terminal", "Memory", "ProcessorLoad"]

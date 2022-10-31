@@ -3,20 +3,20 @@ local gears = require("gears")
 local awful = require("awful")
 local beautiful = require("beautiful")
 
--- Keyboard map indicator and switcher with background image
-local mykeyboardlayout = wibox.container.background(awful.widget.keyboardlayout())
-mykeyboardlayout.fg = "black"
-mykeyboardlayout.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_blue.png"
+-- TODO: move layoutbox widget to the widgets directory
 
-local powerLauncher = require("widgets/wibar/power")
-local memoryUsage = require("widgets/wibar/memoryUsage")
-local batteryAndNotification = require("widgets/wibar/batteryAndNotification")
-local clockAndCal = require("widgets/wibar/clockAndCal")
-local brightness = require("widgets/wibar/brightness").brightnessWidgetContainer
-local volume = require("widgets/wibar/volume").volumeWidgetContainer
-local bluetooth = require("widgets/wibar/bluetooth")
-local network = require("widgets/wibar/network")
-local microphone = require("widgets/wibar/microphone")
+-- A bunch of widgets (ugly)
+local keyboard = require("widgets.wibar.keyboard")
+local power = require("widgets.wibar.power")
+local memory= require("widgets.wibar.memory")
+local battery = require("widgets.wibar.battery")
+local clock = require("widgets.wibar.clock")
+local brightness = require("widgets.wibar.brightness").brightness_widget_container
+local volume = require("widgets.wibar.volume")
+local bluetooth = require("widgets.wibar.bluetooth")
+local network = require("widgets.wibar.network")
+local microphone = require("widgets.wibar.microphone")
+local packages = require("widgets.wibar.packages")
 
 -- Create a wibox for each screen and add it
 local taglist_buttons = gears.table.join(
@@ -64,8 +64,8 @@ awful.screen.connect_for_each_screen(function(s)
 		end)
 	))
 	-- Make background for layoutbox
-	local mylayoutboxWithColor = wibox.container.background(s.mylayoutbox)
-	mylayoutboxWithColor.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_pink2.png"
+	local layoutbox_container = wibox.container.background(s.mylayoutbox)
+	layoutbox_container.bgimage = beautiful.layout.background_image
 	-- Create a taglist widget
 	s.mytaglist = awful.widget.taglist({
 		screen = s,
@@ -95,22 +95,23 @@ awful.screen.connect_for_each_screen(function(s)
 			{ -- Right widgets
 				layout = wibox.layout.fixed.horizontal,
 
-				mykeyboardlayout,
-				memoryUsage,
-				batteryAndNotification,
+				keyboard,
+				memory,
+				packages,
+				battery,
 				-- wibox.widget.systray(),
 				bluetooth,
 				microphone,
 				volume,
 				brightness,
 				network,
-				mylayoutboxWithColor,
-				powerLauncher,
+				layoutbox_container,
+				power,
 			},
 		},
 		{
 			-- mytextclock,
-			clockAndCal,
+			clock,
 			valign = "center",
 			halign = "center",
 			layout = wibox.container.place,

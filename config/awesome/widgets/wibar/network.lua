@@ -1,9 +1,10 @@
 -- not done yet
 local wibox = require("wibox")
+local beautiful = require("beautiful")
 
-local networkWidget = wibox.widget({
+local network_widget = wibox.widget({
 	{
-		image = "/home/jetblack/.config/awesome/images/wibar/network/signal-cellular-2.svg",
+		image = beautiful.network.icon,
 		resize = true,
 		widget = wibox.widget.imagebox,
 	},
@@ -21,8 +22,7 @@ local networkWidget = wibox.widget{
 }
 --]]
 
-_G.networkWidgetContainer = wibox.container.background(networkWidget)
-_G.networkWidgetContainer.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_green3.png"
-_G.networkWidgetContainer.fg = "black"
+local network_widget_container = wibox.container.background(network_widget)
+network_widget_container.bgimage = beautiful.network.background_image
 
-return _G.networkWidgetContainer
+return network_widget_container

@@ -1,7 +1,6 @@
 #! /bin/sh
 
 # Wrapper script for lf that allows it to create image previews with uberzug
-# Is this files tracked by git?
 
 set -e
 

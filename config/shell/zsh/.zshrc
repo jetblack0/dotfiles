@@ -72,8 +72,8 @@
 # Keybindings
 # ------------------------------------------------------------------------------
 	bindkey -s '^o' '^ulfcd\n'
-	bindkey -s '^y' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfConfig.sh\n'
-	bindkey -s '^p' '^usource /home/jetblack/Development/MyScript/fzfScript/fzfCd.sh && lfcd\n'
+	bindkey -s '^y' '^usource /home/jetblack/Development/myScript/fzfScript/fzfConfig.sh\n'
+	bindkey -s '^p' '^usource /home/jetblack/Development/myScript/fzfScript/fzfCd.sh && lfcd\n'
 # ------------------------------------------------------------------------------
 
 

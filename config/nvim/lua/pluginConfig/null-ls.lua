@@ -24,7 +24,7 @@ local my_sources = {
 	}),
 }
 
-require("null-ls").setup({
+null_ls.setup({
 	debug = false,
     sources = my_sources
 })

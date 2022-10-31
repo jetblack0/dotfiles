@@ -1,14 +1,14 @@
 -- not done yet
 local wibox = require("wibox")
+local beautiful = require("beautiful")
 
 local micWidget = wibox.widget{
-	image =  "/home/jetblack/.config/awesome/images/wibar/microphone/microphone-off.svg",
+	image = beautiful.microphone.icon,
 	resize = true,
 	widget = wibox.widget.imagebox
 }
 
-_G.micWidgetContainer = wibox.container.background(micWidget)
-_G.micWidgetContainer.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_green3.png"
-_G.micWidgetContainer.fg = "black"
+local mic_widget_container = wibox.container.background(micWidget)
+mic_widget_container.bgimage = beautiful.microphone.background_image
 
-return _G.micWidgetContainer
+return mic_widget_container

@@ -1,5 +1,6 @@
 -- not done yet
 local wibox = require("wibox")
+local beautiful = require("beautiful")
 
 --[[
 local bluetoothWidget = wibox.widget{
@@ -9,21 +10,20 @@ local bluetoothWidget = wibox.widget{
 }
 --]]
 
-local bluetoothWidget = wibox.widget({
+local bluetooth_widget = wibox.widget({
 	{
 		text = " ",
 		widget = wibox.widget.textbox
 	},
 	{
-		image = "/home/jetblack/.config/awesome/images/wibar/bluetooth/bluetooth-off.svg",
+		image = beautiful.bluetooth.icon,
 		resize = true,
 		widget = wibox.widget.imagebox
 	},
 	layout = wibox.layout.fixed.horizontal,
 })
 
-_G.bluetoothWidgetContainer = wibox.container.background(bluetoothWidget)
-_G.bluetoothWidgetContainer.bgimage = "/home/jetblack/.config/awesome/images/wibar/background/bg_green3.png"
-_G.bluetoothWidgetContainer.fg = "black"
+local bluetooth_widget_container = wibox.container.background(bluetooth_widget)
+bluetooth_widget_container.bgimage = beautiful.bluetooth.background_image
 
-return _G.bluetoothWidgetContainer
+return bluetooth_widget_container

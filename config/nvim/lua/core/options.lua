@@ -29,7 +29,7 @@ local options = {
 	termguicolors = true,
 	-- Use system clipboard
 	clipboard = "unnamedplus",
-	-- Make vim fast again (don't know how it works)
+	-- Will speed up nvim, but i didn't notice any change
 	ttyfast = true,
 	-- lazyredraw = true,
 }

@@ -1,0 +1,56 @@
+spacing         = 1
+padding         = 2
+hide_ascii      = false
+separator       = " "
+key_color       = "#81C8BE"
+separator_color = "#C6D0F5"
+
+[palette]
+type            = "Light"
+glyph           = " ● "
+visible         = true
+
+[bar]
+glyph           = "●"
+symbol_open     = '('
+symbol_close    = ')'
+visible         = true
+hide_delimiters = true
+
+[box]
+title           = " "
+border          = "plain"
+visible         = false
+
+[box.inner_margin]
+x               = 2
+y               = 1
+
+[custom_ascii]
+color           = "#C6D0F5"
+path = "~/Pictures/ascii/ascii_cat.txt"
+
+[randomize]
+key_color       = false
+separator_color = false
+pool            = "base"
+
+[keys]
+host            = "host"
+kernel          = "kernel"
+battery         = "battery"
+os              = "os"
+de              = "dE"
+wm              = "wM"
+distro          = "os"
+terminal        = "terminal"
+shell           = "shell"
+packages        = "packages"
+uptime          = "uptime"
+memory          = "memory"
+machine         = "machine"
+local_ip        = "iP"
+backlight       = "brightness"
+resolution      = "resolution"
+cpu_load        = "cpu"
+cpu             = "cpu"

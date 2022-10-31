@@ -1,5 +1,9 @@
 #! /bin/bash
 
+# Description: a script that used with lf file manager to delete files in the cowsay way
+
+# Usage: change the code inside your lfrc delete function to "/home/cowDelete.sh $fx", change the /home/cowDelete.sh to the path of this file
+
 lightBlue='\033[1;34m'
 lightPurple='\033[1;35m'
 withoutColor='\033[0m'
