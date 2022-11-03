@@ -1,22 +1,16 @@
 local wibox = require("wibox")
-local naughty = require("naughty")
-local timer = require("gears.timer")
+local awful = require("awful")
 local beautiful = require("beautiful")
+local naughty = require("naughty")
 
--- TODO: Find some nice icons and change it to imagebox
-
--- Send noise if battery is lower than 10
+-- send noise if battery is lower than 10
 local function send_noise(capacity, is_charging)
 	if capacity <= 10 and not is_charging then
 		naughty.notify({ text = "I'm gonna shutdown bro ", timeout = 10 })
 	end
 end
 
--- Get battery info
-local function get_wibox_text()
-	local capacity = assert(io.open("/sys/class/power_supply/BAT0/capacity", "r")):read("n")
-	-- kinda stupid
-	local is_charging = assert(io.open("/sys/class/power_supply/BAT0/status", "r")):read("l") == "Charging" or assert(io.open("/sys/class/power_supply/BAT0/status", "r")):read("l") == "Full"
+local function get_text(capacity, is_charging)
 	local battery_icon
 
 	if capacity > 80 then
@@ -31,8 +25,6 @@ local function get_wibox_text()
 		battery_icon = " "
 	end
 
-	send_noise(capacity, is_charging)
-
 	if is_charging then
 		return battery_icon .. capacity .. "%" .. " "
 	else
@@ -40,19 +32,32 @@ local function get_wibox_text()
 	end
 end
 
-local battery_widget = wibox.widget.textbox()
-
 -- refresh battery text every 60 second
-timer({
-	timeout = 60,
-	call_now = true,
-	autostart = true,
-	callback = function()
-		battery_widget:set_text(get_wibox_text())
-	end
-})
+local battery_widget = awful.widget.watch(
+	"cat /sys/class/power_supply/BAT0/capacity /sys/class/power_supply/BAT0/status",
+	60,
+	function(widget, stdout)
+		local lines = {}
+		for s in stdout:gmatch("[^\n]+") do
+			table.insert(lines, s)
+		end
 
--- give a nice background image to it
+		local capacity = tonumber(lines[1])
+		local is_charging = lines[2]
+
+		-- Sometimes i plug my charger but the status file says not charging, wired
+		if is_charging == "Charging" or is_charging == "Full" then
+			is_charging = true
+		else
+			is_charging = false
+		end
+
+		send_noise(capacity, is_charging)
+
+		widget:set_text(get_text(capacity, is_charging))
+	end
+)
+
 local battery_widget_container = wibox.container.background(battery_widget)
 battery_widget_container.bgimage = beautiful.battery.background_image
 
