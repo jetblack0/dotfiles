@@ -22,7 +22,7 @@ My lightweight Arch linux daily drive which highly focus on the terminal and loo
 * Themes: [catppuccin](https://github.com/catppuccin/catppuccin) 
 * Fonts: [CaskaydiaCove Nerd Font](https://github.com/eliheuer/caskaydia-cove)
 
-I didn't list all the software whose config files inclued in this repo because I didn't do too much things to them or they are not that interenting, check those files yourself to see if they are interenting to you anyway.
+I didn't list all the software whose config files included in this repo because I didn't do too much things to them or they are not that interesting, check those files yourself to see if they are interesting to you anyway.
 
 ## Installation
 Clone this repo and pick up which configuration you want to use into your own file, you should know what you doing at this point.
