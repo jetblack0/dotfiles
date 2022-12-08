@@ -6,6 +6,7 @@ require("pluginConfig.lualine")
 require("pluginConfig.cmp")
 require("pluginConfig.null-ls")
 require("pluginConfig.comment")
+require("pluginConfig.neoscroll")
 
 require("core.colorscheme")
 require("core.options")
