@@ -1,9 +1,8 @@
 #! /bin/bash
 
-# Description:  a script that change the backlight of my laptop, make sure you have /sys/class/backlight/intel_backlight/brightness and /sys/class/backlight/intel_backlight/max_brightness files on your system
+# Description: a script that change the backlight of my laptop, make sure you have /sys/class/backlight/intel_backlight or /sys/class/backlight/nvidia_0 directory
 
 # Usage: sudo brightness +20, to increase backlight by 20%, sudo brightness -5, to decrease backlight by 5%, edit the sudoer file if you wanna run this without typing password, for example, add: username ALL=NOPASSWD:/usr/local/bin/brightness to your sudoers file using visudo command, be careful! 
-
 
 # $1: operator
 # $2: newBrightness
@@ -30,13 +29,14 @@ changeBrightness() {
 
 	# setuid doesn't work for shell script, run this as sudo instead (change sudoer file for nopasswd)
 	# echo "$newBrightness" > /sys/class/backlight/intel_backlight/brightness
-	echo "$newBrightness" | sudo tee /sys/class/backlight/intel_backlight/brightness > /dev/null
+	echo "$newBrightness" | sudo tee "$path"/brightness > /dev/null
 }
 
-brightnessMax=$(cat /sys/class/backlight/intel_backlight/max_brightness)
-brightnessCur=$(cat /sys/class/backlight/intel_backlight/brightness)
-# brightness can not lower than this value, otherwise i can't see anything
-brightnessMin=100
+[ -d /sys/class/backlight/intel_backlight ] && path="/sys/class/backlight/intel_backlight" || path="/sys/class/backlight/nvidia_0"
+
+brightnessMax=$(cat $path/max_brightness)
+brightnessCur=$(cat $path/brightness)
+brightnessMin=0
 
 if [[ "$*" =~ [+-][0-9]+$ ]]
 then

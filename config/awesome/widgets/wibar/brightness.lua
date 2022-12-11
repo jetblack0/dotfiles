@@ -5,7 +5,7 @@ local beautiful = require("beautiful")
 local M = {}
 
 local function get_percentage(brightness_cur, brightness_max)
-	local brightness_min = 100
+	local brightness_min = 0
 	return math.modf(brightness_cur / (brightness_max - brightness_min) * 100)
 end
 
@@ -34,8 +34,13 @@ local function get_wibar_icon(percentage)
 end
 
 -- Just read these files once when starting awesomewm
-local brightness_cur = assert(io.open("/sys/class/backlight/intel_backlight/brightness", "r")):read("n")
-local brightness_max = assert(io.open("/sys/class/backlight/intel_backlight/max_brightness", "r")):read("n")
+local brightness_cur = io.open("/sys/class/backlight/intel_backlight/brightness", "r") or io.open("/sys/class/backlight/nvidia_0/brightness", "r")
+brightness_cur = brightness_cur:read("n")
+local brightness_max = io.open("/sys/class/backlight/intel_backlight/max_brightness", "r") or io.open("/sys/class/backlight/nvidia_0/max_brightness", "r")
+brightness_max = brightness_max:read("n")
+
+--[[ local brightness_cur = assert(io.open("/sys/class/backlight/intel_backlight/brightness", "r")):read("n")
+local brightness_max = assert(io.open("/sys/class/backlight/intel_backlight/max_brightness", "r")):read("n") ]]
 local initial_percentage = get_percentage(brightness_cur, brightness_max)
 
 local brightness_widget = wibox.widget{
