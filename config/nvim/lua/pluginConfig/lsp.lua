@@ -1,9 +1,7 @@
 local lspconfig = require("lspconfig")
 local servers = { "sumneko_lua", "rust_analyzer" }
 
--- TODO: Is there a way to speed up the diagnostic?
--- TODO: lualine with lsp
--- TODO: keybindings to toggle cmp
+-- TODO: keybinding or filetypes to toggle cmp
 
 local opts = { noremap = true, silent = true }
 vim.keymap.set("n", "<a-l>", vim.diagnostic.open_float, opts)
@@ -20,8 +18,9 @@ local on_attach = function(client, bufnr)
 	local bufopts = { noremap = true, silent = true, buffer = bufnr }
 	vim.keymap.set("n", "<a-h>", vim.lsp.buf.hover, bufopts)
 	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
-	vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
-	vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+	-- <c-i> and <c-o> to get back
+	vim.keymap.set("n", "<leader>d", vim.lsp.buf.definition, bufopts)
+	vim.keymap.set("n", "<leader>D", vim.lsp.buf.implementation, bufopts)
 	vim.keymap.set("n", "<leader>k", vim.lsp.buf.signature_help, bufopts)
 	vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, bufopts)
 	vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
@@ -56,15 +55,9 @@ local on_attach = function(client, bufnr)
 	end
 end
 
--- for _, lsp in ipairs(servers) do
--- 	lspconfig[lsp].setup({
--- 		on_attach = on_attach,
--- 	})
--- end
-
 local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
--- Linter works only when save buffer
+-- rust_analyzer for rust
 lspconfig.rust_analyzer.setup({
 	root_dir = lspconfig.util.root_pattern("Cargo.toml"),
 	flags = {
@@ -86,6 +79,7 @@ lspconfig.rust_analyzer.setup({
 	capabilities = capabilities,
 })
 
+-- sumneko_lua for lua
 lspconfig.sumneko_lua.setup({
 	settings = {
 		Lua = {
@@ -100,7 +94,7 @@ lspconfig.sumneko_lua.setup({
 				library = {
 					"/usr/share/nvim/runtime/lua",
 					"/usr/share/nvim/runtime/lua/lsp",
-					"/usr/share/awesome/lib",
+					-- "/usr/share/awesome/lib",
 				},
 			},
 			completion = {
@@ -120,6 +114,85 @@ lspconfig.sumneko_lua.setup({
 	capabilities = capabilities,
 })
 
+-- web development (just some simple html, css and js)
+-- tsserver for javascript
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+require("lspconfig").tsserver.setup({
+	cmd = { "typescript-language-server", "--stdio" },
+	filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
+	init_options = {
+		hostInfo = "neovim",
+	},
+	root_dir = function()
+		return vim.loop.cwd()
+	end,
+	on_attach = on_attach,
+	capabilities = capabilities,
+})
+
+-- emmet_ls for html tag
+lspconfig.emmet_ls.setup({
+	filetypes = {
+		"html",
+		"typescriptreact",
+		"javascriptreact",
+		-- "css",
+		"sass",
+		"scss",
+		"less",
+	},
+	single_file_support = true,
+	init_options = {
+		html = {
+			options = {
+				-- For possible options, see: https://github.com/emmetio/emmet/blob/master/src/config.ts#L79-L267
+				["bem.enabled"] = true,
+			},
+		},
+	},
+	on_attach = on_attach,
+	capabilities = capabilities,
+})
+
+-- vscode-langservers-extracted for html and css
+lspconfig.html.setup({
+	cmd = { "vscode-html-language-server", "--stdio" },
+	filetypes = { "html" },
+	init_options = {
+		configurationSection = { "html", "css", "javascript" },
+		embeddedLanguages = {
+			css = true,
+			javascript = true,
+		},
+		provideFormatter = true,
+	},
+	single_file_support = true,
+	on_attach = on_attach,
+	capabilities = capabilities,
+})
+
+lspconfig.cssls.setup({
+	cmd = { "vscode-css-language-server", "--stdio" },
+	filetypes = { "css", "scss", "less" },
+	settings = {
+		css = {
+			validate = true,
+		},
+		less = {
+			validate = true,
+		},
+		scss = {
+			validate = true,
+		},
+	},
+	single_file_support = true,
+	on_attach = on_attach,
+	capabilities = capabilities,
+})
+
+
+-- configuration for general lsp diagnostic
 vim.diagnostic.config({
 	virtual_text = false,
 	signs = true,
@@ -135,6 +208,12 @@ vim.diagnostic.config({
 		-- header = "", -- show the header in the diagnostics window
 	},
 })
+
+-- for _, lsp in ipairs(servers) do
+-- 	lspconfig[lsp].setup({
+-- 		on_attach = on_attach,
+-- 	})
+-- end
 
 -- Change diagnostic symbols in the sign column (gutter)
 local signs = { Error = "", Warn = "", Hint = "", Info = "" }
