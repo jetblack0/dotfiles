@@ -2,6 +2,7 @@ local lspconfig = require("lspconfig")
 local servers = { "sumneko_lua", "rust_analyzer" }
 
 -- TODO: keybinding or filetypes to toggle cmp
+-- TODO: disable formatting if there is no server attached
 
 local opts = { noremap = true, silent = true }
 vim.keymap.set("n", "<a-l>", vim.diagnostic.open_float, opts)
@@ -29,7 +30,7 @@ local on_attach = function(client, bufnr)
 	end, bufopts)
 	vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
 	vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
-	vim.keymap.set("n", "<space>ca", vim.lsp.buf.code_action, bufopts)
+	vim.keymap.set("n", "<space>a", vim.lsp.buf.code_action, bufopts)
 	vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
 	vim.keymap.set("n", "<space>f", function()
 		vim.lsp.buf.format({ async = true })
@@ -118,7 +119,7 @@ lspconfig.sumneko_lua.setup({
 -- tsserver for javascript
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-require("lspconfig").tsserver.setup({
+lspconfig.tsserver.setup({
 	cmd = { "typescript-language-server", "--stdio" },
 	filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
 	init_options = {
@@ -127,30 +128,6 @@ require("lspconfig").tsserver.setup({
 	root_dir = function()
 		return vim.loop.cwd()
 	end,
-	on_attach = on_attach,
-	capabilities = capabilities,
-})
-
--- emmet_ls for html tag
-lspconfig.emmet_ls.setup({
-	filetypes = {
-		"html",
-		"typescriptreact",
-		"javascriptreact",
-		-- "css",
-		"sass",
-		"scss",
-		"less",
-	},
-	single_file_support = true,
-	init_options = {
-		html = {
-			options = {
-				-- For possible options, see: https://github.com/emmetio/emmet/blob/master/src/config.ts#L79-L267
-				["bem.enabled"] = true,
-			},
-		},
-	},
 	on_attach = on_attach,
 	capabilities = capabilities,
 })
@@ -190,7 +167,6 @@ lspconfig.cssls.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
 })
-
 
 -- configuration for general lsp diagnostic
 vim.diagnostic.config({
