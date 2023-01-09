@@ -1,8 +1,6 @@
-local lspconfig = require("lspconfig")
-local servers = { "sumneko_lua", "rust_analyzer" }
+-- luacheck: globals vim
 
--- TODO: keybinding or filetypes to toggle cmp
--- TODO: disable formatting if there is no server attached
+local lspconfig = require("lspconfig")
 
 local opts = { noremap = true, silent = true }
 vim.keymap.set("n", "<a-l>", vim.diagnostic.open_float, opts)
@@ -30,13 +28,13 @@ local on_attach = function(client, bufnr)
 	end, bufopts)
 	vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, bufopts)
 	vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, bufopts)
-	vim.keymap.set("n", "<space>a", vim.lsp.buf.code_action, bufopts)
+	vim.keymap.set("n", "<leader>a", vim.lsp.buf.code_action, bufopts)
 	vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
-	vim.keymap.set("n", "<space>f", function()
+	vim.keymap.set("n", "<leader>f", function()
 		vim.lsp.buf.format({ async = true })
 	end, bufopts)
 
-	-- document highlight, how to make it toggle by some key?
+	-- document highlight
 	vim.o.updatetime = 300
 	if client.server_capabilities.documentHighlightProvider then
 		vim.api.nvim_create_augroup("lsp_document_highlight", { clear = true })
@@ -56,8 +54,42 @@ local on_attach = function(client, bufnr)
 	end
 end
 
-local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 
+local signature_setup = {
+	-- will show two lines of comment/doc(if there are more than two lines in doc, will be truncated);
+	-- set to 0 if you DO NOT want any API comments be shown
+	-- This setting only take effect in insert mode, it does not affect signature help in normal mode
+	doc_lines = 0,
+
+	-- show hint in a floating window, set to false for virtual text only mode
+	floating_window = true,
+
+	-- try to place the floating above the current line when possible
+	-- Note: will set to true when fully tested, set to false will use whichever side has more space
+	-- this setting will be helpful if you do not want the PUM and floating win overlap
+	floating_window_above_cur_line = false,
+
+	handler_opts = {
+		border = "rounded", -- double, rounded, single, shadow, none, or a table of borders
+	},
+
+	close_timeout = 400, -- close floating window after ms when laster parameter is entered
+
+	-- virtual hint enable
+	hint_enable = false,
+
+	-- disabled by default, allow floating win transparent value 1~100
+	transparency = 100,
+}
+
+local function lsp_signature_on_attach(client, bufnr)
+	require "lsp_signature".on_attach(signature_setup, bufnr)
+end
+
+local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
+capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+-- each servers
 -- rust_analyzer for rust
 lspconfig.rust_analyzer.setup({
 	root_dir = lspconfig.util.root_pattern("Cargo.toml"),
@@ -76,8 +108,12 @@ lspconfig.rust_analyzer.setup({
 			},
 		},
 	},
-	on_attach = on_attach,
+	-- on_attach = on_attach,
 	capabilities = capabilities,
+	on_attach = function(client, bufnr)
+		on_attach(client, bufnr)
+		lsp_signature_on_attach(client, bufnr)
+	end,
 })
 
 -- sumneko_lua for lua
@@ -85,7 +121,8 @@ lspconfig.sumneko_lua.setup({
 	settings = {
 		Lua = {
 			runtime = {
-				version = "Lua 5.4.4",
+				-- version = "Lua 5.4.4",
+				version = "LuaJIT",
 				path = {
 					"?/init.lua",
 					"?.lua",
@@ -111,13 +148,15 @@ lspconfig.sumneko_lua.setup({
 		},
 	},
 
-	on_attach = on_attach,
+	on_attach = function(client, bufnr)
+		on_attach(client, bufnr)
+		lsp_signature_on_attach(client, bufnr)
+	end,
 	capabilities = capabilities,
 })
 
 -- web development (just some simple html, css and js)
 -- tsserver for javascript
-capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 lspconfig.tsserver.setup({
 	cmd = { "typescript-language-server", "--stdio" },
@@ -128,14 +167,17 @@ lspconfig.tsserver.setup({
 	root_dir = function()
 		return vim.loop.cwd()
 	end,
-	on_attach = on_attach,
+	on_attach = function(client, bufnr)
+		client.server_capabilities.documentFormattingProvider = false
+		on_attach(client, bufnr)
+	end,
 	capabilities = capabilities,
 })
 
 -- vscode-langservers-extracted for html and css
 lspconfig.html.setup({
 	cmd = { "vscode-html-language-server", "--stdio" },
-	filetypes = { "html" },
+	filetypes = { "html", "css" },
 	init_options = {
 		configurationSection = { "html", "css", "javascript" },
 		embeddedLanguages = {
@@ -145,8 +187,12 @@ lspconfig.html.setup({
 		provideFormatter = true,
 	},
 	single_file_support = true,
-	on_attach = on_attach,
 	capabilities = capabilities,
+	-- on_attach = on_attach,
+	on_attach = function(client, bufnr)
+		client.server_capabilities.documentFormattingProvider = false
+		on_attach(client, bufnr)
+	end,
 })
 
 lspconfig.cssls.setup({
@@ -164,8 +210,17 @@ lspconfig.cssls.setup({
 		},
 	},
 	single_file_support = true,
-	on_attach = on_attach,
 	capabilities = capabilities,
+	-- on_attach = on_attach,
+	on_attach = function(client, bufnr)
+		client.server_capabilities.documentFormattingProvider = false
+		on_attach(client, bufnr)
+	end,
+})
+
+lspconfig.jsonls.setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
 })
 
 -- configuration for general lsp diagnostic
@@ -184,12 +239,6 @@ vim.diagnostic.config({
 		-- header = "", -- show the header in the diagnostics window
 	},
 })
-
--- for _, lsp in ipairs(servers) do
--- 	lspconfig[lsp].setup({
--- 		on_attach = on_attach,
--- 	})
--- end
 
 -- Change diagnostic symbols in the sign column (gutter)
 local signs = { Error = "", Warn = "", Hint = "", Info = "" }

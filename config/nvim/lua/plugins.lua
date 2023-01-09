@@ -39,12 +39,15 @@ packer.init({
 })
 
 return require("packer").startup(function(use)
-	-- Useful functionality
+	-- Useful basic stuff
 	-- packer itself
 	use({ "wbthomason/packer.nvim" })
 	use({ "nvim-tree/nvim-tree.lua" })
 	-- dependency for a lot of plugins (null-ls not working without this)
 	use({ "nvim-lua/plenary.nvim" })
+
+
+	-- Dev tools
 	-- easy way to comment things out
 	use({ "numToStr/Comment.nvim" })
 	-- show color when type color code
@@ -53,6 +56,18 @@ return require("packer").startup(function(use)
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
 	-- autopair
 	-- use({ "windwp/nvim-autopairs" })
+	-- git signs
+	use({ "lewis6991/gitsigns.nvim" })
+	-- markdown preview
+	use({
+		"iamcco/markdown-preview.nvim",
+		run = "cd app && npm install",
+		setup = function()
+			vim.g.mkdp_filetypes = { "markdown" }
+		end,
+		ft = { "markdown" },
+	})
+
 
 	-- Ui enhancement
 	use({ "nvim-lualine/lualine.nvim" })
@@ -64,6 +79,7 @@ return require("packer").startup(function(use)
 		as = "catppuccin",
 	})
 
+
 	-- LSP and completion
 	use({ "neovim/nvim-lspconfig" })
 	-- the completion plugin
@@ -74,6 +90,7 @@ return require("packer").startup(function(use)
 	use({ "hrsh7th/cmp-path" })
 	-- use completion that provided by language servers
 	use({ "hrsh7th/cmp-nvim-lsp" })
+	use({ "ray-x/lsp_signature.nvim" })
 	-- Supplement diagnostics and fixer for some language servers don't support this
 	use({ "jose-elias-alvarez/null-ls.nvim" })
 	-- cmdline completion
@@ -83,6 +100,7 @@ return require("packer").startup(function(use)
 	use({ "dcampos/cmp-emmet-vim" })
 	-- for completion icon
 	-- use({ "onsails/lspkind-nvim" })
+
 
 	-- Snippets
 	-- just a snippet engine, don't provide sources i think, got error when typing snippets if we don't use a snippet engine

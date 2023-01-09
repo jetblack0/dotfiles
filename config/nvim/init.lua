@@ -7,6 +7,8 @@ require("pluginConfig.cmp")
 require("pluginConfig.null-ls")
 require("pluginConfig.comment")
 require("pluginConfig.neoscroll")
+require("pluginConfig.treesitter")
+require("pluginConfig.gitsigns")
 
 require("core.colorscheme")
 require("core.options")
