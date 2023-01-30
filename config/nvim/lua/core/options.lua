@@ -20,6 +20,7 @@ local options = {
 	number = true,
 	relativenumber = true,
 	mouse = "",
+	-- ttymouse = "",
 	-- Remove highlighting after search is done
 	hlsearch = true,
 	incsearch = true,
@@ -31,11 +32,20 @@ local options = {
 	clipboard = "unnamedplus",
 	-- Will speed up nvim, but i didn't notice any change
 	ttyfast = true,
-	-- lazyredraw = true,
+	lazyredraw = true,
+	--[[ wildmenu = true,
+	wildmode = "list:longest,full", ]]
 }
 
-for k, v in pairs(options)
-do
+local global = {
+	-- goyo_width = "80",
+	goyo_height = "95%",
+}
+
+for k, v in pairs(options) do
 	vim.opt[k] = v
 end
 
+for k, v in pairs(global) do
+	vim.g[k] = v
+end

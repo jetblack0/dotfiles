@@ -13,28 +13,35 @@ keymap("n", "<F6>", ":set spell!<CR>", opts)
 keymap("n", "<c-b>", ":NvimTreeToggle<CR>", opts)
 -- Get rid of search highlight
 keymap("n", "<esc><esc>", ":noh<CR>:echo \"\"<CR>", opts)
--- Formatting
-keymap("n", "<leader>f", "execute 'lua vim.lsp.buf.format()'", opts)
 -- Toggle colorizer
 keymap("n", "<leader>c", ":ColorizerToggle<CR>", opts)
+-- Toggle and lualine
+keymap("n", "<c-g>", ":lua require('lualine').hide()<CR> | :Goyo<CR> | :Gitsigns toggle_signs<CR>", opts)
 
--- Nvim window manager
-	-- Resize split TODO: kinda confused, make it like my WM (resize by the focused window)
-	keymap("n", "<c-h>", ":vertical resize -2<CR>", opts)
-	keymap("n", "<c-l>", ":vertical resize +2<CR>", opts)
-	keymap("n", "<c-Up>", ":resize +2<CR>", opts)
-	keymap("n", "<c-Down>", ":resize -2<CR>", opts)
-	-- Change the position of splits (can not map to ctrl shift?)
-	keymap("n", "<c-a-l>", "<C-w><S-l>", opts)
-	keymap("n", "<c-a-h>", "<C-w><S-h>", opts)
-	keymap("n", "<c-a-k>", "<C-w><S-k>", opts)
-	keymap("n", "<c-a-j>", "<C-w><S-j>", opts)
-	-- Switch split
-	keymap("n", "<c-j>", "<c-w>w", opts)
-	keymap("n", "<c-k>", "<c-w><c-w>", opts)
-	-- Switch tags
-	keymap("n", "<c-Left>", "gT", opts)
-	keymap("n", "<c-Right>", "gt", opts)
+
+-- Manage window (tmux style)
+-- Resize split (try submode)
+keymap("n", "<c-h>", ":vertical resize -2<CR>", opts)
+keymap("n", "<c-l>", ":vertical resize +2<CR>", opts)
+keymap("n", "<c-Up>", ":resize +2<CR>", opts)
+keymap("n", "<c-Down>", ":resize -2<CR>", opts)
+-- Change the position of splits (can not map to ctrl shift?)
+keymap("n", "<c-a-l>", "<C-w><S-l>", opts)
+keymap("n", "<c-a-h>", "<C-w><S-h>", opts)
+keymap("n", "<c-a-k>", "<C-w><S-k>", opts)
+keymap("n", "<c-a-j>", "<C-w><S-j>", opts)
+-- Switch split
+keymap("n", "<c-j>", "<c-w>w", opts)
+keymap("n", "<c-k>", "<c-w><c-w>", opts)
+-- full screen
+keymap("n", "<c-.>", "<c-w>_<c-w>|", opts)
+keymap("n", "<c-,>", "<c-w>=", opts)
+-- Change tag
+keymap("n", "<a-.>", "gt<CR>", opts)
+keymap("n", "<a-,>", "gT<CR>", opts)
+
+-- toggle markdown preview
+keymap("n", "<leader>m", ":MarkdownPreviewToggle<CR>", opts)
 -------------------------------------------------------
 
 
@@ -50,8 +57,12 @@ keymap("v", "p", "\"_dP", opts)
 --------------------------------------------------------
 
 
--- Visual Block --
+-- Virtual Block ----------------------------------------
 -- Move text up and down
 keymap("x", "<a-j>", ":move '>+1<CR>gv-gv", opts)
 keymap("x", "<a-k>", ":move '<-2<CR>gv-gv", opts)
+--------------------------------------------------------
+
+
+-- Command Mode ----------------------------------------
 --------------------------------------------------------

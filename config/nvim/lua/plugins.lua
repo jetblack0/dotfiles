@@ -78,6 +78,7 @@ return require("packer").startup(function(use)
 		"catppuccin/nvim",
 		as = "catppuccin",
 	})
+	use({ "junegunn/goyo.vim" })
 
 
 	-- LSP and completion

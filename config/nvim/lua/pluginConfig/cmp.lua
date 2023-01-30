@@ -65,7 +65,7 @@ cmp.setup({
 
 	formatting = {
 		fields = { "abbr", "menu", "kind" },
-		format = function(_, vim_item)
+		format = function(entry, vim_item)
 			-- Set max width for abbr
 			-- vim_item.abbr = string.sub(vim_item.abbr, 1, 20)
 
@@ -79,6 +79,7 @@ cmp.setup({
 				luasnip = "[Snippet]",
 				buffer = "[Buffer]",
 				path = "[Path]",
+				emmet_vim = "[emmet]",
 			})[entry.source.name] ]]
 
 			return vim_item

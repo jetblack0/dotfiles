@@ -177,7 +177,7 @@ lspconfig.tsserver.setup({
 -- vscode-langservers-extracted for html and css
 lspconfig.html.setup({
 	cmd = { "vscode-html-language-server", "--stdio" },
-	filetypes = { "html", "css" },
+	filetypes = { "html" },
 	init_options = {
 		configurationSection = { "html", "css", "javascript" },
 		embeddedLanguages = {

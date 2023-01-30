@@ -1,3 +1,8 @@
+local lualine_status_ok, lualine = pcall(require, "lualine")
+if not lualine_status_ok then
+	return
+end
+
 local colors = {
 	blue = "#8AADF4",
 	cyan = "#8BD5CA",
@@ -29,7 +34,8 @@ local bubbles_theme = {
 		c = { fg = colors.black, bg = colors.black },
 	},
 }
-require("lualine").setup({
+
+lualine.setup({
 	options = {
 		globalstatus = true,
 		always_divide_middle = false,
@@ -38,6 +44,7 @@ require("lualine").setup({
 		section_separators = { left = "", right = "" },
 		ignore_focus = { "nerdtree" },
 		extensions = {},
+		disabled_filetypes = { "NvimTree" },
 	},
 	sections = {
 		lualine_a = {
@@ -46,6 +53,7 @@ require("lualine").setup({
 		lualine_b = {
 			"filename",
 			"branch",
+			-- "%{&spell ? '[en_US.utf8]' : ''}",
 		},
 		lualine_c = {},
 		lualine_x = {},

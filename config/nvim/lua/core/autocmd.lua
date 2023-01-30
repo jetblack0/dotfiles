@@ -11,3 +11,8 @@ augroup remember_folds
 	autocmd BufWinLeave *.* mkview
 	autocmd BufWinEnter *.* silent! loadview
 augroup END]]
+
+-- two space for html file
+vim.cmd[[autocmd FileType html setlocal expandtab shiftwidth=2 tabstop=2]]
+
+vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
