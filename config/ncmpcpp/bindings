@@ -1,0 +1,61 @@
+def_key "j"
+    scroll_down
+
+def_key "k"
+    scroll_up
+
+def_key "h"
+    previous_column
+
+def_key "l"
+    next_column
+
+def_key "ctrl-u"
+    page_up
+
+def_key "ctrl-d"
+    page_down
+
+def_key "space"
+  select_item
+  scroll_down
+
+def_key "a"
+  add_item_to_playlist
+
+def_key "A"
+  add_selected_items
+
+def_key "o"
+  enter_directory
+
+def_key "o"
+  toggle_output
+
+def_key "o"
+  run_action
+
+def_key "o"
+  play_item
+
+def_key "escape"
+  remove_selection
+
+
+def_key "d"
+  delete_playlist_items
+
+def_key "d"
+  delete_browser_items
+
+def_key "d"
+  delete_stored_playlist
+
+def_key "+"
+  show_clock
+
+def_key "="
+  volume_up
+
+def_key "-"
+  volume_down

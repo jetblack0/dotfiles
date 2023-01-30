@@ -1,0 +1,24 @@
+##### directories ######
+ncmpcpp_directory = ~/.config/ncmpcpp
+lyrics_directory = ~/Multimedia/Audio/Music/Lyrics
+
+
+##### connection settings #####
+mpd_host = localhost
+mpd_port = 6600
+mpd_connection_timeout = 5
+mpd_music_dir = ~/Multimedia/Audio/Music/Artists/
+
+
+##### music visualizer #####
+audio_output {
+       type            "fifo"
+       name            "Visualizer feed"
+       path            "/tmp/mpd.fifo"
+       format          "44100:16:2"
+}
+visualizer_data_source = /tmp/mpd.fifo
+visualizer_output_name = "my_fifo" 
+visualizer_in_stereo = yes
+visualizer_type = spectrum
+visualizer_look = ●▮
