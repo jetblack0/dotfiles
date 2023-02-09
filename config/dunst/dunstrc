@@ -1,0 +1,51 @@
+[global]
+    follow = keyboard
+    width = 300
+    height = 500
+    origin = top-right
+    offset = 10x12
+    notification_limit = 0
+    corner_radius = 10
+
+    progress_bar = true
+    progress_bar_height = 14
+    progress_bar_frame_width = 1
+    progress_bar_min_width = 150
+    progress_bar_max_width = 300
+
+    horizontal_padding = 10
+    text_icon_padding = 20
+
+    frame_width = 0
+    gap_size = 10
+
+    font = "Varela Round" 11
+    icon_theme = Adwaita
+    icon_position = left
+    min_icon_size = 32
+    max_icon_size = 64
+
+    history_length = 200
+
+
+[urgency_low]
+    background = "#BAB4D9"
+    foreground = "#1e1e2e"
+    timeout = 20
+    #default_icon = /path/to/icon
+
+[urgency_normal]
+    background = "#C6AAE8"
+    foreground = "#1e1e2e"
+    timeout = 30
+    #default_icon = /path/to/icon
+
+[urgency_critical]
+    background = "#F5C2E7"
+    foreground = "#1e1e2e"
+    timeout = 0
+    #default_icon = /path/to/icon
+
+[notification_sound]
+	summary = "*"
+	script = ~/.config/dunst/scripts/notification_sound.sh

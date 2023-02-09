@@ -1,0 +1,238 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; right bar widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defwidget clock []
+  (eventbox :onhover "${EWW_CMD} update time_rev=true" :onhoverlost "${EWW_CMD} update time_rev=false"
+    (box :orientation "h" :spacing "5" :space-evenly "false" :class "clock"
+      (label :text "${current_time.hour}:${current_time.min}" :class "clock_text")
+      (revealer :transition "slideright" :reveal time_rev :duration "350ms"
+        (button :onclick "${EWW_CMD} open --toggle calendar"
+          (label :text "${current_time.mouth} ${current_time.day} ${current_time.week}")
+        )
+      )
+    )
+  )
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; buttons
+(defwidget home_button []
+  (button
+    (image :path "./images/icons/menu.svg" :image-width "${icon_size}" :image-height "${icon_size}")
+  )
+)
+
+(defwidget power_button []
+  (button :onclick "/home/jetblack/.config/rofi/theme/powermenu/type-3/powermenu.sh"
+    (image :path "./images/icons/power.svg" :image-width "${icon_size}" :image-height "${icon_size}")
+  )
+)
+
+(defwidget buttons []
+  (box :orientation "h" :spacing "5" :class "buttons"
+    (home_button)
+    (power_button)
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; buttons
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; system icons
+(defwidget battery []
+  (eventbox :onhover "${EWW_CMD} update battery_rev=true" :onhoverlost "${EWW_CMD} update battery_rev=false"
+    (box :orientation "h" :space-evenly false :spacing "2"
+      (image :path "${battery_icon_path}" :image-width "${icon_size}" :image-height "${icon_size}")
+      (revealer :transition "slideleft" :reveal battery_rev :duration "350ms"
+        (label :text "${EWW_BATTERY.BAT0.capacity}%")
+      )
+    )
+  )
+)
+
+(defwidget network []
+  (eventbox :onhover "${EWW_CMD} update network_rev=true" :onhoverlost "${EWW_CMD} update network_rev=false"
+    (box :orientation "h" :space-evenly false :spacing "2"
+      (image :path "${network_info.icon_path}" :image-width "${icon_size}" :image-height "${icon_size}")
+      (revealer :transition "slideleft" :reveal network_rev :duration "350ms"
+        (label :text "${network_info.name}")
+      )
+    )
+  )
+)
+
+; simply show all the names of connected devices when hover (only tested for one device because i usually just use one)
+(defwidget bluetooth []
+  (eventbox :onhover "${EWW_CMD} update bluetooth_rev=true" :onhoverlost "${EWW_CMD} update bluetooth_rev=false"
+    (box :orientation "h" :spacing "2" :space-evenly "false"
+      (image :path "${bluetooth_info.icon_path}" :image-width "${icon_size}" :image-height "${icon_size}")
+      (revealer :transition "slideright" :reveal bluetooth_rev :duration "350ms"
+        (label :text "${bluetooth_info.names}")
+      )
+    )
+  )
+)
+
+(defwidget brightness []
+  (eventbox :onhover "${EWW_CMD} update brightness_rev=true" :onhoverlost "${EWW_CMD} update brightness_rev=false"
+    (box :orientation "h" :space-evenly false :spacing "2"
+      (image :path "${brightness_info.icon_path}" :image-width "${icon_size}" :image-height "${icon_size}")
+      (revealer :transition "slideright" :reveal brightness_rev :duration "350ms"
+        (label :text " ${brightness_info.percentage}%")
+      )
+    )
+  )
+)
+
+(defwidget volume []
+  (eventbox :onhover "${EWW_CMD} update volume_rev=true" :onhoverlost "${EWW_CMD} update volume_rev=false"
+    (box :space-evenly "false" :orientation "h" :spacing "2"
+      (button
+        (image :path "${volume_info.icon_path}" :image-width "${icon_size}" :image-height "${icon_size}")
+      )
+      (revealer :transition "slideleft" :reveal volume_rev :duration "350ms"
+        (label :text "${volume_info.percentage}%")
+      )
+    )
+  )
+)
+
+(defwidget packages []
+  (eventbox :onhover "${EWW_CMD} update packages_rev=true ; ${EWW_CMD} update number_of_packages=$(pacman -Q | wc -l)" :onhoverlost "${EWW_CMD} update packages_rev=false"
+    (box :orientation "h" :space-evenly false :spacing "2"
+      (image :path "./images/icons/package.svg" :image-width "${icon_size}" :image-height "${icon_size}")
+      (revealer :transition "slideright" :reveal packages_rev :duration "350ms"
+        (label :text " ${number_of_packages}")
+      )
+    )
+  )
+)
+
+(defwidget uptime []
+  (eventbox :onhover "${EWW_CMD} update uptime_rev=true ; ${EWW_CMD} update uptime=$(uptime | awk '{print $3}' | tr -d ',')" :onhoverlost "${EWW_CMD} update uptime_rev=false"
+    (box :orientation "h" :space-evenly false :spacing "2"
+      (image :path "./images/icons/uptime.svg" :image-width "${icon_size}" :image-height "${icon_size}")
+      (revealer :transition "slideright" :reveal uptime_rev :duration "350ms"
+        (label :text " ${uptime}")
+      )
+    )
+  )
+)
+
+(defwidget system_icon []
+  (box :orientation "h" :space-evenly false :spacing "4" :class "system_icon"
+    (uptime)
+    (packages)
+    (volume)
+    (brightness)
+    (bluetooth)
+    (network)
+    (battery)
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; system icons
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; system indicator
+(defwidget memory []
+  (box :orientation "h" :spacing "0" :space-evenly false
+    (button :tooltip "${round(EWW_RAM.used_mem / 1024 / 1024, 0)} mb memory used"
+      (image :path "./images/icons/memory.svg" :image-width "${icon_size}" :image-height "${icon_size}" :class "memory_icon")
+    )
+    (progress :value {EWW_RAM.used_mem_perc} :class "memory_bar")
+  )
+)
+
+(defwidget cpu []
+  (box :orientation "h" :spacing "0" :space-evenly false
+    (button :tooltip "${round(EWW_CPU.avg, 2)}% cpu used"
+      (image :path "./images/icons/cpu.svg" :image-width "${icon_size}" :image-height "${icon_size}" :class "cpu_icon")
+    )
+    (progress :value {EWW_CPU.avg})
+  )
+)
+
+(defwidget indicator []
+  (box :orientation "h" :spacing "10" :class "indicator"
+    (cpu)
+    (memory)
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; system indicator
+
+(defwidget right []
+  (box :orientation "h" :space-evenly false :halign "end" :valign "center" :spacing "10" :class "right_bar"
+    (indicator)
+    (system_icon)
+    (buttons)
+    (clock)
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; right bar widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; left bar widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar ws-icons '["", "", "", "", "", "", "", "", "", ""]')
+(defwidget workspace []
+  (eventbox
+  :onscroll "echo {} | sed -e \"s/up/-1/g\" -e \"s/down/+1/g\" | xargs hyprctl dispatch workspace"
+    (box :class "workspace" :spacing 8
+      (for i in workspace_info
+        (button :onclick "hyprctl dispatch workspace ${i.number}" ; :class "ws icon"
+          (label :style "font-size: 18px; color: ${i.color};" :text "${ws-icons[i.number - 1]}")
+        )
+      )
+    )
+  )
+)
+
+(defwidget music []
+  (box :orientation "h" :spacing "5" :space-evenly false :class "music_widget" :visible {music_info.visible}
+    ; (image :path "./images/icons/music/widget_icon.svg" :image-width "${icon_size}" :image-height "${icon_size}")
+    (button :onclick "${EWW_CMD} open --toggle music"
+      (label :text "   ${music_info.title}" :class "music_widget_title")
+    )
+  )
+)
+
+(defwidget left []
+  (box :orientation "h" :space-evenly false :halign "start" :valign "center" :spacing "10" :class "left_bar"
+    (workspace)
+    (music)
+    ; (window_title)
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; left bar widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; widgets for window ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; BUG: doesn't show up if music title contains double quote due to the json format
+(defvar music_box_icon_size "16")
+(defwidget music_box []
+  (box :speacing-evenly false :class "music_box"
+    ; (box :class "album_cover"
+    ;   (image :path "${music_info.album_cover_path}" :image-width "${album_cover_size}" :image-height "${album_cover_size}")
+    ; )
+    (box :style "background-image: url(\"${music_info.album_cover_path}\");" :class "album_cover")
+    (box :orientation "v" :class "music_info_container"
+      (label :wrap true :text "${music_info.title}" :class "music_info_title")
+      (label :wrap true :text "${music_info.artists}" :class "music_info_artists")
+      (label :wrap true :text "${music_info.album}" :class "music_info_album")
+      (centerbox :class "music_box_icon" :speacing "40"
+        (button :onclick "mpc prev"
+          (image :path "./images/icons/music/prev.svg" :image-width "${music_box_icon_size}" :image-height "${music_box_icon_size}")
+        )
+        (button :onclick "mpc toggle"
+          (image :path "${music_info.icon_middle_path}" :image-width "${music_box_icon_size}" :image-height "${music_box_icon_size}")
+        )
+        (button :onclick "mpc next"
+          (image :path "./images/icons/music/next.svg" :image-width "${music_box_icon_size}" :image-height "${music_box_icon_size}")
+        )
+      )
+    )
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; widgets for window ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; unused widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defwidget window_title []
+  (box
+    (label :text "${window_title}")
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; unused widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

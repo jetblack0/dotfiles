@@ -1,0 +1,84 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defvar battery_rev false)
+(defvar time_rev false)
+(defvar packages_rev false)
+(defvar volume_rev false)
+(defvar brightness_rev false)
+(defvar network_rev false)
+(defvar bluetooth_rev false)
+(defvar uptime_rev false)
+
+(defvar icon_size "16")
+(defvar number_of_packages "update_when_hover")
+(defvar uptime "update_when_hover")
+
+(defpoll current_time :interval "10s"
+  `date '+{"hour":"%H","min":"%M","mouth":"%b","day":"%d","week":"%A"}'`
+)
+
+(deflisten brightness_info
+  `./scripts/brightness.sh`
+)
+(deflisten battery_icon_path
+  `./scripts/battery.sh`
+)
+(deflisten volume_info
+  `./scripts/volume.sh`
+)
+(deflisten workspace_info
+  `./scripts/workspace.sh`
+)
+(deflisten bluetooth_info
+  `./scripts/bluetooth.sh`
+)
+(deflisten network_info
+  `./scripts/network.sh`
+)
+(deflisten music_info
+  `./scripts/music.sh`
+)
+(deflisten window_title :initial "..." 
+  `bash ./scripts/window_title.sh`
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(include "./widgets.yuck")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; window defination ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defwindow calendar
+  :monitor 0
+  :geometry (geometry :width "0" :height "0" :anchor "top right")
+  (calendar)
+)
+
+(defwindow music
+  :monitor 0
+  :stacking "fg" 
+  :geometry (geometry :x "100px" :y "10px" :width "0" :height "0")
+  :exclusive false
+  (music_box)
+)
+
+; (defwindow color_chooser
+;   :monitor 0
+;   ; :geometry (geometry :width "0" :height "0" :anchor "top right")
+;   (color-chooser)
+; )
+
+(defwindow status_bar
+  :monitor 0
+  :stacking "fg"
+  :exclusive true
+  ; :windowtype "dock"
+  :geometry (geometry :width "98%" :height "1%" :anchor "top center")
+  ; :reserve (struts :distance "40px" :side "top")
+  (box :orientation "h"
+    (left)
+    (right)
+  )
+)
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; window defination ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

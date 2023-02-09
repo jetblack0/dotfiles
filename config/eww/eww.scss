@@ -1,0 +1,176 @@
+///////////////////////////////////// variables ////////////////////////////////////////////
+$clock_background: #F5C2E7;
+$clock_foreground: black;
+$buttons_background: #C6AAE8;
+$system_icon_background: #BAB4D9;
+$indicator_background: #BAB4D9;
+$progressbar_empry_background: #A5ADCB;
+$progressbar_fill: #7B9C98;
+
+$workspace_background: #BAB4D9;
+
+$tooltip_background: #BAB4D9;
+$tooltip_foreground: #1e1e2e;
+
+$calendar_selected_foreground: #d3859a;
+$calendar_empty_foreground: #70706C;
+
+$music_box_background: #BAB4D9;
+///////////////////////////////////// variables ////////////////////////////////////////////
+
+
+///////////////////////////////////// general ////////////////////////////////////////////
+* {
+	all: unset;
+	font-size: 15px;
+	font-family: "Iosevka";
+	border-radius: 5px;
+}
+
+label {
+	color: $tooltip_foreground;
+}
+
+progressbar > trough {
+	min-width: 70px;
+	// color: #89B4FA;
+	background-color: $progressbar_empry_background;
+	border-radius: 10px;
+	margin-bottom: 7px;
+}
+
+progressbar > trough > progress {
+	border-radius: 10px;
+	background-color: $progressbar_fill;
+}
+///////////////////////////////////// general ////////////////////////////////////////////
+
+
+///////////////////////////////////// right bar and widgets ////////////////////////////////////////////
+.right_bar {
+	// background-color: #1e1e2e;
+	// border-radius: 15px;
+
+	margin-top: 5px;
+}
+
+.clock {
+	background-color: $clock_background;
+
+	padding: 2px 5px;
+	color: $clock_foreground;
+}
+
+.buttons {
+	padding: 0 5px;
+	background-color: $buttons_background;
+}
+
+.system_icon {
+	background-color: $system_icon_background;
+	padding: 0px 5px;
+}
+
+.memory_icon, .cpu_icon {
+	margin-right: 8px;
+}
+
+.indicator {
+	background-color: $indicator_background;
+	padding: 0 10px;
+}
+///////////////////////////////////// right bar and widgets ////////////////////////////////////////////
+
+
+///////////////////////////////////// left bar widgets ////////////////////////////////////////////
+.left_bar {
+	margin-top: 5px;
+}
+
+.workspace {
+	background-color: $workspace_background;
+
+	padding: 0 20px;
+}
+
+.music_widget {
+	background-color: $music_box_background;
+	padding: 0 10px;
+}
+
+.music_widget_title {
+	font-family: "Varela Round";
+	font-size: 13px;
+}
+///////////////////////////////////// left bar widgets ////////////////////////////////////////////
+
+
+///////////////////////////////////// separate window ////////////////////////////////////////////
+///////////////////////////////////// music box
+.music_box {
+	border-radius: 10px;
+	background-color: $music_box_background;
+}
+
+.album_cover {
+	// background-size: 200px;
+	// background-repeat: no-repeat;
+	min-width: 150px;
+	min-height: 150px;
+	background-position: center;
+	background-size: cover;
+	margin: 1em;
+	border-radius: 10px;
+}
+
+.music_info_container {
+	min-width: 220px;
+	min-height: 180px;
+	margin-top: 20px;
+	// margin-left: 10px;
+	margin-right: 5px;
+}
+
+.music_info_title {
+	font-family: "Varela Round";
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+.music_info_artists {
+	font-family: "Varela Round";
+	font-size: 1.1em;
+}
+
+.music_info_album {
+	font-size: 1.1em;
+	font-family: "Varela Round";
+}
+///////////////////////////////////// music box
+
+tooltip {
+	background-color: $tooltip_background;
+	color: $tooltip_foreground;
+}
+
+calendar {
+	background-color: $clock_background;
+	color: $clock_foreground;
+	padding: 5px;
+	border-radius: 10px;
+
+	.highlight {
+		color: $calendar_selected_foreground;
+		font-weight: bold;
+	}
+
+	:selected {
+		color: $calendar_selected_foreground;
+		// background-color: #87af87;
+	}
+
+	:indeterminate {
+		color: $calendar_empty_foreground;
+	}
+}
+///////////////////////////////////// separate window ////////////////////////////////////////////
