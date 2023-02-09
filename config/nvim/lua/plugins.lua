@@ -4,13 +4,13 @@ local fn = vim.fn
 local install_path = fn.stdpath("data") .. "/site/pack/packer/start/packer.nvim"
 if fn.empty(fn.glob(install_path)) > 0 then
 	PACKER_BOOTSTRAP = fn.system({
-		"git",
-		"clone",
-		"--depth",
-		"1",
-		"https://github.com/wbthomason/packer.nvim",
-		install_path,
-	})
+			"git",
+			"clone",
+			"--depth",
+			"1",
+			"https://github.com/wbthomason/packer.nvim",
+			install_path,
+		})
 	print("Installing packer close and reopen Neovim...")
 	vim.cmd([[packadd packer.nvim]])
 end
@@ -45,15 +45,17 @@ return require("packer").startup(function(use)
 	use({ "nvim-tree/nvim-tree.lua" })
 	-- dependency for a lot of plugins (null-ls not working without this)
 	use({ "nvim-lua/plenary.nvim" })
+	-- speed up loading Lua modules in Neovim to improve startup time 
+	use 'lewis6991/impatient.nvim'
 
 
 	-- Dev tools
 	-- easy way to comment things out
 	use({ "numToStr/Comment.nvim" })
 	-- show color when type color code
-	use({ "norcalli/nvim-colorizer.lua" })
+	use({ "NvChad/nvim-colorizer.lua" })
 	-- tree sitter
-	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
+	use({ "nvim-treesitter/nvim-treesitter" })
 	-- autopair
 	-- use({ "windwp/nvim-autopairs" })
 	-- git signs
@@ -67,6 +69,7 @@ return require("packer").startup(function(use)
 		end,
 		ft = { "markdown" },
 	})
+	use({ "elkowar/yuck.vim" })
 
 
 	-- Ui enhancement
@@ -78,7 +81,7 @@ return require("packer").startup(function(use)
 		"catppuccin/nvim",
 		as = "catppuccin",
 	})
-	use({ "junegunn/goyo.vim" })
+	use {'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons'}
 
 
 	-- LSP and completion
@@ -99,8 +102,8 @@ return require("packer").startup(function(use)
 	-- emmet completion
 	use({ "mattn/emmet-vim" })
 	use({ "dcampos/cmp-emmet-vim" })
-	-- for completion icon
-	-- use({ "onsails/lspkind-nvim" })
+	-- automatically highlighting other uses of the word under the cursor using either LSP, Tree-sitter, or regex matching
+	use({ "RRethy/vim-illuminate" })
 
 
 	-- Snippets

@@ -2,12 +2,6 @@
 
 local lspconfig = require("lspconfig")
 
-local opts = { noremap = true, silent = true }
-vim.keymap.set("n", "<a-l>", vim.diagnostic.open_float, opts)
-vim.keymap.set("n", "<a-k>", vim.diagnostic.goto_prev, opts)
-vim.keymap.set("n", "<a-j>", vim.diagnostic.goto_next, opts)
-vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, opts)
-
 local on_attach = function(client, bufnr)
 	-- Enable completion triggered by <c-x><c-o>
 	vim.api.nvim_buf_set_option(bufnr, "omnifunc", "v:lua.vim.lsp.omnifunc")
@@ -15,6 +9,11 @@ local on_attach = function(client, bufnr)
 	-- Mappings.
 	-- See `:help vim.lsp.*` for documentation on any of the below functions
 	local bufopts = { noremap = true, silent = true, buffer = bufnr }
+	vim.keymap.set("n", "<a-l>", vim.diagnostic.open_float, bufopts)
+	vim.keymap.set("n", "<a-k>", vim.diagnostic.goto_prev, bufopts)
+	vim.keymap.set("n", "<a-j>", vim.diagnostic.goto_next, bufopts)
+	vim.keymap.set("n", "<leader>q", vim.diagnostic.setloclist, bufopts)
+
 	vim.keymap.set("n", "<a-h>", vim.lsp.buf.hover, bufopts)
 	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
 	-- <c-i> and <c-o> to get back
@@ -33,25 +32,6 @@ local on_attach = function(client, bufnr)
 	vim.keymap.set("n", "<leader>f", function()
 		vim.lsp.buf.format({ async = true })
 	end, bufopts)
-
-	-- document highlight
-	vim.o.updatetime = 300
-	if client.server_capabilities.documentHighlightProvider then
-		vim.api.nvim_create_augroup("lsp_document_highlight", { clear = true })
-		vim.api.nvim_clear_autocmds({ buffer = bufnr, group = "lsp_document_highlight" })
-		vim.api.nvim_create_autocmd("CursorHold", {
-			callback = vim.lsp.buf.document_highlight,
-			buffer = bufnr,
-			group = "lsp_document_highlight",
-			desc = "Document Highlight",
-		})
-		vim.api.nvim_create_autocmd("CursorMoved", {
-			callback = vim.lsp.buf.clear_references,
-			buffer = bufnr,
-			group = "lsp_document_highlight",
-			desc = "Clear All the References",
-		})
-	end
 end
 
 
@@ -157,7 +137,6 @@ lspconfig.sumneko_lua.setup({
 
 -- web development (just some simple html, css and js)
 -- tsserver for javascript
-
 lspconfig.tsserver.setup({
 	cmd = { "typescript-language-server", "--stdio" },
 	filetypes = { "javascript", "javascriptreact", "javascript.jsx", "typescript", "typescriptreact", "typescript.tsx" },
@@ -241,7 +220,7 @@ vim.diagnostic.config({
 })
 
 -- Change diagnostic symbols in the sign column (gutter)
-local signs = { Error = "", Warn = "", Hint = "", Info = "" }
+local signs = { Error = "", Warn = "", Hint = "", Info = "" }
 for type, icon in pairs(signs) do
 	local hl = "DiagnosticSign" .. type
 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })

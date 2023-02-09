@@ -15,8 +15,6 @@ keymap("n", "<c-b>", ":NvimTreeToggle<CR>", opts)
 keymap("n", "<esc><esc>", ":noh<CR>:echo \"\"<CR>", opts)
 -- Toggle colorizer
 keymap("n", "<leader>c", ":ColorizerToggle<CR>", opts)
--- Toggle and lualine
-keymap("n", "<c-g>", ":lua require('lualine').hide()<CR> | :Goyo<CR> | :Gitsigns toggle_signs<CR>", opts)
 
 
 -- Manage window (tmux style)
@@ -42,6 +40,8 @@ keymap("n", "<a-,>", "gT<CR>", opts)
 
 -- toggle markdown preview
 keymap("n", "<leader>m", ":MarkdownPreviewToggle<CR>", opts)
+-- toggle gitsigns
+keymap("n", "<leader>g", ":Gitsigns toggle_signs<CR>", opts)
 -------------------------------------------------------
 
 

@@ -20,6 +20,7 @@ local options = {
 	number = true,
 	relativenumber = true,
 	mouse = "",
+	laststatus = 3,
 	-- ttymouse = "",
 	-- Remove highlighting after search is done
 	hlsearch = true,
@@ -38,8 +39,9 @@ local options = {
 }
 
 local global = {
-	-- goyo_width = "80",
-	goyo_height = "95%",
+	-- For nvim-tree
+	loaded_netrw = 1,
+	loaded_netrwPlugin = 1,
 }
 
 for k, v in pairs(options) do

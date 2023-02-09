@@ -36,6 +36,4 @@ catppuccin.setup({
 		telescope = true,
 		treesitter = true,
 	},
-	color_overrides = {},
-	custom_highlights = {},
 })
