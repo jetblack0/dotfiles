@@ -1,35 +1,19 @@
 #!/usr/bin/env bash
 
-## This is a rofi script that i use these themes from: 
-## Github: https://github.com/adi1090x/rofi
 ## Author : Aditya Shakya (adi1090x)
+## Github : @adi1090x
+#
+## Rofi   : Power Menu
+#
+## Available Styles
+#
+## style-1   style-2   style-3   style-4   style-5
 
-# I didn't test all of the themes and styles, some of them may not work (need to use ./theme/powermenu/type-3/powermenu.sh for type-3)
+# usage: ./powermenu.sh
 
-# $1: type of this rofi popup
-# $2: style of this rofi popup
-# $3: color scheme of this rofi popup
-# $4: font of this rofi popup
-# $5: font size of this rofi popup
-# for example: ./powermenu.sh 2 2 everforest JetBrains\ Mono\ Nerd\ Font 12
-
-makeColorAndFont() {
-	colorFile="$rofiHome/theme/shared/colorAndfont.rasi"
-	echo "@import \"$rofiHome/theme/shared/colors/$color.rasi\"" > "$colorFile"
-	echo "* { font: \"$font $fontSize\"; }" >> "$colorFile"
-}
-
-rofiHome="$HOME/.config/rofi"
-
-layout="$rofiHome/theme/powermenu/type-$1"
-theme="$layout/style-$2.rasi"
-color="$3"
-font="$4"
-fontSize="$5"
-
-# CMDs
-# uptime="`uptime -p | sed -e 's/up //g'`"
-# host=`hostname`
+# Current Theme
+dir="/home/jetblack/.config/rofi/theme/powermenu/type-3/"
+theme='style-6'
 
 # Options
 shutdown=''
@@ -43,22 +27,14 @@ no=''
 # Rofi CMD
 rofi_cmd() {
 	rofi -dmenu \
-		-theme "$theme"
-		# -p "Uptime: $uptime" \
-		# -mesg "Uptime: $uptime" \
+		-theme ${dir}/${theme}.rasi
 }
 
 # Confirmation CMD
 confirm_cmd() {
-	rofi -theme-str 'window {location: center; anchor: center; fullscreen: false; width: 350px;}' \
-		-theme-str 'mainbox {children: [ "message", "listview" ];}' \
-		-theme-str 'listview {columns: 2; lines: 1;}' \
-		-theme-str 'element-text {horizontal-align: 0.5;}' \
-		-theme-str 'textbox {horizontal-align: 0.5;}' \
-		-dmenu \
+	rofi -dmenu \
 		-p 'Confirmation' \
-		-mesg 'Are you Sure?' \
-		-theme "$theme"
+		-theme ${dir}/shared/confirm.rasi
 }
 
 # Ask for confirmation
@@ -80,6 +56,8 @@ run_cmd() {
 		elif [[ $1 == '--reboot' ]]; then
 			systemctl reboot
 		elif [[ $1 == '--suspend' ]]; then
+			mpc -q pause
+			amixer set Master mute
 			systemctl suspend
 		elif [[ $1 == '--logout' ]]; then
 			if [[ "$DESKTOP_SESSION" == 'openbox' ]]; then
@@ -98,7 +76,6 @@ run_cmd() {
 }
 
 # Actions
-makeColorAndFont
 chosen="$(run_rofi)"
 case ${chosen} in
     $shutdown)
@@ -109,7 +86,7 @@ case ${chosen} in
         ;;
     $lock)
 		if [[ -x '/usr/bin/betterlockscreen' ]]; then
-			betterlockscreen --lock blur
+			betterlockscreen -l
 		elif [[ -x '/usr/bin/i3lock' ]]; then
 			i3lock
 		fi

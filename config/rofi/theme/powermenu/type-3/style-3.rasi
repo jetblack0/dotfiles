@@ -13,8 +13,7 @@ configuration {
 }
 
 /*****----- Global Properties -----*****/
-@import                          "shared/colors.rasi"
-@import                          "shared/fonts.rasi"
+@import                          "../../shared/colorAndfont.rasi"
 
 * {
     /* Resolution : 1920x1080 */
