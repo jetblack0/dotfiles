@@ -16,6 +16,9 @@ augroup END]]
 vim.cmd[[autocmd FileType html setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType yuck setlocal expandtab shiftwidth=2 tabstop=2]]
 
+-- Hide gitsign by default
+vim.cmd[[Gitsigns toggle_signs]]
+
 -- Treat ejs as html
 vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
 

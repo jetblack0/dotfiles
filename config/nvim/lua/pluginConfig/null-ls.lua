@@ -8,11 +8,12 @@ local diagnostics = null_ls.builtins.diagnostics
 local code_actions = null_ls.builtins.code_actions
 
 local my_sources = {
-	-- diagnostics.eslint_d,
+
+	formatting.prettierd,
+	-- HACK: don't know how to turn off the tsserver's linter
 	-- formatting.eslint_d,
 	-- code_actions.eslint_d,
-
-	null_ls.builtins.formatting.prettierd,
+	-- diagnostics.eslint_d,
 
 	-- for lua, fixer and linter from lsp are slow
 	formatting.stylua.with({
@@ -26,7 +27,6 @@ local my_sources = {
 	diagnostics.shellcheck.with({
 		filetypes = { "sh" },
 	}),
-	-- TODO: doesn't work, but works with command line
 	formatting.shfmt.with({
 		filetypes = { "sh" },
 	}),

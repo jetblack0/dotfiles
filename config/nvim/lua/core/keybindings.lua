@@ -64,5 +64,11 @@ keymap("x", "<a-k>", ":move '<-2<CR>gv-gv", opts)
 --------------------------------------------------------
 
 
--- Command Mode ----------------------------------------
+-- For null-ls ----------------------------------------
 --------------------------------------------------------
+keymap("n", "<leader>f", ":lua vim.lsp.buf.format({ async = true })<CR>", opts)
+keymap("n", "<leader>a", ":lua vim.lsp.buf.code_action()<CR>", opts)
+keymap("n", "<leader>q", ":lua vim.diagnostic.setloclist()<CR>", opts)
+keymap("n", "<a-j>", ":lua vim.diagnostic.goto_next({buffer=0})<CR>", opts)
+keymap("n", "<a-k>", ":lua vim.diagnostic.goto_prev({buffer=0})<CR>", opts)
+keymap("n", "<a-l>", ":lua vim.diagnostic.open_float()<CR>", opts)

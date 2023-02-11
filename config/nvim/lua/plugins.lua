@@ -81,11 +81,14 @@ return require("packer").startup(function(use)
 		"catppuccin/nvim",
 		as = "catppuccin",
 	})
-	use {'akinsho/bufferline.nvim', tag = "v3.*", requires = 'nvim-tree/nvim-web-devicons'}
+	use ({ "akinsho/bufferline.nvim", tag = "v3.*", requires = "nvim-tree/nvim-web-devicons" })
+	use ({ "folke/todo-comments.nvim" })
 
 
 	-- LSP and completion
 	use({ "neovim/nvim-lspconfig" })
+	use({ "williamboman/mason.nvim" })
+	use({ "williamboman/mason-lspconfig.nvim" })
 	-- the completion plugin
 	use({ "hrsh7th/nvim-cmp" })
 	-- buffer completion

@@ -89,5 +89,8 @@ nvim_tree.setup({
 			enable = true,
 			global = true,
 		},
+		open_file = {
+			quit_on_open = true,
+		}
 	},
 })
