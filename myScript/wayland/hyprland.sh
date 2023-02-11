@@ -1,4 +1,5 @@
 #!/bin/sh
+# $1: hybrid or discrete mode, nvidia or something else
 
 cd ~
 
@@ -19,8 +20,16 @@ export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP=Hyprland
 
 export MOZ_ENABLE_WAYLAND=1
-# export __GLX_VENDOR_LIBRARY_NAME=nvidia
-# export GBM_BACKEND=nvidia-drm
-# export WLR_NO_HARDWARE_CURSORS=1
+
+if [ "$1" = "nvidia" ]
+then
+	export __GLX_VENDOR_LIBRARY_NAME=nvidia
+	export GBM_BACKEND=nvidia-drm
+	export WLR_NO_HARDWARE_CURSORS=1
+	export LIBVA_DRIVER_NAME=nvidia
+	sed -i -E 's/monitor=eDP-[0-9],1920x1080/monitor=eDP-1,1920x1080/g' ~/.config/hypr/hyprland.conf
+else
+	sed -i -E 's/monitor=eDP-[0-9],1920x1080/monitor=eDP-2,1920x1080/g' ~/.config/hypr/hyprland.conf
+fi
 
 exec Hyprland
