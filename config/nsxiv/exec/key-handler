@@ -1,0 +1,21 @@
+#!/bin/bash
+
+readarray -t files
+length=${#files[@]}
+
+case "$1" in
+"w")
+	swww img "${files[$(( "$length" - 1))]}" --transition-type random --transition-angle 30 --transition-step 90 ;;
+"d")
+	# works when files contain space
+	for single in "${files[@]}"
+	do
+		rm "$single"
+	done ;;
+"c")
+	wl-copy -n "${files[@]}" ;;
+"C")
+	wl-copy < "${files[$(( "$length" - 1))]}" ;;
+"r")
+	echo "$file" ;;
+esac
