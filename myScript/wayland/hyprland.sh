@@ -1,12 +1,10 @@
 #!/bin/sh
-# $1: hybrid or discrete mode, nvidia or something else
+# $1: nvidia or hybrid or integrated, NOTE: xwayland works terrible on nvidia, and hyprpicker won't work either
 
 cd ~
 
-# Log WLR errors and logs to the hyprland log. Recommended
 export HYPRLAND_LOG_WLR=1
 
-# Tell XWayland to use a cursor theme
 export XCURSOR_THEME=Catppuccin-Mocha-Light
 export XCURSOR_SIZE=16
 
@@ -21,15 +19,24 @@ export XDG_SESSION_DESKTOP=Hyprland
 
 export MOZ_ENABLE_WAYLAND=1
 
-if [ "$1" = "nvidia" ]
-then
-	export __GLX_VENDOR_LIBRARY_NAME=nvidia
-	export GBM_BACKEND=nvidia-drm
-	export WLR_NO_HARDWARE_CURSORS=1
-	export LIBVA_DRIVER_NAME=nvidia
-	sed -i -E 's/monitor=eDP-[0-9],1920x1080/monitor=eDP-1,1920x1080/g' ~/.config/hypr/hyprland.conf
-else
-	sed -i -E 's/monitor=eDP-[0-9],1920x1080/monitor=eDP-2,1920x1080/g' ~/.config/hypr/hyprland.conf
-fi
+# Tell some program to use wayland
+export ANKI_WAYLAND=1
+
+case "$1" in
+	nvidia)
+		export __GLX_VENDOR_LIBRARY_NAME=nvidia
+		export GBM_BACKEND=nvidia-drm
+		export WLR_NO_HARDWARE_CURSORS=1
+		export LIBVA_DRIVER_NAME=nvidia
+		sed -i -E 's/monitor=eDP-[0-9],1920x1080/monitor=eDP-1,1920x1080/g' ~/.config/hypr/hyprland.conf
+		;;
+	integrated)
+		export __EGL_VENDOR_LIBRARY_FILENAMES=/usr/share/glvnd/egl_vendor.d/50_mesa.json
+		sed -i -E 's/monitor=eDP-[0-9],1920x1080/monitor=eDP-2,1920x1080/g' ~/.config/hypr/hyprland.conf
+		;;
+	hybrid|*)
+		sed -i -E 's/monitor=eDP-[0-9],1920x1080/monitor=eDP-2,1920x1080/g' ~/.config/hypr/hyprland.conf
+		;;
+esac
 
 exec Hyprland
