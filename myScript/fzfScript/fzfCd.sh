@@ -1,25 +1,19 @@
-#! /bin/bash
+#!/bin/sh
 
-# Description: a script that use fzf to change the current directory, you can add directories that you use most to a file and replace the path in the code "cat "$HOME"/Development/myScript/fzfScript/fzfCdList" to that file.
+# Description: a script that use fzf to change the current directory, put directories that you use most to $file, each directories are separated by a new line, you can put # as comment, empty line doesn't matter
 
-# Note: the directory path in that file should be absolute path, you can separate each path by white space or carriage return
+# Usage: source ./fzfCd.sh
 
-# Usage: run command, ./fzfCd.sh
-
-
-cdEntry() {
+change_dir() {
 	read -r dir
 
-	if [ -d "$dir" ]; then
+	if [ -d "$dir" ]
+	then
 		cd "$dir" || return 1
 	else
 		return 1
 	fi
 }
 
-# add desired directories path to this file
-cdEntry=($(cat "$HOME"/Development/myScript/fzfScript/fzfCdList))
-
-for entry in "${cdEntry[@]}"; do
-	echo "$entry"
-done | fzf | cdEntry
+file="$HOME/Development/myScript/fzfScript/fzfCdList"
+grep -v "^#" "$file" | grep -v "^$" | fzf | change_dir

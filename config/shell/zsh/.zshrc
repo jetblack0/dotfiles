@@ -1,12 +1,3 @@
-#                .__                   
-# ________  _____|  |_________   ____  
-# \___   / /  ___/  |  \_  __ \_/ ___\ 
-#  /    /  \___ \|   Y  \  | \/\  \___ 
-# /_____ \/____  >___|  /__|    \___  >
-#       \/     \/     \/            \/
-# JetBlack's zsh configrue
-
-
 # Theme and outfit
 # ------------------------------------------------------------------------------
 	pluginPath="$HOME/.config/shell/zsh/plugins"
@@ -24,23 +15,44 @@
 	setopt HIST_FIND_NO_DUPS
 	setopt HIST_SAVE_NO_DUPS
 	# share history between different session
-	# setopt SHARE_HISTORY
+	setopt SHARE_HISTORY
 	# don't record command that start with space
-	# setopt HIST_IGNORE_SPACE
+	setopt HIST_IGNORE_SPACE
 # ------------------------------------------------------------------------------
 
 # Custom functionality
 # ------------------------------------------------------------------------------
-# use lf to switch directories
-	lfcd () {
-		tmp="$(mktemp -uq)"
-		trap 'rm -f $tmp >/dev/null 2>&1' HUP INT QUIT TERM PWR EXIT
-		lfub -last-dir-path="$tmp" "$@"
-		if [ -f "$tmp" ]; then
-			dir="$(cat "$tmp")"
-			[ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
-		fi
-	}
+# use lf to switch directories (image preview doesn't work on wayland)
+	# lfcd () {
+	# 	tmp="$(mktemp -uq)"
+	# 	trap 'rm -f $tmp >/dev/null 2>&1' HUP INT QUIT TERM PWR EXIT
+	# 	lfub -last-dir-path="$tmp" "$@"
+	# 	if [ -f "$tmp" ]; then
+	# 		dir="$(cat "$tmp")"
+	# 		[ -d "$dir" ] && [ "$dir" != "$(pwd)" ] && cd "$dir"
+	# 	fi
+	# }
+
+ lfcd () {
+     tmp="$(mktemp)"
+     # `command` is needed in case `lfcd` is aliased to `lf`
+     command lf -last-dir-path="$tmp" "$@"
+     if [ -f "$tmp" ]; then
+         dir="$(cat "$tmp")"
+         rm -f "$tmp"
+         if [ -d "$dir" ]; then
+             if [ "$dir" != "$(pwd)" ]; then
+                 cd "$dir"
+             fi
+         fi
+     fi
+ }
+
+ # open all the images in current directory using nsxiv
+ images() {
+	# fd -e "jpeg" -e "png" -e "jpg" --print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
+	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg" -print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
+ }
 
 # use vi mode
 	bindkey -v
@@ -69,14 +81,6 @@
 # ------------------------------------------------------------------------------
 
 
-# Keybindings
-# ------------------------------------------------------------------------------
-	bindkey -s '^o' '^ulfcd\n'
-	bindkey -s '^y' '^usource /home/jetblack/Development/myScript/fzfScript/fzfConfig.sh\n'
-	bindkey -s '^p' '^usource /home/jetblack/Development/myScript/fzfScript/fzfCd.sh && lfcd\n'
-# ------------------------------------------------------------------------------
-
-
 # Plugin
 # ------------------------------------------------------------------------------
 	source /usr/share/fzf/key-bindings.zsh
@@ -84,7 +88,6 @@
 
 	source $pluginPath/zsh-autosuggestions/zsh-autosuggestions.zsh
 	source $pluginPath/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-	# TODO: works not good, changethe the Keybindings
 	source $pluginPath/zsh-completion/completion.zsh
 	# source $pluginPath/catppuccin-zsh-syntax-highlighting/catppuccin_macchiato-zsh-syntax-highlighting.zsh
 	# source $pluginPath/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
@@ -92,11 +95,24 @@
 # ------------------------------------------------------------------------------
 
 
+# Keybindings
+# ------------------------------------------------------------------------------
+	bindkey -s '^f' '^ulfcd\n'
+	bindkey -s '^n' '^uimages\n'
+	# bindkey -s '^e' '^usource /home/jetblack/Development/myScript/fzfScript/fzfListDirectories.sh\n'
+	bindkey -s '^p' '^usource /home/jetblack/Development/myScript/fzfScript/fzfCd.sh\n'
+	bindkey -s '^o' '^usource /home/jetblack/Development/myScript/fzfScript/fzfOpen.sh\n'
+	bindkey -s '^v' '^unvim .\n'
+	# bindkey -M menuselect 'u' send-break
+	# bindkey -M menuselect '\e' accept-line
+# ------------------------------------------------------------------------------
+
+
 # Alias
 # ------------------------------------------------------------------------------
-	alias nvidia-settings="$XDG_CONFIG_HOME/nvidia/settings"
-	alias wget=wget --hsts-file="$XDG_DATA_HOME/wget-hsts"
-	alias lf="lfcd"
+	alias nvidia-settings="nvidia-settings --config="$XDG_CONFIG_HOME/nvidia/settings""
+	alias wget="wget --hsts-file="$XDG_DATA_HOME/wget-hsts""
+	# alias lf="lfcd"
 	alias vim="nvim"
 	alias nivm="nvim"
 	alias diff="diff --color"
@@ -110,7 +126,7 @@
 	alias ls="exa"
 	alias ll="ls -lHg"
 	alias lla="ll -a"
-	alias lsa="ls -a"
+	alias la="ls -a"
 	alias tree="exa -TL"
 	# ripgrep for grep
 	alias grep="rg"
