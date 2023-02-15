@@ -21,7 +21,7 @@ I put all the dotfiles of programs that I customized in this repository, some of
 
 * **Common**:
 These programs work fine on both wayland and xorg.
-  * [rofi](https://github.com/GrenicMars/dotfiles/tree/master/config/rofi): I use this program for application launcher, emoji and nerd font icon selector and a logout application which you see on the screenshot. It works well on xorg and xwayland. My configuration comes from this project with some customization.
+  * [rofi](https://github.com/GrenicMars/dotfiles/tree/master/config/rofi): I use this program for application launcher, emoji and nerd font icon selector and a logout application which you see on the screenshot. It works well on both xorg and xwayland. My configuration comes from this [project](https://github.com/adi1090x/rofi) with some customization.
   * [neovim](https://github.com/GrenicMars/dotfiles/tree/master/config/nvim): Lsp support and some useful plugins which bring me a happy text editing and web development experience. 
   * [tmux](https://github.com/GrenicMars/dotfiles/blob/master/config/tmux/tmux.conf): Some customization override the counter-intuitive default keybindings.
   * [zsh](https://github.com/GrenicMars/dotfiles/tree/master/config/shell/zsh): Debloated, without something like on-my-zsh.
@@ -34,7 +34,7 @@ These programs work fine on both wayland and xorg.
 
 Install these programs to use my configuration (doesn't include the program itself):
 * **nvim**: Open nvim and type `:Mason` to install **luacheck**, **stylua**, **prettierd**, **shfmt**. `yay -S wl-clipboard` for wayland or `yay -S xclip` for xorg.
-* **hyprland**: _Note: you don't need to install all of these programs in order to make hyprland work, but some keybindings may break, again, check out those files yourself_. `yay -S swww swayidle swaylock-effects dunst pamixer mpd grimblast-git alacritty rofi eww-wayland hyprpicker-git firefox`. _Note: hyprpicker doesn't support nvidia._ You may need to use my configuration for rofi.
+* **hyprland**: _Note: you don't need to install all of these programs in order to make hyprland work, but some keybindings may break, again, check out those files yourself_. `yay -S swww swayidle swaylock-effects dunst pamixer mpd grimblast-git alacritty rofi eww-wayland hyprpicker-git firefox`. You may need to use my configuration for rofi. _Note: hyprpicker doesn't support nvidia._
 * **eww**: `yay -S hyprland bluez bc ripgrep mpc mpd networkmanager pamixer pipewire pipewire-pulse gojq socat jap`. Install **Iosevka** and **Varela Round** font.
 * **tmux**: `yay wl-clipboard` for wayland or `yay -S xclip` for xorg, you way need to install [catppuccin color scheme](https://github.com/catppuccin/tmux) and change its path in the config file manually.
 * **nsxiv**: `yay -S wl-copy swww`.
