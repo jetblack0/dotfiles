@@ -24,9 +24,9 @@ local my_sources = {
 	}),
 
 	-- for bash script
-	diagnostics.shellcheck.with({
-		filetypes = { "sh" },
-	}),
+	-- diagnostics.shellcheck.with({
+	-- 	filetypes = { "sh" },
+	-- }),
 	formatting.shfmt.with({
 		filetypes = { "sh" },
 	}),

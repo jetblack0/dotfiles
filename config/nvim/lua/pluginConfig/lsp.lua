@@ -58,11 +58,12 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 -- NOTE: formatter and linter need to install manually
 local must_have_servers = {
 	"rust_analyzer",
-	"sumneko_lua",
+	"lua_ls",
 	"tsserver",
 	"html",
 	"cssls",
 	"jsonls",
+	"bashls"
 }
 
 local mason_config = {
@@ -120,7 +121,7 @@ lspconfig.rust_analyzer.setup({
 })
 
 -- sumneko_lua for lua
-lspconfig.sumneko_lua.setup({
+lspconfig.lua_ls.setup({
 	settings = {
 		Lua = {
 			runtime = {
@@ -222,6 +223,14 @@ lspconfig.cssls.setup({
 
 lspconfig.jsonls.setup({
 	capabilities = capabilities,
+	on_attach = function(client, bufnr)
+		client.server_capabilities.documentFormattingProvider = false
+		lsp_keybind(client, bufnr)
+	end,
+})
+
+lspconfig.bashls.setup({
+	capabilities = capabilities,
 	on_attach = lsp_keybind,
 })
 ----------------------------------------------- config for each servers ------------------------------------------------
@@ -237,7 +246,7 @@ vim.diagnostic.config({
 	float = {
 		focusable = true,
 		border = "rounded",
-		source = "always", -- show where the message come from
+		-- source = "always", -- show where the message come from
 		style = "minimal",
 		prefix = "",
 		-- header = "", -- show the header in the diagnostics window

@@ -115,5 +115,5 @@ return require("packer").startup(function(use)
 	-- luasnip completion source for cmp
 	use({ "saadparwaiz1/cmp_luasnip" })
 	-- a bunch of snippet sources
-	use({ "rafamadriz/friendly-snippets" })
+	-- use({ "rafamadriz/friendly-snippets" })
 end)
