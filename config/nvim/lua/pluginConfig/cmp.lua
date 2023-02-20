@@ -46,7 +46,7 @@ cmp.setup({
 	-- get error if we don't use snippet engine
 	snippet = {
 		expand = function(args)
-			luasnip.lsp_expand(args.body) -- For `luasnip` users.
+			luasnip.lsp_expand(args.body)
 		end,
 	},
 	mapping = {
@@ -143,7 +143,7 @@ cmp.setup.filetype({ "rust", "lua" }, {
 	},
 })
 
-cmp.setup.filetype({ "css" }, {
+cmp.setup.filetype({ "css", "html" }, {
 	sources = {
 		{ name = "nvim_lsp" },
 		{ name = "emmet_vim" },

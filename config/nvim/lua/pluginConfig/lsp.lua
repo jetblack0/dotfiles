@@ -1,8 +1,4 @@
 -- luacheck: globals vim
-local status_lspconfig_ok, lspconfig = pcall(require, "lspconfig")
-if not status_lspconfig_ok then
-	return
-end
 
 ------------------------------------------ keybindings when attach to a server -----------------------------------------
 local lsp_keybind = function(client, bufnr)
@@ -94,6 +90,11 @@ require("mason-lspconfig").setup({
 
 
 ----------------------------------------------- config for each servers ------------------------------------------------
+local status_lspconfig_ok, lspconfig = pcall(require, "lspconfig")
+if not status_lspconfig_ok then
+	return
+end
+
 -- rust_analyzer for rust
 lspconfig.rust_analyzer.setup({
 	root_dir = lspconfig.util.root_pattern("Cargo.toml"),

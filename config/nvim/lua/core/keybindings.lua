@@ -2,8 +2,8 @@ local opts = { noremap = true, silent = true }
 local keymap = vim.api.nvim_set_keymap
 
 -- Set leader key as space
-keymap("", "<Space>", "<Nop>", opts)
-vim.g.mapleader = " "
+-- keymap("", "<Space>", "<Nop>", opts)
+-- vim.g.mapleader = " "
 
 
 -- Normal Mode ----------------------------------------
@@ -13,11 +13,9 @@ keymap("n", "<F6>", ":set spell!<CR>", opts)
 keymap("n", "<c-b>", ":NvimTreeToggle<CR>", opts)
 -- Get rid of search highlight
 keymap("n", "<esc><esc>", ":noh<CR>:echo \"\"<CR>", opts)
--- Toggle colorizer
-keymap("n", "<leader>c", ":ColorizerToggle<CR>", opts)
 
 
--- Manage window (tmux style)
+-- Manage window (awesome style)
 -- Resize split (try submode)
 keymap("n", "<c-h>", ":vertical resize -2<CR>", opts)
 keymap("n", "<c-l>", ":vertical resize +2<CR>", opts)
@@ -40,8 +38,6 @@ keymap("n", "<a-,>", "gT<CR>", opts)
 
 -- toggle markdown preview
 keymap("n", "<leader>m", ":MarkdownPreviewToggle<CR>", opts)
--- toggle gitsigns
-keymap("n", "<leader>g", ":Gitsigns toggle_signs<CR>", opts)
 -------------------------------------------------------
 
 

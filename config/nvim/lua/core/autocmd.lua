@@ -12,12 +12,13 @@ augroup remember_folds
 	autocmd BufWinEnter *.* silent! loadview
 augroup END]]
 
--- Two space for html and yuck file
+-- Two space for html, markdown and yuck
 vim.cmd[[autocmd FileType html setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType yuck setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType markdown setlocal expandtab shiftwidth=2 tabstop=2]]
 
 -- Hide gitsign by default
-vim.cmd[[Gitsigns toggle_signs]]
+-- vim.cmd[[Gitsigns toggle_signs]]
 
 -- Treat ejs as html
 vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
