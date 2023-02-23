@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 iconData="$HOME/.config/rofi/data/nerdIconData.txt"
 if [ -z "$1" ]

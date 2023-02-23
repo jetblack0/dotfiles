@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/bin/sh
 
 # Rofi calls the executable without arguments on startup. This should generate a list of options, separated by a newline (\n) (This can be changed by the script). If the user selects an option, rofi calls the executable with the text of that option as the first argument. If the script returns no entries, rofi quits.
 

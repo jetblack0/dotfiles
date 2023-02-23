@@ -29,7 +29,9 @@ fontSize="$5"
 
 makeColorAndFont
 
-multiheadCmd="$rofiHome/component/multihead.sh"
-mailCmd="$rofiHome/component/mail.sh"
+# multiheadCmd="$rofiHome/component/multihead.sh"
+# mailCmd="$rofiHome/component/mail.sh"
+emojiCmd="$rofiHome/component/emoji.sh"
+nerdIconCmd="$rofiHome/component/nerdIcon.sh"
 
-rofi -modi "drun,multihead:$multiheadCmd,mail:$mailCmd" -show drun -theme "$theme"
+rofi -modi "drun,multihead:$emojiCmd,mail:$nerdIconCmd" -show drun -theme "$theme"
