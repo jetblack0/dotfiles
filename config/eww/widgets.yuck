@@ -13,20 +13,30 @@
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; buttons
+(defwidget power_button []
+  (button :onclick "/home/jetblack/.config/rofi/powermenu.sh catppuccin"
+    (image :path "./images/icons/power.svg" :image-width "${icon_size}" :image-height "${icon_size}")
+  )
+)
+
+; NOTE: didn't implement, just for some eye candy
+; TODO: implement this widget
 (defwidget home_button []
   (button
     (image :path "./images/icons/menu.svg" :image-width "${icon_size}" :image-height "${icon_size}")
   )
 )
 
-(defwidget power_button []
-  (button :onclick "/home/jetblack/.config/rofi/theme/powermenu/type-3/powermenu.sh"
-    (image :path "./images/icons/power.svg" :image-width "${icon_size}" :image-height "${icon_size}")
+; NOTE: didn't find some approciate icons
+(defwidget layout []
+  (button :onclick "/home/jetblack/Development/myScript/wayland/hyprland/layoutSwitcher.sh"
+    (image :path "./images/icons/layout/${which_layout}.svg" :image-width "${icon_size}" :image-height "${icon_size}")
   )
 )
 
 (defwidget buttons []
   (box :orientation "h" :spacing "5" :class "buttons"
+    (layout)
     (home_button)
     (power_button)
   )
@@ -201,6 +211,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; widgets for window ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; BUG: doesn't show up if music title contains double quote due to the json format
+; TODO: use more variables to handle this issue 
 (defvar music_box_icon_size "16")
 (defwidget music_box []
   (box :speacing-evenly false :class "music_box"

@@ -11,34 +11,35 @@
 (defvar icon_size "16")
 (defvar number_of_packages "update_when_hover")
 (defvar uptime "update_when_hover")
+(defvar which_layout "master")
 
 (defpoll current_time :interval "10s"
   `date '+{"hour":"%H","min":"%M","mouth":"%b","day":"%d","week":"%A"}'`
 )
 
 (deflisten brightness_info
-  `./scripts/brightness.sh`
+  `/home/jetblack/Development/myScript/eww/brightness.sh`
 )
 (deflisten battery_icon_path
-  `./scripts/battery.sh`
+  `/home/jetblack/Development/myScript/eww/battery.sh`
 )
 (deflisten volume_info
-  `./scripts/volume.sh`
+  `/home/jetblack/Development/myScript/eww/volume.sh`
 )
 (deflisten workspace_info
-  `./scripts/workspace.sh`
+  `/home/jetblack/Development/myScript/eww/workspace.sh`
 )
 (deflisten bluetooth_info
-  `./scripts/bluetooth.sh`
+  `/home/jetblack/Development/myScript/eww/bluetooth.sh`
 )
 (deflisten network_info
-  `./scripts/network.sh`
+  `/home/jetblack/Development/myScript/eww/network.sh`
 )
 (deflisten music_info
-  `./scripts/music.sh`
+  `/home/jetblack/Development/myScript/eww/music.sh`
 )
 (deflisten window_title :initial "..." 
-  `bash ./scripts/window_title.sh`
+  `bash /home/jetblack/Development/myScript/eww/window_title.sh`
 )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
