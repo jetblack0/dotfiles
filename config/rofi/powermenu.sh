@@ -1,123 +1,71 @@
-#!/usr/bin/env bash
+#!/bin/sh
+# fullscreen powermenu using your bluured wallpaper as background, execute command with no question asked
 
-## This is a rofi script that i use these themes from: 
-## Github: https://github.com/adi1090x/rofi
-## Author : Aditya Shakya (adi1090x)
+# usage:
+# $1: color scheme of this rofi window, valid value: all files name inside ./theme/colorScheme directory, default to catppuccin if the color scheme is not found
+# $2 (optional): font of this rofi popup
+# $3 (optional): font size of this rofi popup
+# for example, ./powermenu.sh catppuccin Iosevka 15 or simply ./powermenu.sh
 
-# I didn't test all of the themes and styles, some of them may not work (need to use ./theme/powermenu/type-3/powermenu.sh for type-3)
+set_color_and_font() {
+	color_font_file="$ROFI_HOME/theme/colorAndFont.rasi"
 
-# $1: type of this rofi popup
-# $2: style of this rofi popup
-# $3: color scheme of this rofi popup
-# $4: font of this rofi popup
-# $5: font size of this rofi popup
-# for example: ./powermenu.sh 2 2 everforest JetBrains\ Mono\ Nerd\ Font 12
+	if [ ! -f "$ROFI_HOME/theme/colorScheme/$color.rasi" ] || [ -z "$color" ]
+	then
+		color="catppuccin"
+	fi
+	echo "@import \"$ROFI_HOME/theme/colorScheme/$color.rasi\"" > "$color_font_file"
 
-makeColorAndFont() {
-	colorFile="$rofiHome/theme/shared/colorAndfont.rasi"
-	echo "@import \"$rofiHome/theme/shared/colors/$color.rasi\"" > "$colorFile"
-	echo "* { font: \"$font $fontSize\"; }" >> "$colorFile"
+	if [ -n "$font" ] && [ -n "$font_size" ]
+	then
+		font="Iosevka"
+		font_size=15
+	fi
+	echo "* { font: \"$font $font_size\"; }" >> "$color_font_file"
 }
 
-rofiHome="$HOME/.config/rofi"
+rofi_cmd() {
+	rofi -dmenu \
+		-theme "$THEME"
+}
 
-layout="$rofiHome/theme/powermenu/type-$1"
-theme="$layout/style-$2.rasi"
-color="$3"
-font="$4"
-fontSize="$5"
+run_rofi() {
+	printf "%s\n%s\n%s\n%s\n%s\n" "$lock" "$suspend" "$logout" "$reboot" "$shutdown" | rofi_cmd
+}
 
-# CMDs
-# uptime="`uptime -p | sed -e 's/up //g'`"
-# host=`hostname`
 
-# Options
+ROFI_HOME="$HOME/.config/rofi"
+THEME="$ROFI_HOME/theme/powermenu.rasi"
+
+color="$1"
+font="$2"
+font_size="$3"
+
 shutdown=''
 reboot=''
 lock=''
 suspend=''
 logout=''
-yes=''
-no=''
 
-# Rofi CMD
-rofi_cmd() {
-	rofi -dmenu \
-		-theme "$theme"
-		# -p "Uptime: $uptime" \
-		# -mesg "Uptime: $uptime" \
-}
 
-# Confirmation CMD
-confirm_cmd() {
-	rofi -theme-str 'window {location: center; anchor: center; fullscreen: false; width: 350px;}' \
-		-theme-str 'mainbox {children: [ "message", "listview" ];}' \
-		-theme-str 'listview {columns: 2; lines: 1;}' \
-		-theme-str 'element-text {horizontal-align: 0.5;}' \
-		-theme-str 'textbox {horizontal-align: 0.5;}' \
-		-dmenu \
-		-p 'Confirmation' \
-		-mesg 'Are you Sure?' \
-		-theme "$theme"
-}
-
-# Ask for confirmation
-confirm_exit() {
-	echo -e "$yes\n$no" | confirm_cmd
-}
-
-# Pass variables to rofi dmenu
-run_rofi() {
-	echo -e "$lock\n$suspend\n$logout\n$reboot\n$shutdown" | rofi_cmd
-}
-
-# Execute Command
-run_cmd() {
-	selected="$(confirm_exit)"
-	if [[ "$selected" == "$yes" ]]; then
-		if [[ $1 == '--shutdown' ]]; then
-			systemctl poweroff
-		elif [[ $1 == '--reboot' ]]; then
-			systemctl reboot
-		elif [[ $1 == '--suspend' ]]; then
-			systemctl suspend
-		elif [[ $1 == '--logout' ]]; then
-			if [[ "$DESKTOP_SESSION" == 'openbox' ]]; then
-				openbox --exit
-			elif [[ "$DESKTOP_SESSION" == 'bspwm' ]]; then
-				bspc quit
-			elif [[ "$DESKTOP_SESSION" == 'i3' ]]; then
-				i3-msg exit
-			elif [[ "$DESKTOP_SESSION" == 'plasma' ]]; then
-				qdbus org.kde.ksmserver /KSMServer logout 0 0 0
-			fi
-		fi
-	else
-		exit 0
-	fi
-}
-
-# Actions
-makeColorAndFont
+set_color_and_font
 chosen="$(run_rofi)"
 case ${chosen} in
-    $shutdown)
-		run_cmd --shutdown
+    "$shutdown")
+		systemctl poweroff
         ;;
-    $reboot)
-		run_cmd --reboot
+    "$reboot")
+		systemctl reboot
         ;;
-    $lock)
-		if [[ -x '/usr/bin/betterlockscreen' ]]; then
-			betterlockscreen --lock blur
-		elif [[ -x '/usr/bin/i3lock' ]]; then
-			i3lock
-		fi
+    "$lock")
+		swaylock
         ;;
-    $suspend)
-		run_cmd --suspend
+    "$suspend")
+		mpc -q pause
+		amixer set Master mute
+		systemctl suspend
         ;;
-    $logout)
-		run_cmd --logout
+    "$logout")
+		hyprctl dispatch exit
         ;;
 esac

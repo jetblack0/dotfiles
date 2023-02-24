@@ -1,6 +1,8 @@
 #!/bin/sh
 
-iconData="$HOME/.config/rofi/data/nerdIconData.txt"
+# HACK: there are always some weird icons don't display properly
+
+iconData="$HOME/.config/rofi/data/nerdIconData"
 if [ -z "$1" ]
 then
 	cat "$iconData"

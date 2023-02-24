@@ -1,37 +1,35 @@
-#! /bin/bash
+#!/bin/sh
+# A rofi script to launch program, select emoji and nerd font icon
 
-## This is a rofi script that i use these themes from: 
-## Github: https://github.com/adi1090x/rofi
-## Author : Aditya Shakya (adi1090x)
+# Usage:
+# $1: color scheme of this rofi window, valid value: all files name inside ./theme/colorScheme directory, default to catppuccin if the color scheme is not found
+# $2: font of this rofi popup
+# $3: font size of this rofi popup
+# for example: ./launcher.sh everforest Iosevka 15
 
-# I use it to launch programs, switch monitor schemes and check my mail. The last one are not done yet
 
-# $1: type of this rofi popup
-# $2: style of this rofi popup
-# $3: color scheme of this rofi popup
-# $4: font of this rofi popup
-# $5: font size of this rofi popup
-# for example: ./launcher.sh 1 4 everforest Iosevka 15
+set_color_and_font() {
+	color_font_file="$ROFI_HOME/theme/colorAndFont.rasi"
 
-makeColorAndFont() {
-	colorFile="$rofiHome/theme/shared/colorAndfont.rasi"
-	echo "@import \"$rofiHome/theme/shared/colors/$color.rasi\"" > "$colorFile"
-	echo "* { font: \"$font $fontSize\"; }" >> "$colorFile"
+	if [ ! -f "$ROFI_HOME/theme/colorScheme/$color.rasi" ]
+	then
+		color="catppuccin"
+	fi
+
+	echo "@import \"$ROFI_HOME/theme/colorScheme/$color.rasi\"" > "$color_font_file"
+	echo "* { font: \"$font $font_size\"; }" >> "$color_font_file"
 }
 
-rofiHome="$HOME/.config/rofi"
+ROFI_HOME="$HOME/.config/rofi"
+THEME="$ROFI_HOME/theme/launcher.rasi"
 
-layout="$rofiHome/theme/launcher/type-$1"
-theme="$layout/style-$2.rasi"
-color="$3"
-font="$4"
-fontSize="$5"
+color="$1"
+font="$2"
+font_size="$3"
 
-makeColorAndFont
+set_color_and_font
 
-# multiheadCmd="$rofiHome/component/multihead.sh"
-# mailCmd="$rofiHome/component/mail.sh"
-emojiCmd="$rofiHome/component/emoji.sh"
-nerdIconCmd="$rofiHome/component/nerdIcon.sh"
+emoji_cmd="$ROFI_HOME/component/emoji.sh"
+nerdicon_cmd="$ROFI_HOME/component/nerdIcon.sh"
 
-rofi -modi "drun,multihead:$emojiCmd,mail:$nerdIconCmd" -show drun -theme "$theme"
+rofi -modi "drun,multihead:$emoji_cmd,mail:$nerdicon_cmd" -show drun -theme "$THEME"
