@@ -1,5 +1,9 @@
 #!/bin/sh
-# $1: nvidia or hybrid or integrated, NOTE: xwayland works terrible on nvidia, and hyprpicker won't work either
+# A script to launch hyprland on integrated, hybrid or nvidia gpu mode
+
+# Usage:
+# $1: nvidia or hybrid or integrated
+# for example, ./hyprlandLauncher.sh nvidia
 
 cd ~
 

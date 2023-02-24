@@ -1,5 +1,5 @@
 #!/bin/sh
-# cycle through hyprland master and dwindle layout (currently only these two are available)
+# A script to cycle through hyprland master and dwindle layout (currently only these two are available)
 
 # Usage: ./layoutSwitcher.sh
 
