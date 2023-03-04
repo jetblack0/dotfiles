@@ -35,8 +35,17 @@
 (deflisten network_info
   `/home/jetblack/Development/myScript/eww/network.sh`
 )
-(deflisten music_info
-  `/home/jetblack/Development/myScript/eww/music.sh`
+(deflisten music_meta
+  `/home/jetblack/Development/myScript/eww/music/music_meta.sh`
+)
+(deflisten music_info_title
+  `/home/jetblack/Development/myScript/eww/music/music_info.sh title`
+)
+(deflisten music_info_album
+  `/home/jetblack/Development/myScript/eww/music/music_info.sh album`
+)
+(deflisten music_info_artists
+  `/home/jetblack/Development/myScript/eww/music/music_info.sh artists`
 )
 (deflisten window_title :initial "..." 
   `bash /home/jetblack/Development/myScript/eww/window_title.sh`

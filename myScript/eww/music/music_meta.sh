@@ -1,5 +1,5 @@
 #!/bin/sh
-# return {icon_middle_path, album_cover_path, title, artists, album, visible}
+# return {icon_middle_path, album_cover_path, visible}
 
 get() {
 	if [ "$(systemctl --user is-active mpd)" = "inactive" ] || [ -z "$(mpc current)" ]
@@ -7,9 +7,7 @@ get() {
 		visible=false
 	else
 		visible=true
-		title="$(mpc current -f %title%)"
-		artists="$(mpc current -f %artist%)"
-		album="$(mpc current -f %album%)"
+
 		# TODO: handle other image format as well using globs
 		album_cover_path=$(dirname "$music_directory/$(mpc current -f %file%)")/Artwork/Cover.jpg
 		# echo "$album_cover_path"
@@ -27,16 +25,16 @@ get() {
 		fi
 	fi
 
-	echo "{\"icon_middle_path\":\"${icon_middle_path}\",\"album_cover_path\":\"${album_cover_path}\",\"title\":\"${title}\",\"artists\":\"${artists}\",\"album\":\"${album}\",\"visible\":\"${visible}\"}"
+	echo "{\"icon_middle_path\":\"${icon_middle_path}\",\"album_cover_path\":\"${album_cover_path}\",\"visible\":\"${visible}\"}"
 }
 
 music_directory="$HOME/Multimedia/Audio/Music/Artists"
 fallback_album_path="/home/jetblack/Multimedia/Audio/Music/Artists/Astrud Gilberto/A Certain Smile, A Certrain Sadness 1967/Artwork/Cover.jpg"
 
-refresh_rate=1
+REFRESH_RATE=1
 while true
 do
 	get
-	sleep $refresh_rate
+	sleep $REFRESH_RATE
 done
 
