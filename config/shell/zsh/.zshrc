@@ -103,6 +103,7 @@
 	bindkey -s '^p' '^usource /home/jetblack/Development/myScript/fzfScript/fzfCd.sh\n'
 	bindkey -s '^o' '^usource /home/jetblack/Development/myScript/fzfScript/fzfOpen.sh\n'
 	bindkey -s '^v' '^unvim .\n'
+	bindkey -s '^b' '^usource /home/jetblack/Development/myScript/night_shift.sh\n'
 	# bindkey -M menuselect 'u' send-break
 	# bindkey -M menuselect '\e' accept-line
 # ------------------------------------------------------------------------------
@@ -111,6 +112,7 @@
 # Alias
 # ------------------------------------------------------------------------------
 	alias nvidia-settings="nvidia-settings --config="$XDG_CONFIG_HOME/nvidia/settings""
+	alias yarn="yarn --use-yarnrc $XDG_CONFIG_HOME/yarn/config"
 	alias wget="wget --hsts-file="$XDG_DATA_HOME/wget-hsts""
 	# alias lf="lfcd"
 	alias vim="nvim"

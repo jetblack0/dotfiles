@@ -1,0 +1,185 @@
+#!/bin/sh
+# Description: a script to toggle the dark or light theme for programs that i can find a way to achieve this, definitely only works on my machine
+# $1: dark, light or toggle
+# Usage: source ./night_shift.sh
+
+# TODO: anki, firefox start page
+
+# use alacritty as the indicator of the current theme
+get_toggle_theme() {
+	line=$(grep -io "catppuccin-.*" ~/.config/alacritty/alacritty.yml)
+	if [ "$line" = "catppuccin-mocha.yml" ]
+	then
+		echo "$light_theme"
+	elif [ "$line" = "catppuccin-latte.yml" ]
+	then
+		echo "$dark_theme"
+	fi
+}
+
+alacritty_theme() {
+	location="$XDG_CONFIG_HOME/alacritty/alacritty.yml"
+
+	sed -i -E "s/catppuccin-(latte|mocha).yml/catppuccin-$next_theme.yml/g" "$location"
+}
+
+neovim_theme() {
+	location="$XDG_CONFIG_HOME/nvim/lua/pluginConfig/catppuccin.lua"
+	location_illuminate="$XDG_CONFIG_HOME/nvim/lua/pluginConfig/illuminate.lua"
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		illuminate_color="#45475A"
+	else
+		illuminate_color="#BCC0CC"
+	fi
+
+	sed -i -E "s/flavour = \"(mocha|latte)\"/flavour = \"$next_theme\"/g" "$location"
+	sed -i -E "s/bg = \"(#BCC0CC|#45475A)\"/bg = \"$illuminate_color\"/g" "$location_illuminate"
+}
+
+tmux_theme() {
+	location="$XDG_CONFIG_HOME/tmux/tmux.conf"
+	sed -i -E "s/(mocha|latte).conf/$next_theme.conf/g" "$location"
+
+	if [ -n "$(pgrep tmux)" ]
+	then
+		tmux source-file "$location"
+	fi
+}
+
+bat_theme() {
+	location="$XDG_CONFIG_HOME/bat/config"
+
+	sed -i -E "s/Catppuccin-(latte|mocha)/Catppuccin-$next_theme/g" "$location"
+}
+
+fzf_theme() {
+	location="$XDG_CONFIG_HOME/shell/zsh/.zshenv"
+
+	dark_config='--height 50% --layout=reverse --cycle --border=rounded --color=bw,spinner:#f4dbd6,hl:#F5BDE6:regular,fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6,marker:#f4dbd6,fg+:#B7BDF8:regular,prompt:#c6a0f6,hl+:#F5BDE6:regular'
+	light_config='--height 50% --layout=reverse --cycle --border=rounded --color=bw,spinner:#dc8a78,hl:#EA76CB:regular,fg:#4c4f69,header:#d20f39,info:#8839ef,pointer:#dc8a78,marker:#dc8a78,fg+:#4c4f69:regular,prompt:#8839ef,hl+:#EA76CB:regular'
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		sed -i -E "s/FZF_DEFAULT_OPTS='.*'/FZF_DEFAULT_OPTS='$dark_config'/" "$location"
+	else
+		sed -i -E "s/FZF_DEFAULT_OPTS='.*'/FZF_DEFAULT_OPTS='$light_config'/" "$location"
+	fi
+
+	source "$XDG_CONFIG_HOME/shell/zsh/.zshenv"
+}
+
+qt5_theme() {
+	location="$XDG_CONFIG_HOME/qt5ct/qt5ct.conf"
+
+	sed -E -i "s/catppuccin_(latte|mocha)/catppuccin_$next_theme/" "$location"
+}
+
+gtk_theme() {
+	gtk_three_location="$XDG_CONFIG_HOME/gtk-3.0/settings.ini"
+	gtk_two_location="$XDG_CONFIG_HOME/gtk-2.0/gtkrc"
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		dark_or_light="Dark"
+	else
+		dark_or_light="Light"
+	fi
+
+	sed -E -i "2 s/Catppuccin-(Latte|Mocha)-Standard-Pink-(Light|Dark)/Catppuccin-$(echo "$next_theme" | awk '{ print toupper(substr($0, 1, 1)) substr($0, 2) }')-Standard-Pink-$dark_or_light/" "$gtk_three_location"
+	sed -E -i "5 s/Catppuccin-(Latte|Mocha)-Standard-Pink-(Light|Dark)/Catppuccin-$(echo "$next_theme" | awk '{ print toupper(substr($0, 1, 1)) substr($0, 2) }')-Standard-Pink-$dark_or_light/" "$gtk_two_location"
+}
+
+xwayland_theme() {
+	if [ "$next_theme" = "mocha" ]
+	then
+		xrdb -load /home/jetblack/.config/X11/.Xresources_dark
+	else
+		xrdb -load /home/jetblack/.config/X11/.Xresources_light
+	fi
+}
+
+hyprland_theme() {
+	location="$XDG_CONFIG_HOME/hypr/hyprland.conf"
+	if [ "$next_theme" = "mocha" ]
+	then
+		inactive_border_color="0xff1e1e2e"
+
+		active_border_color_one="0xffb4befe"
+		active_border_color_two="0xfff5c2e7"
+
+	else
+		inactive_border_color="0xffeff1f5"
+
+		active_border_color_one="0xff1e1e2e"
+		active_border_color_two="0xff1e1e2e"
+	fi
+
+	sed -E -i -e "s/col.inactive_border = (0xff1e1e2e|0xffeff1f5)/col.inactive_border = $inactive_border_color/" -e "s/col.active_border = .*/col.active_border = $active_border_color_one $active_border_color_two 45deg/" "$location"
+}
+
+rofi_theme() {
+	location="$XDG_CONFIG_HOME/hypr/hyprland.conf"
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		next_rofi_theme="catppuccin"
+	else
+		next_rofi_theme="paper"
+	fi
+
+	sed -E -i -e "s/launcher.sh (catppuccin|paper)/launcher.sh $next_rofi_theme/" -e "s/powermenu.sh (catppuccin|paper)/powermenu.sh $next_rofi_theme/" "$location"
+}
+
+bottom_theme() {
+	location="$XDG_CONFIG_HOME/bottom"
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		cat "$location"/bottom_dark.toml > "$location"/bottom.toml
+	else
+		cat "$location"/bottom_light.toml > "$location"/bottom.toml
+	fi
+}
+
+newboat_theme() {
+	location="$XDG_CONFIG_HOME/newsboat/config"
+
+	sed -E -i "s/catppuccin_(mocha|latte)/catppuccin_$next_theme/" "$location"
+}
+
+fcitx5_theme() {
+	location="$XDG_CONFIG_HOME/fcitx5/conf/classicui.conf"
+
+	sed -E -i "s/catppuccin-(mocha|latte)/catppuccin-$next_theme/" "$location"
+
+	# restart fcitx5
+	kill "$(pidof fcitx5)" && fcitx5 -d > /dev/null 2>&1
+}
+
+dark_theme="mocha"
+light_theme="latte"
+
+case "$1" in
+	dark) next_theme=$dark_theme ;;
+	light) next_theme=$light_theme ;;
+	toggle|*) next_theme=$(get_toggle_theme) ;;
+esac
+
+# cli part
+alacritty_theme
+neovim_theme
+tmux_theme
+bat_theme
+fzf_theme
+bottom_theme
+newboat_theme
+
+# gui part
+qt5_theme
+gtk_theme
+xwayland_theme
+hyprland_theme
+rofi_theme
+fcitx5_theme
