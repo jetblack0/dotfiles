@@ -1,21 +1,31 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-readarray -t files
-length=${#files[@]}
+readarray -t relative_path
+length=${#relative_path[@]}
+
+absolute_path=()
+for file in "${relative_path[@]}"
+do
+	absolute_path+=("$(readlink -f "$file")")
+done
 
 case "$1" in
 "w")
-	swww img "${files[$(( "$length" - 1))]}" --transition-type random --transition-angle 30 --transition-step 90 ;;
+	swww img "${relative_path[$(( "$length" - 1))]}" --transition-type random --transition-angle 30 --transition-step 90 --transition-fps 60;;
 "d")
-	# works when files contain space
-	for single in "${files[@]}"
+	# works when file contain space
+	for single in "${relative_path[@]}"
 	do
 		rm "$single"
 	done ;;
 "c")
-	wl-copy -n "${files[@]}" ;;
+	wl-copy -n "${relative_path[@]}" ;;
 "C")
-	wl-copy < "${files[$(( "$length" - 1))]}" ;;
+	wl-copy < "${relative_path[$(( "$length" - 1))]}" ;;
+"y")
+	wl-copy -n "${absolute_path[@]}" ;;
+
+# for debugging purposes
 "r")
-	echo "$file" ;;
+	echo "${absolute_path[@]}" ;;
 esac
