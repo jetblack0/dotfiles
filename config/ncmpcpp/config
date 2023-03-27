@@ -22,3 +22,21 @@ visualizer_output_name = "my_fifo"
 visualizer_in_stereo = yes
 visualizer_type = spectrum
 visualizer_look = ●▮
+
+##### appearance #####
+user_interface = classic
+playlist_display_mode = columns
+browser_display_mode = columns
+header_visibility = no
+
+song_columns_list_format = "(50)[black]{t} (30)[black]{a} (20)[white]{b}"
+song_library_format = %t
+current_item_prefix = $(black)$r
+selected_item_prefix = $7
+
+empty_tag_color = white
+main_window_color = black
+progressbar_color = white
+progressbar_elapsed_color = black
+progressbar_look = ->
+statusbar_time_color = cyan
