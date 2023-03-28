@@ -1,21 +1,25 @@
 ///////////////////////////////////// variables ////////////////////////////////////////////
-$clock_background: #F5C2E7;
-$clock_foreground: black;
-$buttons_background: #C6AAE8;
-$system_icon_background: #BAB4D9;
-$indicator_background: #BAB4D9;
-$progressbar_empry_background: #A5ADCB;
+$clock_background: #7B9C98;
+$clock_foreground: #000000;
+$buttons_background: #EFF1F5;
+$system_icon_background: #EFF1F5;
+$indicator_background: #EFF1F5;
+$progressbar_empry_background: #D6D3D6;
 $progressbar_fill: #7B9C98;
 
-$workspace_background: #BAB4D9;
+$workspace_background: #EFF1F5;
 
-$tooltip_background: #BAB4D9;
-$tooltip_foreground: #1e1e2e;
+$tooltip_background: #EFF1F5;
+$tooltip_foreground: #1E1E2E;
 
-$calendar_selected_foreground: #d3859a;
+$calendar_selected_foreground: #179299;
 $calendar_empty_foreground: #70706C;
 
-$music_box_background: #BAB4D9;
+$music_box_background: #EFF1F5;
+
+$widget_border_color: #1E1E2E;
+$widget_border_length: 2px;
+$calendar_background_color: #EFF1F5;
 ///////////////////////////////////// variables ////////////////////////////////////////////
 
 
@@ -55,6 +59,8 @@ progressbar > trough > progress {
 }
 
 .clock {
+	border: $widget_border_length solid $widget_border_color;
+
 	background-color: $clock_background;
 
 	padding: 2px 5px;
@@ -62,11 +68,15 @@ progressbar > trough > progress {
 }
 
 .buttons {
+	border: $widget_border_length solid $widget_border_color;
+
 	padding: 0 5px;
 	background-color: $buttons_background;
 }
 
 .system_icon {
+	border: $widget_border_length solid $widget_border_color;
+
 	background-color: $system_icon_background;
 	padding: 0px 5px;
 }
@@ -76,6 +86,8 @@ progressbar > trough > progress {
 }
 
 .indicator {
+	border: $widget_border_length solid $widget_border_color;
+
 	background-color: $indicator_background;
 	padding: 0 10px;
 }
@@ -88,12 +100,16 @@ progressbar > trough > progress {
 }
 
 .workspace {
+	border: $widget_border_length solid $widget_border_color;
+
 	background-color: $workspace_background;
 
 	padding: 0 20px;
 }
 
 .music_widget {
+	border: $widget_border_length solid $widget_border_color;
+
 	background-color: $music_box_background;
 	padding: 0 10px;
 }
@@ -108,6 +124,8 @@ progressbar > trough > progress {
 ///////////////////////////////////// separate window ////////////////////////////////////////////
 ///////////////////////////////////// music box
 .music_box {
+	border: $widget_border_length solid $widget_border_color;
+	
 	border-radius: 10px;
 	background-color: $music_box_background;
 }
@@ -154,7 +172,9 @@ tooltip {
 }
 
 calendar {
-	background-color: $clock_background;
+	border: $widget_border_length solid $widget_border_color;
+
+	background-color: $calendar_background_color;
 	color: $clock_foreground;
 	padding: 5px;
 	border-radius: 10px;

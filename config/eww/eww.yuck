@@ -61,7 +61,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; window defination ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defwindow calendar
   :monitor 0
-  :geometry (geometry :width "0" :height "0" :anchor "top right")
+  :geometry (geometry :x "1650px" :y "5px" :width "0" :height "0")
   (calendar)
 )
 

@@ -149,6 +149,25 @@ newboat_theme() {
 	sed -E -i "s/catppuccin_(mocha|latte)/catppuccin_$next_theme/" "$location"
 }
 
+lualine_theme() {
+	location="$XDG_CONFIG_HOME/nvim/lua/pluginConfig/lualine.lua"
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		color_added="green_diff"
+		color_modified="orange_diff"
+		color_removed="red_diff"
+	else
+		color_added="green_diff_light"
+		color_modified="orange_diff_light"
+		color_removed="red_diff_light"
+	fi
+
+	sed -E -i "s/added.*fg = .*}/added = { fg = colors.$color_added }/" "$location"
+	sed -E -i "s/modified.*fg = .*}/modified = { fg = colors.$color_modified }/" "$location"
+	sed -E -i "s/removed.*fg = .*}/removed = { fg = colors.$color_removed }/" "$location"
+}
+
 fcitx5_theme() {
 	location="$XDG_CONFIG_HOME/fcitx5/conf/classicui.conf"
 
@@ -156,6 +175,74 @@ fcitx5_theme() {
 
 	# restart fcitx5
 	kill "$(pidof fcitx5)" && fcitx5 -d > /dev/null 2>&1
+}
+
+swaylock_theme() {
+	location="$XDG_CONFIG_HOME/swaylock/config"
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		next_wall="\/home\/jetblack\/Pictures\/Wallpaper\/landscape\/nature\/wallhaven-eyelqr\.jpg"
+	else
+		next_wall="\/home\/jetblack\/Pictures\/Wallpaper\/landscape\/simple\/minimalist-cat-window-sleeping-4k-tl-2048x1152\.jpg"
+	fi
+
+	sed -i -E "s/image=.*/image=$next_wall/" "$location"
+}
+
+eww_theme() {
+	location="$XDG_CONFIG_HOME/eww/eww.scss"
+
+	if [ "$next_theme" = "mocha" ]
+	then
+		clock_background="#F5C2E7"
+		clock_foreground="#000000"
+		buttons_background="#C6AAE8"
+		system_icon_background="#BAB4D9"
+		indicator_background="#BAB4D9"
+		progressbar_empry_background="#A5ADCB"
+		progressbar_fill="#7B9C98"
+		workspace_background="#BAB4D9"
+		tooltip_background="#BAB4D9";
+		tooltip_foreground="#1E1E2E";
+		calendar_selected_foreground="#D3859A";
+		calendar_empty_foreground="#70706C";
+		music_box_background="#BAB4D9";
+		widget_border_length="0px"
+		calendar_background_color="#F5C2E7"
+	else
+		clock_background="#7B9C98"
+		clock_foreground="#000000"
+		buttons_background="#EFF1F5"
+		system_icon_background="#EFF1F5"
+		indicator_background="#EFF1F5"
+		progressbar_empry_background="#D6D3D6"
+		progressbar_fill="#7B9C98"
+		workspace_background="#EFF1F5"
+		tooltip_background="#EFF1F5";
+		tooltip_foreground="#1E1E2E";
+		calendar_selected_foreground="#179299";
+		calendar_empty_foreground="#70706C";
+		music_box_background="#EFF1F5";
+		widget_border_length="2px"
+		calendar_background_color="#EFF1F5"
+	fi
+
+	sed -E -i "s/clock_background: #[A-Za-z0-9]{6}/clock_background: $clock_background/" "$location"
+	sed -E -i "s/clock_foreground: #[A-Za-z0-9]{6}/clock_foreground: $clock_foreground/" "$location"
+	sed -E -i "s/buttons_background: #[A-Za-z0-9]{6}/buttons_background: $buttons_background/" "$location"
+	sed -E -i "s/system_icon_background: #[A-Za-z0-9]{6}/system_icon_background: $system_icon_background/" "$location"
+	sed -E -i "s/indicator_background: #[A-Za-z0-9]{6}/indicator_background: $indicator_background/" "$location"
+	sed -E -i "s/progressbar_empry_background: #[A-Za-z0-9]{6}/progressbar_empry_background: $progressbar_empry_background/" "$location"
+	sed -E -i "s/progressbar_fill: #[A-Za-z0-9]{6}/progressbar_fill: $progressbar_fill/" "$location"
+	sed -E -i "s/workspace_background: #[A-Za-z0-9]{6}/workspace_background: $workspace_background/" "$location"
+	sed -E -i "s/tooltip_background: #[A-Za-z0-9]{6}/tooltip_background: $tooltip_background/" "$location"
+	sed -E -i "s/tooltip_foreground: #[A-Za-z0-9]{6}/tooltip_foreground: $tooltip_foreground/" "$location"
+	sed -E -i "s/calendar_selected_foreground: #[A-Za-z0-9]{6}/calendar_selected_foreground: $calendar_selected_foreground/" "$location"
+	sed -E -i "s/calendar_empty_foreground: #[A-Za-z0-9]{6}/calendar_empty_foreground: $calendar_empty_foreground/" "$location"
+	sed -E -i "s/music_box_background: #[A-Za-z0-9]{6}/music_box_background: $music_box_background/" "$location"
+	sed -E -i "s/widget_border_length: [0-9]px/widget_border_length: $widget_border_length/" "$location"
+	sed -E -i "s/calendar_background_color: #[A-Za-z0-9]{6}/calendar_background_color: $calendar_background_color/" "$location"
 }
 
 dark_theme="mocha"
@@ -175,6 +262,7 @@ bat_theme
 fzf_theme
 bottom_theme
 newboat_theme
+lualine_theme
 
 # gui part
 qt5_theme
@@ -183,3 +271,5 @@ xwayland_theme
 hyprland_theme
 rofi_theme
 fcitx5_theme
+swaylock_theme
+eww_theme

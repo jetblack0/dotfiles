@@ -96,7 +96,7 @@
         (image :path "${volume_info.icon_path}" :image-width "${icon_size}" :image-height "${icon_size}")
       )
       (revealer :transition "slideleft" :reveal volume_rev :duration "350ms"
-        (label :text "${volume_info.percentage}%")
+        (label :text "${volume_info.percentage}")
       )
     )
   )
@@ -203,7 +203,7 @@
   (box :orientation "h" :space-evenly false :halign "start" :valign "center" :spacing "10" :class "left_bar"
     (workspace)
     (music)
-    ; (window_title)
+    ;; (window_title)
   )
 )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; left bar widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
