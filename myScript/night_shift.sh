@@ -3,8 +3,6 @@
 # $1: dark, light or toggle
 # Usage: source ./night_shift.sh
 
-# TODO: anki, firefox start page
-
 # use alacritty as the indicator of the current theme
 get_toggle_theme() {
 	line=$(grep -io "catppuccin-.*" ~/.config/alacritty/alacritty.yml)
@@ -31,11 +29,11 @@ neovim_theme() {
 	then
 		illuminate_color="#45475A"
 	else
-		illuminate_color="#BCC0CC"
+		illuminate_color="#F5C2E7"
 	fi
 
 	sed -i -E "s/flavour = \"(mocha|latte)\"/flavour = \"$next_theme\"/g" "$location"
-	sed -i -E "s/bg = \"(#BCC0CC|#45475A)\"/bg = \"$illuminate_color\"/g" "$location_illuminate"
+	sed -i -E "s/bg = \"(#F5C2E7|#45475A)\"/bg = \"$illuminate_color\"/g" "$location_illuminate"
 }
 
 tmux_theme() {
@@ -58,7 +56,7 @@ fzf_theme() {
 	location="$XDG_CONFIG_HOME/shell/zsh/.zshenv"
 
 	dark_config='--height 50% --layout=reverse --cycle --border=rounded --color=bw,spinner:#f4dbd6,hl:#F5BDE6:regular,fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6,marker:#f4dbd6,fg+:#B7BDF8:regular,prompt:#c6a0f6,hl+:#F5BDE6:regular'
-	light_config='--height 50% --layout=reverse --cycle --border=rounded --color=bw,spinner:#dc8a78,hl:#EA76CB:regular,fg:#4c4f69,header:#d20f39,info:#8839ef,pointer:#dc8a78,marker:#dc8a78,fg+:#4c4f69:regular,prompt:#8839ef,hl+:#EA76CB:regular'
+	light_config='--height 50% --layout=reverse --cycle --border=rounded --color=bw,spinner:#dc8a78,hl:#EA76CB:regular,fg:#4c4f69,header:#d20f39,info:#8839ef,pointer:#dc8a78,marker:#dc8a78,fg+:#179299:regular,prompt:#8839ef,hl+:#EA76CB:regular'
 
 	if [ "$next_theme" = "mocha" ]
 	then
@@ -146,7 +144,12 @@ bottom_theme() {
 newboat_theme() {
 	location="$XDG_CONFIG_HOME/newsboat/config"
 
-	sed -E -i "s/catppuccin_(mocha|latte)/catppuccin_$next_theme/" "$location"
+	if [ "$next_theme" = "mocha" ]
+	then
+		sed -E -i "s/(dark|light)/light/" "$location"
+	else
+		sed -E -i "s/(dark|light)/dark/" "$location"
+	fi
 }
 
 lualine_theme() {
