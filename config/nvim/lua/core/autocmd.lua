@@ -12,13 +12,13 @@ augroup remember_folds
 	autocmd BufWinEnter *.* silent! loadview
 augroup END]]
 
--- Two space for html, markdown and yuck
+-- Two space for some file types
 vim.cmd[[autocmd FileType html setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType yuck setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType markdown setlocal expandtab shiftwidth=2 tabstop=2]]
-
--- Hide gitsign by default
--- vim.cmd[[Gitsigns toggle_signs]]
+vim.cmd[[autocmd FileType json setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType javascript setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType javascriptreact setlocal expandtab shiftwidth=2 tabstop=2]]
 
 -- Treat ejs as html
 vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
@@ -26,18 +26,20 @@ vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
 -- Open nvim-tree if is a direcotry, and cd into that
 local function open_nvim_tree(data)
 
-  -- buffer is a directory
   local directory = vim.fn.isdirectory(data.file) == 1
 
   if not directory then
     return
   end
 
-  -- change to the directory
   vim.cmd.cd(data.file)
 
-  -- open the tree
   require("nvim-tree.api").tree.open()
 end
 
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
+
+-- Change fcitx5 input method to english when press escape
+vim.cmd[[let fcitx5state=system("fcitx5-remote")]]
+vim.cmd[[autocmd InsertLeave * :silent let fcitx5state=system("fcitx5-remote")[0] | silent !fcitx5-remote -c]]
+vim.cmd[[autocmd InsertEnter * :silent if fcitx5state == 2 | call system("fcitx5-remote -o") | endif]]
