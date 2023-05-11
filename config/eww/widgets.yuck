@@ -49,7 +49,7 @@
     (box :orientation "h" :space-evenly false :spacing "2"
       (image :path "${battery_icon_path}" :image-width "${icon_size}" :image-height "${icon_size}")
       (revealer :transition "slideleft" :reveal battery_rev :duration "350ms"
-        (label :text "${EWW_BATTERY.BAT0.capacity}%")
+        (label :text "${EWW_BATTERY.BAT1.capacity + EWW_BATTERY.BAT0.capacity}%")
       )
     )
   )
@@ -176,14 +176,27 @@
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; left bar widgets ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar ws-icons '["", "", "", "", "", "", "", "", "", ""]')
-(defwidget workspace []
+(defvar workspace_icon "")
+(defwidget workspace_one []
   (eventbox
   :onscroll "echo {} | sed -e \"s/up/-1/g\" -e \"s/down/+1/g\" | xargs hyprctl dispatch workspace"
     (box :class "workspace" :spacing 8
-      (for i in workspace_info
-        (button :onclick "hyprctl dispatch workspace ${i.number}" ; :class "ws icon"
-          (label :style "font-size: 18px; color: ${i.color};" :text "${ws-icons[i.number - 1]}")
+      (for i in workspace_info_one
+        (button :class "workspace_button" :onclick "hyprctl dispatch workspace ${i.number}"
+          (label :style "font-size: 18px; color: ${i.color};" :text "${workspace_icon}")
+        )
+      )
+    )
+  )
+)
+
+(defwidget workspace_two []
+  (eventbox
+  :onscroll "echo {} | sed -e \"s/up/-1/g\" -e \"s/down/+1/g\" | xargs hyprctl dispatch workspace"
+    (box :class "workspace" :spacing 8
+      (for i in workspace_info_two
+        (button :class "workspace_button" :onclick "hyprctl dispatch workspace ${i.number}"
+          (label :style "font-size: 18px; color: ${i.color};" :text "${workspace_icon}")
         )
       )
     )
@@ -199,9 +212,17 @@
   )
 )
 
-(defwidget left []
+(defwidget left_one []
   (box :orientation "h" :space-evenly false :halign "start" :valign "center" :spacing "10" :class "left_bar"
-    (workspace)
+    (workspace_one)
+    (music)
+    ;; (window_title)
+  )
+)
+
+(defwidget left_two []
+  (box :orientation "h" :space-evenly false :halign "start" :valign "center" :spacing "10" :class "left_bar"
+    (workspace_two)
     (music)
     ;; (window_title)
   )

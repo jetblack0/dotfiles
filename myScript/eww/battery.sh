@@ -1,9 +1,20 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # return icon_path
 
+get_capacity() {
+	total_capacity=0
+
+	while read -r capacity
+	do
+		total_capacity=$(( total_capacity + capacity))
+	done < <(cat /sys/class/power_supply/BAT*/capacity)
+
+	echo "$total_capacity"
+}
+
 get() {
-	status="$(cat /sys/class/power_supply/ADP0/online)"
-	capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
+	status="$(cat /sys/class/power_supply/AC/online)"
+	capacity="$(get_capacity)"
 
 	if [ "$status" = "1" ]
 	then

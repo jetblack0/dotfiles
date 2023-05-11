@@ -26,8 +26,11 @@
 (deflisten volume_info
   `/home/jetblack/Development/myScript/eww/volume.sh`
 )
-(deflisten workspace_info
-  `/home/jetblack/Development/myScript/eww/workspace.sh`
+(deflisten workspace_info_one
+  `/home/jetblack/Development/myScript/eww/workspace.sh 0`
+)
+(deflisten workspace_info_two
+  `/home/jetblack/Development/myScript/eww/workspace.sh 1`
 )
 (deflisten bluetooth_info
   `/home/jetblack/Development/myScript/eww/bluetooth.sh`
@@ -79,7 +82,7 @@
 ;   (color-chooser)
 ; )
 
-(defwindow status_bar
+(defwindow status_bar_0
   :monitor 0
   :stacking "fg"
   :exclusive true
@@ -87,7 +90,20 @@
   :geometry (geometry :width "98%" :height "1%" :anchor "top center")
   ; :reserve (struts :distance "40px" :side "top")
   (box :orientation "h"
-    (left)
+    (left_one)
+    (right)
+  )
+)
+
+(defwindow status_bar_1
+  :monitor 1
+  :stacking "fg"
+  :exclusive true
+  ; :windowtype "dock"
+  :geometry (geometry :width "98%" :height "1%" :anchor "top center")
+  ; :reserve (struts :distance "40px" :side "top")
+  (box :orientation "h"
+    (left_two)
     (right)
   )
 )
