@@ -1,14 +1,19 @@
 #!/bin/sh
-
 # send notification if the battery is lower then 10, suspend this computer if the battery is lower than 5
-# NOTE: maybe not a good idea to use systemd timer for this, just start thsi script with your compositor
+
+pgrep --full "home/jetblack/Development/myScript/wayland/batteryNotification.sh" >/dev/null || exit 0
 
 battery_low_count=0
 refresh_rate=60
 while true
 do
-	capacity="$(cat /sys/class/power_supply/BAT0/capacity)"
-	status="$(cat /sys/class/power_supply/ADP0/online)"
+	if [ -z "$XDG_CURRENT_DESKTOP" ]
+	then
+		exit 0
+	fi
+
+	capacity="$(cat /sys/class/power_supply/BAT1/capacity)"
+	status="$(cat /sys/class/power_supply/AC/online)"
 
 	if [ "$status" = "1" ]
 	then

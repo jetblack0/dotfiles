@@ -146,9 +146,9 @@ newboat_theme() {
 
 	if [ "$next_theme" = "mocha" ]
 	then
-		sed -E -i "s/(dark|light)/light/" "$location"
-	else
 		sed -E -i "s/(dark|light)/dark/" "$location"
+	else
+		sed -E -i "s/(dark|light)/light/" "$location"
 	fi
 }
 
