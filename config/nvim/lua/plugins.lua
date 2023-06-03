@@ -19,7 +19,7 @@ local lazy_config = {
 	}
 }
 
-local lsp_filetypes = { "lua", "sh", "rust", "javascript", "tsx", "jsx", "html", "css", "scss", "ejs", "json" }
+local lsp_filetypes = { "lua", "sh", "rust", "javascript", "tsx", "jsx", "html", "css", "scss", "ejs", "json", "javascriptreact" }
 require("lazy").setup({
 	------------------------------------- General stuff --------------------------------------
 	{
@@ -41,7 +41,7 @@ require("lazy").setup({
 		"NvChad/nvim-colorizer.lua",
 		cmd = "ColorizerToggle",
 		keys = {
-			{ "<leader>c", ":ColorizerToggle<CR>", desc = "toggle colorizer" },
+			{ "<leader>c", ":ColorizerToggle<CR>", "n", desc = "toggle colorizer", silent = true, noremap = true },
 		},
 		config = function()
 			require("pluginConfig.nvim-colorizer")
@@ -49,13 +49,11 @@ require("lazy").setup({
 	},
 	{
 		"lewis6991/gitsigns.nvim",
+		config = true,
 		cmd = "Gitsigns",
 		keys = {
-			{ "<leader>g", "<cmd>:Gitsigns toggle_signs<CR>", desc = "toggle git signs" },
+			{ "<leader>g", "<cmd>:Gitsigns toggle_signs<CR>", "n", desc = "toggle git signs", silent = true, noremap = true },
 		},
-		config = function()
-			require("pluginConfig.gitsigns")
-		end,
 	},
 	{
 		"nvim-treesitter/nvim-treesitter",
@@ -83,6 +81,10 @@ require("lazy").setup({
 	{
 		"elkowar/yuck.vim",
 		ft = { "yuck" },
+	},
+	{
+		"Fymyte/rasi.vim",
+		ft = { "rasi" },
 	},
 
 
@@ -158,8 +160,8 @@ require("lazy").setup({
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
+			"dcampos/nvim-snippy",
+			"dcampos/cmp-snippy"
 		},
 		config = function()
 			require("pluginConfig.cmp")

@@ -24,6 +24,6 @@ todo_comments.setup({
 vim.keymap.set("n", "<c-n>", function()
 	todo_comments.jump_next({ keywords = {} })
 end, { desc = "Next todo comment" })
-vim.keymap.set("n", "<c-N>", function()
+vim.keymap.set("n", "<c-p>", function()
 	todo_comments.jump_prev({ keywords = {} })
-end, { desc = "Next todo comment" })
+end, { desc = "Previous todo comment" })

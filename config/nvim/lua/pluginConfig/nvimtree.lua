@@ -77,6 +77,10 @@ nvim_tree.setup({
 		-- Update the root directory of the tree if the file is not under current root directory.
 		update_root = true,
 	},
+	view = {
+		preserve_window_proportions = true,
+		cursorline = true,
+	},
 	-- Indicate which file have unsaved modification. (not worky?)
 	modified = {
 		enable = true,

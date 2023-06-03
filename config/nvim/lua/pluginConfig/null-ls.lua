@@ -9,8 +9,8 @@ local code_actions = null_ls.builtins.code_actions
 
 local my_sources = {
 
+	-- NOTE: All of them suck
 	formatting.prettierd,
-	-- HACK: don't know how to turn off the tsserver's linter
 	-- formatting.eslint_d,
 	-- code_actions.eslint_d,
 	-- diagnostics.eslint_d,
@@ -24,9 +24,6 @@ local my_sources = {
 	}),
 
 	-- for bash script
-	-- diagnostics.shellcheck.with({
-	-- 	filetypes = { "sh" },
-	-- }),
 	formatting.shfmt.with({
 		filetypes = { "sh" },
 	}),

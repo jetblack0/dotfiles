@@ -60,11 +60,14 @@ keymap("x", "<a-k>", ":move '<-2<CR>gv-gv", opts)
 --------------------------------------------------------
 
 
--- For null-ls ----------------------------------------
---------------------------------------------------------
+-- Other stuff ----------------------------------------
+-- For null-ls
 keymap("n", "<leader>f", ":lua vim.lsp.buf.format({ async = true })<CR>", opts)
 keymap("n", "<leader>a", ":lua vim.lsp.buf.code_action()<CR>", opts)
 keymap("n", "<leader>q", ":lua vim.diagnostic.setloclist()<CR>", opts)
 keymap("n", "<a-j>", ":lua vim.diagnostic.goto_next({buffer=0})<CR>", opts)
 keymap("n", "<a-k>", ":lua vim.diagnostic.goto_prev({buffer=0})<CR>", opts)
 keymap("n", "<a-l>", ":lua vim.diagnostic.open_float()<CR>", opts)
+
+-- Live servers
+-- TODO: add a keybinding to toggle live-server if current directory has a index.html file

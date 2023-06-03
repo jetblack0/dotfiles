@@ -6,7 +6,7 @@ end
 catppuccin.setup({
 	-- use command :CatppuccinCompile to compile this config into cache
 	compile_path = vim.fn.stdpath("cache") .. "/catppuccin",
-	flavour = "mocha",
+	flavour = "latte",
 	transparent_background = true,
 	term_colors = true,
 	dim_inactive = {

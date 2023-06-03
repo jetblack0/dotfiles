@@ -36,6 +36,8 @@ local options = {
 	lazyredraw = true,
 	--[[ wildmenu = true,
 	wildmode = "list:longest,full", ]]
+	backup = false,
+	writebackup = false,
 }
 
 local global = {

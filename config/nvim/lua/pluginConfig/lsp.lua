@@ -154,6 +154,7 @@ lspconfig.lua_ls.setup({
 	},
 
 	on_attach = function(client, bufnr)
+		client.server_capabilities.documentFormattingProvider = false
 		lsp_keybind(client, bufnr)
 		lsp_signature_setup(client, bufnr)
 	end,
@@ -241,7 +242,7 @@ lspconfig.bashls.setup({
 vim.diagnostic.config({
 	virtual_text = false,
 	signs = true,
-	underline = true,
+	underline = false,
 	update_in_insert = true,
 	severity_sort = true,
 	float = {
@@ -255,7 +256,7 @@ vim.diagnostic.config({
 })
 
 -- Change diagnostic symbols in the sign column (gutter)
-local signs = { Error = "", Warn = "", Hint = "", Info = "" }
+local signs = { Error = "", Warn = "", Hint = "", Info = "" }
 for type, icon in pairs(signs) do
 	local hl = "DiagnosticSign" .. type
 	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })

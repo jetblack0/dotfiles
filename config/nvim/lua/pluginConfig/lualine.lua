@@ -26,6 +26,11 @@ local colors = {
 	red_diff = '#F38BA8',
 	green_diff = '#A6E3A1',
 	orange_diff = '#F9E2AF',
+
+	green_diff_light = '#40A02B',
+	orange_diff_light = '#DF8E1D',
+	red_diff_light = '#D20F39',
+
 }
 
 local conditions = {
@@ -172,7 +177,7 @@ ins_left({ "progress", color = { fg = colors.fg, gui = "bold" } })
 ins_left({
 	"diagnostics",
 	sources = { "nvim_diagnostic" },
-	symbols = { error = " ", warn = " ", info = " ", hint = " " },
+	symbols = { error = " ", warn = " ", info = " ", hint = " " },
 	-- color = { fg = colors.darkblue, gui = "bold"},
 	colored = true,
 	update_in_insert = false,
@@ -204,9 +209,9 @@ ins_right({
 	-- Is it me or the symbol for modified us really weird
 	symbols = { added = " ", modified = " ", removed = " " },
 	diff_color = {
-		added = { fg = colors.green_diff },
-		modified = { fg = colors.orange_diff },
-		removed = { fg = colors.red_diff },
+		added = { fg = colors.green_diff_light },
+		modified = { fg = colors.orange_diff_light },
+		removed = { fg = colors.red_diff_light },
 	},
 
 	cond = conditions.hide_in_width,
