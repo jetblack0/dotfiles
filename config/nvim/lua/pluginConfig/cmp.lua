@@ -3,12 +3,10 @@ if not cmp_status_ok then
 	return
 end
 
-local snip_status_ok, luasnip = pcall(require, "luasnip")
+local snip_status_ok, snippy = pcall(require, "snippy")
 if not snip_status_ok then
 	return
 end
-
--- require("luasnip/loaders/from_vscode").lazy_load()
 
 local kind_icons = {
 	Text = " ",
@@ -46,8 +44,8 @@ cmp.setup({
 	-- get error if we don't use snippet engine
 	snippet = {
 		expand = function(args)
-			luasnip.lsp_expand(args.body)
-		end,
+		      require 'snippy'.expand_snippet(args.body)
+		end
 	},
 	mapping = {
 		["<C-k>"] = cmp.mapping.select_prev_item(),
@@ -76,7 +74,7 @@ cmp.setup({
 			-- show the sources name
 			--[[ vim_item.menu = ({
 				nvim_lsp = "[LSP]",
-				luasnip = "[Snippet]",
+				snippy = "[Snippet]",
 				buffer = "[Buffer]",
 				path = "[Path]",
 				emmet_vim = "[emmet]",
@@ -87,16 +85,29 @@ cmp.setup({
 	},
 	sources = {
 		{ name = "nvim_lsp" },
-		-- { name = "luasnip" },
+		-- { name = "snippy" },
 		{ name = "buffer" },
 		{ name = "path" },
 	},
 	window = {
-		documentation = cmp.config.window.bordered(),
+		completion = {
+			border = "rounded",
+			side_padding = 0,
+			col_offset = 0,
+			winhighlight = "CursorLine:PmenuSel,Search:None",
+		},
+		documentation = {
+			border = "rounded",
+			side_padding = 0,
+			col_offset = 0,
+			-- winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:None",
+		}
+
+		-- documentation = cmp.config.window.bordered(),
+		-- completion = cmp.config.window.bordered(),
 	},
 	experimental = {
 		ghost_text = true,
-		native_menu = false,
 	},
 	enabled = function()
 		-- disable completion in comments
