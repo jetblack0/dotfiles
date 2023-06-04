@@ -32,7 +32,7 @@ get_json() {
 	echo -n '['
 
 	start=$(( which_monitor * 10 + 1 ))
-	end=$(( start + 9 ))
+	end=$(( start + 10 ))
 
 	for ((i = start; i < end; i++))
 	do
