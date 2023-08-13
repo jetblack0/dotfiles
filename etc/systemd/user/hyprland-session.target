@@ -1,0 +1,4 @@
+[Unit]
+Description=Hyprland session 
+Requisite=default.target
+After=default.target
