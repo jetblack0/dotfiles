@@ -1,0 +1,9 @@
+[Unit]
+Description=battery monitoring daemon
+
+[Service]
+Type=simple
+ExecStart=/home/jetblack/Development/myScript/wayland/batteryNotification.sh
+
+[Install]
+WantedBy=default.target
