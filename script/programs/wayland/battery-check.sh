@@ -17,9 +17,9 @@ urgency="low"
 
 if [ "$status" = "1" ]
 then
-	path=/home/jetblack/.config/eww/images/icons/battery/charging
+	path=/home/johnny/.config/eww/images/icons/battery/charging
 else
-	path=/home/jetblack/.config/eww/images/icons/battery/normal
+	path=/home/johnny/.config/eww/images/icons/battery/normal
 fi
 
 if [ "$capacity" -gt 90 ]

@@ -35,7 +35,7 @@ get() {
 	fi
 }
 
-path_two="/sys/class/net/enp0s20f0u2c4i2/carrier"
+path_two="/sys/class/net/enp0s20f0u1c4i2/carrier"
 path_one="/sys/class/net/enp7s0/carrier"
 refresh_rate=60
 

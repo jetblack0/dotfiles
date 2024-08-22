@@ -1,8 +1,8 @@
 #!/bin/sh
-# $1: title, artists, album, return corresponding information
+# $1: title, artists or album, return corresponding information
 
 title() {
-	mpc current -f %title%
+	mpc current -f %title% | sed 's/(.*)//'
 }
 
 album() {

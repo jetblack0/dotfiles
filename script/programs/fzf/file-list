@@ -1,0 +1,11 @@
+################################################### Config files ###################################################
+# wayland stuff
+$HOME/.config/hypr/hyprland.conf
+$HOME/.config/dunst/dunstrc
+$HOME/.config/eww/eww.yuck
+$HOME/.config/swaylock/config
+$HOME/.config/swayidle/config
+
+# nvim
+$HOME/.config/nvim/init.lua
+$HOME/.config/nvim/lua/plugins.lua

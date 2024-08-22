@@ -1,0 +1,12 @@
+[Unit]
+Description=Simple battery monitoring and notification daemon
+
+[Service]
+Type=exec
+User=johnny
+Group=johnny
+WorkingDirectory=/home/johnny/Development/script/programs/wayland
+ExecStart=/home/johnny/Development/script/programs/wayland/battery-notification.sh
+
+[Install]
+WantedBy=default.target

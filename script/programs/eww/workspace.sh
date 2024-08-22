@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# introduction: a script to accomplish awesomewm like workspace in hyprland, in order to make it work correctly, you need to bind 1-10 workspaces on monitor 0, 11-20 to monitor 1 and so fourth
+# a script to accomplish awesomewm like workspace in hyprland, in order to make it work, you need to bind 1-10 workspaces on monitor 0, 11-20 to monitor 1 and so fourth
 # return: an array of {workspace_id, color}
 # $1: which monitor to draw this bar (start with 0)
+
+# TODO: ugly af
 
 ##################################################### function declaration ################################################
 set_color() {
@@ -11,6 +13,11 @@ set_color() {
 	# occupied_workspaces_color="occupied"
 	# focused_workspaces_color="focused"
 	# empty_workspaces_color="empty"
+
+	if [ "$focused_workspace" -eq "$1" ]; then
+		echo -n $focused_workspaces_color
+		return
+	fi
 
 	if [ "${occupied_workspaces[$1]}" -eq 1 ]
 	then
@@ -56,27 +63,41 @@ focused_workspace=$(hyprctl -j monitors | jaq -r '.[] | select(.focused == true)
 while read -r workspace_id
 do
 	occupied_workspaces[$workspace_id]=1
-done < <(hyprctl -j workspaces | gojq -r '.[]|"\(.id)"')
+done < <(hyprctl -j workspaces | gojq '.[] | select(.windows > 0) | .id')
 
 get_json
 
 
 ##################################################### listen to events ######################################################
-socat -u UNIX-CONNECT:/tmp/hypr/"$HYPRLAND_INSTANCE_SIGNATURE"/.socket2.sock - | while read -r line
+socat -u UNIX-CONNECT:/run/user/$UID/hypr/"$HYPRLAND_INSTANCE_SIGNATURE"/.socket2.sock - | while read -r line
 do
-	case ${line%>>*} in
-		"workspace")
-		  focused_workspace=${line#*>>}
-		  ;;
-		"focusedmon")
-		  focused_workspace=${line#*,}
-		  ;;
-		"createworkspace")
-		  workspace_event_handler "${line#*>>}" 1
-		  ;;
-		"destroyworkspace")
-		  workspace_event_handler "${line#*>>}" 0
-		  ;;
-	esac
+	while read -r workspace_id
+	do
+		occupied_workspaces[$workspace_id]=0
+	done < <(hyprctl -j workspaces | gojq '.[] | select(.windows == 0) | .id')
+
+	while read -r workspace_id
+	do
+		occupied_workspaces[$workspace_id]=1
+	done < <(hyprctl -j workspaces | gojq '.[] | select(.windows > 0) | .id')
+
+	focused_workspace=$(hyprctl -j monitors | jaq -r '.[] | select(.focused == true) | .activeWorkspace.id')
+
+	# NOTE: following lines are no longer usable after Hyprland version 0.42.0. Above is a quick fix
+	# case ${line%>>*} in
+	# "workspace")
+	# 	focused_workspace=${line#*>>}
+	# ;;
+	# "focusedmon")
+	# 	focused_workspace=${line#*,}
+	# ;;
+	# "createworkspace")
+	# 	workspace_event_handler "${line#*>>}" 1
+	# ;;
+	# "destroyworkspace")
+	# 	workspace_event_handler "${line#*>>}" 0
+	# ;;
+	# esac
+
 	get_json
 done

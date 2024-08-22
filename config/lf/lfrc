@@ -38,7 +38,7 @@ cmd extract ${{
 
 # delete files
 cmd delete ${{
-	/home/jetblack/Development/myScript/lf/cowDelete.sh $fx	
+	/home/johnny/Development/script/programs/lf/cow-delete.sh $fx	
 }}
 
 # set picture as wallpaper

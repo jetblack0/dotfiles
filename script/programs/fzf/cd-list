@@ -1,0 +1,15 @@
+# Configuration
+$HOME/.config
+
+# System configuration 
+/proc/sys
+/etc/systemd/system
+/etc/systemd/user
+/usr/local/bin
+/usr/share/fonts/TTF
+/etc/pacman.d
+/sys/class/power_supply
+/sys/class/backlight
+
+# Downloads
+$HOME/Downloads

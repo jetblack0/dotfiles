@@ -28,8 +28,8 @@ get() {
 	echo "{\"icon_middle_path\":\"${icon_middle_path}\",\"album_cover_path\":\"${album_cover_path}\",\"visible\":\"${visible}\"}"
 }
 
-music_directory="$HOME/Multimedia/Audio/Music/Artists"
-fallback_album_path="/home/jetblack/Multimedia/Audio/Music/Artists/Astrud Gilberto/A Certain Smile, A Certrain Sadness 1967/Artwork/Cover.jpg"
+music_directory="$HOME/Resources/media/audio/Music/Artists"
+fallback_album_path="$HOME/Resources/media/audio/Music/Artists/Astrud Gilberto/A Certain Smile, A Certrain Sadness 1967/Artwork/Cover.jpg"
 
 REFRESH_RATE=1
 while true

@@ -3,7 +3,11 @@
 
 get() {
 	is_mute=$(pamixer --get-mute)
-	percentage=$(pamixer --get-volume)
+
+	if [ "$is_mute" != "true" ]
+	then
+		percentage="$(pamixer --get-volume)%"
+	fi
 
 	if [ "$is_mute" = "true" ] || [ "$percentage" -eq 0 ]
 	then
