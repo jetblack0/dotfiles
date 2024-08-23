@@ -1,3 +1,8 @@
+urls-source "freshrss"
+freshrss-url "https://feed.unazoomer.com/api/greader.php"
+freshrss-login "xxxxxxxxxxxxxxx"
+freshrss-password "xxxxxxxxxxxxxxx"
+
 max-items 100
 bind-key j down
 bind-key k up
@@ -9,6 +14,6 @@ bind-key ^D pagedown
 bind-key ^U pageup
 bind-key U show-urls
 unbind-key ENTER
-browser /home/jetblack/.config/newsboat/linkhandler.sh
+browser ~/.config/newsboat/linkhandler.sh
 
 include ~/.config/newsboat/themes/light
