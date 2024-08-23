@@ -1,0 +1,25 @@
+# Networkd configuration for iPhone tethering
+[Match]
+Name=xxxxxxxxxxxxxxx
+MACAddress=xx:xx:xx:xx:xx:xx
+
+[Network]
+DHCP=yes
+IPv6AcceptRA=yes
+
+# resolved doesn't support DoH, so use a separate client for now 
+DNS=127.0.0.1
+
+# networkd doesn't support DNS over HTTPS yet
+# DNSSEC=yes
+# DNSOverTLS=yes
+# DNS=8.8.8.8#dns.google
+# DNS=1.1.1.1#cloudflare-dns.com
+# FallbackDNS=9.9.9.9#dns.quad9.net
+# FallbackDNS=8.8.4.4#dns.google
+
+[DHCPv4]
+UseDNS=no
+
+[DHCPv6]
+UseDNS=no

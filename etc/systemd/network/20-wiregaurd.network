@@ -1,0 +1,11 @@
+[Match]
+Name=j100*
+Kind=wireguard
+
+[Network]
+Address=xxx.xxx.xxx.xxx/xx
+Address=xxxx:xxxx:xxxx:x::xx/xxx
+DNS=xxx.xxx.x.x
+# Domains that can only be resolved and accessed inside the VPN network
+# Resolved will use DNS configured above to resolve following domains
+Domains=~xxxxxxxx.xxx ~xxxxxxxx-xxxx.xxxx ~xxxxxxxxxxx.xxxx
