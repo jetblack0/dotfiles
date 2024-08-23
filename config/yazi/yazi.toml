@@ -1,0 +1,62 @@
+[manager]
+ratio			= [ 1, 4, 3 ]
+# sort_by			= "alphabetical"
+# sort_reverse	= true
+# sort_dir_first	= true
+
+[preview]
+image_quality = 50
+
+[opener]
+edit = [
+	{ run = 'nvim "$@"', block = true },
+]
+video = [
+	{ run = 'mpv "$@"', orphan = true, for = "unix" },
+]
+book = [
+	{ run = 'zathura "$@"', orphan = true },
+]
+image = [
+	{ run = 'nsxiv -- "$@"', orphan = true },
+]
+audio = [
+	{ run = 'mpv --audio-display=no "$@"' },
+]
+do-nothing = [
+	{ run = ':' },
+]
+fallback-open = [
+	{ run = 'xdg-open "$@"' },
+]
+
+[open]
+prepend_rules = [
+	{ mime = "text/*",					use = "edit" },
+	{ mime = "application/json",		use = "edit" },
+	{ mime = "application/json",		use = "edit" },
+	{ mime = "application/javascript",	use = "edit" },
+
+	{ mime = "application/pdf",			use = "book" },
+	{ mime = "image/vnd.djvu",			use = "book" },
+	{ mime = "application/epub*",		use = "book" },
+
+	{ mime = "video/*",					use = "video" },
+
+	{ mime = "audio/*",					use = "audio" },
+	{ name = "*.html",					use = [ "open", "edit" ] },
+]
+append_rules = [
+	{ name = "*",						use = "fallback-open" },
+]
+
+[plugin]
+prepend_previewers = [
+	# Archive previewer
+	{ mime = "application/*zip",            run = "ouch" },
+	{ mime = "application/x-tar",           run = "ouch" },
+	{ mime = "application/x-bzip2",         run = "ouch" },
+	{ mime = "application/x-7z-compressed", run = "ouch" },
+	{ mime = "application/x-rar",           run = "ouch" },
+	{ mime = "application/x-xz",            run = "ouch" },
+]

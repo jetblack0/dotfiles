@@ -1,0 +1,298 @@
+# A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
+# If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
+"$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
+
+[manager]
+keymap = [
+	{ on = [ "<Esc>" ], run = "escape",             desc = "exit visual mode, clear selected, or cancel search" },
+	{ on = [ "<C-[>" ], run = "escape",             desc = "exit visual mode, clear selected, or cancel search" },
+	{ on = [ "q" ],     run = "quit",               desc = "exit the process" },
+	{ on = [ "Q" ],     run = "quit --no-cwd-file", desc = "exit the process without writing cwd-file" },
+	{ on = [ "<C-q>" ], run = "close",              desc = "close the current tab, or quit if it is last tab" },
+	{ on = [ "<C-z>" ], run = "suspend",            desc = "suspend the process" },
+
+	# Navigation
+	{ on = [ "k" ], run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "j" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "K" ], run = "arrow -5", desc = "move cursor up 5 lines" },
+	{ on = [ "J" ], run = "arrow 5",  desc = "move cursor down 5 lines" },
+
+	{ on = [ "<C-u>" ], run = "arrow -50%",  desc = "move cursor up half page" },
+	{ on = [ "<C-d>" ], run = "arrow 50%",   desc = "move cursor down half page" },
+	{ on = [ "<C-b>" ], run = "arrow -100%", desc = "move cursor up one page" },
+	{ on = [ "<C-f>" ], run = "arrow 100%",  desc = "move cursor down one page" },
+
+	{ on = [ "h" ], run = "leave",						desc = "go back to the parent directory" },
+	# { on = [ "l" ], run = "enter",						desc = "enter the child directory" },
+	{ on = [ "l" ], run = "plugin --sync smart-enter",	desc = "smart enter" },
+
+	{ on = [ "H" ], run = "back",    desc = "go back to the previous directory" },
+	{ on = [ "L" ], run = "forward", desc = "go forward to the next directory" },
+
+	{ on = [ "<A-k>" ], run = "seek -5", desc = "seek up 5 units in the preview" },
+	{ on = [ "<A-j>" ], run = "seek 5",  desc = "seek down 5 units in the preview" },
+
+	{ on = [ "g", "g" ], run = "arrow -99999999", desc = "move cursor to the top" },
+	{ on = [ "G" ],      run = "arrow 99999999",  desc = "move cursor to the bottom" },
+
+	# Selection
+	{ on = [ "<Space>" ], run = [ "select --state=none", "arrow 1" ], desc = "toggle the current selection state" },
+	{ on = [ "v" ],       run = "visual_mode",                        desc = "enter visual mode (selection mode)" },
+	{ on = [ "V" ],       run = "visual_mode --unset",                desc = "enter visual mode (unset mode)" },
+	{ on = [ "<C-a>" ],   run = "select_all --state=true",            desc = "select all files" },
+	{ on = [ "<C-r>" ],   run = "select_all --state=none",            desc = "inverse selection of all files" },
+
+	# Operation
+	{ on = [ "o" ],         run = "open",                       desc = "open the selected files" },
+	{ on = [ "O" ],         run = "open --interactive",         desc = "open the selected files interactively" },
+	# { on = [ "<Enter>" ],   run = "open",                       desc = "open the selected files" },
+	# { on = [ "<C-Enter>" ], run = "open --interactive",         desc = "open the selected files interactively" },
+	{ on = [ "y" ],         run = "yank",                       desc = "copy the selected files" },
+	{ on = [ "c" ],         run = "unyank",                     desc = "cancel the yank status of files" },
+	{ on = [ "d" ],         run = "yank --cut",                 desc = "cut the selected files" },
+	# { on = [ "t" ],         run = "remove --permanently",       desc = "permanently delete the files" },
+	{ on = [ "D" ],         run = "remove",                     desc = "move the files to the trash" },
+	{ on = [ "c" ],         run = "unyank",                     desc = "cancel the yank status of files" },
+	{ on = [ "p" ],         run = "paste",                      desc = "paste the files" },
+	# { on = [ "P" ],         run = "paste --force",              desc = "Paste the files (overwrite if the destination exists)" },
+	{ on = [ "-" ],         run = "link",                       desc = "symlink the absolute path of files" },
+	{ on = [ "_" ],         run = "link --relative",            desc = "symlink the relative path of files" },
+	{ on = [ "m" ],         run = "create",                     desc = "create a file or directory (ends with / for directories)" },
+	{ on = [ "r" ],         run = "rename --cursor=before_ext",			desc = "rename a file or directory" },
+	{ on = [ "R" ],			run = "rename --cursor=start --empty=stem",	desc = "rename a file or directory" },
+	{ on = [ "<Enter>" ],	run = 'shell --interactive',								desc = "run a shell command" },
+	# { on = [ ":" ],         run = "shell --block",              desc = "Run a shell command (block the UI until the command finishes)" },
+	{ on = [ "." ],         run = "hidden toggle",              desc = "toggle the visibility of hidden files" },
+	{ on = [ "s" ],         run = "search fd",                  desc = "search files by name using fd" },
+	{ on = [ "S" ],         run = "search rg",                  desc = "search files by content using ripgrep" },
+	{ on = [ "<C-s>" ],     run = "search none",                desc = "cancel the ongoing search" },
+	{ on = [ "z" ],         run = "plugin fzf",                 desc = "jump to a directory, or reveal a file using fzf" },
+	{ on = [ "Z" ],         run = "plugin zoxide",              desc = "jump to a directory using zoxide" },
+
+	# Linemode
+	{ on = [ "b", "s" ], run = "linemode size",        desc = "set linemode to size" },
+	{ on = [ "b", "p" ], run = "linemode permissions", desc = "set linemode to permissions" },
+	{ on = [ "b", "m" ], run = "linemode mtime",       desc = "set linemode to mtime" },
+	{ on = [ "b", "n" ], run = "linemode none",        desc = "set linemode to none" },
+
+	# Copy
+	{ on = [ "C", "c" ], run = "copy path",             desc = "copy the absolute path" },
+	{ on = [ "C", "d" ], run = "copy dirname",          desc = "copy the path of the parent directory" },
+	{ on = [ "C", "f" ], run = "copy filename",         desc = "copy the name of the file" },
+	{ on = [ "C", "n" ], run = "copy name_without_ext", desc = "copy the name of the file without the extension" },
+
+	# Filter
+	{ on = [ "f" ], run = "filter --smart", desc = "filter the files" },
+
+	# Find
+	{ on = [ "/" ], run = "find --smart",            desc = "find next file" },
+	{ on = [ "?" ], run = "find --previous --smart", desc = "find previous file" },
+	{ on = [ "n" ], run = "find_arrow",              desc = "go to next found file" },
+	{ on = [ "N" ], run = "find_arrow --previous",   desc = "go to previous found file" },
+
+	# Sorting
+	{ on = [ ",", "m" ], run = "sort modified --reverse=no --dir-first",               desc = "sort by modified time" },
+	{ on = [ ",", "M" ], run = "sort modified --reverse --dir-first",     desc = "sort by modified time (reverse)" },
+	{ on = [ ",", "e" ], run = "sort extension --reverse=no --dir-first",		 	  desc = "sort by extension" },
+	{ on = [ ",", "E" ], run = "sort extension --reverse --dir-first",    desc = "sort by extension (reverse)" },
+	{ on = [ ",", "s" ], run = "sort size --reverse=no --dir-first",                   desc = "sort by size" },
+	{ on = [ ",", "S" ], run = "sort size --reverse=no --reverse --dir-first",         desc = "sort by size (reverse)" },
+	{ on = [ ",", "c" ], run = "sort created --reverse=no --dir-first",                desc = "sort by created time" },
+	{ on = [ ",", "C" ], run = "sort created --reverse --dir-first",      desc = "sort by created time (reverse)" },
+	{ on = [ ",", "a" ], run = "sort alphabetical --reverse=no --dir-first",           desc = "sort alphabetically" },
+	{ on = [ ",", "A" ], run = "sort alphabetical --reverse --dir-first", desc = "sort alphabetically (reverse)" },
+	{ on = [ ",", "n" ], run = "sort natural --reverse=no --dir-first",                desc = "sort naturally" },
+	{ on = [ ",", "N" ], run = "sort natural --reverse --dir-first",      desc = "sort naturally (reverse)" },
+
+	# Tabs
+	{ on = [ "T" ], run = "tab_create --current", desc = "create a new tab using the current path" },
+
+	{ on = [ "1" ], run = "tab_switch 0", desc = "switch to the first tab" },
+	{ on = [ "2" ], run = "tab_switch 1", desc = "switch to the second tab" },
+	{ on = [ "3" ], run = "tab_switch 2", desc = "switch to the third tab" },
+	{ on = [ "4" ], run = "tab_switch 3", desc = "switch to the fourth tab" },
+	{ on = [ "5" ], run = "tab_switch 4", desc = "switch to the fifth tab" },
+	{ on = [ "6" ], run = "tab_switch 5", desc = "switch to the sixth tab" },
+	{ on = [ "7" ], run = "tab_switch 6", desc = "switch to the seventh tab" },
+	{ on = [ "8" ], run = "tab_switch 7", desc = "switch to the eighth tab" },
+	{ on = [ "9" ], run = "tab_switch 8", desc = "switch to the ninth tab" },
+
+	{ on = [ "[" ], run = "tab_switch -1 --relative", desc = "switch to the previous tab" },
+	{ on = [ "]" ], run = "tab_switch 1 --relative",  desc = "switch to the next tab" },
+
+	{ on = [ "{" ], run = "tab_swap -1", desc = "swap the current tab with the previous tab" },
+	{ on = [ "}" ], run = "tab_swap 1",  desc = "swap the current tab with the next tab" },
+
+	# Tasks
+	{ on = [ "w" ], run = "tasks_show", desc = "show the tasks manager" },
+
+	# Goto
+	{ on = [ "g", "h" ],       run = "cd ~",             desc = "go home" },
+	{ on = [ "g", "<Space>" ], run = "cd --interactive", desc = "go to a directory" },
+	# { on = [ "g", "c" ],       run = "cd ~/.config",     desc = "Go to the config directory" },
+	# { on = [ "g", "d" ],       run = "cd ~/Downloads",   desc = "Go to the downloads directory" },
+	# { on = [ "g", "t" ],       run = "cd /tmp",          desc = "Go to the temporary directory" },
+
+	# Help
+	{ on = [ "~" ], run = "help", desc = "open help" },
+
+	# custom shell commands
+	{ on = [ "E" ], run = 'shell --confirm "ouch decompress $0"', desc = "decompress archives" },
+]
+
+[tasks]
+
+keymap = [
+	{ on = [ "<Esc>" ], run = "close", desc = "hide the task manager" },
+	{ on = [ "<C-[>" ], run = "close", desc = "hide the task manager" },
+	{ on = [ "<C-q>" ], run = "close", desc = "hide the task manager" },
+	{ on = [ "w" ],     run = "close", desc = "hide the task manager" },
+
+	{ on = [ "k" ], run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "j" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "<Up>" ],   run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "<Down>" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "<Enter>" ], run = "inspect", desc = "inspect the task" },
+	{ on = [ "x" ],       run = "cancel",  desc = "cancel the task" },
+
+	{ on = [ "~" ], run = "help", desc = "open help" }
+]
+
+[select]
+
+keymap = [
+	{ on = [ "<Esc>" ],   run = "close",          desc = "cancel selection" },
+	{ on = [ "<C-[>" ],   run = "close",          desc = "cancel selection" },
+	{ on = [ "<C-q>" ],   run = "close",          desc = "cancel selection" },
+	{ on = [ "<Enter>" ], run = "close --submit", desc = "submit the selection" },
+
+	{ on = [ "k" ], run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "j" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "K" ], run = "arrow -5", desc = "move cursor up 5 lines" },
+	{ on = [ "J" ], run = "arrow 5",  desc = "move cursor down 5 lines" },
+
+	{ on = [ "<Up>" ],   run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "<Down>" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "<S-Up>" ],   run = "arrow -5", desc = "move cursor up 5 lines" },
+	{ on = [ "<S-Down>" ], run = "arrow 5",  desc = "move cursor down 5 lines" },
+
+	{ on = [ "~" ], run = "help", desc = "open help" }
+]
+
+[input]
+
+keymap = [
+	{ on = [ "<C-q>" ],   run = "close",          desc = "cancel input" },
+	{ on = [ "<Enter>" ], run = "close --submit", desc = "submit the input" },
+	{ on = [ "<Esc>" ],   run = "escape",         desc = "go back the normal mode, or cancel input" },
+	{ on = [ "<C-[>" ],   run = "escape",         desc = "go back the normal mode, or cancel input" },
+
+	# Mode
+	{ on = [ "i" ], run = "insert",                              desc = "enter insert mode" },
+	{ on = [ "a" ], run = "insert --append",                     desc = "enter append mode" },
+	{ on = [ "I" ], run = [ "move -999", "insert" ],             desc = "move to the BOL, and enter insert mode" },
+	{ on = [ "A" ], run = [ "move 999", "insert --append" ],     desc = "move to the EOL, and enter append mode" },
+	{ on = [ "v" ], run = "visual",                              desc = "enter visual mode" },
+	{ on = [ "V" ], run = [ "move -999", "visual", "move 999" ], desc = "enter visual mode and select all" },
+
+	# Character-wise movement
+	{ on = [ "h" ],       run = "move -1", desc = "move back a character" },
+	{ on = [ "l" ],       run = "move 1",  desc = "move forward a character" },
+	{ on = [ "<Left>" ],  run = "move -1", desc = "move back a character" },
+	{ on = [ "<Right>" ], run = "move 1",  desc = "move forward a character" },
+	{ on = [ "<C-b>" ],   run = "move -1", desc = "move back a character" },
+	{ on = [ "<C-f>" ],   run = "move 1",  desc = "move forward a character" },
+
+	# Word-wise movement
+	{ on = [ "b" ],     run = "backward",              desc = "move back to the start of the current or previous word" },
+	{ on = [ "w" ],     run = "forward",               desc = "move forward to the start of the next word" },
+	{ on = [ "e" ],     run = "forward --end-of-word", desc = "move forward to the end of the current or next word" },
+	{ on = [ "<A-b>" ], run = "backward",              desc = "move back to the start of the current or previous word" },
+	{ on = [ "<A-f>" ], run = "forward --end-of-word", desc = "move forward to the end of the current or next word" },
+
+	# Line-wise movement
+	{ on = [ "0" ],      run = "move -999", desc = "move to the BOL" },
+	{ on = [ "$" ],      run = "move 999",  desc = "move to the EOL" },
+	{ on = [ "<C-a>" ],  run = "move -999", desc = "move to the BOL" },
+	{ on = [ "<C-e>" ],  run = "move 999",  desc = "move to the EOL" },
+	{ on = [ "<Home>" ], run = "move -999", desc = "move to the BOL" },
+	{ on = [ "<End>" ],  run = "move 999",  desc = "move to the EOL" },
+
+	# Delete
+	{ on = [ "<Backspace>" ], run = "backspace",	     desc = "delete the character before the cursor" },
+	{ on = [ "<Delete>" ],    run = "backspace --under", desc = "delete the character under the cursor" },
+	{ on = [ "<C-h>" ],       run = "backspace",         desc = "delete the character before the cursor" },
+	{ on = [ "<C-d>" ],       run = "backspace --under", desc = "delete the character under the cursor" },
+
+	# Kill
+	{ on = [ "<C-u>" ], run = "kill bol",      desc = "kill backwards to the BOL" },
+	{ on = [ "<C-k>" ], run = "kill eol",      desc = "kill forwards to the EOL" },
+	{ on = [ "<C-w>" ], run = "kill backward", desc = "kill backwards to the start of the current word" },
+	{ on = [ "<A-d>" ], run = "kill forward",  desc = "kill forwards to the end of the current word" },
+
+	# Cut/Yank/Paste
+	{ on = [ "d" ], run = "delete --cut",                              desc = "cut the selected characters" },
+	{ on = [ "D" ], run = [ "delete --cut", "move 999" ],              desc = "cut until the EOL" },
+	{ on = [ "c" ], run = "delete --cut --insert",                     desc = "cut the selected characters, and enter insert mode" },
+	{ on = [ "C" ], run = [ "delete --cut --insert", "move 999" ],     desc = "cut until the EOL, and enter insert mode" },
+	{ on = [ "x" ], run = [ "delete --cut", "move 1 --in-operating" ], desc = "cut the current character" },
+	{ on = [ "y" ], run = "yank",           desc = "copy the selected characters" },
+	{ on = [ "p" ], run = "paste",          desc = "paste the copied characters after the cursor" },
+	{ on = [ "P" ], run = "paste --before", desc = "paste the copied characters before the cursor" },
+
+	# Undo/Redo
+	{ on = [ "u" ],     run = "undo", desc = "undo the last operation" },
+	{ on = [ "<C-r>" ], run = "redo", desc = "redo the last operation" },
+
+	# Help
+	{ on = [ "~" ], run = "help", desc = "open help" }
+]
+
+[completion]
+
+keymap = [
+	{ on = [ "<C-q>" ],   run = "close",                                      desc = "cancel completion" },
+	{ on = [ "<Tab>" ],   run = "close --submit",                             desc = "submit the completion" },
+	{ on = [ "<Enter>" ], run = [ "close --submit", "close_input --submit" ], desc = "submit the completion and input" },
+
+	{ on = [ "<A-k>" ], run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "<A-j>" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "<Up>" ],   run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "<Down>" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "<C-p>" ], run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "<C-n>" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "~" ], run = "help", desc = "Open help" }
+]
+
+[help]
+
+keymap = [
+	{ on = [ "<Esc>" ], run = "escape", desc = "clear the filter, or hide the help" },
+	{ on = [ "<C-[>" ], run = "escape", desc = "clear the filter, or hide the help" },
+	{ on = [ "q" ],     run = "close",  desc = "exit the process" },
+	{ on = [ "<C-q>" ], run = "close",  desc = "hide the help" },
+
+	# Navigation
+	{ on = [ "k" ], run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "j" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "K" ], run = "arrow -5", desc = "move cursor up 5 lines" },
+	{ on = [ "J" ], run = "arrow 5",  desc = "move cursor down 5 lines" },
+
+	{ on = [ "<Up>" ],   run = "arrow -1", desc = "move cursor up" },
+	{ on = [ "<Down>" ], run = "arrow 1",  desc = "move cursor down" },
+
+	{ on = [ "<S-Up>" ],   run = "arrow -5", desc = "move cursor up 5 lines" },
+	{ on = [ "<S-Down>" ], run = "arrow 5",  desc = "move cursor down 5 lines" },
+
+	# Filtering
+	{ on = [ "/" ], run = "filter", desc = "apply a filter for the help items" },
+]

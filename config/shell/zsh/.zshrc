@@ -31,26 +31,36 @@
 	# 	fi
 	# }
 
- lfcd () {
-     tmp="$(mktemp)"
-     # `command` is needed in case `lfcd` is aliased to `lf`
-     command lf -last-dir-path="$tmp" "$@"
-     if [ -f "$tmp" ]; then
-         dir="$(cat "$tmp")"
-         rm -f "$tmp"
-         if [ -d "$dir" ]; then
-             if [ "$dir" != "$(pwd)" ]; then
-                 cd "$dir"
-             fi
-         fi
-     fi
- }
+	# lfcd () {
+	# 	tmp="$(mktemp)"
+	# 	# `command` is needed in case `lfcd` is aliased to `lf`
+	# 	command lf -last-dir-path="$tmp" "$@"
+	# 	if [ -f "$tmp" ]; then
+	# 		dir="$(cat "$tmp")"
+	# 		rm -f "$tmp"
+	# 		if [ -d "$dir" ]; then
+	# 			if [ "$dir" != "$(pwd)" ]; then
+	# 				cd "$dir"
+	# 			fi
+	# 		fi
+	# 	fi
+	# }
 
- # open all the images in current directory using nsxiv
- images() {
-	# fd -e "jpeg" -e "png" -e "jpg" --print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
-	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg" -print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
- }
+	# yazi
+	function yy() {
+		local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+		yazi "$@" --cwd-file="$tmp"
+		if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+			cd -- "$cwd"
+		fi
+		rm -f -- "$tmp"
+	}
+
+	# open all the images in current directory using nsxiv
+	images() {
+		# fd -e "jpeg" -e "png" -e "jpg" --print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
+		find . -regextype awk -iregex ".*png|.*jpeg|.*jpg" -print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
+	}
 
 	# use vi mode
 	bindkey -v
@@ -89,21 +99,21 @@
 	source $plugin_path/zsh-autosuggestions/zsh-autosuggestions.zsh
 	source $plugin_path/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 	source $plugin_path/zsh-completion/completion.zsh
-	# source $pluginPath/catppuccin-zsh-syntax-highlighting/catppuccin_macchiato-zsh-syntax-highlighting.zsh
-	# source $pluginPath/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
+	# source $plugin_path/catppuccin-zsh-syntax-highlighting/catppuccin_macchiato-zsh-syntax-highlighting.zsh
+	# source $plugin_path/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
 
 
 # Keybindings
 # ------------------------------------------------------------------------------
-	bindkey -s '^f' '^ulfcd\n'
+	# bindkey -s '^f' '^ulfcd\n'
+	bindkey -s '^f' '^uyy\n'
 	bindkey -s '^n' '^uimages\n'
-	# bindkey -s '^e' '^usource /home/jetblack/Development/myScript/fzfScript/fzfListDirectories.sh\n'
+	# bindkey -s '^e' '^usource $HOME/Development/script/programs/fzf/fzfListDirectories.sh\n'
 	bindkey -s '^p' '^usource $HOME/Development/script/programs/fzf/fzfcd.sh\n'
 	bindkey -s '^o' '^usource $HOME/Development/script/programs/fzf/fzfopen.sh\n'
 	bindkey -s '^v' '^unvim .\n'
 	# bindkey -M menuselect 'u' send-break
 	# bindkey -M menuselect '\e' accept-line
-# ------------------------------------------------------------------------------
 
 
 # Alias
