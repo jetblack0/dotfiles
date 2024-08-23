@@ -22,7 +22,7 @@ do
 		then
 			wall "please charge your laptop!"
 		else
-			dunstify -I /home/johnny/.config/dunst/images/icons/battery-low.svg "Battery notification" "please charge your laptop!"
+			dunstify -I $HOME/.config/dunst/images/icons/battery-low.svg "Battery notification" "please charge your laptop!"
 		fi
 
 		battery_low_count=1
@@ -34,7 +34,7 @@ do
 		then
 			wall "No battery left, I will suspend to prevent losing your work after 20 seconds!"
 		else
-			dunstify -u "crtical" -I /home/johnny/.config/dunst/images/icons/battery-empty.svg "Battery notification" "no battery left, I will suspend to prevent losing your work after 20 seconds!"
+			dunstify -u "crtical" -I $HOME/.config/dunst/images/icons/battery-empty.svg "Battery notification" "no battery left, I will suspend to prevent losing your work after 20 seconds!"
 		fi
 
 		sleep 20

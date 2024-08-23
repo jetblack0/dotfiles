@@ -1,20 +1,21 @@
 #!/bin/sh
+
 # fullscreen powermenu using your bluured wallpaper as background, execute command with no question asked
 
 # usage:
-# $1: color scheme of this rofi window, valid value: all files name inside ./theme/colorScheme directory, default to catppuccin if the color scheme is not found
+# $1: color scheme of this rofi window, valid value: all files name inside ./theme/colorscheme directory, default to catppuccin if the color scheme is not found
 # $2 (optional): font of this rofi popup
 # $3 (optional): font size of this rofi popup
 # for example, ./powermenu.sh catppuccin Iosevka 15 or simply ./powermenu.sh
 
 set_color_and_font() {
-	color_font_file="$ROFI_HOME/theme/colorAndFont.rasi"
+	color_font_file="$ROFI_HOME/theme/font-color.rasi"
 
-	if [ ! -f "$ROFI_HOME/theme/colorScheme/$color.rasi" ] || [ -z "$color" ]
+	if [ ! -f "$ROFI_HOME/theme/colorscheme/$color.rasi" ] || [ -z "$color" ]
 	then
 		color="catppuccin"
 	fi
-	echo "@import \"$ROFI_HOME/theme/colorScheme/$color.rasi\"" > "$color_font_file"
+	echo "@import \"$ROFI_HOME/theme/colorscheme/$color.rasi\"" > "$color_font_file"
 
 	if [ -n "$font" ] && [ -n "$font_size" ]
 	then
@@ -25,7 +26,7 @@ set_color_and_font() {
 }
 
 rofi_cmd() {
-	rofi -dmenu \
+	rofi -steal-focus -normal-window -dmenu \
 		-theme "$THEME"
 }
 
@@ -69,3 +70,4 @@ case ${chosen} in
 		hyprctl dispatch exit
         ;;
 esac
+sac

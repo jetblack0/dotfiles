@@ -20,7 +20,7 @@
 
 # Custom functionality
 # ------------------------------------------------------------------------------
-	# use lf to switch directories (image preview doesn't work on wayland)
+	# use lf to switch directories without image preview
 	# lfcd () {
 	# 	tmp="$(mktemp -uq)"
 	# 	trap 'rm -f $tmp >/dev/null 2>&1' HUP INT QUIT TERM PWR EXIT
@@ -98,8 +98,8 @@
 	bindkey -s '^f' '^ulfcd\n'
 	bindkey -s '^n' '^uimages\n'
 	# bindkey -s '^e' '^usource /home/jetblack/Development/myScript/fzfScript/fzfListDirectories.sh\n'
-	bindkey -s '^p' '^usource /home/johnny/Development/script/programs/fzf/fzfcd.sh\n'
-	bindkey -s '^o' '^usource /home/johnny/Development/script/programs/fzf/fzfopen.sh\n'
+	bindkey -s '^p' '^usource $HOME/Development/script/programs/fzf/fzfcd.sh\n'
+	bindkey -s '^o' '^usource $HOME/Development/script/programs/fzf/fzfopen.sh\n'
 	bindkey -s '^v' '^unvim .\n'
 	# bindkey -M menuselect 'u' send-break
 	# bindkey -M menuselect '\e' accept-line

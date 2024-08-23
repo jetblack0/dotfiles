@@ -18,40 +18,40 @@
 )
 
 (deflisten brightness_info
-  `/home/jetblack/Development/myScript/eww/brightness.sh`
+  `~/Development/script/programs/eww/brightness.sh`
 )
 (deflisten battery_icon_path
-  `/home/jetblack/Development/myScript/eww/battery.sh`
+  `~/Development/script/programs/eww/battery.sh`
 )
 (deflisten volume_info
-  `/home/jetblack/Development/myScript/eww/volume.sh`
+  `~/Development/script/programs/eww/volume.sh`
 )
 (deflisten workspace_info_one
-  `/home/jetblack/Development/myScript/eww/workspace.sh 0`
+  `~/Development/script/programs/eww/workspace.sh 0`
 )
 (deflisten workspace_info_two
-  `/home/jetblack/Development/myScript/eww/workspace.sh 1`
+  `~/Development/script/programs/eww/workspace.sh 1`
 )
 (deflisten bluetooth_info
-  `/home/jetblack/Development/myScript/eww/bluetooth.sh`
+  `~/Development/script/programs/eww/bluetooth.sh`
 )
 (deflisten network_info
-  `/home/jetblack/Development/myScript/eww/network.sh`
+  `~/Development/script/programs/eww/network.sh`
 )
 (deflisten music_meta
-  `/home/jetblack/Development/myScript/eww/music/music_meta.sh`
+  `~/Development/script/programs/eww/music/music_meta.sh`
 )
 (deflisten music_info_title
-  `/home/jetblack/Development/myScript/eww/music/music_info.sh title`
+  `~/Development/script/programs/eww/music/music_info.sh title`
 )
 (deflisten music_info_album
-  `/home/jetblack/Development/myScript/eww/music/music_info.sh album`
+  `~/Development/script/programs/eww/music/music_info.sh album`
 )
 (deflisten music_info_artists
-  `/home/jetblack/Development/myScript/eww/music/music_info.sh artists`
+  `~/Development/script/programs/eww/music/music_info.sh artists`
 )
 (deflisten window_title :initial "..." 
-  `bash /home/jetblack/Development/myScript/eww/window_title.sh`
+  `bash ~/Development/script/programs/eww/window_title.sh`
 )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

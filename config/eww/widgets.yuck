@@ -14,7 +14,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; buttons
 (defwidget power_button []
-  (button :onclick "/home/jetblack/.config/rofi/powermenu.sh catppuccin"
+  (button :onclick "~/.config/rofi/powermenu.sh catppuccin"
     (image :path "./images/icons/power.svg" :image-width "${icon_size}" :image-height "${icon_size}")
   )
 )
@@ -29,7 +29,7 @@
 
 ; NOTE: didn't find some approciate icons
 (defwidget layout []
-  (button :onclick "/home/jetblack/Development/myScript/wayland/hyprland/layoutSwitcher.sh"
+  (button :onclick "~/Development/script/programs/wayland/hyprland/layout-switcher.sh"
     (image :path "./images/icons/layout/${which_layout}.svg" :image-width "${icon_size}" :image-height "${icon_size}")
   )
 )
