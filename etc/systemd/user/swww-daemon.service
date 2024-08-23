@@ -1,0 +1,13 @@
+[Unit]
+Description=sww daemon
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/swww init
+# ExecStartPost=%h/Development/script/programs/wayland/swww/utility.sh random
+
+[Install]
+WantedBy=graphical-session.target

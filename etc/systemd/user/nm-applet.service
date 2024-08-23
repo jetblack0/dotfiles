@@ -1,0 +1,12 @@
+[Unit]
+Description=Network Manager applet systray
+PartOf=graphical-session.target
+After=graphical-session.target eww-daemon.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/nm-applet
+Restart=on-abort
+
+[Install]
+WantedBy=graphical-session.target

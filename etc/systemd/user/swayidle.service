@@ -1,0 +1,13 @@
+[Unit]
+Description=Idle manager for Wayland
+Documentation=man:swayidle(1)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=exec
+# $XDG_CONFIG_HOME/swayidle/config or $HOME/swayidle/config configuration file will be used
+ExecStart=/usr/bin/swayidle -w -d
+
+[Install]
+WantedBy=graphical-session.target

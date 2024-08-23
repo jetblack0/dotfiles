@@ -1,0 +1,15 @@
+[Unit]
+Description=Hyprland's idle daemon without suspending
+Documentation=https://wiki.hyprland.org/Hypr-Ecosystem/hypridle
+PartOf=graphical-session.target
+After=graphical-session.target
+ConditionEnvironment=WAYLAND_DISPLAY
+Conflicts=hypridle.service
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/hypridle -c %h/.config/hypr/hypridle-awake.conf
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

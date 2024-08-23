@@ -1,0 +1,22 @@
+# NOTE: remember to unlock gnome-keyring automatically 
+# otherwise it will ask password when starting.
+# For some reason the main dialog window of this client 
+# keeps disappearing after losing mouse focus, if
+# the systray is present. The systray won't appear 
+# if the eww bar hasn't opened yet (i.e., eww-toggle@.service).
+
+[Unit]
+Description=Nextcloud file syncing daemon
+PartOf=graphical-session.target
+# Wants=eww-toggle@status_bar_0
+After=eww-daemon.service
+# After=eww-toggle@status_bar_0
+
+[Service]
+Type=exec
+ExecStart=/usr/bin/nextcloud --background --logfile -
+CPUQuota=80%
+
+[Install]
+WantedBy=graphical-session.target
+
