@@ -1,29 +1,30 @@
-# configuration file for lf
+# variables
 # --------------------------------------------
-# Basic vars
 set shellopts '-eu'
 set ifs "\n"
 set scrolloff 10
 set icons
 set period 1
+set cursorpreviewfmt "\033[7m"
 set cleaner '~/.config/lf/cleaner'
 set previewer '~/.config/lf/scope'
-# --------------------------------------------
 
-# cmds/functions
+
+# functions
 # --------------------------------------------
 # open files
 cmd open ${{
     case $(file --mime-type "$(readlink -f $f)" -b) in
-    	text/*|application/json|inode/x-empty) $EDITOR $fx;;
-    	image/svg+xml) display -- $f ;;
+    	text/*|application/json|application/javascript|inode/x-empty) $EDITOR $fx;;
+		application/pdf|image/vnd.djvu|application/epub*) setsid -f zathura $fx >/dev/null 2>&1 ;;
+    	image/*) nsxiv -- $f ;;
     	audio/*) mpv --audio-display=no $f ;;
-		video/*) setsid -f vlc $f > /dev/null 2>&1 ;;
+		video/*) setsid -f mpv $f > /dev/null 2>&1 ;;
     	*) for f in $fx; do setsid -f $OPENER $f >/dev/null 2>&1; done;;
     esac
 }}
 
-# extract current file
+# extract compressed files
 cmd extract ${{
     set -f
     case $f in
@@ -41,16 +42,16 @@ cmd delete ${{
 	$HOME/Development/script/programs/lf/cow-delete.sh $fx	
 }}
 
-# set picture as wallpaper
+# set wallpaper
 cmd wallpaper ${{
-	feh --bg-fill --no-fehbg -z $f &
+	# feh --bg-fill --no-fehbg -z $f &
+	swww img $f --transition-type random
 }}
 
-# bulkrename (using vidir)
 cmd bulkrename $vidir
 
 
-# key bind
+# keybindings
 # --------------------------------------------
 map D delete
 map E extract
@@ -59,17 +60,17 @@ map <enter> shell
 # set current image as wallpaper
 map W wallpaper
 
-# execute current file (must be executable)
-map x $$f   
-map X !$f
+# execute current file
+# map x $$f   
+# map X !$f
 
 # dedicated keys for file opener actions
-map o &mimeopen $f
-map O $mimeopen --ask $f
+# map o &mimeopen $f
+# map O $mimeopen --ask $f
 
-# rename (not quite sure how does it work)
-#map A rename # at the very end
-#map c push A<c-u> # new rename
+# rename files
+map r rename # before extension
+map R push r<c-u> # with basename deleted
 #map I push A<c-a> # at the very beginning
 #map i push A<a-b><a-b><a-f> # before extension
 #map a push A<a-b> # after extension

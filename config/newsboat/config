@@ -12,8 +12,9 @@ bind-key j next articlelist
 bind-key k prev articlelist
 bind-key ^D pagedown
 bind-key ^U pageup
-bind-key U show-urls
+
+# bind-key U show-urls
 unbind-key ENTER
 browser ~/.config/newsboat/linkhandler.sh
 
-include ~/.config/newsboat/themes/light
+include ~/.config/newsboat/themes/dark

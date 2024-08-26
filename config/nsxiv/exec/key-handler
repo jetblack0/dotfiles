@@ -11,19 +11,25 @@ done
 
 case "$1" in
 "w")
-	swww img "${relative_path[$(( "$length" - 1))]}" --transition-type random --transition-angle 30 --transition-step 90 --transition-fps 60;;
+	# swww img "${relative_path[$(( "$length" - 1))]}" --transition-type random --transition-angle 30 --transition-step 90 --transition-fps 60;;
+	swww img "${relative_path[$(( "$length" - 1))]}"
+	;;
 "d")
 	# works when file contain space
 	for single in "${relative_path[@]}"
 	do
 		rm "$single"
-	done ;;
+	done
+	;;
 "c")
-	wl-copy -n "${relative_path[@]}" ;;
+	wl-copy -n "${relative_path[@]}"
+	;;
 "C")
-	wl-copy < "${relative_path[$(( "$length" - 1))]}" ;;
+	wl-copy -n "${absolute_path[@]}"
+	;;
 "y")
-	wl-copy -n "${absolute_path[@]}" ;;
+	wl-copy < "${relative_path[$(( "$length" - 1))]}"
+	;;
 
 # for debugging purposes
 "r")

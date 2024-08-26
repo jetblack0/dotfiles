@@ -2,11 +2,12 @@ ignore-empty-password
 disable-caps-lock-text
 
 fade-in=0.3
-font=Iosevka
-effect-blur=10x1
+font=Grape Nuts
+font-size=40
+effect-blur=10x2
 clock
 
-image=~/Pictures/Wallpaper/nature/cloud.png
+image=~/Resources/media/pictures/wallpaper/landscape/nature/wallhaven-eyelqr.jpg
 
 indicator
 indicator-radius=110
@@ -27,10 +28,10 @@ line-ver-color=83a59800
 line-wrong-color=d3869b00
 line-clear-color=53bad900
 
-text-color=1e1e2e80
-text-clear-color=1e1e2e80
-text-ver-color=1e1e2e80
-text-wrong-color=1e1e2e80
+text-color=1e1e2eff
+text-clear-color=1e1e2eff
+text-ver-color=1e1e2eff
+text-wrong-color=1e1e2eff
 
 key-hl-color=83a59866
 bs-hl-color=83a59866
