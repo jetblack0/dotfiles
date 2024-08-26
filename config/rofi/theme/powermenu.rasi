@@ -13,7 +13,7 @@ configuration {
 }
 
 /*****----- Global Properties -----*****/
-@import                          "./colorAndFont.rasi"
+@import                          "./font-color.rasi"
 
 * {
     /* Resolution : 1920x1080 */
@@ -49,7 +49,7 @@ window {
     border-radius:               0px;
     border-color:                @selected;
     cursor:                      "default";
-    background-color:            black/30%;
+    background-color:            black/20%;
 }
 
 /*****----- Main Box -----*****/

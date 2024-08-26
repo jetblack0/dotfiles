@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# hyprpicker needs to be installed: https://github.com/hyprwm/hyprpicker
+
+set_color_and_font() {
+	color_font_file="$ROFI_HOME/theme/font-color.rasi"
+
+	if [ ! -f "$ROFI_HOME/theme/colorscheme/$color.rasi" ]
+	then
+		color="catppuccin"
+	fi
+
+	echo "@import \"$ROFI_HOME/theme/colorscheme/$color.rasi\"" > "$color_font_file"
+	echo "* { font: \"$font $font_size\"; }" >> "$color_font_file"
+}
+
+ROFI_HOME="$HOME/.config/rofi"
+THEME="$ROFI_HOME/theme/dmenu.rasi"
+
+color="$1"
+font="$2"
+font_size="$3"
+
+set_color_and_font
+
+# available formats: hex, rgb, cmyk, hsl, hsv
+format="$(printf "hex\nrgb\ncmyk\nhsl\nhsv\n" | rofi -steal-focus -normal-window -theme "$THEME" -p "format:" -dmenu)"
+
+if [ -z "$format" ]; then
+	dunstify -I ~/.config/dunst/images/icons/eyedropper.svg "selection cancelled"
+	exit 0
+fi
+
+hyprpicker -a -f "$format"
+
+dunstify -I ~/.config/dunst/images/icons/eyedropper.svg "color has been copied into clipboard"

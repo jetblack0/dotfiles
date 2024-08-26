@@ -1,5 +1,4 @@
 #!/bin/sh
-
 # fullscreen powermenu using your bluured wallpaper as background, execute command with no question asked
 
 # usage:
@@ -70,4 +69,3 @@ case ${chosen} in
 		hyprctl dispatch exit
         ;;
 esac
-sac

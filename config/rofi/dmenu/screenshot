@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# grimblast needs to be installed: https://github.com/hyprwm/contrib
+
+set_color_and_font() {
+	color_font_file="$ROFI_HOME/theme/font-color.rasi"
+
+	if [ ! -f "$ROFI_HOME/theme/colorscheme/$color.rasi" ]
+	then
+		color="catppuccin"
+	fi
+
+	echo "@import \"$ROFI_HOME/theme/colorscheme/$color.rasi\"" > "$color_font_file"
+	echo "* { font: \"$font $font_size\"; }" >> "$color_font_file"
+}
+
+ROFI_HOME="$HOME/.config/rofi"
+THEME="$ROFI_HOME/theme/dmenu.rasi"
+
+color="$1"
+font="$2"
+font_size="$3"
+
+set_color_and_font
+
+# options: copy and save screen area, copy screen area, copy and save the entire screen
+option="$(printf "copy and save screen area\ncopy screen area\ncopy and save the entire screen\nsave the entire screen\n" | rofi -steal-focus -normal-window -theme "$THEME" -p "option:" -dmenu)"
+
+if [ -z "$option" ]; then
+	dunstify -I ~/.config/dunst/images/icons/screenshot.svg "screenshot cancelled"
+	exit 0
+fi
+
+screenshot_location=$(cat ~/.config/hypr/subconfig/grimblast-path)
+
+case "$option" in
+	"copy and save screen area")
+		grimblast --notify copysave area "$screenshot_location/$(date '+%Y-%m-%d_%H-%M-%S.png')"
+		;;
+	"copy screen area")
+		grimblast --notify copy area "$screenshot_location/$(date '+%Y-%m-%d_%H-%M-%S.png')"
+		;;
+	"copy the entire screen")
+		grimblast --notify copy screen "$screenshot_location/$(date '+%Y-%m-%d_%H-%M-%S.png')"
+		;;
+	"copy and save the entire screen")
+		grimblast --notify copysave screen "$screenshot_location/$(date '+%Y-%m-%d_%H-%M-%S.png')"
+		;;
+esac

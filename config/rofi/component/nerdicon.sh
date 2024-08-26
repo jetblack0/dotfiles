@@ -2,10 +2,10 @@
 
 # HACK: there are always some weird icons don't display properly
 
-iconData="$HOME/.config/rofi/data/nerdIconData"
+icon_data="$HOME/.config/rofi/data/nerdicon"
 if [ -z "$1" ]
 then
-	cat "$iconData"
+	cat "$icon_data"
 	# awk '$1 != "#" {print $0}' "$iconData"
 else
 	# echo "$1" | awk '{printf $1}' | xclip -selection clipboard > /dev/null 2>&1

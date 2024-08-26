@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set_color_and_font() {
+	color_font_file="$ROFI_HOME/theme/font-color.rasi"
+
+	if [ ! -f "$ROFI_HOME/theme/colorscheme/$color.rasi" ]
+	then
+		color="catppuccin"
+	fi
+
+	echo "@import \"$ROFI_HOME/theme/colorscheme/$color.rasi\"" > "$color_font_file"
+	echo "* { font: \"$font $font_size\"; }" >> "$color_font_file"
+}
+
+ROFI_HOME="$HOME/.config/rofi"
+THEME="$ROFI_HOME/theme/dmenu.rasi"
+
+color="$1"
+font="$2"
+font_size="$3"
+
+set_color_and_font
+
+lang="$(tesseract --list-langs | tail -n +2 | rofi -steal-focus -normal-window -theme "$THEME" -p "language:" -dmenu)"
+
+if [ -z "$lang" ]; then
+	dunstify -I ~/.config/dunst/images/icons/text-recognition.svg "selection cancelled"
+	exit 0
+fi
+
+grimblast copy area
+wl-paste | tesseract -l "$lang" stdin stdout 2>/dev/null | wl-copy
+
+dunstify -I ~/.config/dunst/images/icons/text-recognition.svg "OCR text has been copied into clipboard"
