@@ -33,7 +33,7 @@ custom_cursor_colors: true
 import:
   # catppuccin color scheme: https://github.com/catppuccin/alacritty
 
-  - ~/.config/alacritty/colorScheme/catppuccin/catppuccin-macchiato.yml
+  - ~/.config/alacritty/themes/catppuccin/catppuccin-macchiato.yml
 
 draw_bold_text_with_bright_colors: false
 

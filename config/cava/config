@@ -127,6 +127,7 @@
 ; sdl_x = -1
 ; sdl_y= -1
 
+# From the https://github.com/catppuccin/cava project
 [color]
 
 # Colors can be one of seven predefined: black, blue, cyan, green, magenta, red, white, yellow.

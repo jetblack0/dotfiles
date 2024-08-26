@@ -5,8 +5,9 @@
 # Specify desired highlighting theme (e.g. "TwoDark"). Run `bat --list-themes`
 # for a list of all available themes
 
-# catppuccin color scheme: https://github.com/catppuccin/bat
---theme="Catppuccin-macchiato"
+# NOTE: bat reads theme files from $(bat --config-dir)/themes/*.tmTheme.
+# Theme files and usage for Catppuccin can be found at: https://github.com/catppuccin/bat
+--theme="catppuccin-mocha"
 # --theme="base16"
 
 # Enable this to use italic text on the terminal. This is not supported on all
