@@ -44,21 +44,41 @@ cmp.setup({
 	-- get error if we don't use snippet engine
 	snippet = {
 		expand = function(args)
-		      require 'snippy'.expand_snippet(args.body)
-		end
+			require("snippy").expand_snippet(args.body)
+		end,
 	},
 	mapping = {
-		["<C-k>"] = cmp.mapping.select_prev_item(),
-		["<C-j>"] = cmp.mapping.select_next_item(),
+		["<a-k>"] = cmp.mapping.select_prev_item(),
+		["<a-j>"] = cmp.mapping.select_next_item(),
 		["<C-u>"] = cmp.mapping(cmp.mapping.scroll_docs(-1), { "i", "c" }),
 		["<C-d>"] = cmp.mapping(cmp.mapping.scroll_docs(1), { "i", "c" }),
 		-- ["<C-Space>"] = cmp.mapping(cmp.mapping.complete(), { "i", "c" }),
 		-- ["<C-y>"] = cmp.config.disable, -- Specify `cmp.config.disable` if you want to remove the default `<C-y>` mapping.
-		["<c-e>"] = cmp.mapping({
+		["<a-e>"] = cmp.mapping({
 			i = cmp.mapping.abort(),
 			c = cmp.mapping.close(),
 		}),
 		["<TAB>"] = cmp.mapping.confirm({ select = true }),
+		["<a-m>"] = cmp.mapping({
+			i = function()
+				if cmp.visible() then
+					-- require("notify")("visible")
+					cmp.abort()
+				else
+					-- require("notify")("not visible")
+					cmp.complete()
+				end
+			end,
+			c = function()
+				if cmp.visible() then
+					-- require("notify")("visible")
+					cmp.close()
+				else
+					-- require("notify")("not visible")
+					cmp.complete()
+				end
+			end,
+		}),
 	},
 
 	formatting = {
@@ -72,13 +92,13 @@ cmp.setup({
 			vim_item.menu = "  "
 
 			-- show the sources name
-			--[[ vim_item.menu = ({
-				nvim_lsp = "[LSP]",
-				snippy = "[Snippet]",
-				buffer = "[Buffer]",
-				path = "[Path]",
-				emmet_vim = "[emmet]",
-			})[entry.source.name] ]]
+			-- vim_item.menu = ({
+			-- 	nvim_lsp = "[LSP]",
+			-- 	snippy = "[Snippet]",
+			-- 	buffer = "[Buffer]",
+			-- 	path = "[Path]",
+			-- 	emmet_vim = "[emmet]",
+			-- })[entry.source.name]
 
 			return vim_item
 		end,
@@ -90,24 +110,19 @@ cmp.setup({
 		{ name = "path" },
 	},
 	window = {
-		completion = {
-			border = "rounded",
-			side_padding = 0,
-			col_offset = 0,
+		completion = cmp.config.window.bordered({
 			winhighlight = "CursorLine:PmenuSel,Search:None",
-		},
-		documentation = {
-			border = "rounded",
-			side_padding = 0,
-			col_offset = 0,
-			-- winhighlight = "Normal:Pmenu,CursorLine:PmenuSel,Search:None",
-		}
+		}),
+		documentation = cmp.config.window.bordered({
+			winhighlight = "CursorLine:PmenuSel,Search:None",
+		}),
 
 		-- documentation = cmp.config.window.bordered(),
 		-- completion = cmp.config.window.bordered(),
 	},
 	experimental = {
-		ghost_text = true,
+		-- bad performance
+		ghost_text = false,
 	},
 	enabled = function()
 		-- disable completion in comments
@@ -162,3 +177,12 @@ cmp.setup.filetype({ "css", "html" }, {
 		{ name = "path" },
 	},
 })
+
+-- cmp.setup.filetype({ "java" }, {
+-- 	sources = {
+-- 		{ name = "nvim_lsp" },
+-- 		{ name = "snippy" },
+-- 		{ name = "buffer" },
+-- 		{ name = "path" },
+-- 	},
+-- })

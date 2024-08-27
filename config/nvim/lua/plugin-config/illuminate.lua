@@ -18,6 +18,6 @@ illuminate.configure({
     under_cursor = false,
 })
 
-vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = "#F5C2E7" })
-vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = "#F5C2E7" })
-vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#F5C2E7" })
+vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = "#45475A" })
+vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = "#45475A" })
+vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#45475A" })

@@ -20,10 +20,10 @@ todo_comments.setup({
 		after = "",
 	},
 })
-
-vim.keymap.set("n", "<c-n>", function()
+ 
+vim.keymap.set("n", "<leader>n", function()
 	todo_comments.jump_next({ keywords = {} })
 end, { desc = "Next todo comment" })
-vim.keymap.set("n", "<c-p>", function()
+vim.keymap.set("n", "<leader>N", function()
 	todo_comments.jump_prev({ keywords = {} })
 end, { desc = "Previous todo comment" })

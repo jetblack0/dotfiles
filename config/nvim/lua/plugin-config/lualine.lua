@@ -23,9 +23,9 @@ local colors = {
 	red = '#ec5f67',
 	pink = '#F35588',
 
-	red_diff = '#F38BA8',
-	green_diff = '#A6E3A1',
-	orange_diff = '#F9E2AF',
+	red_diff = '#eb6f92',
+	green_diff = '#31748f',
+	orange_diff = '#f6c177',
 
 	green_diff_light = '#40A02B',
 	orange_diff_light = '#DF8E1D',

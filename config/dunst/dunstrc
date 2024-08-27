@@ -29,23 +29,23 @@
 
 
 [urgency_low]
-    background = "#BAB4D9"
+    background = "#BCC0CC"
     foreground = "#1e1e2e"
     timeout = 20
     #default_icon = /path/to/icon
 
 [urgency_normal]
-    background = "#C6AAE8"
+    background = "#F5C2E7"
     foreground = "#1e1e2e"
     timeout = 30
     #default_icon = /path/to/icon
 
 [urgency_critical]
-    background = "#F5C2E7"
+    background = "#DC8A78"
     foreground = "#1e1e2e"
     timeout = 0
     #default_icon = /path/to/icon
 
 [notification_sound]
 	summary = "*"
-	script = ~/.config/dunst/scripts/notification_sound.sh
+	script = ~//Development/script/programs/dunst/notification-sound.sh

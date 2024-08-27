@@ -19,7 +19,9 @@ local lazy_config = {
 	}
 }
 
-local lsp_filetypes = { "lua", "sh", "rust", "javascript", "tsx", "jsx", "html", "css", "scss", "ejs", "json", "javascriptreact" }
+local lsp_filetypes = { "lua", "sh", "rust", "javascript", "tsx", "jsx", "html", "css", "scss", "ejs", "json", "javascriptreact", "java" }
+local nullls_filetypes = { "lua", "sh" }
+local indent_line_filetypes = { "yaml", "rust", "java", "c", "json", "make" }
 require("lazy").setup({
 	------------------------------------- General stuff --------------------------------------
 	{
@@ -28,13 +30,13 @@ require("lazy").setup({
 			"nvim-tree/nvim-web-devicons",
 		},
 		config = function()
-			require("pluginConfig.nvimtree")
+			require("plugin-config.nvimtree")
 		end,
 	},
 	{
 		"numToStr/Comment.nvim",
 		config = function()
-			require("pluginConfig.comment")
+			require("plugin-config.comment")
 		end,
 	},
 	{
@@ -44,7 +46,7 @@ require("lazy").setup({
 			{ "<leader>c", ":ColorizerToggle<CR>", "n", desc = "toggle colorizer", silent = true, noremap = true },
 		},
 		config = function()
-			require("pluginConfig.nvim-colorizer")
+			require("plugin-config.nvim-colorizer")
 		end,
 	},
 	{
@@ -58,25 +60,38 @@ require("lazy").setup({
 	{
 		"nvim-treesitter/nvim-treesitter",
 		config = function()
-			require("pluginConfig.treesitter")
+			require("plugin-config.treesitter")
 		end,
 	},
 	{
 		"folke/todo-comments.nvim",
 		config = function()
-			require("pluginConfig.todo-comment")
+			require("plugin-config.todo-comment")
 		end,
 	},
 
 
 	------------------------------------- Language specific --------------------------------------
+	-- {
+	-- 	"iamcco/markdown-preview.nvim",
+	-- 	build = "cd app && npm install",
+	-- 	config = function()
+	-- 		vim.g.mkdp_filetypes = { "markdown" }
+	-- 	end,
+	-- 	ft = { "markdown" },
+	-- },
 	{
-		"iamcco/markdown-preview.nvim",
-		build = "cd app && npm install",
-		config = function()
-			vim.g.mkdp_filetypes = { "markdown" }
-		end,
-		ft = { "markdown" },
+	  "iamcco/markdown-preview.nvim",
+	  cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+	  build = "cd app && npm install",
+	  init = function()
+		vim.g.mkdp_filetypes = { "markdown" }
+	  end,
+	  ft = { "markdown" },
+	},
+	{
+		"mzlogin/vim-markdown-toc",
+		ft = { "markdown" }
 	},
 	{
 		"elkowar/yuck.vim",
@@ -95,29 +110,48 @@ require("lazy").setup({
 			"nvim-tree/nvim-web-devicons",
 		},
 		config = function()
-			require("pluginConfig.lualine")
+			require("plugin-config.lualine")
 		end,
 	},
 	{
 		"akinsho/bufferline.nvim",
-		version = "v3.*",
+		-- version = "*",
+		branch = 'main',
 		dependencies = "nvim-tree/nvim-web-devicons",
 		config = function()
-			require("pluginConfig.bufferline")
+			require("plugin-config.bufferline")
 		end,
 	},
 	{
 		"karb94/neoscroll.nvim",
 		config = function()
-			require("pluginConfig.neoscroll")
+			require("plugin-config.neoscroll")
 		end,
 	},
 	{
 		"catppuccin/nvim",
 		name = "catppuccin",
 		config = function()
-			require("pluginConfig.catppuccin")
+			require("plugin-config.catppuccin")
 		end,
+	},
+	-- {
+	-- 	"rose-pine/neovim",
+	-- 	name = "rose-pine",
+	-- 	config = function ()
+	-- 		require("plugin-config.rose-pine")
+	-- 	end
+	-- },
+	-- {
+	-- 	'NLKNguyen/papercolor-theme',
+	-- },
+	{
+		"lukas-reineke/indent-blankline.nvim",
+		main = "ibl",
+		ft = indent_line_filetypes,
+		config = function ()
+			require("plugin-config.indent-blankline")
+		end
 	},
 
 
@@ -132,23 +166,38 @@ require("lazy").setup({
 			{
 				"RRethy/vim-illuminate",
 				config = function()
-					require("pluginConfig.illuminate")
+					require("plugin-config.illuminate")
 				end,
 			},
-			{
-				"jose-elias-alvarez/null-ls.nvim",
-				dependencies = {
-					"nvim-lua/plenary.nvim",
-				},
-				config = function()
-					require("pluginConfig.null-ls")
-				end,
-			},
+			-- {
+			-- 	"jose-elias-alvarez/null-ls.nvim",
+			-- 	ft = nullls_filetypes,
+			-- 	dependencies = {
+			-- 		"nvim-lua/plenary.nvim",
+			-- 	},
+			-- 	config = function()
+			-- 		require("plugin-config.null-ls")
+			-- 	end,
+			-- },
 			"hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
-			require("pluginConfig.lsp")
+			require("plugin-config.lsp")
 		end,
+	},
+	{
+		"jose-elias-alvarez/null-ls.nvim",
+		ft = nullls_filetypes,
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+		},
+		config = function()
+			require("plugin-config.null-ls")
+		end,
+	},
+	{
+		"mfussenegger/nvim-jdtls",
+		ft = { "java" },
 	},
 
 
@@ -156,7 +205,8 @@ require("lazy").setup({
 	-- NOTE: get error if i delete luasnip
 	{
 		"hrsh7th/nvim-cmp",
-		dependencies = {
+	-- ft = lsp_filetypes,
+	dependencies = {
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
@@ -164,7 +214,7 @@ require("lazy").setup({
 			"dcampos/cmp-snippy"
 		},
 		config = function()
-			require("pluginConfig.cmp")
+			require("plugin-config.cmp")
 		end,
 	},
 	{
@@ -173,5 +223,11 @@ require("lazy").setup({
 		dependencies = {
 			"dcampos/cmp-emmet-vim",
 		},
+	},
+
+
+	------------------------------------- Combination with other programs ---------------------
+	{
+		'christoomey/vim-tmux-navigator',
 	},
 }, lazy_config)

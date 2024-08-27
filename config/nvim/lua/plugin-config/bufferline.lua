@@ -7,10 +7,10 @@ bufferline.setup({
 	options = {
 		mode = "tabs", -- set to "tabs" to only show tabpages instead
 		numbers = "none",
-		close_command = nil,
-		right_mouse_command = nil,
-		left_mouse_command = nil,
-		middle_mouse_command = nil,
+		close_command = false,
+		right_mouse_command = false,
+		left_mouse_command = false,
+		middle_mouse_command = false,
 		buffer_close_icon = nil,
 		modified_icon = "●",
 		close_icon = nil,
@@ -32,4 +32,5 @@ bufferline.setup({
 			enabled = false,
 		},
 	},
+	highlights = require("catppuccin.groups.integrations.bufferline").get(),
 })

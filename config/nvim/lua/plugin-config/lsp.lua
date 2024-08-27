@@ -6,11 +6,11 @@ local lsp_keybind = function(client, bufnr)
 	-- Mappings
 	local bufopts = { noremap = true, silent = true, buffer = bufnr }
 
-	vim.keymap.set("n", "<a-h>", vim.lsp.buf.hover, bufopts)
+	vim.keymap.set("n", "<leader>h", vim.lsp.buf.hover, bufopts)
 	vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
 	vim.keymap.set("n", "<leader>d", vim.lsp.buf.definition, bufopts)
 	vim.keymap.set("n", "<leader>i", vim.lsp.buf.implementation, bufopts)
-	vim.keymap.set("n", "<leader>h", vim.lsp.buf.signature_help, bufopts)
+	vim.keymap.set("n", "<leader>H", vim.lsp.buf.signature_help, bufopts)
 	vim.keymap.set("n", "<leader>r", vim.lsp.buf.references, bufopts)
 	vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, bufopts)
 	vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
@@ -22,32 +22,37 @@ local lsp_keybind = function(client, bufnr)
 end
 ------------------------------------------ keybindings when attach to a server -----------------------------------------
 
-
--------------------------- config for nvim-signature plugin (only attach to some servers) ------------------------------
-local signature_config = {
-	doc_lines = 0,
-	floating_window = true,
-	floating_window_above_cur_line = false,
-	handler_opts = {
-		border = "rounded",
-	},
-	close_timeout = 400,
-	hint_enable = false,
-	transparency = 100,
-}
-
-local function lsp_signature_setup(client, bufnr)
-	local status_lsp_signature_ok, lsp_signature = pcall(require, "lsp_signature")
-	if not status_lsp_signature_ok then
-		return
-	end
-	lsp_signature.on_attach(signature_config, bufnr)
-end
--------------------------- config for nvim-signature plugin (only attach to some servers) ------------------------------
-
-
 local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
+
+local on_attach = function(client, bufnr)
+	lsp_keybind(client, bufnr)
+	client.server_capabilities.documentFormattingProvider = true
+end
+
+-------------------------- config for nvim-signature plugin (only attach to some servers) ------------------------------
+-- local signature_config = {
+-- 	doc_lines = 0,
+-- 	floating_window = true,
+-- 	floating_window_above_cur_line = false,
+-- 	handler_opts = {
+-- 		border = "rounded",
+-- 	},
+-- 	close_timeout = 400,
+-- 	hint_enable = false,
+-- 	transparency = 100,
+-- }
+--
+-- local function lsp_signature_setup(client, bufnr)
+-- 	local status_lsp_signature_ok, lsp_signature = pcall(require, "lsp_signature")
+-- 	if not status_lsp_signature_ok then
+-- 		return
+-- 	end
+-- 	lsp_signature.on_attach(signature_config, bufnr)
+-- end
+-------------------------- config for nvim-signature plugin (only attach to some servers) ------------------------------
+
+
 
 
 ----------------------------------------------- mason to manage servers ------------------------------------------------
@@ -117,7 +122,7 @@ lspconfig.rust_analyzer.setup({
 	capabilities = capabilities,
 	on_attach = function(client, bufnr)
 		lsp_keybind(client, bufnr)
-		lsp_signature_setup(client, bufnr)
+		-- lsp_signature_setup(client, bufnr)
 	end,
 })
 
@@ -156,10 +161,20 @@ lspconfig.lua_ls.setup({
 	on_attach = function(client, bufnr)
 		client.server_capabilities.documentFormattingProvider = false
 		lsp_keybind(client, bufnr)
-		lsp_signature_setup(client, bufnr)
+		-- lsp_signature_setup(client, bufnr)
 	end,
 	capabilities = capabilities,
 })
+
+-- jdtls for Java
+-- lspconfig.jdtls.setup({
+-- 	on_attach = function(client, bufnr)
+-- 		lsp_keybind(client, bufnr)
+-- 		-- lsp_signature_setup(client, bufnr)
+-- 	end,
+-- 	root_dir = lspconfig.util.root_pattern("pom.xml", "build.gradle", ".git") or vim.fn.getcwd(),
+-- 	capabilities = capabilities,
+-- })
 
 -- web development (just some simple html, css and js)
 -- tsserver for javascript
@@ -233,8 +248,9 @@ lspconfig.jsonls.setup({
 
 lspconfig.bashls.setup({
 	capabilities = capabilities,
-	on_attach = lsp_keybind,
+	on_attach = on_attach,
 })
+
 ----------------------------------------------- config for each servers ------------------------------------------------
 
 
@@ -266,3 +282,5 @@ end
 vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = "rounded" })
 vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(vim.lsp.handlers.signature_help, { border = "rounded" })
 -------------------------------------------------- nvim lsp UI config --------------------------------------------------
+
+return M

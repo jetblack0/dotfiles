@@ -10,7 +10,7 @@ local code_actions = null_ls.builtins.code_actions
 local my_sources = {
 
 	-- NOTE: All of them suck
-	formatting.prettierd,
+	-- formatting.prettierd,
 	-- formatting.eslint_d,
 	-- code_actions.eslint_d,
 	-- diagnostics.eslint_d,
