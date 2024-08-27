@@ -38,21 +38,28 @@
 (deflisten network_info
   `~/Development/script/programs/eww/network.sh`
 )
-(deflisten music_meta
-  `~/Development/script/programs/eww/music/music_meta.sh`
-)
-(deflisten music_info_title
-  `~/Development/script/programs/eww/music/music_info.sh title`
-)
-(deflisten music_info_album
-  `~/Development/script/programs/eww/music/music_info.sh album`
-)
-(deflisten music_info_artists
-  `~/Development/script/programs/eww/music/music_info.sh artists`
-)
-(deflisten window_title :initial "..." 
-  `bash ~/Development/script/programs/eww/window_title.sh`
-)
+
+;; 
+;; NOTE: i no longer use mpd and its ncmpcpp client for music
+;; streaming, so the following scripts as well as their windows 
+;; and widgets are commented out.
+;;
+
+;; (deflisten music_meta
+;;   `~/Development/script/programs/eww/music/music-meta.sh`
+;; )
+;; (deflisten music_info_title
+;;   `~/Development/script/programs/eww/music/music-info.sh title`
+;; )
+;; (deflisten music_info_album
+;;   `~/Development/script/programs/eww/music/music-info.sh album`
+;; )
+;; (deflisten music_info_artists
+;;   `~/Development/script/programs/eww/music/music-info.sh artists`
+;; )
+;; (deflisten window_title :initial "..." 
+;;   `bash ~/Development/script/programs/eww/window-title.sh`
+;; )
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; variables ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -68,13 +75,13 @@
   (calendar)
 )
 
-(defwindow music
-  :monitor 0
-  :stacking "fg" 
-  :geometry (geometry :x "100px" :y "10px" :width "0" :height "0")
-  :exclusive false
-  (music_box)
-)
+;; (defwindow music
+;;   :monitor 0
+;;   :stacking "fg" 
+;;   :geometry (geometry :x "100px" :y "10px" :width "0" :height "0")
+;;   :exclusive false
+;;   (music_box)
+;; )
 
 ; (defwindow color_chooser
 ;   :monitor 0

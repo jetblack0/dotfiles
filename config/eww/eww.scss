@@ -1,25 +1,25 @@
 ///////////////////////////////////// variables ////////////////////////////////////////////
-$clock_background: #7B9C98;
+$clock_background: #F5C2E7;
 $clock_foreground: #000000;
-$buttons_background: #EFF1F5;
-$system_icon_background: #EFF1F5;
-$indicator_background: #EFF1F5;
-$progressbar_empry_background: #D6D3D6;
+$buttons_background: #C6AAE8;
+$system_icon_background: #BAB4D9;
+$indicator_background: #BAB4D9;
+$progressbar_empry_background: #A5ADCB;
 $progressbar_fill: #7B9C98;
 
-$workspace_background: #EFF1F5;
+$workspace_background: #BAB4D9;
 
-$tooltip_background: #EFF1F5;
+$tooltip_background: #BAB4D9;
 $tooltip_foreground: #1E1E2E;
 
-$calendar_selected_foreground: #179299;
+$calendar_selected_foreground: #D3859A;
 $calendar_empty_foreground: #70706C;
 
-$music_box_background: #EFF1F5;
+$music_box_background: #BAB4D9;
 
 $widget_border_color: #1E1E2E;
-$widget_border_length: 2px;
-$calendar_background_color: #EFF1F5;
+$widget_border_length: 0px;
+$calendar_background_color: #F5C2E7;
 ///////////////////////////////////// variables ////////////////////////////////////////////
 
 
@@ -108,7 +108,51 @@ progressbar > trough > progress {
 }
 
 .workspace_button {
-	margin: 0px 1px;
+	margin: 0px 0px;
+}
+
+.system_tray {
+	background-color: $system_icon_background;
+	// border: $widget_border_length solid $widget_border_color;
+}
+
+.system_tray image {
+	color: black;
+	// border: $widget_border_length solid $widget_border_color;
+}
+
+.system_tray menuitem {
+	padding: 2px 5px;
+	transition-timing-function: ease;
+}
+
+.system_tray menuitem:hover  {
+	background-color: $calendar_selected_foreground;
+}
+
+.system_tray menu {
+	background-color: $system_icon_background;
+	margin: 0px;
+	padding: 10px 5px;
+}
+
+.system_tray separator  {
+	background-color: #908caa;
+	min-width: 1px;
+	min-height: 1px;
+	margin: 4px 0;
+}
+
+.system_tray label  {
+	color: #1E1E2E;
+	padding: 0 25px;
+	font-size: 17px;
+}
+
+// undocumented stop using eww if systray still this poorly implemented
+.system_tray arrow {
+}
+.system_tray check {
 }
 
 .music_widget {
