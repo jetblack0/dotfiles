@@ -13,6 +13,7 @@ augroup remember_folds
 augroup END]]
 
 -- Two space for some file types
+vim.cmd[[autocmd FileType java setlocal expandtab shiftwidth=4 tabstop=4]]
 vim.cmd[[autocmd FileType html setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType yuck setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType markdown setlocal expandtab shiftwidth=2 tabstop=2]]
