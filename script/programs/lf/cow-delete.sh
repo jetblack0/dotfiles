@@ -1,4 +1,4 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
 # Description: a script that used with lf file manager to delete files in the cowsay way
 

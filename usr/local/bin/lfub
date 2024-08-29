@@ -1,6 +1,8 @@
-#! /bin/sh
+#!/bin/sh
 
-# Wrapper script for lf that allows it to create image previews with uberzug
+# This is a wrapper script for lf that allows it to create image previews with
+# ueberzug. This works in concert with the lf configuration file and the
+# lf-cleaner script. Wayland works fine with the ueberzuggpp fork
 
 set -e
 

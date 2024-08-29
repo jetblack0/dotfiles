@@ -20,7 +20,7 @@
 
 # Custom functionality
 # ------------------------------------------------------------------------------
-	# use lf to switch directories without image preview
+	# use lf to switch directories (for wayland)
 	# lfcd () {
 	# 	tmp="$(mktemp -uq)"
 	# 	trap 'rm -f $tmp >/dev/null 2>&1' HUP INT QUIT TERM PWR EXIT
@@ -32,18 +32,18 @@
 	# }
 
 	# lfcd () {
-	# 	tmp="$(mktemp)"
-	# 	# `command` is needed in case `lfcd` is aliased to `lf`
-	# 	command lf -last-dir-path="$tmp" "$@"
-	# 	if [ -f "$tmp" ]; then
-	# 		dir="$(cat "$tmp")"
-	# 		rm -f "$tmp"
-	# 		if [ -d "$dir" ]; then
-	# 			if [ "$dir" != "$(pwd)" ]; then
-	# 				cd "$dir"
-	# 			fi
-	# 		fi
-	# 	fi
+	#  tmp="$(mktemp)"
+	#  # `command` is needed in case `lfcd` is aliased to `lf`
+	#  command lf -last-dir-path="$tmp" "$@"
+	#  if [ -f "$tmp" ]; then
+	# 	 dir="$(cat "$tmp")"
+	# 	 rm -f "$tmp"
+	# 	 if [ -d "$dir" ]; then
+	# 		 if [ "$dir" != "$(pwd)" ]; then
+	# 			 cd "$dir"
+	# 		 fi
+	# 	 fi
+	#  fi
 	# }
 
 	# yazi
@@ -58,8 +58,7 @@
 
 	# open all the images in current directory using nsxiv
 	images() {
-		# fd -e "jpeg" -e "png" -e "jpg" --print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
-		find . -regextype awk -iregex ".*png|.*jpeg|.*jpg" -print0 | xargs -0 exa --reverse --sort=time | nsxiv -i
+		find . -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=time | nsxiv -i
 	}
 
 	# use vi mode
@@ -96,6 +95,10 @@
 	source /usr/share/fzf/key-bindings.zsh
 	source /usr/share/fzf/completion.zsh
 
+	# NOTE: some plugin files are not included in this repo, but links to the repositories are listed below:  
+	# zsh-autosuggestions.zsh: https://github.com/zsh-users/zsh-autosuggestions
+	# zsh-syntax-highlighting.zsh: https://github.com/zsh-users/zsh-syntax-highlighting
+
 	source $plugin_path/zsh-autosuggestions/zsh-autosuggestions.zsh
 	source $plugin_path/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 	source $plugin_path/zsh-completion/completion.zsh
@@ -108,10 +111,9 @@
 	# bindkey -s '^f' '^ulfcd\n'
 	bindkey -s '^f' '^uyy\n'
 	bindkey -s '^n' '^uimages\n'
-	# bindkey -s '^e' '^usource $HOME/Development/script/programs/fzf/fzfListDirectories.sh\n'
+	bindkey -s '^v' '^unvim .\n'
 	bindkey -s '^p' '^usource $HOME/Development/script/programs/fzf/fzfcd.sh\n'
 	bindkey -s '^o' '^usource $HOME/Development/script/programs/fzf/fzfopen.sh\n'
-	bindkey -s '^v' '^unvim .\n'
 	# bindkey -M menuselect 'u' send-break
 	# bindkey -M menuselect '\e' accept-line
 

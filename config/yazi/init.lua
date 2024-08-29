@@ -10,7 +10,7 @@ require("session"):setup {
 	sync_yanked = true,
 }
 
--- rounded border, ya pack -a yazi-rs/plugins#full-border
+-- rounded border. NOTE: run `ya pack -a yazi-rs/plugins#full-border` to install the plugin
 require("full-border"):setup()
 
 -- show more stuff in header

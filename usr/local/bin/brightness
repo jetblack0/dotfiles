@@ -1,17 +1,32 @@
-#! /bin/bash
+#!/usr/bin/env bash
 
-# Description: a script that change the backlight of my laptop, make sure you have /sys/class/backlight/intel_backlight or /sys/class/backlight/nvidia_0 directory
+# 
+# A script that change the backlight of laptops that have file
+# interfaces /sys/class/backlight/intel_backlight/brightness 
+# and /sys/class/backlight/intel_backlight/max_brightness present. 
+# Systems with Nvidia graphics card might not be supported.
+# 
 
-# Usage: sudo brightness +20, to increase backlight by 20%, sudo brightness -5, to decrease backlight by 5%, edit the sudoer file if you wanna run this without typing password, for example, add: username ALL=NOPASSWD:/usr/local/bin/brightness to your sudoers file using visudo command, be careful! 
+# Usage: ./brightness [ARG]. 
+# The arugment can be +|-percentage, with no space in between.
+# For example, ./brightness +20 increases backlight value by 20%,
+# while ./brightness -5 decreases backlight by 5%. If no argument is
+# given, this script prints out the help message and quits with 
+# exit code 1. 
+# Write permissions for these two files are needed, you can run this 
+# with sudo, or you can edit the sudoer file to run the script without 
+# typing password, for example, add line: 
+# username ALL=NOPASSWD:/usr/local/bin/brightness
+# to your sudoers file using visudo command.
 
 # $1: operator
-# $2: newBrightness
+# $2: new_brightness
 check() {
 	if [ "$1" != "+" ] && [ "$1" != "-" ]
 	then
 		echo -e "Usage: +|-step, no space between them, step in percentage\nFor example: $0 +20"
 		exit 1
-	elif [ "$2" -gt "$brightnessMax" ] || [ "$2" -lt "$brightnessMin" ]
+	elif [ "$2" -gt "$brightness_max" ] || [ "$2" -lt "$brightness_min" ]
 	then
 		echo "invalid value"
 		exit 1
@@ -19,28 +34,31 @@ check() {
 }
 
 # $1: +|-step, for example +5
-changeBrightness() {
+change_value() {
 	operator=${1:0:1}
 	step=$(echo "scale=2; ${1:1} / 100" | bc)
 
-	newBrightness=$(echo "($brightnessCur $operator $brightnessMax * $step) / 1" | bc)
+	new_brightness=$(echo "($brightness_cur $operator $brightness_max * $step) / 1" | bc)
 
-	check "$operator" "$newBrightness"
+	check "$operator" "$new_brightness"
 
 	# setuid doesn't work for shell script, run this as sudo instead (change sudoer file for nopasswd)
-	# echo "$newBrightness" > /sys/class/backlight/intel_backlight/brightness
-	echo "$newBrightness" | sudo tee "$path"/brightness > /dev/null
+	# echo "$new_brightness" > /sys/class/backlight/intel_backlight/brightness
+	echo "$new_brightness" | sudo tee "$path"/brightness > /dev/null
 }
 
 [ -d /sys/class/backlight/intel_backlight ] && path="/sys/class/backlight/intel_backlight" || path="/sys/class/backlight/nvidia_0"
 
-brightnessMax=$(cat $path/max_brightness)
-brightnessCur=$(cat $path/brightness)
-brightnessMin=0
+brightness_max=$(cat $path/max_brightness)
+brightness_cur=$(cat $path/brightness)
+brightness_min=0
+
+# [ -e /sys/class/backlight/intel_backlight/max_brightness ] && brightness_max=$(cat /sys/class/backlight/intel_backlight/max_brightness) || brightness_max=$(cat /sys/class/backlight/nvidia_0/max_brightness)
+# [ -e /sys/class/backlight/intel_backlight/brightness ] && brightness_cur=$(cat /sys/class/backlight/intel_backlight/brightness) || brightness_cur=$(cat /sys/class/backlight/nvidia_0/brightness)
 
 if [[ "$*" =~ [+-][0-9]+$ ]]
 then
-	changeBrightness "$@"
+	change_value "$@"
 else
 	echo -e "Usage: +|-step, no space between them, step in percentage\nFor example: $0 +20"
 	exit 1
