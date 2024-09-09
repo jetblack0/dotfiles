@@ -1,17 +1,22 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable",
-		lazypath,
-	})
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  if vim.v.shell_error ~= 0 then
+    vim.api.nvim_echo({
+      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+      { out, "WarningMsg" },
+      { "\nPress any key to exit..." },
+    }, true, {})
+    vim.fn.getchar()
+    os.exit(1)
+  end
 end
+
 vim.opt.rtp:prepend(lazypath)
 
 vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
 
 local lazy_config = {
 	ui = {
@@ -21,7 +26,8 @@ local lazy_config = {
 
 local lsp_filetypes = { "lua", "sh", "rust", "javascript", "tsx", "jsx", "html", "css", "scss", "ejs", "json", "javascriptreact", "java" }
 local nullls_filetypes = { "lua", "sh" }
-local indent_line_filetypes = { "yaml", "rust", "java", "c", "json", "make" }
+local indent_line_filetypes = { "yaml", "rust", "java", "c", "json", "make", "lua" }
+
 require("lazy").setup({
 	------------------------------------- General stuff --------------------------------------
 	{
@@ -68,6 +74,15 @@ require("lazy").setup({
 		config = function()
 			require("plugin-config.todo-comment")
 		end,
+	},
+	{
+		'nvim-telescope/telescope.nvim', tag = '0.1.8',
+		config = function()
+			require("plugin-config.telescope")
+		end,
+		dependencies = { 
+			'nvim-lua/plenary.nvim' 
+		},
 	},
 
 

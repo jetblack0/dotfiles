@@ -13,16 +13,22 @@ augroup remember_folds
 augroup END]]
 
 -- Two space for some file types
-vim.cmd[[autocmd FileType java setlocal expandtab shiftwidth=4 tabstop=4]]
 vim.cmd[[autocmd FileType html setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType yuck setlocal expandtab shiftwidth=2 tabstop=2]]
-vim.cmd[[autocmd FileType markdown setlocal expandtab shiftwidth=2 tabstop=2]]
+-- for some reason 1Wrtier is not happy about two spaces 
+vim.cmd[[autocmd FileType markdown setlocal expandtab shiftwidth=4 tabstop=4]]
 vim.cmd[[autocmd FileType json setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType javascript setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType javascriptreact setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType lua setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType java setlocal expandtab shiftwidth=4 tabstop=4]]
+vim.cmd[[autocmd FileType xml setlocal expandtab shiftwidth=2 tabstop=2]]
 
 -- Treat ejs as html
 vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
+
+-- Show line numbers in telescope preview 
+vim.cmd[[autocmd User TelescopePreviewerLoaded setlocal number]]
 
 -- Open nvim-tree if is a direcotry, and cd into that
 local function open_nvim_tree(data)
