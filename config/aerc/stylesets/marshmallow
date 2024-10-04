@@ -1,0 +1,59 @@
+#
+# customized from solarized styleset
+#
+*error.bold=true
+
+border.default=true
+border.fg=#bcc0cc
+
+*.selected.bg=#E3B1B0
+*.selected.fg=#4C4F69
+
+tab.bg=#eee8d5
+tab.fg=#BCC0CC
+tab.selected.bg=#E3B1B0
+tab.selected.fg=#4C4F69
+
+statusline_*.default=true
+statusline_*.fg=#179299
+statusline_error.fg=#D20F39
+
+
+
+
+completion_pill.reverse=true
+error.fg=#dc322f # red
+header.bold=true
+selector_chooser.bold=true
+success.fg=#859900 # green
+warning.fg=#b58900 # yellow
+
+dirlist_recent.fg=#b58900
+dirlist_unread.fg=#51AFEF
+msglist_flagged.bold=true
+msglist_flagged.fg=#a3be8c
+msglist_marked.bg=#81a1c1
+msglist_unread.fg=#b58900
+msglist_unread.selected.bg=#b58900
+msglist_unread.selected.fg=#002b36
+
+[viewer]
+diff_add.fg=#859900 # green
+diff_chunk.dim=true
+diff_chunk.fg=#2aa198 # cyan
+diff_del.fg=#dc322f # red
+diff_meta.bold=true
+diff_meta.fg=#839496 # bright blue
+header.bold=true
+header.fg=#d33682 # magenta
+quote_*.dim=true
+quote_*.fg=#93a1a1 # bright cyan
+quote_1.dim=false
+quote_1.fg=#268bd2 # blue
+quote_2.fg=#cb4b16 # bright red
+quote_3.fg=#d33682 # magenta
+quote_4.fg=#6c71c4 # bright magenta
+signature.dim=true
+signature.fg=#d33682 # magenta
+url.fg=#b58900 # yellow
+url.underline=true
