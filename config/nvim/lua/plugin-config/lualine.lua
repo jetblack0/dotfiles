@@ -1,7 +1,9 @@
-local lualine_status_ok, lualine = pcall(require, "lualine")
-if not lualine_status_ok then
-	return
-end
+local helpers = require("utils.helpers")
+local lualine = helpers.safe_require("lualine")
+local web_devicons = helpers.safe_require("nvim-web-devicons")
+local nvim_navic = helpers.safe_require("nvim-navic")
+
+if not lualine then return end
 
 -- Eviline config for lualine
 -- Author: shadmansaleh
@@ -10,18 +12,18 @@ end
 -- Color table for highlights
 -- stylua: ignore
 local colors = {
-	bg = '#1C1E26',
-	fg = '#bbc2cf',
-	yellow = '#ECBE7B',
-	cyan = '#008080',
+	bg = '#3C3836',
+	fg = '#D1CFC0',
+	yellow = '#FABD2F',
+	cyan = '#689D6A',
 	darkblue = '#081633',
-	green = '#98be65',
-	orange = '#FF8800',
+	green = '#98971A',
+	orange = '#D79921',
 	violet = '#a9a1e1',
-	magenta = '#c678dd',
-	blue = '#51afef',
-	red = '#ec5f67',
-	pink = '#F35588',
+	magenta = '#D3869B',
+	blue = '#83a598',
+	red = '#cc241d',
+	pink = '#D19097',
 
 	red_diff = '#eb6f92',
 	green_diff = '#31748f',
@@ -30,7 +32,6 @@ local colors = {
 	green_diff_light = '#40A02B',
 	orange_diff_light = '#DF8E1D',
 	red_diff_light = '#D20F39',
-
 }
 
 local conditions = {
@@ -45,6 +46,9 @@ local conditions = {
 		local gitdir = vim.fn.finddir(".git", filepath .. ";")
 		return gitdir and #gitdir > 0 and #gitdir < #filepath
 	end,
+  is_navic_available = function ()
+    return nvim_navic.is_available
+  end
 }
 
 -- Config
@@ -60,8 +64,8 @@ local config = {
 			normal = { c = { fg = colors.fg, bg = nil } },
 			inactive = { c = { fg = colors.fg, bg = nil } },
 		},
-		ignore_focus = { "nerdtree" },
-		disabled_filetypes = { "NvimTree" },
+		ignore_focus = { },
+		disabled_filetypes = { "netrw" },
 	},
 	sections = {
 		-- these are to remove the defaults
@@ -98,23 +102,27 @@ ins_left({
 	function()
 		return "▊"
 	end,
-	color = { fg = colors.blue }, -- Sets highlighting of component
+	color = { fg = colors.pink }, -- Sets highlighting of component
 	padding = { left = 0, right = 1 }, -- We don't need space before this
 })
 
 ins_left({
 	-- mode component
 	function()
-		return ""
+    local filename = vim.fn.expand("%:t")
+    local extension = vim.fn.expand("%:e")
+		return web_devicons.get_icon(filename, extension, { default = true })
 	end,
-	color = function()
+	padding = { right = 1, left = 1 },
+  color = { fg = colors.pink }
+	--[[ color = function()
 		-- auto change color according to neovims mode
 		local mode_color = {
-			n = colors.blue,
+			n = colors.pink,
 			i = colors.violet,
-			v = colors.pink,
-			[""] = colors.pink,
-			V = colors.pink,
+			v = colors.blue,
+			[""] = colors.blue,
+			V = colors.blue,
 			c = colors.magenta,
 			no = colors.red,
 			s = colors.orange,
@@ -132,14 +140,13 @@ ins_left({
 			t = colors.red,
 		}
 		return { fg = mode_color[vim.fn.mode()] }
-	end,
-	padding = { right = 1 },
+	end, ]]
 })
 
 ins_left({
 	"filename",
 	cond = conditions.buffer_not_empty,
-	color = { fg = colors.blue, gui = "bold" },
+	color = { fg = colors.pink, gui = "bold" },
 })
 
 ins_left({
@@ -179,24 +186,39 @@ ins_left({
 	sources = { "nvim_diagnostic" },
 	symbols = { error = " ", warn = " ", info = " ", hint = " " },
 	-- color = { fg = colors.darkblue, gui = "bold"},
+  diagnostics_color = {
+    error = 'DiagnosticSignError',
+    warn  = 'DiagnosticSignWarn',
+    info  = 'DiagnosticSignInfo',
+    hint  = 'DiagnosticSignHint',
+  },
 	colored = true,
 	update_in_insert = false,
 	always_visible = false,
 })
 
-ins_right({
-	"o:encoding", -- option component same as &encoding in viml
-	fmt = string.upper, -- I'm not sure why it's upper case either ;)
-	cond = conditions.hide_in_width,
-	color = { fg = colors.fg },
-})
+-- NOTE: I only see UTF-8 encoding, not very useful. 
+-- ins_right({
+-- 	"o:encoding",
+-- 	fmt = string.upper,
+-- 	cond = conditions.hide_in_width,
+-- 	color = { fg = colors.fg },
+-- })
 
 ins_right({
-	"fileformat",
-	fmt = string.upper,
-	icons_enabled = false, -- I think icons are cool but Eviline doesn't have them. sigh
-	color = { fg = colors.fg },
+  function ()
+    return nvim_navic.get_location()
+  end,
+  cond = is_navic_available,
+	color = { fg = colors.blue, gui = "bold" },
 })
+
+-- ins_right({
+-- 	"fileformat",
+-- 	fmt = string.upper,
+-- 	icons_enabled = false,
+-- 	color = { fg = colors.fg },
+-- })
 
 ins_right({
 	"branch",
@@ -209,9 +231,9 @@ ins_right({
 	-- Is it me or the symbol for modified us really weird
 	symbols = { added = " ", modified = " ", removed = " " },
 	diff_color = {
-		added = { fg = colors.green_diff_light },
-		modified = { fg = colors.orange_diff_light },
-		removed = { fg = colors.red_diff_light },
+		added = { fg = colors.green_diff },
+		modified = { fg = colors.orange_diff },
+		removed = { fg = colors.red_diff },
 	},
 
 	cond = conditions.hide_in_width,
@@ -221,7 +243,7 @@ ins_right({
 	function()
 		return "▊"
 	end,
-	color = { fg = colors.blue },
+	color = { fg = colors.pink },
 	padding = { left = 1 },
 })
 

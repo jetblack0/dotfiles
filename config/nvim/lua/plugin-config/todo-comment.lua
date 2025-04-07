@@ -1,7 +1,6 @@
-local treesitter_status_ok, todo_comments = pcall(require, "todo-comments")
-if not treesitter_status_ok then
-	return
-end
+local helpers = require("utils.helpers")
+local todo_comments = helpers.safe_require("todo-comments")
+if not todo_comments then return end
 
 todo_comments.setup({
 	signs = true,
@@ -24,6 +23,7 @@ todo_comments.setup({
 vim.keymap.set("n", "<leader>n", function()
 	todo_comments.jump_next({ keywords = {} })
 end, { desc = "Next todo comment" })
+
 vim.keymap.set("n", "<leader>N", function()
 	todo_comments.jump_prev({ keywords = {} })
 end, { desc = "Previous todo comment" })

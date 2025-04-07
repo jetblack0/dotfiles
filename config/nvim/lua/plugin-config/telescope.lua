@@ -1,7 +1,6 @@
-local telescope_status_ok, telescope = pcall(require, "telescope")
-if not telescope_status_ok then
-	return
-end
+local helpers = require("utils.helpers")
+local telescope = helpers.safe_require("telescope")
+local telescope_built_in = helpers.safe_require("telescope.builtin") 
 
 telescope.setup{
 	defaults = {
@@ -13,6 +12,7 @@ telescope.setup{
 				["<Tab>"] = "toggle_selection",
 				["<a-Tab>"] = "toggle_selection",
 				["<c-c>"] = "close",
+				["<leader>c"] = "close",
 				["<c-o>"] = "select_default",
 			},
 			n = {
@@ -22,20 +22,16 @@ telescope.setup{
 				["<Tab>"] = "toggle_selection",
 				["<a-Tab>"] = "toggle_selection",
 				["<c-c>"] = "close",
+				["<leader>c"] = "close",
 				["<c-o>"] = "select_default",
 			},
 		}
 	},
 }
 
-
-local builtin = require('telescope.builtin')
-vim.keymap.set("n", "<c-e>", function()
-	builtin.builtin()
-end, { desc = "Telescope function menu" })
-
-vim.keymap.set("n", "<c-r>", function()
-	builtin.find_files({
+-- Keybindings
+vim.keymap.set("n", "<leader>q", function()
+	telescope_built_in.find_files({
     layout_strategy = 'vertical',
     layout_config = {
       width = 0.8,              -- this means 80% of the terminal
@@ -48,8 +44,8 @@ vim.keymap.set("n", "<c-r>", function()
   })
 end, { desc = "Telescope fuzzy file finder" })
 
-vim.keymap.set("n", "<c-s>", function()
-	builtin.live_grep({
+vim.keymap.set("n", "<leader>w", function()
+	telescope_built_in.live_grep({
     layout_strategy = 'horizontal',
     layout_config = {
       width = 0.8,
@@ -61,3 +57,12 @@ vim.keymap.set("n", "<c-s>", function()
     }
   })
 end, { desc = "Telescope live grep" })
+
+vim.keymap.set("n", "<leader>e", function()
+	telescope_built_in.builtin()
+end, { desc = "Telescope function menu" })
+
+vim.keymap.set("n", "<leader>r", function()
+	telescope_built_in.command_history()
+end, { desc = "Telescope command history" })
+

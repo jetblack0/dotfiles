@@ -1,10 +1,16 @@
-local treesitter_status_ok, treesitter = pcall(require, "nvim-treesitter.configs")
-if not treesitter_status_ok then
-	return
-end
+local helpers = require("utils.helpers")
+
+local treesitter = helpers.safe_require("nvim-treesitter.configs")
+if not treesitter then return end
 
 treesitter.setup({
-  ensure_installed = { "html", "bash", "c", "javascript", "json", "lua", "python", "typescript", "tsx", "css", "rust", "java", "yaml", "markdown", "markdown_inline" }, -- one of "all" or a list of languages
+  ensure_installed = {
+    "html", "css", "json", "jsonc", "yaml", "javascript", "typescript", "tsx",
+    "helm",
+    "markdown", "markdown_inline",
+    "c", "rust", "java", "go", "gotmpl",
+    "bash", "lua", "python",
+  },
 	ignore_install = { "" }, -- List of parsers to ignore installing
 	highlight = {
 		enable = true, -- false will disable the whole extension

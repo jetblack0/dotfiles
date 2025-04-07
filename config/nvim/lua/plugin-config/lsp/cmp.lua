@@ -1,12 +1,9 @@
-local cmp_status_ok, cmp = pcall(require, "cmp")
-if not cmp_status_ok then
-	return
-end
+local helpers = require("utils.helpers")
+local cmp = helpers.safe_require("cmp")
+local snippy = helpers.safe_require("snippy")
 
-local snip_status_ok, snippy = pcall(require, "snippy")
-if not snip_status_ok then
-	return
-end
+if not cmp then return end
+if not snippy then return end
 
 local kind_icons = {
 	Text = " ",
@@ -36,15 +33,18 @@ local kind_icons = {
 	TypeParameter = "",
 }
 
+
+-- Global Settings
+------------------
 cmp.setup({
-	-- By default, the Custom menu is enabled
 	view = {
-		entries = "custom", -- can be "custom", "wildmenu" or "native"
+    -- Can be "custom", "wildmenu" or "native".
+		entries = "custom",
 	},
 	-- get error if we don't use snippet engine
 	snippet = {
 		expand = function(args)
-			require("snippy").expand_snippet(args.body)
+			snippy.expand_snippet(args.body)
 		end,
 	},
 	mapping = {
@@ -92,31 +92,38 @@ cmp.setup({
 			vim_item.menu = "  "
 
 			-- show the sources name
-			-- vim_item.menu = ({
-			-- 	nvim_lsp = "[LSP]",
-			-- 	snippy = "[Snippet]",
-			-- 	buffer = "[Buffer]",
-			-- 	path = "[Path]",
-			-- 	emmet_vim = "[emmet]",
-			-- })[entry.source.name]
+			vim_item.menu = ({
+				nvim_lsp = "[LSP]",
+				snippy = "[Snippet]",
+				buffer = "[Buffer]",
+				path = "[Path]",
+				-- emmet_vim = "[emmet]",
+			})[entry.source.name]
 
 			return vim_item
 		end,
 	},
 	sources = {
-		{ name = "nvim_lsp" },
+		-- { name = "nvim_lsp" },
 		-- { name = "snippy" },
 		{ name = "buffer" },
 		{ name = "path" },
 	},
 	window = {
-		completion = cmp.config.window.bordered({
-			winhighlight = "CursorLine:PmenuSel,Search:None",
-		}),
-		documentation = cmp.config.window.bordered({
-			winhighlight = "CursorLine:PmenuSel,Search:None",
-		}),
+    completion = {
+      winhighlight = "Normal:Pmenu",
+    },
+    documentation = {
+      winhighlight = "Normal:CmpNormal",
+    },
 
+		-- completion = cmp.config.window.bordered({
+		--     winhighlight = "CursorLine:PmenuSel,Search:None",
+		-- }),
+		-- documentation = cmp.config.window.bordered({
+		-- 	winhighlight = "CursorLine:PmenuSel,Search:None",
+		-- }),
+		--
 		-- documentation = cmp.config.window.bordered(),
 		-- completion = cmp.config.window.bordered(),
 	},
@@ -125,34 +132,42 @@ cmp.setup({
 		ghost_text = false,
 	},
 	enabled = function()
-		-- disable completion in comments
 		local context = require("cmp.config.context")
-		-- keep command mode completion enabled when cursor is in a comment
-		if vim.api.nvim_get_mode().mode == "c" then
-			return true
-		else
-			return not context.in_treesitter_capture("comment") and not context.in_syntax_group("Comment")
-		end
+    local buftype = vim.api.nvim_buf_get_option(0, "buftype")
+
+    if not vim.api.nvim_get_mode().mode == "c" then return false end
+		-- Disable completion in Telescope prompt.
+    if buftype == "prompt" then return false end
+
+		-- Disable completion in comments.
+    return not context.in_treesitter_capture("comment") and not context.in_syntax_group("Comment")
 	end,
 })
 
--- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
-cmp.setup.cmdline({ "/", "?" }, {
-	mapping = cmp.mapping.preset.cmdline(),
-	sources = {
-		{ name = "buffer" },
-	},
-	formatting = {
-		fields = { "abbr" },
-	},
-})
 
--- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+-- Settings for different buffer type 
+-------------------------------------
+-- Completion for vim searching.
+-- cmp.setup.cmdline({ "/", "?" }, {
+-- 	mapping = cmp.mapping.preset.cmdline(),
+-- 	sources = {
+-- 		{ name = "buffer" },
+-- 	},
+-- 	formatting = {
+-- 		fields = { "abbr" },
+-- 	},
+-- })
+
 cmp.setup.cmdline(":", {
-	mapping = cmp.mapping.preset.cmdline(),
+  mapping = cmp.mapping.preset.cmdline({
+    -- Use default nvim history scrolling
+    ["<a-j>"] = { c = cmp.mapping.select_next_item() },
+    ["<a-k>"] = { c = cmp.mapping.select_prev_item() },
+    ["<C-e>"] = { c = cmp.mapping.abort() },
+  }),
 	sources = cmp.config.sources({
 		{ name = "path" },
-	}, {
+	},{
 		{ name = "cmdline" },
 	}),
 	formatting = {
@@ -160,10 +175,14 @@ cmp.setup.cmdline(":", {
 	},
 })
 
--- for certain filetypes
-cmp.setup.filetype({ "rust", "lua" }, {
+
+-- Settings for different filetypes
+-----------------------------------
+-- For certain filetypes.
+cmp.setup.filetype({ "rust", "lua", "sh", "javascript", "markdown" }, {
 	sources = {
 		{ name = "nvim_lsp" },
+ 		{ name = "snippy" },
 		{ name = "buffer" },
 		{ name = "path" },
 	},
@@ -172,7 +191,8 @@ cmp.setup.filetype({ "rust", "lua" }, {
 cmp.setup.filetype({ "css", "html" }, {
 	sources = {
 		{ name = "nvim_lsp" },
-		{ name = "emmet_vim" },
+ 		{ name = "snippy" },
+		-- { name = "emmet_vim" },
 		{ name = "buffer" },
 		{ name = "path" },
 	},
@@ -186,3 +206,21 @@ cmp.setup.filetype({ "css", "html" }, {
 -- 		{ name = "path" },
 -- 	},
 -- })
+
+
+-- Highlights for the completion menu 
+vim.api.nvim_set_hl(0, "CmpNormal", { bg = "#3C3836" })
+
+
+-- Additional keybindings
+-------------------------
+-- Toggle cmp on and off.
+vim.keymap.set("n", "<leader>z", function()
+  cmp.setup.buffer({ enabled = false }) 
+    vim.notify("Turn off cmp", vim.log.levels.INFO, { title = "Autocomplete" })
+end, { desc = "Turn off cmp" })
+
+vim.keymap.set("n", "<leader>x", function()
+    vim.notify("Turn on cmp", vim.log.levels.INFO, { title = "Autocomplete" })
+  cmp.setup.buffer({ enabled = true }) 
+end, { desc = "Turn on cmp" })

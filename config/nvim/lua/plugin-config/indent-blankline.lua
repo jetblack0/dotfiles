@@ -1,7 +1,6 @@
-local indent_blankline_ok, ibl = pcall(require, "ibl")
-if not indent_blankline_ok then
-	return
-end
+local helpers = require("utils.helpers")
+local ibl = helpers.safe_require("ibl")
+if not ibl then return end
 
 ibl.setup {
 	indent = { char = "╎" },

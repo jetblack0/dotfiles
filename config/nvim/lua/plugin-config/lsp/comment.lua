@@ -1,7 +1,6 @@
-local status_ok, comment = pcall(require, "Comment")
-if not status_ok then
-	return
-end
+local helpers = require("utils.helpers")
+local comment = helpers.safe_require("Comment")
+if not comment then return end
 
 comment.setup({
 	---Add a space b/w comment and the line
