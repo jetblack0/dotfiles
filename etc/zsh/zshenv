@@ -11,21 +11,4 @@ export XDG_CACHE_HOME="$HOME"/.cache
 # export XDG_DATA_DIRS="$XDG_DATA_HOME":/usr/local/share:/usr/share
 
 
-# ----------------------------- config path of some programs ---------------------------
-# zsh
-	export ZDOTDIR="$XDG_CONFIG_HOME"/shell/zsh
-# inputrc
-	export INPUTRC="$XDG_CONFIG_HOME"/shell/.inputrc
-# less
-	export LESSHISTFILE="$XDG_CACHE_HOME"/less/history
-# node
-	export NODE_REPL_HISTORY="$XDG_DATA_HOME"/node_repl_history
-# postgresql
-	export PSQL_HISTORY="$XDG_DATA_HOME/psql_history"
-# gnupg
-	export GNUPGHOME="$XDG_DATA_HOME"/gnupg
-
-# --------------------------------- history setting ------------------------------------
-HISTFILE="$HOME/.config/shell/zsh/.zsh_history"
-HISTSIZE=9223372036854775807
-SAVEHIST=9223372036854775807
+export ZDOTDIR="$XDG_CONFIG_HOME"/shell/zsh
