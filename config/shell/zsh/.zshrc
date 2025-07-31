@@ -112,8 +112,8 @@
 	bindkey -s '^f' '^uyy\n'
 	bindkey -s '^n' '^uimages\n'
 	bindkey -s '^v' '^unvim .\n'
-	bindkey -s '^p' '^usource $HOME/Development/script/programs/fzf/fzfcd.sh\n'
-	bindkey -s '^o' '^usource $HOME/Development/script/programs/fzf/fzfopen.sh\n'
+	bindkey -s '^p' '^usource $HOME/Development/script/cli/fzf/fzfcd.sh\n'
+	bindkey -s '^o' '^usource $HOME/Development/script/cli/fzf/fzfopen.sh\n'
 	# bindkey -M menuselect 'u' send-break
 	# bindkey -M menuselect '\e' accept-line
 

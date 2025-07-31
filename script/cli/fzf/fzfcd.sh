@@ -18,5 +18,5 @@ change_dir() {
     fi
 }
 
-cd_list="$HOME/Development/script/programs/fzf/cd-list"
+cd_list="$HOME/Development/script/cli/fzf/cd-list"
 grep -v "^#" "$cd_list" | grep -v "^$" | fzf | change_dir

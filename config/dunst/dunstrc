@@ -1,9 +1,14 @@
 [global]
     follow = keyboard
+
+	# The width and height of each notification in pixels. Can be a
+	# single number to specify a constant value or two numbers for the
+	# minimum and maximum
     width = 300
-    height = 500
+    # height = (60, 500)
+
     origin = top-right
-    offset = 10x12
+    offset = (10,12)
     notification_limit = 0
     corner_radius = 10
 
@@ -13,13 +18,19 @@
     progress_bar_min_width = 150
     progress_bar_max_width = 300
 
+	# The distance in pixels from the content to the separator/border
+	# of the window in the vertical and horizontal axis.
+	padding = 15
     horizontal_padding = 10
+
+	# The distance in pixels from the text to the icon (or vice versa) in
+	# the horizontal axis.
     text_icon_padding = 20
 
     frame_width = 0
     gap_size = 10
 
-    font = "Varela Round" 11
+    font = "Varela Round" 12
     icon_theme = Adwaita
     icon_position = left
     min_icon_size = 32
@@ -35,8 +46,8 @@
     #default_icon = /path/to/icon
 
 [urgency_normal]
-    background = "#F5C2E7"
-    foreground = "#1e1e2e"
+    background = "#EEBA9B"
+    foreground = "#201d1f"
     timeout = 30
     #default_icon = /path/to/icon
 
@@ -48,4 +59,4 @@
 
 [notification_sound]
 	summary = "*"
-	script = ~//Development/script/programs/dunst/notification-sound.sh
+	script = ~/Development/script/gui/dunst/notification-sound.sh

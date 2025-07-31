@@ -57,6 +57,7 @@ tooltip {
 #bluetooth:hover,
 #network:hover,
 #battery:hover,
+#battery.bat2:hover,
 #cpu:hover,
 #memory:hover,
 #pulseaudio:hover,
@@ -188,7 +189,7 @@ tooltip {
 #bluetooth,
 #pulseaudio,
 #network,
-#battery {
+#battery, #battery.bat2 {
     padding: 0px 7px;
     color:@color7;
     transition: all .3s ease;
@@ -206,15 +207,15 @@ tooltip {
     text-shadow: 0px 0px 1.5px rgba(0, 0, 0, 1);
 }
 
-#battery.charging {
+#battery.charging, #battery.bat2.charging {
     color: #26A65B;
 }
 
-#battery.warning:not(.charging) {
+#battery.warning:not(.charging), #battery.bat2.warning:not(.charging) {
     color: #ffbe61;
 }
 
-#battery.critical:not(.charging) {
+#battery.critical:not(.charging), #battery.bat2.critical:not(.charging) {
     color: #f53c3c;
     animation-name: blink;
     animation-duration: 0.5s;

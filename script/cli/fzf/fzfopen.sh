@@ -15,5 +15,5 @@ open() {
     fi
 }
 
-open_list="$HOME/Development/script/programs/fzf/file-list"
+open_list="$HOME/Development/script/cli/fzf/file-list"
 grep -v "^#" "$open_list" | grep -v "^$" | fzf | open

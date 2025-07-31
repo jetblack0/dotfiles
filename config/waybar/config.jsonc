@@ -23,6 +23,7 @@
 		"pulseaudio",
 		"bluetooth",
 		"network",
+		"battery#bat2",
 		"battery",
 		"custom/powermenu",
 	],
@@ -84,8 +85,8 @@
 		"tooltip": true,
 		"tooltip-format": "Select a wallpaper",
 		"format": "",
-		"on-click": "~/Development/script/programs/wayland/swww/utility.sh random",
-        "on-click-right": "~/Development/script/programs/wayland/swww/utility.sh favorite",
+		"on-click": "~/Development/script/gui/swww/utility.sh random",
+        "on-click-right": "~/Development/script/gui/swww/utility.sh favorite",
 		"escape": true
 	},
 	// NOTE: I don't know if it works
@@ -134,8 +135,8 @@
             "none": ""
         },
         "return-type": "json",
-        "exec-if": "test -x ~/Development/projects/dotfiles/script/programs/wayland/waybar/notifications.py",
-        "exec": "~/Development/projects/dotfiles/script/programs/wayland/waybar/notifications.py",
+        "exec-if": "test -x ~/Development/script/gui/waybar/notifications.py",
+        "exec": "~/Development/script/gui/waybar/notifications.py",
         "on-scroll-down": "sleep 0.1 && dunstctl history-pop",
         "on-click": "dunstctl set-paused toggle",
         "on-click-middle": "dunstctl history-clear",
@@ -200,7 +201,29 @@
 		"tooltip-format-ethernet": "{ifname} 🖧 "
 	},
 	"battery": {
-		"interval":30,
+		"bat": "BAT0",
+		"interval": 30,
+		"states": {
+			"good": 95,
+			"warning": 30,
+			"critical": 20
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "󰂄 {capacity}%",
+		"format-plugged": "󰂄  {capacity}%",
+		"format-alt": "{time} {icon}",
+		"format-icons": [
+			"󰁻",
+			"󰁼",
+			"󰁾",
+			"󰂀",
+			"󰂂",
+			"󰁹"
+		]
+	},
+	"battery#bat2": {
+		"bat": "BAT1",
+		"interval": 30,
 		"states": {
 			"good": 95,
 			"warning": 30,
