@@ -8,12 +8,13 @@
 [Unit]
 Description=Nextcloud file syncing daemon
 PartOf=graphical-session.target
-# Wants=eww-toggle@status_bar_0
+# Wants=eww-toggle@status_bar_0 eww-daemon.service
 After=eww-daemon.service
 # After=eww-toggle@status_bar_0
 
 [Service]
 Type=exec
+Environment=QT_STYLE_OVERRIDE=kvantum
 ExecStart=/usr/bin/nextcloud --background --logfile -
 CPUQuota=80%
 

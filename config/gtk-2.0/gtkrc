@@ -1,8 +1,5 @@
-# DO NOT EDIT! This file will be overwritten by LXAppearance.
-# Any customization should be done in ~/.gtkrc-2.0.mine instead.
-
-include "/home/johnny/.gtkrc-2.0.mine"
-gtk-theme-name="Catppuccin-Mocha-Standard-Pink-Dark"
+include "/home/henry/.gtkrc-2.0.mine"
+gtk-theme-name="Graphite-Dark-compact"
 gtk-icon-theme-name="Tela-circle-nord-dark"
 gtk-font-name="Inter 13"
 gtk-cursor-theme-name="Mocu-White-Right"
