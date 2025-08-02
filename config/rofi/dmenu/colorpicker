@@ -24,7 +24,7 @@ font_size="$3"
 set_color_and_font
 
 # available formats: hex, rgb, cmyk, hsl, hsv
-format="$(printf "hex\nrgb\ncmyk\nhsl\nhsv\n" | rofi -steal-focus -normal-window -theme "$THEME" -p "format:" -dmenu)"
+format="$(printf "hex\nrgb\ncmyk\nhsl\nhsv\n" | rofi -steal-focus -theme "$THEME" -p "format:" -dmenu)"
 
 if [ -z "$format" ]; then
 	dunstify -I ~/.config/dunst/images/icons/eyedropper.svg "selection cancelled"

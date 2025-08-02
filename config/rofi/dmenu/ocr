@@ -21,7 +21,7 @@ font_size="$3"
 
 set_color_and_font
 
-lang="$(tesseract --list-langs | tail -n +2 | rofi -steal-focus -normal-window -theme "$THEME" -p "language:" -dmenu)"
+lang="$(tesseract --list-langs | tail -n +2 | rofi -steal-focus -theme "$THEME" -p "language:" -dmenu)"
 
 if [ -z "$lang" ]; then
 	dunstify -I ~/.config/dunst/images/icons/text-recognition.svg "selection cancelled"

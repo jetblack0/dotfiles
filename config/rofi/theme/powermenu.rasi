@@ -10,6 +10,7 @@
 /*****----- Configuration -----*****/
 configuration {
     show-icons:                 false;
+	kb-cancel:					"[66],Escape,Control+g,Control+bracketleft";
 }
 
 /*****----- Global Properties -----*****/
@@ -156,7 +157,7 @@ listview {
 /*****----- Elements -----*****/
 element {
     enabled:                     true;
-    spacing:                     0px;
+    spacing:                     100px;
     margin:                      0px;
     padding:                     var(element-padding);
     border:                      0px solid;
@@ -171,7 +172,7 @@ element-text {
     background-color:            transparent;
     text-color:                  inherit;
     cursor:                      inherit;
-    vertical-align:              0.5;
+    vertical-align:              0.0;
     horizontal-align:            0.5;
 }
 element selected.normal {

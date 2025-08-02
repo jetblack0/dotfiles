@@ -23,8 +23,12 @@ font_size="$3"
 
 set_color_and_font
 
-# options: copy and save screen area, copy screen area, copy and save the entire screen
-option="$(printf "copy and save screen area\ncopy screen area\ncopy and save the entire screen\nsave the entire screen\n" | rofi -steal-focus -normal-window -theme "$THEME" -p "option:" -dmenu)"
+# options: 
+# - copy and save screen area
+# - copy screen area
+# - copy and save the entire screen
+# - save the entire screen
+option="$(printf "copy and save screen area\ncopy screen area\ncopy and save the entire screen\nsave the entire screen\n" | rofi -steal-focus -theme "$THEME" -p "option:" -dmenu)"
 
 if [ -z "$option" ]; then
 	dunstify -I ~/.config/dunst/images/icons/screenshot.svg "screenshot cancelled"

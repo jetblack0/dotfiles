@@ -25,7 +25,8 @@ set_color_and_font() {
 }
 
 rofi_cmd() {
-	rofi -steal-focus -normal-window -dmenu \
+	rofi -steal-focus -dmenu \
+		-window-title "powermenu" \
 		-theme "$THEME"
 }
 
@@ -58,11 +59,11 @@ case ${chosen} in
 		systemctl reboot
         ;;
     "$lock")
-		swaylock
+		hyprlock
         ;;
     "$suspend")
-		mpc -q pause
-		amixer set Master mute
+		# mpc -q pause
+		# amixer set Master mute
 		systemctl suspend
         ;;
     "$logout")

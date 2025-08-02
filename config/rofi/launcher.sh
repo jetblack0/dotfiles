@@ -32,4 +32,4 @@ set_color_and_font
 emoji_cmd="$ROFI_HOME/component/emoji.sh"
 nerdicon_cmd="$ROFI_HOME/component/nerdicon.sh"
 
-rofi -steal-focus -normal-window -modi "drun,multihead:$emoji_cmd,mail:$nerdicon_cmd" -show drun -theme "$THEME"
+rofi -steal-focus -modi "drun,multihead:$emoji_cmd,mail:$nerdicon_cmd" -show drun -theme "$THEME"

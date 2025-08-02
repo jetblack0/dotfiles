@@ -14,7 +14,7 @@ set_color_and_font() {
 
 ROFI_HOME="$HOME/.config/rofi"
 THEME="$ROFI_HOME/theme/dmenu.rasi"
-DMENU_SCRIPT="$ROFI_HOME/dmenu/"
+WALLPAPER_DIR="$HOME/Resources/media/pictures/wallpaper/landscape/"
 
 color="$1"
 font="$2"
@@ -22,8 +22,8 @@ font_size="$3"
 
 set_color_and_font
 
-tool="$(eza -1 "$DMENU_SCRIPT" | rofi -steal-focus -theme "$THEME" -p "tool:" -dmenu)"
+wall_dir="$(eza -1 "$WALLPAPER_DIR" | rofi -steal-focus -theme "$THEME" -p "tool:" -dmenu)"
 
-[ -z "$tool" ] && exit 0
+[ -z "$wall_dir" ] && exit 0
 
-"$DMENU_SCRIPT"/"$tool" "$color" "$font" "$font_size" 
+find "$HOME"/Resources/media/pictures/wallpaper/landscape/"$wall_dir" -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=created | nsxiv -i

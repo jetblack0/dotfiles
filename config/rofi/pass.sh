@@ -31,8 +31,8 @@ set_color_and_font
 
 pass_all="$ROFI_HOME/component/pass/pass.sh"
 pass_sites="$ROFI_HOME/component/pass/pass-sites.sh"
-pass_keys="$ROFI_HOME/component/pass/pass-keys.sh"
+# pass_keys="$ROFI_HOME/component/pass/pass-keys.sh"
 pass_system="$ROFI_HOME/component/pass/pass-system.sh"
 pass_onion="$ROFI_HOME/component/pass/pass-onion.sh"
 
-rofi -steal-focus -normal-window -modi "sites:$pass_sites,keys:$pass_keys,system:$pass_system,links:$pass_onion" -show sites -theme "$THEME"
+rofi -steal-focus -modi "sites:$pass_sites,system:$pass_system,links:$pass_onion" -show sites -theme "$THEME"

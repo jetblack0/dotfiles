@@ -1,2 +1,2 @@
-@import "/home/johnny/.config/rofi/theme/colorscheme/catppuccin.rasi"
+@import "/home/henry/.config/rofi/theme/colorscheme/gruvbox.rasi"
 * { font: "CodeNewRoman Nerd Font 15"; }

@@ -12,6 +12,7 @@ configuration {
     show-icons:                 false;
 	drun-display-format:        "{name} [<span weight='light' size='small'><i>({generic})</i></span>]";
 	window-format:              "{w} · {c} · {t}";
+	kb-cancel:					"[66],Escape,Control+g,Control+bracketleft";
 }
 
 /*****----- Global Properties -----*****/

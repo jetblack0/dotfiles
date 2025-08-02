@@ -1,0 +1,12 @@
+[Unit]
+Description=cliphist clipboard manager
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+Type=exec
+RemainAfterExit=yes
+ExecStart=/usr/bin/wl-paste --watch cliphist store
+
+[Install]
+WantedBy=graphical-session.target

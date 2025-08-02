@@ -23,4 +23,4 @@ font_size="$3"
 
 set_color_and_font
 
-rofi -steal-focus -normal-window -theme "$THEME" -show calc -modi calc -no-show-match -no-sort
+rofi -steal-focus -theme "$THEME" -show calc -modi calc -no-show-match -no-sort
