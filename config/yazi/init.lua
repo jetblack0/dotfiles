@@ -10,6 +10,10 @@ require("session"):setup {
 	sync_yanked = true,
 }
 
+require("smart-enter"):setup {
+	open_multi = true,
+}
+
 -- rounded border. NOTE: run `ya pack -a yazi-rs/plugins#full-border` to install the plugin
 require("full-border"):setup()
 
@@ -18,6 +22,6 @@ Header:children_add(function()
 	if ya.target_family() ~= "unix" then
 		return ui.Line {}
 	end
-	return ui.Span(" "):fg("gray"):bold(true)
+	return ui.Span("󱙝  "):fg("gray"):bold(true)
 	-- return ui.Span(ya.user_name() .. "@" .. ya.host_name() .. ":"):fg("blue")
 end, 500, Header.LEFT)

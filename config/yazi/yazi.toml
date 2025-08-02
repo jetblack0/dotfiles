@@ -1,4 +1,4 @@
-[manager]
+[mgr]
 ratio			= [ 1, 4, 3 ]
 # sort_by			= "alphabetical"
 # sort_reverse	= true
@@ -15,10 +15,11 @@ video = [
 	{ run = 'mpv "$@"', orphan = true, for = "unix" },
 ]
 book = [
-	{ run = 'zathura "$@"', orphan = true },
+	# open zathura into a Hyprland group, only works when there is a group window at the top  
+	{ run = 'zathura "$@" && hyprclt dispatch moveintogroup u', orphan = true },
 ]
 image = [
-	{ run = 'nsxiv -- "$@"', orphan = true },
+	{ run = 'nsxiv "$@"', orphan = true },
 ]
 audio = [
 	{ run = 'mpv --audio-display=no "$@"' },
@@ -39,6 +40,7 @@ prepend_rules = [
 
 	{ mime = "application/pdf",			use = "book" },
 	{ mime = "image/vnd.djvu",			use = "book" },
+	{ mime = "image/*",					use = "image" },
 	{ mime = "application/epub*",		use = "book" },
 
 	{ mime = "video/*",					use = "video" },
@@ -52,11 +54,11 @@ append_rules = [
 
 [plugin]
 prepend_previewers = [
-	# Archive previewer
-	{ mime = "application/*zip",            run = "ouch" },
-	{ mime = "application/x-tar",           run = "ouch" },
-	{ mime = "application/x-bzip2",         run = "ouch" },
-	{ mime = "application/x-7z-compressed", run = "ouch" },
-	{ mime = "application/x-rar",           run = "ouch" },
-	{ mime = "application/x-xz",            run = "ouch" },
+	{ name = "*.srt", run = "code" },
+	{ mime = "application/*zip,tar,bzip2,7z-compressed,rar,xz}", run = "ouch" },
+	# { mime = "application/tar",           run = "ouch" },
+	# { mime = "application/bzip2",         run = "ouch" },
+	# { mime = "application/7z-compressed", run = "ouch" },
+	# { mime = "application/rar",           run = "ouch" },
+	# { mime = "application/xz",            run = "ouch" },
 ]
