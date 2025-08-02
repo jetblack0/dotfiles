@@ -5,11 +5,14 @@ if not treesitter then return end
 
 treesitter.setup({
   ensure_installed = {
-    "html", "css", "json", "jsonc", "yaml", "javascript", "typescript", "tsx",
-    "helm",
+    "html", "css", "javascript", "typescript", "tsx",
+    "helm", "groovy",
+    "json", "jsonc", "yaml",
     "markdown", "markdown_inline",
-    "c", "rust", "java", "go", "gotmpl",
-    "bash", "lua", "python",
+    "c", "rust", "java", "nasm",
+    "go", "gotmpl",
+    "bash", "lua",
+    "python", "requirements", "htmldjango", "jinja", "jinja_inline"
   },
 	ignore_install = { "" }, -- List of parsers to ignore installing
 	highlight = {

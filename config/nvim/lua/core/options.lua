@@ -37,6 +37,8 @@ local options = {
 	wildmode = "list:longest,full", ]]
 	backup = false,
 	writebackup = false,
+  -- folding.
+  foldmethod = "manual",
 
 
 	-- UI: highlights 

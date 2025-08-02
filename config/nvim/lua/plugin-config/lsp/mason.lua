@@ -10,6 +10,7 @@ local must_have_servers = {
 	"rust_analyzer",
 	"lua_ls", "bashls",
 	"ts_ls", "html", "cssls", "jsonls",
+	"ansiblels"
 }
 
 local mason_config = {
@@ -27,6 +28,7 @@ local mason_config = {
     keymaps = {
       toggle_package_expand = "o",
       uninstall_package = "D",
+      install_package = "I",
     },
   },
 }

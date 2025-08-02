@@ -22,7 +22,7 @@ keymap("n", "U", ":redo<CR>", default_map_opts)
 -- Open spell check.
 keymap("n", "<leader>s", ":set spell!<CR>", default_map_opts)
 -- Press escape twice to get rid of search highlight.
-keymap("n", "<esc><esc>", ":noh<CR>:echo \"\"<CR>", default_map_opts)
+keymap("n", "<leader><leader>", ":noh<CR>:echo \"\"<CR>", default_map_opts)
 -- Records the working directory of nvim, and return home. vim doesn't
 -- override its working directory in its process table. Quite useful for
 -- Telescope.
@@ -55,8 +55,6 @@ keymap("n", "<a-/>", "<c-w>=", default_map_opts)
 
 
 -- Netrw
--- NOTE: For Lex, new file will always be created in the current directory,
--- Better off just using commands.
 --------
 keymap("n", "<c-b>", ":Lexplore<CR>", default_map_opts)
 vim.cmd[[
@@ -68,6 +66,19 @@ augroup NetrwMappings
   autocmd FileType netrw nmap <buffer> a C%:let g:netrw_chgwin=-1<Enter>
 augroup END
 ]]
+
+
+-- Folding
+----------
+-- NOTE: maybe map them to something else someday.
+-- zf{motion}	Create a fold over a range
+-- zd	Delete the fold at cursor
+-- zE	Delete all folds in the buffer
+-- zo	Open the fold under the cursor
+-- zc	Close the fold under the cursor
+-- za	Toggle the fold under the cursor
+-- zR	Open all folds
+-- zM	Close all folds
 
 
 

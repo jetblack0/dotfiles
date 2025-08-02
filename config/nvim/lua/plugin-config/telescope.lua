@@ -11,7 +11,7 @@ telescope.setup{
 				["<a-k>"] = "move_selection_previous",
 				["<Tab>"] = "toggle_selection",
 				["<a-Tab>"] = "toggle_selection",
-				["<c-c>"] = "close",
+				["<c-c>"] = false,
 				["<leader>c"] = "close",
 				["<c-o>"] = "select_default",
 			},
@@ -21,7 +21,7 @@ telescope.setup{
 				["<a-k>"] = "move_selection_previous",
 				["<Tab>"] = "toggle_selection",
 				["<a-Tab>"] = "toggle_selection",
-				["<c-c>"] = "close",
+        ["<Esc>"] = "close",
 				["<leader>c"] = "close",
 				["<c-o>"] = "select_default",
 			},
@@ -66,3 +66,6 @@ vim.keymap.set("n", "<leader>r", function()
 	telescope_built_in.command_history()
 end, { desc = "Telescope command history" })
 
+vim.keymap.set("n", "<leader>b", function()
+	telescope_built_in.buffers()
+end, { desc = "Telescope buffer selection menu" })

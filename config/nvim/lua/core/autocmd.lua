@@ -25,12 +25,40 @@ augroup END]]
 
 -- Programming languages
 ------------------------
+-- Change filetypes for template language.
+vim.cmd[[au BufRead,BufNewFile */playbooks/*.yml setlocal ft=yaml.ansible]]
+vim.cmd[[au BufRead,BufNewFile */playbooks/*.yaml setlocal ft=yaml.ansible]]
+vim.cmd[[au BufRead,BufNewFile */roles/*/tasks/*.yml setlocal ft=yaml.ansible]]
+vim.cmd[[au BufRead,BufNewFile */roles/*/tasks/*.yaml setlocal ft=yaml.ansible]]
+vim.cmd[[au BufRead,BufNewFile */roles/*/handlers/*.yml setlocal ft=yaml.ansible]]
+vim.cmd[[au BufRead,BufNewFile */roles/*/handlers/*.yaml setlocal ft=yaml.ansible]]
+vim.cmd[[au BufRead,BufNewFile *.j2 setlocal ft=jinja]]
+vim.api.nvim_create_autocmd("BufReadPost", {
+  pattern = "*.yml,*.yaml",
+  callback = function(args)
+    local fname = args.file
+    local dir = vim.fn.fnamemodify(fname, ":p:h")
+    while dir ~= "/" do
+      if vim.fn.filereadable(dir .. "/ansible.cfg") == 1 then
+        vim.bo[args.buf].filetype = "yaml.ansible"
+        return
+      end
+      dir = vim.fn.fnamemodify(dir, ":h")
+    end
+  end,
+})
+
+
 -- Change indentation width based on their file types.
-vim.cmd[[autocmd FileType html,text,yuck,json,javascript,javascriptreact,lua,xml setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType sh,html,htmldjango,text,yuck,json,javascript,javascriptreact,lua,xml,ruby,jinja,yaml.ansible setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType markdown,java setlocal expandtab shiftwidth=4 tabstop=4]]
+
 
 -- Treat ejs as html
 vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
+
+-- Seems neovim doesn't automatically recognize different asm syntax
+-- vim.cmd[[au BufNewFile,BufRead *.asm set filetype=nasm]]
 
 -- Detect go template files.
 vim.filetype.add({

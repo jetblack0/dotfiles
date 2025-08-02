@@ -8,6 +8,7 @@ conform.setup({
     -- executed sequentially.
     lua = { "stylua" },
     sh = { "shfmt" },
+    ruby = { "rubyfmt" },
   },
 })
 

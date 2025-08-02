@@ -137,6 +137,24 @@ lspconfig.bashls.setup({
 	on_attach = on_attach,
 })
 
+-- Python
+lspconfig.ruff.setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+})
+
+lspconfig.basedpyright.setup({
+	capabilities = capabilities,
+	on_attach = on_attach,
+	settings = {
+    basedpyright = {
+      analysis = {
+        typeCheckingMode = "off",
+      }
+    }
+	},
+})
+
 
 -- Markup languages
 -------------------
@@ -210,6 +228,40 @@ lspconfig.jsonls.setup({
 		lsp_keybind(client, bufnr)
 	end,
 })
+
+-- Ansible (bottom line broken)
+lspconfig.ansiblels.setup({
+	capabilities = capabilities,
+	on_attach = function(client, bufnr)
+		client.server_capabilities.documentFormattingProvider = false
+		lsp_keybind(client, bufnr)
+	end,
+  cmd = { "ansible-language-server", "--stdio" },
+  filetypes = { "yaml.ansible", "ansible" },
+  root_dir = lspconfig.util.root_pattern("ansible.cfg", ".ansible-lint"),
+  single_file_support = true,
+	settings = {
+    ansible = {
+      ansible = {
+        path = "ansible"
+      },
+      executionEnvironment = {
+        enabled = false
+      },
+      python = {
+        interpreterPath = "python"
+      },
+      validation = {
+        enabled = true,
+        lint = {
+          enabled = true,
+          path = "ansible-lint --profile basic --offline"
+        }
+      }
+    }
+	},
+})
+
 
 -- Markdown
 -- NOTE: No completion for some reason. I am looking

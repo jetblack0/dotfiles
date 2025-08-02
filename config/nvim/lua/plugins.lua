@@ -17,17 +17,20 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Define which file types should the plguin be loaded.
 local indent_line_filetypes = {
-  "html", "css", "yaml", "json", "jsonc", "javascript", "javascriptreact", "tsx", "typescript",
-  "rust", "java", "c", "make", "go",
+  "html", "css", "htmldjango",
+  "javascript", "javascriptreact", "tsx", "typescript",
+  "yaml", "json", "jsonc", "yaml.ansible",
+  "rust", "java", "c", "make", "go", "ruby",
+  "python",
   "lua", "sh"
 }
 
 -- Define what file types should load LSP.
 local lsp_filetypes = {
-  "lua", "sh",
+  "lua", "sh", "python", "ruby",
   "rust", "java",
   "javascript", "tsx", "jsx", "html", "css", "scss", "ejs", "json", "javascriptreact",
-  "markdown", "yaml"
+  "yaml", "yaml.ansible"
 }
 
 -- Lazy vim configuration.

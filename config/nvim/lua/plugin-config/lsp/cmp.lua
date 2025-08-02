@@ -179,10 +179,18 @@ cmp.setup.cmdline(":", {
 -- Settings for different filetypes
 -----------------------------------
 -- For certain filetypes.
-cmp.setup.filetype({ "rust", "lua", "sh", "javascript", "markdown" }, {
+cmp.setup.filetype({ "rust", "lua", "sh", "javascript", "markdown", "python", "ruby" }, {
 	sources = {
 		{ name = "nvim_lsp" },
  		{ name = "snippy" },
+		{ name = "buffer" },
+		{ name = "path" },
+	},
+})
+
+cmp.setup.filetype({ "yaml.ansible", "jinja" }, {
+	sources = {
+		{ name = "nvim_lsp" },
 		{ name = "buffer" },
 		{ name = "path" },
 	},
