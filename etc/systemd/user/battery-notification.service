@@ -3,8 +3,7 @@ Description=Simple battery monitoring and notification daemon
 
 [Service]
 Type=exec
-WorkingDirectory=%h/Development/script/programs/wayland
-ExecStart=%h/Development/script/programs/wayland/battery-notification.sh
+ExecStart=%h/Development/script/gui/battery-notification.sh
 
 [Install]
 WantedBy=default.target
