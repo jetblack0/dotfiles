@@ -1,27 +1,36 @@
 local helpers = require("utils.helpers")
 
-local treesitter = helpers.safe_require("nvim-treesitter.configs")
+local treesitter = helpers.safe_require("nvim-treesitter")
 if not treesitter then return end
 
+local ensure_installed = {
+  "html", "css", "javascript", "typescript", "tsx",
+  "helm", "groovy",
+  "json", "jsonc", "yaml",
+  "markdown", "markdown_inline",
+  "c", "rust", "java", "nasm",
+  "go", "gotmpl",
+  "bash", "lua",
+  "python", "requirements", "htmldjango", "jinja", "jinja_inline"
+}
+
 treesitter.setup({
-  ensure_installed = {
-    "html", "css", "javascript", "typescript", "tsx",
-    "helm", "groovy",
-    "json", "jsonc", "yaml",
-    "markdown", "markdown_inline",
-    "c", "rust", "java", "nasm",
-    "go", "gotmpl",
-    "bash", "lua",
-    "python", "requirements", "htmldjango", "jinja", "jinja_inline"
-  },
-	ignore_install = { "" }, -- List of parsers to ignore installing
-	highlight = {
-		enable = true, -- false will disable the whole extension
-		disable = { "" }, -- list of language that will be disabled
-	},
-	autopairs = {
-		enable = true,
-	},
-	indent = { enable = true, disable = { "" } },
-	additional_vim_regex_highlighting = false,
+  install_dir = vim.fn.stdpath('data') .. '/treesitter'
+})
+
+local installed = treesitter.get_installed()
+local to_install = vim
+  .iter(ensure_installed)
+  :filter(function(parser) return not vim.tbl_contains(installed, parser) end)
+  :totable()
+
+if #to_install > 0 then treesitter.install(to_install) end
+
+vim.api.nvim_create_autocmd("FileType", {
+  group = vim.api.nvim_create_augroup("EnableTreesitterHighlighting", { clear = true }),
+  desc = "Try to enable tree-sitter syntax highlighting",
+  pattern = "*",
+  callback = function()
+    pcall(function() vim.treesitter.start() end)
+  end,
 })
