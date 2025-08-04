@@ -148,37 +148,32 @@ require("lazy").setup({
 
   -- Programming (LSP)
   --------------------
-  -- LSP and plugins around it.
-	{
-		"neovim/nvim-lspconfig",
-		ft = lsp_filetypes,
-		config = function()
-			require("plugin-config.lsp")
-		end,
-		dependencies = {
-      -- Package manager for LSPs, linters and so on.
-			"williamboman/mason.nvim",
-      -- Bridge mason with lspconfig.
-			"williamboman/mason-lspconfig.nvim",
-      -- Show function signature when typing.
-      -- NOTE: This plugin is not really, signature help can be toggled
-      -- through vim.lsp.buf.signature_help.
-			-- "hrsh7th/cmp-nvim-lsp-signature-help",
-			{
-        -- Highlights other uses of the word under the cursor using LSP,
-        -- linters and so on.
-				"RRethy/vim-illuminate",
-				config = function()
-					require("plugin-config.lsp.illuminate")
-				end,
-			},
-		},
-	},
+    {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+    },
+    config = function()
+      require("plugin-config.lsp.mason")
+    end,
+    post_checkout = function()
+      vim.cmd("MasonToolsInstall")
+    end,
+  },
+  {
+    -- Highlights other uses of the word under the cursor using LSP,
+    -- linters and so on.
+    "RRethy/vim-illuminate",
+    config = function()
+      require("plugin-config.lsp.illuminate")
+    end,
+  },
   -- cmp, the actual impletation for the completion menu.
 	{
 		"hrsh7th/nvim-cmp",
 	dependencies = {
-      -- Bridge cmp (completion) with lspconfig.
+      -- Bridge cmp (completion) with lsp.
 			"hrsh7th/cmp-nvim-lsp",
       -- Bridge cmp with nvim-snippy (snippets).
 			"dcampos/cmp-snippy",
@@ -225,7 +220,6 @@ require("lazy").setup({
   -- Other neat stuff for programming.
   {
     "SmiteshP/nvim-navic",
-    requires = "neovim/nvim-lspconfig"
   },
 
 
@@ -248,15 +242,4 @@ require("lazy").setup({
 		"mzlogin/vim-markdown-toc",
 		ft = { "markdown" }
 	},
-  --[[ {
-    'MeanderingProgrammer/render-markdown.nvim',
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'nvim-tree/nvim-web-devicons' },
-    ---@module 'render-markdown'
-    ---@type render.md.UserConfig
-    opts = {},
-    ft = { "markdown" },
-		config = function()
-			require("plugin-config.render-markdown")
-		end,
-  } ]]
 }, lazy_config)
