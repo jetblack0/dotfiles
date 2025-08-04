@@ -3,7 +3,12 @@ local telescope = helpers.safe_require("telescope")
 local telescope_built_in = helpers.safe_require("telescope.builtin") 
 
 telescope.setup{
+  -- NOTE: turn off treesitter hightlighting for preview, necessary for
+  -- treesitter main branch.
 	defaults = {
+    preview = {
+      treesitter = false,
+    },
 		mappings = {
 			i = {
 				["<c-h>"] = "which_key",
@@ -34,9 +39,9 @@ vim.keymap.set("n", "<leader>q", function()
 	telescope_built_in.find_files({
     layout_strategy = 'vertical',
     layout_config = {
-      width = 0.8,              -- this means 80% of the terminal
+      width = 0.8,
       height = 0.9,
-      preview_cutoff = 26,      -- minimum height before preview is hidden
+      preview_cutoff = 26,
       vertical = {
         preview_height = 0.4,
       },
