@@ -449,6 +449,15 @@ function get_opts_install() {
 
         PRESTART=true
         ;;
+      --slice)
+        [ "$TARGET" = "mihomo" ] && {
+          log "slice option will be silently ignored" warn
+          shift 1
+          continue
+        }
+
+        SLICE=true
+        ;;
       *)
         log "unrecognized option: $1" error
         usage_synopsis_install >&2
@@ -551,6 +560,8 @@ After=network.target
 RefuseManualStart=yes
 EOF
 
+  $SLICE && local slice="Slice=service.slice"
+
   cat > "$SYSTEMD_PREFIX"/singbox@.service <<EOF
 [Unit]
 Description=Sing-box proxy using configuration file /etc/singbox/profiles/%i.yaml
@@ -561,6 +572,9 @@ PartOf=singbox.target
 [Service]
 User=singbox
 Group=singbox
+$slice
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
 ExecStartPre=/bin/sh -c '/usr/bin/env yq -o=json /etc/singbox/profiles/%i.yaml > /run/singbox-%i.json'
 ExecStart=$BIN_DIR/singbox run -c /run/singbox-%i.json -D /etc/singbox
 ExecReload=/bin/kill -HUP \$MAINPID
@@ -752,6 +766,7 @@ function install() {
   fi
 
   if $create_conf_dir || $FORCE; then
+    log "Creating configuration directory" normal 2
     mkdir -p /etc/"$TARGET"/profiles
     chmod 0775 /etc/"$TARGET"
     chmod 0770 /etc/"$TARGET"/profiles
@@ -912,6 +927,7 @@ function main() {
       # personal options
       : "${GENCONF:=false}"
       : "${PRESTART:=false}"
+      : "${SLICE:=false}"
 
       get_opts_install "$@" 
 
