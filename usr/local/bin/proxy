@@ -488,6 +488,27 @@ function get_opts_install() {
       --slice)
         SLICE=true
         ;;
+      --personal-mihomo)
+        [ "$TARGET" != "mihomo" ] && {
+          log "personal option will be silently ignored" warn
+          shift 1
+          continue
+        }
+
+        GENCONF=true
+        PRESTART=true
+        MIHOMO_SUSPEND=true
+        SLICE=true
+        ;;
+      --personal-singbox)
+        [ "$TARGET" != "singbox" ] && {
+          log "personal option will be silently ignored" warn
+          shift 1
+          continue
+        }
+
+        SLICE=true
+        ;;
       *)
         log "unrecognized option: $1" error
         usage_synopsis_install >&2
