@@ -14,7 +14,7 @@ CMD_ABSOPATH="$(realpath "$0")"
 TEMPLATES_SINGBOX=("singbox@.service" "singbox.target")
 TEMPLATES_MIHOMO=("mihomo@.service" "mihomo.target")
 
-SUPPORTED_COMMANDS=(install uninstall stopall)
+SUPPORTED_COMMANDS=(install uninstall stopall restart)
 SUPPORTED_PERSONAL_COMMANDS=(genconf)
 
 declare -Ag SUPPORTED_MIHOMO_GUIS=(
@@ -52,6 +52,7 @@ ${BOLD}${UNDERLINE}Commands${NC}:
   install               Install proxy tools
   uninstall             Uninstall everything created by the install command
   stopall               Stop all running proxy instances
+  restart               Stop all running proxy instances
 
 ${BOLD}${UNDERLINE}Options${NC}:
   -g, --list-guis       List supported mihomo GUIs
@@ -177,6 +178,32 @@ ${BOLD}  -t, --target <tool>${NC}
       - mihomo
 
       [default: singbox] 
+EOF
+}
+
+function usage_synopsis_restart() {
+  cat <<EOF
+${BOLD}${UNDERLINE}Usage${NC}: ${BOLD}${0}${NC} restart [-t | --target [<tool>]]
+EOF
+}
+
+function usage_description_restart() {
+  cat <<EOF
+Restart all running instance for a proxy tool.
+EOF
+}
+
+function usage_options_restart() {
+  cat <<EOF
+${BOLD}${UNDERLINE}Options${NC}:
+${BOLD}  -t, --target <tool>${NC}
+      Restart all running instances for the specified proxy
+
+      Possible values:
+      - singbox
+      - mihomo
+
+      [default: singbox]
 EOF
 }
 
@@ -441,7 +468,7 @@ function get_opts_install() {
         GENCONF=true
         ;;
       --prestart)
-        [ "$TARGET" = "singbox" ] && {
+        [ "$TARGET" != "mihomo" ] && {
           log "prestart option will be silently ignored" warn
           shift 1 
           continue
@@ -449,13 +476,16 @@ function get_opts_install() {
 
         PRESTART=true
         ;;
-      --slice)
-        [ "$TARGET" = "mihomo" ] && {
-          log "slice option will be silently ignored" warn
+      --mihomo-suspend)
+        [ "$TARGET" != "mihomo" ] && {
+          log "suspend option will be silently ignored" warn
           shift 1
           continue
         }
 
+        MIHOMO_SUSPEND=true
+        ;;
+      --slice)
         SLICE=true
         ;;
       *)
@@ -553,6 +583,40 @@ function get_opts_stopall() {
   done
 }
 
+function get_opts_restart() {
+  while [ $# -gt 0 ]; do
+    case $1 in
+      -t|--target)
+        [ -z "$2" ] && {
+          log "Argument for proxy tool (-t|--target) is empty, using default (singbox)" warn
+          shift
+          continue
+        }
+
+        if ! array_contains_element "$2" "${!SUPPORTED_TARGETS[*]}"; then
+          log "Unsupported tool '$2', can only be one of:" error
+
+          for i in "${!SUPPORTED_TARGETS[@]}"; do
+            log "$i: ${SUPPORTED_TARGETS[$i]}" errorn 2
+          done
+
+          exit 1
+        fi
+
+        TARGET="$2"
+        shift
+        ;;
+      *)
+        log "unrecognized option: $1" error
+        usage_synopsis_restart >&2
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+}
+
 function mk_singbox_systemd() {
   cat > "$SYSTEMD_PREFIX"/singbox.target <<EOF
 Description=Passive target unit for singbox@.service
@@ -611,6 +675,7 @@ PartOf=mihomo.target
 Type=exec
 User=mihomo
 Group=mihomo
+$slice
 CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
 AmbientCapabilities=CAP_NET_ADMIN CAP_NET_RAW CAP_NET_BIND_SERVICE CAP_SYS_TIME CAP_SYS_PTRACE CAP_DAC_READ_SEARCH CAP_DAC_OVERRIDE
 WorkingDirectory=/etc/mihomo
@@ -795,6 +860,26 @@ function install() {
       --directory="$MIHOMO_GUI_DIR"/"$MIHOMO_GUI"
   fi
 
+  # TODO: test
+  if [ "$TARGET" = "mihomo" ] && $MIHOMO_SUSPEND; then
+    log "Creating mihomo-restart service" normal 2
+
+    cat > "$SYSTEMD_PREFIX"/mihomo-restart.target <<EOF
+Description=Restart mihomo instances after waking up from suspension
+After=suspend.target
+
+[Service]
+Type=oneshot
+ExecStart=$CMD_ABSOPATH restart
+
+[Install]
+WantedBy=suspend.target
+EOF
+
+  systemctl daemon-reload
+  log "$(systemctl enable mihomo-restart.target)" normal 2
+  fi
+
   chown -R "$TARGET":"$TARGET" /etc/"$TARGET"
   log "Done." normal 2
 }
@@ -888,6 +973,31 @@ function stopall() {
   log "Done." normal 2
 }
 
+function restart() {
+  if ! systemctl list-unit-files "$TARGET"@.service &>/dev/null; then
+    log "$TARGET@.service doesn't exist" error 1
+    log "maybe try '$0 install -t $TARGET' first" error 1
+    exit 1
+  fi
+
+  if [ -z "$(systemctl show "$TARGET@*.service" -t service --state=active)" ]; then
+    log "No active instances for $TARGET@.service" warn 1
+    log "Nothing else to do, quit" abort 1
+    exit 0
+  fi
+
+  log "Restart running instances of $TARGET" normal 1
+  systemctl show "$TARGET@*.service" -t service --state=active --property=Id \
+    --value --no-pager | while read -r unit; do
+    if [ -n "$unit" ]; then
+      log "Restarting unit $unit" normal 2
+      systemctl restart "$unit"
+    fi
+  done
+
+  log "Done." normal 2
+}
+
 function genconf() {
   local base_conf="/etc/mihomo/profiles/tun-dns.yaml"
   local proxy_conf="/etc/mihomo/profiles/proxy.yaml"
@@ -928,6 +1038,7 @@ function main() {
       : "${GENCONF:=false}"
       : "${PRESTART:=false}"
       : "${SLICE:=false}"
+      : "${MIHOMO_SUSPEND:=false}"
 
       get_opts_install "$@" 
 
@@ -982,7 +1093,21 @@ function main() {
       }
       stopall
       ;;
-    # NOTE: Personal subcommands
+    restart)
+      : "${TARGET:="singbox"}"
+      get_opts_restart "$@"
+
+      is_euid_root || {
+        log "please run as the root user" error
+        exit 1
+      }
+
+      [ "$(ps --no-headers -o ucmd -p 1)" != "systemd" ] && {
+        log "non-systemd system, unsupported" error
+        exit 1
+      }
+      restart
+      ;;
     genconf)
       # is_euid_root || {
       #   log "please run as the root user" error
