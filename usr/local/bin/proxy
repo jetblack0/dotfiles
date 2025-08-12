@@ -459,7 +459,7 @@ function get_opts_install() {
       # NOTE: personal options that are specific to my own environment, won't show up in
       # the help menu
       --genconf)
-        [ "$TARGET" = "singbox" ] && {
+        [ "$TARGET" != "mihomo" ] && {
           log "genconf option will be silently ignored" warn
           shift 1 
           continue
@@ -889,9 +889,7 @@ function uninstall() {
   local -n templates="TEMPLATES_${TARGET^^}"
 
   local remove_group=false remove_user=false remove_binary=false \
-    all_units_exist=false
-
-  local profiles
+    all_units_exist=false config_dir_exist=false
 
   local expanded_units=()
 
@@ -900,16 +898,23 @@ function uninstall() {
   is_user_exist "$TARGET" && remove_user=true
   is_cmd_exist "$TARGET" && remove_binary=true
   is_conf_exist "${expanded_units[@]}" && all_units_exist=true
+  [ -d /etc/"$TARGET" ] && config_dir_exist=true
 
-  readarray -t profiles < <(find /etc/"$TARGET"/profiles -type f -name '*.yaml' \
-    -or -name '*.yml' | sed '/^$/d')
+  local profiles
+  [ -d /etc/"$TARGET"/profiles ] && {
+    readarray -t profiles < <(find /etc/"$TARGET"/profiles -type f -name '*.yaml' \
+      -or -name '*.yml' | sed '/^$/d')
+  }
 
   log "Uninstalling $TARGET" normal 1
 
   if $remove_user; then
     log "Removing user $TARGET" normal 2
-    [ "$(stat -c '%U' /etc/"$TARGET")" = "$TARGET" ] && chown root /etc/"$TARGET"
-    userdel "$TARGET" 1>/dev/null
+
+    if $config_dir_exist && [ "$(stat -c '%U' /etc/"$TARGET")" = "$TARGET" ]; then
+      chown root /etc/"$TARGET"
+    fi
+    userdel "$TARGET" &>/dev/null
   else
     log "User $TARGET doesn't exist" skip 2
   fi
@@ -918,7 +923,10 @@ function uninstall() {
 
   if $remove_group; then
     log "Removing group $TARGET" normal 2
-    [ "$(stat -c '%G' /etc/"$TARGET")" = "$TARGET" ] && chown :root /etc/"$TARGET"
+
+    if $config_dir_exist && [ "$(stat -c '%G' /etc/"$TARGET")" = "$TARGET" ]; then
+      chown :root /etc/"$TARGET"
+    fi
     groupdel "$TARGET" &>/dev/null
   else
     log "Group $TARGET doesn't exist" skip 2
@@ -946,7 +954,7 @@ function uninstall() {
     done
   fi
 
-  if [ ! -d /etc/"$TARGET" ]; then
+  if ! $config_dir_exist; then
     log "Directory /etc/$TARGET does not exist" skip 2
   elif [ ${#profiles[@]} -eq 0 ] || $FORCE; then
     log "Removing directory /etc/$TARGET" normal 2
