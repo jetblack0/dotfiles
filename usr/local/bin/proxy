@@ -254,6 +254,9 @@ function log() {
     2)
       indent="  -> "
       ;;
+    3)
+      indent="    → "
+      ;;
   esac
 
   case "$type" in
@@ -264,6 +267,24 @@ function log() {
     warn)   echo "${BOLD}${YELLOW}${indent}WARNING: $message${NC}" ;;
     *)      echo "${BOLD}${GREEN}${indent}${NC}$message"           ;;
   esac
+}
+
+function log_cmd() {
+  set +e
+  local indent=0
+
+  if [[ "$1" =~ ^[0-9]+$ ]]; then
+    indent="$1"
+    shift
+  fi
+
+  local cmd_output
+  if cmd_output="$("$@" 2>&1)"; then
+    [ -n "$cmd_output" ] && log "$1: $cmd_output" normal "$indent"
+  else
+    [ -n "$cmd_output" ] && log "$1: $cmd_output" error "$indent"
+  fi
+  set -e
 }
 
 
@@ -683,6 +704,7 @@ EOF
 
   $GENCONF && local gen_conf_pre="ExecStartPre=$CMD_ABSOPATH genconf"
   $PRESTART && local prestart_conf_pre="ExecStartPre=$CMD_ABSOPATH stopall"
+  $SLICE && local slice="Slice=service.slice"
 
   cat > "$SYSTEMD_PREFIX"/mihomo@.service <<EOF
 [Unit]
@@ -776,6 +798,8 @@ function install() {
   local create_group=false create_user=false create_systemd_service=false \
     download_binary=false create_conf_dir=false
 
+  local create_suspend_service=false
+
   local expanded_units=()
 
   expand_units_with_prefix "$SYSTEMD_PREFIX" expanded_units "${templates[@]}"
@@ -786,6 +810,11 @@ function install() {
   is_conf_exist "${expanded_units[@]}" || create_systemd_service=true
   [ -d "/etc/$TARGET/profiles"  ] || create_conf_dir=true
 
+  if $MIHOMO_SUSPEND && [ "$(systemctl is-enabled mihomo-restart.service)" \
+    != "enabled" ]; then
+      create_suspend_service=true
+  fi
+
   # NOTE: if configuration directory already exists, this won't
   # try to update its permissions or anything, unless -f is given.
   # the intention is to prevent breaking existing setup.
@@ -795,7 +824,8 @@ function install() {
     && ! $download_binary \
     && ! $create_conf_dir \
     && ! $FORCE \
-    && ! ($INSTALL_MIHOMO_GUI && [ "$TARGET" = "mihomo" ]); then
+    && ! ($INSTALL_MIHOMO_GUI && [ "$TARGET" = "mihomo" ]) \
+    && ! $create_suspend_service; then
 
     log "Nothing else to do, quit" abort 1
     exit 0
@@ -885,7 +915,8 @@ function install() {
   if [ "$TARGET" = "mihomo" ] && $MIHOMO_SUSPEND; then
     log "Creating mihomo-restart service" normal 2
 
-    cat > "$SYSTEMD_PREFIX"/mihomo-restart.target <<EOF
+    cat > "$SYSTEMD_PREFIX"/mihomo-restart.service <<EOF
+[Unit]
 Description=Restart mihomo instances after waking up from suspension
 After=suspend.target
 
@@ -898,7 +929,7 @@ WantedBy=suspend.target
 EOF
 
   systemctl daemon-reload
-  log "$(systemctl enable mihomo-restart.target)" normal 2
+  log_cmd 3 systemctl enable mihomo-restart.service
   fi
 
   chown -R "$TARGET":"$TARGET" /etc/"$TARGET"
@@ -935,7 +966,7 @@ function uninstall() {
     if $config_dir_exist && [ "$(stat -c '%U' /etc/"$TARGET")" = "$TARGET" ]; then
       chown root /etc/"$TARGET"
     fi
-    userdel "$TARGET" &>/dev/null
+    log_cmd 3 userdel "$TARGET"
   else
     log "User $TARGET doesn't exist" skip 2
   fi
@@ -948,7 +979,7 @@ function uninstall() {
     if $config_dir_exist && [ "$(stat -c '%G' /etc/"$TARGET")" = "$TARGET" ]; then
       chown :root /etc/"$TARGET"
     fi
-    groupdel "$TARGET" &>/dev/null
+    log_cmd 3 groupdel "$TARGET"
   else
     log "Group $TARGET doesn't exist" skip 2
   fi
@@ -1088,7 +1119,6 @@ function main() {
 
       install
       ;;
-    # TODO: implement
     uninstall)
       : "${TARGET:="singbox"}"
       : "${FORCE:=false}"
