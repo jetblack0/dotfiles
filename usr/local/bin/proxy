@@ -911,7 +911,6 @@ function install() {
       --directory="$MIHOMO_GUI_DIR"/"$MIHOMO_GUI"
   fi
 
-  # TODO: test
   if [ "$TARGET" = "mihomo" ] && $MIHOMO_SUSPEND; then
     log "Creating mihomo-restart service" normal 2
 
@@ -936,12 +935,14 @@ EOF
   log "Done." normal 2
 }
 
-# TODO: haven't been tested whatsoever
+# TODO: indicate if there is nothing else left to do
 function uninstall() {
   local -n templates="TEMPLATES_${TARGET^^}"
 
   local remove_group=false remove_user=false remove_binary=false \
     all_units_exist=false config_dir_exist=false
+
+  local remove_mihomo_restart_service=false
 
   local expanded_units=()
 
@@ -951,6 +952,11 @@ function uninstall() {
   is_cmd_exist "$TARGET" && remove_binary=true
   is_conf_exist "${expanded_units[@]}" && all_units_exist=true
   [ -d /etc/"$TARGET" ] && config_dir_exist=true
+
+  if [ "$TARGET" = "mihomo" ] && \
+    systemctl list-unit-files "mihomo-restart.service" &>/dev/null; then
+    remove_mihomo_restart_service=true
+  fi
 
   local profiles
   [ -d /etc/"$TARGET"/profiles ] && {
@@ -1013,6 +1019,16 @@ function uninstall() {
     rm -rf /etc/"$TARGET"
   else
     log "Found profiles in /etc/$TARGET/profiles" skip 2
+  fi
+
+  if $remove_mihomo_restart_service; then
+    log "Removing mihomo-restart.service" normal 2
+    if [ "$(systemctl is-enabled mihomo-restart.service)" = "enabled" ]; then
+      log_cmd 3 systemctl disable mihomo-restart.service
+    fi
+
+    rm "$SYSTEMD_PREFIX"/mihomo-restart.service
+    systemctl daemon-reload
   fi
 
   log "Done." normal 2
