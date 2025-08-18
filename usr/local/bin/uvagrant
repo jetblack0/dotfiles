@@ -1,0 +1,422 @@
+#!/usr/bin/env bash
+
+# Goal: A single universal vagrant environment that supposes all kinds of OSs and providers.  
+# NOTE: untested 
+
+set -o pipefail
+set -o errexit
+set -o nounset
+
+umask 0022
+
+##############################
+# Hardcoded variables
+##############################
+BASE_DIR="/tmp/uvgrant"
+HOSTNAME_PREFIX="uvgrant"
+SUPPORTED_PROVIDERS=("libvirt")
+
+declare -A SUPPORTED_OS=(
+  [debian12]="generic/debian12"
+)
+
+
+##############################
+# Helpers
+##############################
+function log() {
+  local message="$1"
+  local type=${2:-"normal"}
+  local indent
+
+  case "$3" in
+    1)
+      indent="==> "
+      ;;
+    2)
+      indent="  -> "
+      ;;
+    3)
+      indent="    → "
+      ;;
+  esac
+
+  case "$type" in
+    skip)   echo "${BOLD}${YELLOW}${indent}Skip: $message${NC}"    ;;
+    abort)  echo "${BOLD}${indent}Abort: $message${NC}"            ;;
+    error)  echo "${BOLD}${RED}${indent}ERROR: $message${NC}" >&2  ;;
+    errorn) echo "${BOLD}${indent}$message${NC}" >&2               ;;
+    warn)   echo "${BOLD}${YELLOW}${indent}WARNING: $message${NC}" ;;
+    *)      echo "${BOLD}${GREEN}${indent}${NC}$message"           ;;
+  esac
+}
+
+function ip2int() {
+  local IFS=. 
+  read -r o1 o2 o3 o4 <<< "$1"
+  echo $(( (o1 << 24) + (o2 << 16) + (o3 << 8) + o4 ))
+}
+
+function prefix2maskint() {
+  local prefix=$1
+  echo $(( 0xFFFFFFFF << (32 - prefix) & 0xFFFFFFFF ))
+}
+
+
+##############################
+# Conditions
+##############################
+function is_array_contains_element() {
+  local needle="$1" array="$2"
+
+  for element in $array; do
+    [ "$element" = "$needle" ] && return 0
+  done
+  return 1
+}
+
+function is_unsigned_int() {
+  re='^[0-9]+$'
+  if ! [[ $1 =~ $re ]] ; then
+    return 1
+  fi
+
+  return 0
+}
+
+
+##############################
+# Checks
+##############################
+function checkget_ipcidr() {
+  local cidr=$1
+  local ip prefix network_int ip_int netmask
+
+  IFS=/ read -r ip prefix <<< "$cidr"
+
+  if [[ ! $cidr =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}/[0-9]{1,2}$ ]]; then
+    log "Invalid IPv4 CIDR format: '$cidr'" error 
+    exit 1
+  fi
+
+  if [ "$prefix" -lt 0 ] || [ "$prefix" -gt 32 ]; then
+    log "Invalid prefix length: '$prefix'" error
+    exit 1
+  fi
+
+  IFS=. read -r o1 o2 o3 o4 <<< "$ip"
+  for octet in $o1 $o2 $o3 $o4; do
+    if [ "$octet" -lt 0 ] || [ "$octet" -gt 255 ]; then
+      log "Invalid octet $octet" error
+      exit 1
+    fi
+  done
+
+  if [ "$prefix" -eq 0 ]; then
+    netmask=0
+  else
+    netmask=$(prefix2maskint "$prefix")
+  fi
+
+  ip_int=$(ip2int "$ip")
+  network_int=$(( ip_int & netmask ))
+
+  if (( ip_int != network_int )); then
+    log "Invalid CIDR: host bits are not zero" error
+    exit 1
+  fi
+
+  [ -z "$2" ] && return 0
+
+  local broadcast_int usable_ips
+
+  broadcast_int=$(( network_int | ~netmask & 0xFFFFFFFF ))
+  usable_ips=$(( (broadcast_int - network_int + 1) - 2 ))
+  declare -n _ref="$2"
+  _ref=("$ip_int" "$network_int" "$usable_ips" "$prefix")
+}
+
+
+
+##############################
+# Usage
+##############################
+function usage() {
+  echo "Not implemented yet"
+}
+
+
+
+##############################
+# Options and args
+##############################
+function get_opts() {
+  [ "$#" -eq 0 ] && {
+    usage
+    exit 0
+  }
+
+  while [ $# -gt 0 ]; do
+    case $1 in
+      -h|--help)
+        usage
+        exit 0
+        ;;
+      -p|--provider)
+        # NOTE: check whether the provider is installed is handed over to vagrant
+        [ -z "$2" ] && {
+          log "Argument for provider (-p|--provider) is empty, using default (libvirt)" warn
+          shift
+          continue
+        }
+
+        if ! is_array_contains_element "$2" "${!SUPPORTED_PROVIDERS[*]}"; then
+          log "Unsupported provider '$2', can only be one of:" error
+
+          for i in "${!SUPPORTED_PROVIDERS[@]}"; do
+            log "$i: ${SUPPORTED_PROVIDERS[$i]}" errorn 2
+          done
+
+          exit 1
+        fi
+
+        PROVIDER="$2"
+        shift
+        ;;
+      -o|--os)
+        [ -z "$2" ] && {
+          log "Argument for OS (-o|--os) is empty, using default (debian12)" warn
+          shift
+          continue
+        }
+
+        if [[ "$2" == *,* ]]; then
+          IFS=',' read -r -a OSS <<< "$2"
+        else
+          OSS[0]="$2"
+        fi
+
+        for os in "${OSS[@]}"; do
+          if ! is_array_contains_element "$os" "${!SUPPORTED_OS[*]}" ; then
+            log "Unsupported os '$2', can only be one of:" error
+
+            for i in "${!SUPPORTED_OS[@]}"; do
+              log "$i: ${SUPPORTED_OS[$i]}" errorn 2
+            done
+
+            exit 1
+          fi
+        done
+
+        NUMBER_OF_NODES=${#OSS[@]}
+        shift
+        ;;
+      -4|--ipv4-cidr)
+        [ -z "$2" ] && {
+          log "Argument for IPv4 (-4|--ipv4-cidr) is empty, using default (172.28.128.0/24)" warn
+          shift
+          continue
+        }
+
+        local ip_info
+        checkget_ipcidr "$2" ip_info
+
+        # TODO: Vagrant sets cidr to 24 by default it seems?
+        # Anyway, currently prefix is not used, will be added later though
+        if [ ! "${ip_info[3]}" -eq 24 ]; then
+          log "IPV4 CIDR other than 24 is not supported at this moment, sorry" error
+          exit 1
+        fi
+
+        IPV4_CIDR="$2"
+        IPV4_NETWORK_INT=${ip_info[1]}
+        IPV4_USABLE_IPS=${ip_info[2]}
+
+        shift
+        ;;
+      -m|--memory)
+        [ -z "$2" ] && {
+          log "Argument for memory (-m|--memory) is empty, using default (512 MiB)" warn
+          shift
+          continue
+        }
+
+        if ! is_unsigned_int "$2"; then
+          log "'$2' is not a valid number for memory" error
+          exit 1
+        fi
+
+        local total_memory
+        total_memory="$(free -m | awk 'NR==2{print $2}')"
+
+        if [ "$2" -gt "$total_memory" ]; then
+          log "Memory can not be more than what's available memory on the system \
+            ($total_memory)" error
+          exit 1
+        fi
+
+        MEMORY="$2"
+        shift
+        ;;
+      -c|--cpu)
+        [ -z "$2" ] && {
+          log "Argument for cpu (-c|--cpu) is empty, using default (1)" warn
+          shift
+          continue
+        }
+
+        if is_unsigned_int "$2"; then
+          log "'$2' is not a valid number for CPU cores" error
+          exit 1
+        fi
+
+        local total_cpu
+        total_cpu="$(nproc --all)"
+
+        if [ "$2" -gt "$total_cpu" ]; then
+          log "CPU can not be more than what's available memory on the system \
+            ($total_cpu)" error
+          exit 1
+        fi
+
+        CPU="$2"
+        shift
+        ;;
+      --)
+        shift
+        VAGRANT_ARGS="$*"
+        break
+        ;;
+      *)
+        log "unrecognized option: $1" error
+        usage >&2
+        exit 1
+        ;;
+    esac
+
+    shift
+  done
+
+}
+
+function mk_vagrantfile() {
+  cat > "$BASE_DIR"/Vagrantfile <<EOF
+Vagrant.require_version ">= 1.7.0"
+VAGRANT_API_VERSION = "2"
+
+SUPPORTED_OS = %w[${!SUPPORTED_OS[@]}]
+
+def set_libvirt(virt, override)
+  libvirt__network_name: "#{$HOSTNAME_PREFIX}",
+  libvirt__dhcp_enabled: false,
+  libvirt__guest_ipv6: "no"
+
+  virt.memory = $MEMORY
+  virt.cpus = $CPU
+end
+
+Vagrant.configure(VAGRANT_API_VERSION) do |config|
+  config.ssh.forward_agent = true
+  config.ssh.keys_only = false
+  config.ssh.insert_key = false
+
+  config.vm.provision "file", name: "Copy public keys", source: ".vagrant/key.pub", destination: "/tmp/authorized_keys"
+  config.vm.provision "shell", name: "Configure Ansible user", inline: <<-SHELL 
+    [ -d /root/.ssh ] && mkdir -p /root/.ssh
+    chmod 0700 /root/.ssh
+
+    cat /tmp/authorized_keys >> /root/.ssh/.authorized_keys
+    cat /tmp/authorized_keys >> /home/vagrant/.ssh/authorized_keys
+  SHELL
+
+  (1..$NUMBER_OF_NODES).each do |count|
+    name = "$HOSTNAME_PREFIX-#{count}"
+    ipv4 = [$IPV4_NETWORK_INT + count + 1].pack('N').unpack('CCCC').join('.')
+
+    config.vm.define "#{name}" do |node|
+      node.vm.hostname = "#{name}"
+      node.vm.box = SUPPORTED_OS[count - 1]
+      node.vm.box_check_update = false
+
+      node.vm.network :private_network,
+        ip: "#{ipv4}",
+        auto_config: true,
+
+      node.vm.provider :libvirt do |virt, override|
+        virt.host = "#{node.vm.hostname}"
+        set_libvirt(virt, override)
+      end
+    end
+  end
+end
+EOF
+}
+
+function prepare() {
+  log "Preparing for the environment." normal 1
+
+  # TODO: ugly
+  if [ -d "$BASE_DIR" ]; then
+    log "Directory $BASE_DIR exists" skip 2
+
+    if [ ! -w "$BASE_DIR" ] || [ ! -r "$BASE_DIR" ] || [ ! -x "$BASE_DIR" ]; then
+      log "Don't have sufficient privileges to $BASE_DIR" warn 2
+      log "Trying to chmod $BASE_DIR to 07" warn 2
+
+      if [ "$(stat -c '%U' $BASE_DIR)" = "$USER" ]; then
+        chmod 0700 $BASE_DIR
+      else
+        log "Directory $BASE_DIR is not owned by the current user: $USER" error 2
+        exit 1
+      fi
+    fi
+  else
+    log "Creating directory $BASE_DIR" normal 2
+
+    if [ ! -w "$(dirname "$BASE_DIR")" ]; then
+      log "Insufficient privileges to create $BASE_DIR" error 2
+      exit 1
+    else
+      mkdir "$BASE_DIR" || {
+        log "Error creating $BASE_DIR" error 2
+        exit 1
+      }
+    fi
+  fi
+
+  [ ! -d "$BASE_DIR"/.vagrant ] && mkdir "$BASE_DIR"/.vagrant
+
+  if [ ! -f "$BASE_DIR"/.vagrant/key ] || [ ! -f "$BASE_DIR"/.vagrant/key.pub ] ; then
+    ssh-keygen -q -t ed25519 -N '' -f "$BASE_DIR"/key <<<y >/dev/null 2>&1
+  fi
+
+  log "Done." normal 2
+}
+
+function main() {
+  : "${PROVIDER:="libvirt"}"
+  : "${CPU:=1}"
+  : "${MEMORY:=512}"
+  : "${IPV4_CIDR:="172.28.128.0/24"}"
+  OSS=("debian12")
+  VAGRANT_ARGS=
+
+  # derived
+  NUMBER_OF_NODES=
+  IPV4_NETWORK_INT=
+  IPV4_USABLE_IPS=
+
+  get_opts "$@"
+
+  if [ "$NUMBER_OF_NODES" -gt "$IPV4_USABLE_IPS" ]; then
+    log "Too many nodes '$NUMBER_OF_NODES', only $IPV4_USABLE_IPS usable in \
+      $IPV4_CIDR" error
+    exit 1
+  fi
+
+  prepare
+  mk_vagrantfile
+  # exec vagrant "$VAGRANT_ARGS"
+}
+
+main "$@"
