@@ -5,17 +5,22 @@
 
 set -o pipefail
 set -o errexit
-set -o nounset
 
 umask 0022
 
 ##############################
 # Hardcoded variables
 ##############################
+BOLD=$'\033[1m'
+UNDERLINE=$'\033[4m'
+NC=$'\033[0m'
+GREEN=$'\033[32m'
+RED=$'\033[31m'
+YELLOW=$'\033[33m'
+
 BASE_DIR="/tmp/uvgrant"
 HOSTNAME_PREFIX="uvgrant"
 SUPPORTED_PROVIDERS=("libvirt")
-
 declare -A SUPPORTED_OS=(
   [debian12]="generic/debian12"
 )
@@ -151,11 +156,6 @@ function usage() {
 # Options and args
 ##############################
 function get_opts() {
-  [ "$#" -eq 0 ] && {
-    usage
-    exit 0
-  }
-
   while [ $# -gt 0 ]; do
     case $1 in
       -h|--help)
@@ -163,22 +163,11 @@ function get_opts() {
         exit 0
         ;;
       -p|--provider)
-        # NOTE: check whether the provider is installed is handed over to vagrant
         [ -z "$2" ] && {
           log "Argument for provider (-p|--provider) is empty, using default (libvirt)" warn
           shift
           continue
         }
-
-        if ! is_array_contains_element "$2" "${!SUPPORTED_PROVIDERS[*]}"; then
-          log "Unsupported provider '$2', can only be one of:" error
-
-          for i in "${!SUPPORTED_PROVIDERS[@]}"; do
-            log "$i: ${SUPPORTED_PROVIDERS[$i]}" errorn 2
-          done
-
-          exit 1
-        fi
 
         PROVIDER="$2"
         shift
@@ -190,25 +179,7 @@ function get_opts() {
           continue
         }
 
-        if [[ "$2" == *,* ]]; then
-          IFS=',' read -r -a OSS <<< "$2"
-        else
-          OSS[0]="$2"
-        fi
-
-        for os in "${OSS[@]}"; do
-          if ! is_array_contains_element "$os" "${!SUPPORTED_OS[*]}" ; then
-            log "Unsupported os '$2', can only be one of:" error
-
-            for i in "${!SUPPORTED_OS[@]}"; do
-              log "$i: ${SUPPORTED_OS[$i]}" errorn 2
-            done
-
-            exit 1
-          fi
-        done
-
-        NUMBER_OF_NODES=${#OSS[@]}
+        OS="$2"
         shift
         ;;
       -4|--ipv4-cidr)
@@ -218,20 +189,7 @@ function get_opts() {
           continue
         }
 
-        local ip_info
-        checkget_ipcidr "$2" ip_info
-
-        # TODO: Vagrant sets cidr to 24 by default it seems?
-        # Anyway, currently prefix is not used, will be added later though
-        if [ ! "${ip_info[3]}" -eq 24 ]; then
-          log "IPV4 CIDR other than 24 is not supported at this moment, sorry" error
-          exit 1
-        fi
-
         IPV4_CIDR="$2"
-        IPV4_NETWORK_INT=${ip_info[1]}
-        IPV4_USABLE_IPS=${ip_info[2]}
-
         shift
         ;;
       -m|--memory)
@@ -240,20 +198,6 @@ function get_opts() {
           shift
           continue
         }
-
-        if ! is_unsigned_int "$2"; then
-          log "'$2' is not a valid number for memory" error
-          exit 1
-        fi
-
-        local total_memory
-        total_memory="$(free -m | awk 'NR==2{print $2}')"
-
-        if [ "$2" -gt "$total_memory" ]; then
-          log "Memory can not be more than what's available memory on the system \
-            ($total_memory)" error
-          exit 1
-        fi
 
         MEMORY="$2"
         shift
@@ -264,20 +208,6 @@ function get_opts() {
           shift
           continue
         }
-
-        if is_unsigned_int "$2"; then
-          log "'$2' is not a valid number for CPU cores" error
-          exit 1
-        fi
-
-        local total_cpu
-        total_cpu="$(nproc --all)"
-
-        if [ "$2" -gt "$total_cpu" ]; then
-          log "CPU can not be more than what's available memory on the system \
-            ($total_cpu)" error
-          exit 1
-        fi
 
         CPU="$2"
         shift
@@ -296,7 +226,94 @@ function get_opts() {
 
     shift
   done
+}
 
+function checkset_opts() {
+  case "$1" in
+    provider)
+      if ! is_array_contains_element "$PROVIDER" "${SUPPORTED_PROVIDERS[*]}"; then
+        log "Unsupported provider '$PROVIDER', can only be one of:" error
+
+        for provider in "${SUPPORTED_PROVIDERS[@]}"; do
+          log "$provider" errorn 2
+        done
+
+        exit 1
+      fi
+      ;;
+    os)
+      if [[ "$OS" == *,* ]]; then
+        IFS=',' read -r -a OSS <<< "$OS"
+      else
+        OSS[0]="$OS"
+      fi
+
+      for os in "${OSS[@]}"; do
+        if ! is_array_contains_element "$os" "${!SUPPORTED_OS[*]}" ; then
+          log "Unsupported os '$os', can only be one of:" error
+
+          for i in "${!SUPPORTED_OS[@]}"; do
+            log "$i: ${SUPPORTED_OS[$i]}" errorn 2
+          done
+
+          exit 1
+        fi
+      done
+
+      NUMBER_OF_NODES=${#OSS[@]}
+      ;;
+    ipv4_cidr)
+      local ip_info 
+
+      checkget_ipcidr "$IPV4_CIDR" ip_info
+
+      # TODO: Vagrant sets cidr to 24 by default it seems?
+      # Anyway, currently prefix is not used, will be added later though
+      if [ ! "${ip_info[3]}" -eq 24 ]; then
+        log "IPV4 CIDR other than 24 is not supported at this moment, sorry" error
+        exit 1
+      fi
+
+      IPV4_NETWORK_INT=${ip_info[1]}
+      IPV4_USABLE_IPS=${ip_info[2]}
+
+      if [ "$NUMBER_OF_NODES" -gt "$IPV4_USABLE_IPS" ]; then
+        log "Too many nodes '$NUMBER_OF_NODES', only $IPV4_USABLE_IPS usable in \
+          $IPV4_CIDR" error
+        exit 1
+      fi
+      ;;
+    cpu)
+      if ! is_unsigned_int "$CPU"; then
+        log "'$CPU' is not a valid number for CPU cores" error
+        exit 1
+      fi
+
+      local total_cpu
+      total_cpu="$(nproc --all)"
+
+      if [ "$CPU" -gt "$total_cpu" ]; then
+        log "CPU can not be more than what's available memory on the system \
+          ($total_cpu)" error
+        exit 1
+      fi
+      ;;
+    memory)
+      if ! is_unsigned_int "$MEMORY"; then
+        log "'$MEMORY' is not a valid number for memory" error
+        exit 1
+      fi
+
+      local total_memory
+      total_memory="$(free -m | awk 'NR==2{print $2}')"
+
+      if [ "$MEMORY" -gt "$total_memory" ]; then
+        log "Memory can not be more than what's available memory on the system \
+          ($total_memory)" error
+        exit 1
+      fi
+      ;;
+  esac
 }
 
 function mk_vagrantfile() {
@@ -307,9 +324,10 @@ VAGRANT_API_VERSION = "2"
 SUPPORTED_OS = %w[${!SUPPORTED_OS[@]}]
 
 def set_libvirt(virt, override)
-  libvirt__network_name: "#{$HOSTNAME_PREFIX}",
-  libvirt__dhcp_enabled: false,
-  libvirt__guest_ipv6: "no"
+  override.node.vm.network :private_network,
+    libvirt__network_name: "$HOSTNAME_PREFIX",
+    libvirt__dhcp_enabled: false,
+    libvirt__guest_ipv6: "no"
 
   virt.memory = $MEMORY
   virt.cpus = $CPU
@@ -340,7 +358,7 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
 
       node.vm.network :private_network,
         ip: "#{ipv4}",
-        auto_config: true,
+        auto_config: true
 
       node.vm.provider :libvirt do |virt, override|
         virt.host = "#{node.vm.hostname}"
@@ -387,7 +405,7 @@ function prepare() {
   [ ! -d "$BASE_DIR"/.vagrant ] && mkdir "$BASE_DIR"/.vagrant
 
   if [ ! -f "$BASE_DIR"/.vagrant/key ] || [ ! -f "$BASE_DIR"/.vagrant/key.pub ] ; then
-    ssh-keygen -q -t ed25519 -N '' -f "$BASE_DIR"/key <<<y >/dev/null 2>&1
+    ssh-keygen -q -t ed25519 -N '' -f "$BASE_DIR"/.vagrant/key <<<y >/dev/null 2>&1
   fi
 
   log "Done." normal 2
@@ -398,25 +416,27 @@ function main() {
   : "${CPU:=1}"
   : "${MEMORY:=512}"
   : "${IPV4_CIDR:="172.28.128.0/24"}"
-  OSS=("debian12")
-  VAGRANT_ARGS=
+  : "${VAGRANT_ARGS:=}"
+  : "${OS:="debian12"}"
 
-  # derived
+  # derived from checkset_opts
   NUMBER_OF_NODES=
   IPV4_NETWORK_INT=
   IPV4_USABLE_IPS=
+  declare -a OSS
 
   get_opts "$@"
-
-  if [ "$NUMBER_OF_NODES" -gt "$IPV4_USABLE_IPS" ]; then
-    log "Too many nodes '$NUMBER_OF_NODES', only $IPV4_USABLE_IPS usable in \
-      $IPV4_CIDR" error
-    exit 1
-  fi
+  checkset_opts provider
+  checkset_opts os
+  checkset_opts ipv4_cidr
+  checkset_opts cpu
+  checkset_opts memory
 
   prepare
   mk_vagrantfile
-  # exec vagrant "$VAGRANT_ARGS"
+
+  log "Handing controls to vagrant" normal 1
+  # exec "vagrant $VAGRANT_ARGS"
 }
 
 main "$@"
