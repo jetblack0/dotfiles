@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 # Goal: A single universal vagrant environment that supposes all kinds of OSs and providers.  
-# NOTE: untested 
+# TODO:
+# 1. Implement the usage function
+# 2. Add options to list supported boxes and providers
 
 set -o pipefail
 set -o errexit
@@ -156,6 +158,8 @@ function usage() {
 # Options and args
 ##############################
 function get_opts() {
+  local number_of_arguments=0
+
   while [ $# -gt 0 ]; do
     case $1 in
       -h|--help)
@@ -163,6 +167,7 @@ function get_opts() {
         exit 0
         ;;
       -p|--provider)
+        (( ++number_of_arguments ))
         [ -z "$2" ] && {
           log "Argument for provider (-p|--provider) is empty, using default (libvirt)" warn
           shift
@@ -173,6 +178,7 @@ function get_opts() {
         shift
         ;;
       -o|--os)
+        (( ++number_of_arguments ))
         [ -z "$2" ] && {
           log "Argument for OS (-o|--os) is empty, using default (debian12)" warn
           shift
@@ -183,6 +189,7 @@ function get_opts() {
         shift
         ;;
       -4|--ipv4-cidr)
+        (( ++number_of_arguments ))
         [ -z "$2" ] && {
           log "Argument for IPv4 (-4|--ipv4-cidr) is empty, using default (172.28.128.0/24)" warn
           shift
@@ -193,6 +200,7 @@ function get_opts() {
         shift
         ;;
       -m|--memory)
+        (( ++number_of_arguments ))
         [ -z "$2" ] && {
           log "Argument for memory (-m|--memory) is empty, using default (512 MiB)" warn
           shift
@@ -203,6 +211,7 @@ function get_opts() {
         shift
         ;;
       -c|--cpu)
+        (( ++number_of_arguments ))
         [ -z "$2" ] && {
           log "Argument for cpu (-c|--cpu) is empty, using default (1)" warn
           shift
@@ -213,6 +222,10 @@ function get_opts() {
         shift
         ;;
       --)
+        if [ "$number_of_arguments" -eq 0 ]; then
+          IS_VAGRANT_ARGS_ONLY_ARGUMENT=true
+        fi
+
         shift
         VAGRANT_ARGS="$*"
         break
@@ -299,7 +312,7 @@ function checkset_opts() {
 
       if [ "$CPU" -gt "$total_cpu" ]; then
         log "CPU can not be more than what's available memory on the system \
-          ($total_cpu)" error
+($total_cpu)" error
         exit 1
       fi
       ;;
@@ -314,8 +327,19 @@ function checkset_opts() {
 
       if [ "$MEMORY" -gt "$total_memory" ]; then
         log "Memory can not be more than what's available memory on the system \
-          ($total_memory)" error
+($total_memory)" error
         exit 1
+      fi
+      ;;
+    vagrant_args)
+      if [ -z "$VAGRANT_ARGS" ]; then
+        log "No arguments for vagrant are given, this will not bring up vagrant but only prepare the environment" warn
+      fi
+      ;;
+    skip_mk_vagrantfile)
+      if [ -f "$BASE_DIR"/Vagrantfile ] && $IS_VAGRANT_ARGS_ONLY_ARGUMENT ; then
+        log "Skip generating Vagrantfile" warn
+        SKIP_MK_VAGRANTFILE=true
       fi
       ;;
   esac
@@ -425,24 +449,28 @@ function main() {
   IPV4_USABLE_IPS=
   declare -a BOXES
 
+  SKIP_MK_VAGRANTFILE=false
+  IS_VAGRANT_ARGS_ONLY_ARGUMENT=false
+
   get_opts "$@"
   checkset_opts provider
   checkset_opts os
   checkset_opts ipv4_cidr
   checkset_opts cpu
   checkset_opts memory
-
-  # echo "number of nodes: $NUMBER_OF_NODES"
-  # echo "ipv4 network int: $IPV4_NETWORK_INT"
-  # echo "ipv4 usable ips: $IPV4_USABLE_IPS"
-  # echo "boxes: ${BOXES[*]}"
+  checkset_opts vagrant_args
+  checkset_opts skip_mk_vagrantfile
 
   prepare
-  mk_vagrantfile
+  $SKIP_MK_VAGRANTFILE || mk_vagrantfile
 
-  log "Handing controls to vagrant" normal 1
-  cd $BASE_DIR
-  # exec "vagrant $VAGRANT_ARGS"
+  [ -n "$VAGRANT_ARGS" ] && {
+    log "Handing controls over to vagrant" normal 1
+    cd $BASE_DIR
+    exec "$(which vagrant)" "$VAGRANT_ARGS"
+  }
+
+  exit 0
 }
 
 main "$@"
