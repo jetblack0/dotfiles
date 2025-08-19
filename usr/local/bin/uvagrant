@@ -242,35 +242,40 @@ function checkset_opts() {
       fi
       ;;
     os)
+      local oss
       if [[ "$OS" == *,* ]]; then
-        IFS=',' read -r -a OSS <<< "$OS"
+        IFS=',' read -r -a oss <<< "$OS"
       else
-        OSS[0]="$OS"
+        oss[0]="$OS"
       fi
 
-      for os in "${OSS[@]}"; do
-        if ! is_array_contains_element "$os" "${!SUPPORTED_OS[*]}" ; then
+      for ((i = 0; i < ${#oss[@]}; i++)); do
+        local os
+        os=${oss[$i]}
+
+        if ! is_array_contains_element "$os" "${!SUPPORTED_OS[*]}"; then
           log "Unsupported os '$os', can only be one of:" error
 
-          for i in "${!SUPPORTED_OS[@]}"; do
-            log "$i: ${SUPPORTED_OS[$i]}" errorn 2
+          for j in "${!SUPPORTED_OS[@]}"; do
+            log "$j: ${SUPPORTED_OS[$j]}" errorn 2
           done
 
           exit 1
+        else
+          BOXES[i]=${SUPPORTED_OS[$os]}
         fi
       done
 
-      NUMBER_OF_NODES=${#OSS[@]}
+      NUMBER_OF_NODES=${#BOXES[@]}
       ;;
     ipv4_cidr)
       local ip_info 
 
       checkget_ipcidr "$IPV4_CIDR" ip_info
 
-      # TODO: Vagrant sets cidr to 24 by default it seems?
-      # Anyway, currently prefix is not used, will be added later though
+      # TODO: Vagrant libvirt only supports 24 mask at this moment
       if [ ! "${ip_info[3]}" -eq 24 ]; then
-        log "IPV4 CIDR other than 24 is not supported at this moment, sorry" error
+        log "IPV4 CIDR other than 24 is not supported at this moment by vagrant-libvirt" error
         exit 1
       fi
 
@@ -321,24 +326,14 @@ function mk_vagrantfile() {
 Vagrant.require_version ">= 1.7.0"
 VAGRANT_API_VERSION = "2"
 
-SUPPORTED_OS = %w[${!SUPPORTED_OS[@]}]
-
-def set_libvirt(virt, override)
-  override.node.vm.network :private_network,
-    libvirt__network_name: "$HOSTNAME_PREFIX",
-    libvirt__dhcp_enabled: false,
-    libvirt__guest_ipv6: "no"
-
-  virt.memory = $MEMORY
-  virt.cpus = $CPU
-end
+BOXES = %w[${BOXES[@]}]
 
 Vagrant.configure(VAGRANT_API_VERSION) do |config|
   config.ssh.forward_agent = true
   config.ssh.keys_only = false
   config.ssh.insert_key = false
 
-  config.vm.provision "file", name: "Copy public keys", source: ".vagrant/key.pub", destination: "/tmp/authorized_keys"
+  config.vm.provision "file", source: ".vagrant/key.pub", destination: "/tmp/authorized_keys"
   config.vm.provision "shell", name: "Configure Ansible user", inline: <<-SHELL 
     [ -d /root/.ssh ] && mkdir -p /root/.ssh
     chmod 0700 /root/.ssh
@@ -353,16 +348,21 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
 
     config.vm.define "#{name}" do |node|
       node.vm.hostname = "#{name}"
-      node.vm.box = SUPPORTED_OS[count - 1]
+      node.vm.box = BOXES[count - 1]
       node.vm.box_check_update = false
-
-      node.vm.network :private_network,
-        ip: "#{ipv4}",
-        auto_config: true
 
       node.vm.provider :libvirt do |virt, override|
         virt.host = "#{node.vm.hostname}"
-        set_libvirt(virt, override)
+        virt.uri = 'qemu+unix:///system'
+        virt.memory = 1024
+        virt.cpus = 1
+
+        node.vm.network :private_network,
+          ip: "#{ipv4}",
+          auto_config: true,
+          libvirt__network_name: "uvgrant",
+          libvirt__dhcp_enabled: false,
+          libvirt__guest_ipv6: "no"
       end
     end
   end
@@ -423,7 +423,7 @@ function main() {
   NUMBER_OF_NODES=
   IPV4_NETWORK_INT=
   IPV4_USABLE_IPS=
-  declare -a OSS
+  declare -a BOXES
 
   get_opts "$@"
   checkset_opts provider
@@ -432,10 +432,16 @@ function main() {
   checkset_opts cpu
   checkset_opts memory
 
+  # echo "number of nodes: $NUMBER_OF_NODES"
+  # echo "ipv4 network int: $IPV4_NETWORK_INT"
+  # echo "ipv4 usable ips: $IPV4_USABLE_IPS"
+  # echo "boxes: ${BOXES[*]}"
+
   prepare
   mk_vagrantfile
 
   log "Handing controls to vagrant" normal 1
+  cd $BASE_DIR
   # exec "vagrant $VAGRANT_ARGS"
 }
 
