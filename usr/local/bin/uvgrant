@@ -227,7 +227,7 @@ function get_opts() {
         fi
 
         shift
-        VAGRANT_ARGS="$*"
+        VAGRANT_ARGS=("$@")
         break
         ;;
       *)
@@ -389,7 +389,7 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
       node.vm.provider :libvirt do |virt|
         virt.uri = 'qemu+unix:///system'
         virt.host = "#{node.vm.hostname}"
-        virt.memory = 1024
+        virt.memory = $MEMORY
         virt.cpus = 1
       end
     end
@@ -473,7 +473,7 @@ function main() {
   [ -n "$VAGRANT_ARGS" ] && {
     log "Handing controls over to vagrant" normal 1
     cd $BASE_DIR
-    exec "$(which vagrant)" $VAGRANT_ARGS
+    exec "$(command -v vagrant)" "${VAGRANT_ARGS[@]}"
   }
 
   exit 0
