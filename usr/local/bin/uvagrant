@@ -461,13 +461,15 @@ function main() {
   checkset_opts vagrant_args
   checkset_opts skip_mk_vagrantfile
 
-  prepare
-  $SKIP_MK_VAGRANTFILE || mk_vagrantfile
+  $SKIP_MK_VAGRANTFILE || {
+    prepare
+    mk_vagrantfile
+  }
 
   [ -n "$VAGRANT_ARGS" ] && {
     log "Handing controls over to vagrant" normal 1
     cd $BASE_DIR
-    exec "$(which vagrant)" "$VAGRANT_ARGS"
+    exec "$(which vagrant)" $VAGRANT_ARGS
   }
 
   exit 0
