@@ -351,6 +351,7 @@ Vagrant.require_version ">= 1.7.0"
 VAGRANT_API_VERSION = "2"
 
 BOXES = %w[${BOXES[@]}]
+PROVIDER = "$PROVIDER"
 
 Vagrant.configure(VAGRANT_API_VERSION) do |config|
   config.ssh.forward_agent = true
@@ -358,11 +359,11 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
   config.ssh.insert_key = false
 
   config.vm.provision "file", source: ".vagrant/key.pub", destination: "/tmp/authorized_keys"
-  config.vm.provision "shell", name: "Configure Ansible user", inline: <<-SHELL 
-    [ -d /root/.ssh ] && mkdir -p /root/.ssh
-    chmod 0700 /root/.ssh
+  config.vm.provision "shell", name: "Configure SSH keys", inline: <<-SHELL
+    sudo test -d /root/.ssh || sudo mkdir -p /root/.ssh
+    sudo chmod 0700 /root/.ssh
 
-    cat /tmp/authorized_keys >> /root/.ssh/.authorized_keys
+    cat /tmp/authorized_keys | sudo tee -a /root/.ssh/authorized_keys
     cat /tmp/authorized_keys >> /home/vagrant/.ssh/authorized_keys
   SHELL
 
@@ -375,18 +376,21 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
       node.vm.box = BOXES[count - 1]
       node.vm.box_check_update = false
 
-      node.vm.provider :libvirt do |virt, override|
-        virt.host = "#{node.vm.hostname}"
+      case PROVIDER
+        when 'libvirt'
+          node.vm.network :private_network,
+            ip: "#{ipv4}",
+            auto_config: true,
+            libvirt__network_name: "uvgrant",
+            libvirt__dhcp_enabled: false,
+            libvirt__guest_ipv6: "no"
+      end
+
+      node.vm.provider :libvirt do |virt|
         virt.uri = 'qemu+unix:///system'
+        virt.host = "#{node.vm.hostname}"
         virt.memory = 1024
         virt.cpus = 1
-
-        node.vm.network :private_network,
-          ip: "#{ipv4}",
-          auto_config: true,
-          libvirt__network_name: "uvgrant",
-          libvirt__dhcp_enabled: false,
-          libvirt__guest_ipv6: "no"
       end
     end
   end
