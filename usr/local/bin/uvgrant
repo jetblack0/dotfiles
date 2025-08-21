@@ -2,8 +2,7 @@
 
 # Goal: A single universal vagrant environment that supposes all kinds of OSs and providers.  
 # TODO:
-# 1. Implement the usage function
-# 2. Add options to list supported boxes and providers
+# 1. Add options to list supported boxes and providers
 
 set -o pipefail
 set -o errexit
@@ -148,8 +147,78 @@ function checkget_ipcidr() {
 ##############################
 # Usage
 ##############################
+function usage_synopsis() {
+  cat <<EOF
+${BOLD}${UNDERLINE}Usage${NC}: ${BOLD}${0}${NC} [<options>] [-- <vagrant-args>...]
+       ${BOLD}${0}${NC} [ -h | --help ]
+       ${BOLD}${0}${NC} [ -l | --list-boxes ]
+       ${BOLD}${0}${NC} [ -p | --list-providers ]
+EOF
+}
+
+function usage_description() {
+  cat <<EOF
+A wrapper script for Vagrant that creates a generic Vagrant environment based
+on given options. Arguments after -- are passed directly to vagrant.
+EOF
+}
+
+function usage_options() {
+  cat <<EOF
+${BOLD}${UNDERLINE}Options${NC}:
+${BOLD}  -p, --provider <provider>${NC}
+      The Vagrant provider to use
+
+      Possible values:
+      - libvirt
+
+      [default: libvirt]
+
+${BOLD}  -o, --os <list>${NC}
+      Comma-separated list of guest OS images to use. For example,
+      --os "debian12,debian12" creates two machines both using the debian12 OS
+      image
+
+      Possible values:
+      - debian12
+
+      [default: debian12]
+
+${BOLD}  -4, --ipv4-cidr <cidr>${NC}
+      IPv4 CIDR block for the private network. Each VM will get an IPv4 address
+      starting from the second address within the range, and stop at the last
+
+      Note: CIDR other than 24 it not supported by vagrant-libvirt at this moment
+
+      [default: 172.28.128.0/24]
+
+${BOLD}  -m, --memory <MB>${NC}
+      The amount of memory (in MB) allocated to all the VMs
+
+      [default: 1024]
+
+${BOLD}  -c, --cpu <integer>${NC}
+      The amount of CPU cores allocated to all the VMs
+
+      [default: 1]
+
+${BOLD}  -h, --help${NC}
+      Show this help message and exit
+
+${BOLD}  -l, --list-boxes${NC}
+      List all the supported OS images
+
+${BOLD}  -p, --list-providers${NC}
+      List all the supported providers
+EOF
+}
+
 function usage() {
-  echo "Not implemented yet"
+  usage_synopsis
+  echo
+  usage_description
+  echo
+  usage_options
 }
 
 
@@ -333,7 +402,8 @@ function checkset_opts() {
       ;;
     vagrant_args)
       if [ -z "$VAGRANT_ARGS" ]; then
-        log "No arguments for vagrant are given, this will not bring up vagrant but only prepare the environment" warn
+        log "No arguments for vagrant are given. This will not bring up vagrant \
+but only prepare the environment" warn
       fi
       ;;
     skip_mk_vagrantfile)
