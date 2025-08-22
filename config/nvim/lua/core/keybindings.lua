@@ -23,15 +23,11 @@ keymap("n", "U", ":redo<CR>", default_map_opts)
 keymap("n", "<leader>s", ":set spell!<CR>", default_map_opts)
 -- Press escape twice to get rid of search highlight.
 keymap("n", "<leader><leader>", ":noh<CR>:echo \"\"<CR>", default_map_opts)
--- Records the working directory of nvim, and return home. vim doesn't
--- override its working directory in its process table. Quite useful for
--- Telescope.
 vim.g.process_dir = vim.env.PWD
 keymap("n", "gh", ":execute ':cd' process_dir<CR>", default_map_opts)
--- Go to the directory of the current buffer.
+--- Go to the directory of the current buffer.
 keymap("n", "gH", ":cd %:p:h<CR>", default_map_opts)
--- Open Netrw in my wiki directory in a new tab for quickly access  
--- my notes.
+
 
 -- Window and tabs
 ------------------
@@ -52,20 +48,6 @@ keymap("n", "<a-k>", ":resize +3<CR>", default_map_opts)
 -- Split full screen.
 keymap("n", "<a-.>", "<c-w>_<c-w>|", default_map_opts)
 keymap("n", "<a-/>", "<c-w>=", default_map_opts)
-
-
--- Netrw
---------
-keymap("n", "<c-b>", ":Lexplore<CR>", default_map_opts)
-vim.cmd[[
-augroup NetrwMappings
-  autocmd!
-  autocmd FileType netrw nmap <buffer> o <Enter>
-  autocmd FileType netrw nmap <buffer> <C-v> v <Enter>
-  autocmd FileType netrw nmap <buffer> <C-t> t <Enter>
-  autocmd FileType netrw nmap <buffer> a C%:let g:netrw_chgwin=-1<Enter>
-augroup END
-]]
 
 
 -- Folding

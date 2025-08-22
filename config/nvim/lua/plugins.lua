@@ -96,6 +96,15 @@ require("lazy").setup({
   -- System enhancement
   ---------------------
 	{
+		"nvim-tree/nvim-tree.lua",
+		dependencies = {
+			"nvim-tree/nvim-web-devicons",
+		},
+		config = function()
+			require("plugin-config.nvimtree")
+		end,
+	},
+	{
 		"nvim-treesitter/nvim-treesitter",
     branch = 'main',
     build = ":TSUpdate",
