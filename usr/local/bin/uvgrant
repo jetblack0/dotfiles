@@ -232,6 +232,7 @@ function usage() {
 ##############################
 function get_opts() {
   local number_of_arguments=0
+  local box_os_set=false
 
   while [ $# -gt 0 ]; do
     case $1 in
@@ -252,6 +253,14 @@ function get_opts() {
         ;;
       -o|--os)
         (( ++number_of_arguments ))
+
+        if $box_os_set; then
+          log "Options '-o, --os' and '-b, --box' cannot be set at the same time" error
+          exit 1
+        fi
+
+        box_os_set=true
+
         [ -z "$2" ] && {
           log "Argument for OS (-o|--os) is empty, using default (debian12)" warn
           shift
@@ -259,6 +268,29 @@ function get_opts() {
         }
 
         OS="$2"
+        shift
+        ;;
+      -b|--box)
+        (( ++number_of_arguments ))
+
+        if $box_os_set; then
+          log "Options '-o, --os' and '-b, --box' cannot be set at the same time" error
+          exit 1
+        fi
+
+        box_os_set=true
+        BOX_SET=true
+
+        [ -z "$2" ] && {
+          log "Argument for box (-b|--box) is empty, using default (generic/debian12)" warn
+          BOXES=("generic/debian12")
+          NUMBER_OF_NODES=1
+          shift
+          continue
+        }
+
+        IFS=',' read -r -a BOXES <<< "$2"
+        NUMBER_OF_NODES=${#BOXES[@]}
         shift
         ;;
       -4|--ipv4-cidr)
@@ -555,10 +587,11 @@ function main() {
 
   SKIP_MK_VAGRANTFILE=false
   IS_VAGRANT_ARGS_ONLY_ARGUMENT=false
+  BOX_SET=false
 
   get_opts "$@"
   checkset_opts provider
-  checkset_opts os
+  $BOX_SET || checkset_opts os
   checkset_opts ipv4_cidr
   checkset_opts cpu
   checkset_opts memory
