@@ -214,11 +214,6 @@ ${BOLD}  -c, --cpu <integer>${NC}
 
       [default: 1]
 
-${BOLD}  -s, --skip-host-verify <boolean>${NC}
-      Skip host verification
-
-      [default: false]
-
 ${BOLD}  -h, --help${NC}
       Show this help message and exit
 
@@ -336,10 +331,6 @@ function get_opts() {
         CPU="$2"
         shift
         ;;
-      -s|--skip-host-verify)
-        SKIP_HOST_VERIFY=true
-        shift
-        ;;
       -l|--list-supported)
         log "Supported guest OS and providers:" normal
 
@@ -421,6 +412,15 @@ function checkget_host() {
     log "use [-f | --force] flag to skip host verification" errorn
     exit 1
   fi
+
+  case "$HOST_OS" in
+    linux)
+      PROVIDER="libvirt"
+      ;;
+    darwin)
+      PROVIDER="parallels"
+      ;;
+  esac
 }
 
 function checkset_opts() {
@@ -648,12 +648,13 @@ function prepare() {
 }
 
 function main() {
-  : "${PROVIDER:="libvirt"}"
+  : "${PROVIDER:=""}"
   : "${CPU:=1}"
   : "${MEMORY:=512}"
   : "${IPV4_CIDR:="172.28.128.0/24"}"
   : "${VAGRANT_ARGS:=}"
   : "${OS:="debian12"}"
+  # Can only be changed through environment variable.
   : "${SKIP_HOST_VERIFY:=false}"
 
   # derived from checkset_opts
@@ -666,12 +667,12 @@ function main() {
   IS_VAGRANT_ARGS_ONLY_ARGUMENT=false
   BOX_SET=false
 
-  get_opts "$@"
-
+  # checkget_host also derives the default value for provider.
   HOST_OS="unknown"
   HOST_ARCH="unknown"
   $SKIP_HOST_VERIFY || checkget_host
 
+  get_opts "$@"
   checkset_opts provider
   $BOX_SET || checkset_opts os
   checkset_opts ipv4_cidr
