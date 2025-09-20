@@ -46,10 +46,11 @@ export KREW_ROOT="$XDG_DATA_HOME"/krew
 # Rust
 export CARGO_HOME="$XDG_DATA_HOME"/cargo
 export RUSTUP_HOME="$XDG_DATA_HOME"/rustup
-export PATH=/home/henry/.local/share/cargo/bin:$PATH
+export PATH=$HOME/.local/share/cargo/bin:$PATH
 # Java
 # export _JAVA_OPTIONS=-Djava.util.prefs.userRoot="$XDG_CONFIG_HOME"/java
 export _JAVA_AWT_WM_NONREPARENTING=1
+export GRADLE_USER_HOME="$XDG_DATA_HOME"/gradle
 # go
 export GOPATH="$XDG_DATA_HOME"/go
 # node
@@ -59,7 +60,7 @@ export NPM_PACKAGES="${XDG_DATA_HOME}/npm"
 export NPM_CONFIG_USERCONFIG="$XDG_CONFIG_HOME"/npm/npmrc
 export PATH="$PATH:$NPM_PACKAGES/bin:${KREW_ROOT:-$HOME/.krew}/bin"
 # docker
-# export DOCKER_CONFIG="$XDG_CONFIG_HOME"/docker
+export DOCKER_CONFIG="$XDG_CONFIG_HOME"/docker
 # Vagrant
 export VAGRANT_HOME="$XDG_DATA_HOME"/vagrant
 # nuget
@@ -72,6 +73,11 @@ export SQLITE_HISTORY="$XDG_CACHE_HOME"/sqlite_history
 export PYTHONSTARTUP="$XDG_CONFIG_HOME"/python/pythonrc
 # Android adb
 export ANDROID_USER_HOME="$XDG_DATA_HOME"/android
+# AWS
+export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
+export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
+# Minikube
+export MINIKUBE_HOME="$XDG_DATA_HOME"/minikube
 # Others
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME"/nv
 

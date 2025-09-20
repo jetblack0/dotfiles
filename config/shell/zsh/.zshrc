@@ -30,7 +30,10 @@ zinit wait lucid for \
     zsh-users/zsh-autosuggestions
 
 # snippets -----
-# zinit snippet OMZP::command-not-found
+zinit snippet OMZP::aws
+# zinit snippet OMZP::argocd
+# zinit snippet OMZP::terraform
+# zinit snippet OMZP::kubectl
 
 # local plugins -----
 local plugin_path="$HOME/.config/shell/zsh/plugins"
@@ -161,43 +164,21 @@ bindkey -s '^e' '^ufzfed\n'
 # Aliases ------------------------------
 # --------------------------------------
 alias neofetch="fastfetch -c ani"
-alias manw="manwebb"
 alias nvidia-settings="nvidia-settings --config="$XDG_CONFIG_HOME/nvidia/settings""
 alias yarn="yarn --use-yarnrc $XDG_CONFIG_HOME/yarn/config"
 alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
 alias vim="nvim"
 alias diff="diff --color"
-alias pfi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
-alias pfr="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns"
 alias ip="ip -c=always"
 alias sudo="sudo "
-alias climit="systemd-run --user --scope --slice=program.slice -u compiling.scope -p CPUQuota=100% -p MemoryMax=50%"
 
-# systemd command suite -----
-alias cgtop="systemd-cgtop"
-alias cgls="systemd-cgls"
-alias ctl="systemctl"
-alias clt="systemctl"
-alias jclt="journalctl"
-alias jctl="journalctl"
-alias rctl="resolvectl"
-alias rclt="resolvectl"
-alias lctl="loginctl"
-alias lclt="loginctl"
-alias nctl="networkctl"
-alias nclt="networkctl"
-alias tctl="timedatectl"
-alias tclt="timedatectl"
-alias hctl="hostnamectl"
-alias hclt="hostnamectl"
 
 # alternatives -----
-alias yay="paru"
 alias ls="eza"
 alias ll="ls -lHg"
 alias lla="ll -a"
 alias la="ls -a"
-alias tree="exa -TL"
+alias tree="eza -TL"
 alias grep="rg"
 alias cat="bat"
 alias timer="hyperfine"
@@ -218,3 +199,35 @@ alias sduo="sudo"
 # --------------------------------------
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
+
+
+case "$(uname -s)" in
+	Darwin)
+		alias tldr="tldr -p linux"
+		export PATH=/opt/homebrew/bin:$PATH
+		# alias manw="manwebb"
+		# alias man="gman"
+		;;
+	*)
+		alias cgtop="systemd-cgtop"
+		alias cgls="systemd-cgls"
+		alias ctl="systemctl"
+		alias clt="systemctl"
+		alias jclt="journalctl"
+		alias jctl="journalctl"
+		alias rctl="resolvectl"
+		alias rclt="resolvectl"
+		alias lctl="loginctl"
+		alias lclt="loginctl"
+		alias nctl="networkctl"
+		alias nclt="networkctl"
+		alias tctl="timedatectl"
+		alias tclt="timedatectl"
+		alias hctl="hostnamectl"
+		alias hclt="hostnamectl"
+		alias yay="paru"
+		alias pfi="pacman -Slq | fzf --multi --preview 'pacman -Si {1}' | xargs -ro sudo pacman -S"
+		alias pfr="pacman -Qq | fzf --multi --preview 'pacman -Qi {1}' | xargs -ro sudo pacman -Rns"
+		alias climit="systemd-run --user --scope --slice=program.slice -u compiling.scope -p CPUQuota=100% -p MemoryMax=50%"
+		;;
+esac
