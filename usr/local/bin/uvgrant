@@ -529,7 +529,7 @@ $no_nfs_conf
         virt.uri = 'qemu+unix:///system'
         virt.host = "#{node.vm.hostname}"
         virt.memory = $MEMORY
-        virt.cpus = 1
+        virt.cpus = $CPU
       end
     end
   end
