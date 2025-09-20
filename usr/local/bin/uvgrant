@@ -478,6 +478,12 @@ but only prepare the environment" warn
 }
 
 function mk_vagrantfile() {
+  if [ "$PROVIDER" = "libvirt" ] && $BOX_SET; then
+    local no_nfs_conf="
+  config.nfs.verify_installed = false
+  config.vm.synced_folder '.', '/vagrant', disabled: true"
+  fi
+
   cat > "$BASE_DIR"/Vagrantfile <<EOF
 Vagrant.require_version ">= 1.7.0"
 VAGRANT_API_VERSION = "2"
@@ -489,6 +495,7 @@ Vagrant.configure(VAGRANT_API_VERSION) do |config|
   config.ssh.forward_agent = true
   config.ssh.keys_only = false
   config.ssh.insert_key = false
+$no_nfs_conf
 
   config.vm.provision "file", source: ".vagrant/key.pub", destination: "/tmp/authorized_keys"
   config.vm.provision "shell", name: "Configure SSH keys", inline: <<-SHELL
