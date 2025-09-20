@@ -2,7 +2,7 @@
 
 # Goal: A single universal vagrant environment that supposes all kinds of OSs and providers.  
 # TODO:
-# 1. Add options to list supported boxes and providers
+# - auto-detech the default provider (vmware fusion for macos, libvirt for linux)
 
 set -o pipefail
 set -o errexit
@@ -21,8 +21,20 @@ YELLOW=$'\033[33m'
 
 BASE_DIR="/tmp/uvgrant"
 HOSTNAME_PREFIX="uvgrant"
-SUPPORTED_PROVIDERS=("libvirt")
-declare -A SUPPORTED_OS=(
+SUPPORTED_PROVIDERS=("libvirt" "parallels")
+SUPPORTED_HOST_OS=("darwin" "linux")
+SUPPORTED_HOST_ARCH=("x86_64" "arm64")
+
+declare -A SUPPORTED_OS_MAP=(
+    ["libvirt"]="SUPPORTED_OS_LIBVIRT"
+    ["parallels"]="SUPPORTED_OS_PARALLELS"
+)
+
+declare -A SUPPORTED_OS_PARALLELS=(
+  [debian12]="bento/debian-12"
+)
+
+declare -A SUPPORTED_OS_LIBVIRT=(
   [debian12]="generic/debian12"
 )
 
@@ -152,8 +164,6 @@ function usage_synopsis() {
 ${BOLD}${UNDERLINE}Usage${NC}: ${BOLD}${0}${NC} [<options>] [-- <vagrant-args>...]
        ${BOLD}${0}${NC} [ -h | --help ]
        ${BOLD}${0}${NC} [ -l | --list-supported ]
-       ${BOLD}${0}${NC} [ --list-providers ]
-       ${BOLD}${0}${NC} [ --list-boxes ]
 EOF
 }
 
@@ -172,6 +182,7 @@ ${BOLD}  -p, --provider <provider>${NC}
 
       Possible values:
       - libvirt
+      - parallels
 
       [default: libvirt]
 
@@ -203,17 +214,16 @@ ${BOLD}  -c, --cpu <integer>${NC}
 
       [default: 1]
 
+${BOLD}  -s, --skip-host-verify <boolean>${NC}
+      Skip host verification
+
+      [default: false]
+
 ${BOLD}  -h, --help${NC}
       Show this help message and exit
 
 ${BOLD}  -l, --list-supported${NC}
-      List all the supported OS images and providers
-
-${BOLD}  --list-boxes${NC}
-      List all the supported OS images
-
-${BOLD}  --list-providers${NC}
-      List all the supported providers
+      List all the supported gurst OS, providers, and host architectures
 EOF
 }
 
@@ -326,30 +336,34 @@ function get_opts() {
         CPU="$2"
         shift
         ;;
-      --list-boxes)
-        log "Supported OS images:" normal
-        for i in "${!SUPPORTED_OS[@]}"; do
-          echo "- $i: ${SUPPORTED_OS[$i]}"
-        done
-        exit 0
-        ;;
-      --list-providers)
-        log "Supported providers:" normal
-        for provider in "${SUPPORTED_PROVIDERS[@]}"; do
-          echo "- $provider"
-        done
-        exit 0
+      -s|--skip-host-verify)
+        SKIP_HOST_VERIFY=true
+        shift
         ;;
       -l|--list-supported)
-        log "Supported OS images:" normal
-        for i in "${!SUPPORTED_OS[@]}"; do
-          echo "- $i: ${SUPPORTED_OS[$i]}"
+        log "Supported guest OS and providers:" normal
+
+        for provider in "${!SUPPORTED_OS_MAP[@]}"; do
+          local -n os_array_name="${SUPPORTED_OS_MAP[$provider]}"
+          log "$provider:" normal 2
+
+          for os in "${!os_array_name[@]}"; do
+            log "$os (box: ${os_array_name[$os]})" normal 3
+          done
         done
         echo
-        log "Supported providers:" normal
-        for provider in "${SUPPORTED_PROVIDERS[@]}"; do
-          echo "- $provider"
+
+        log "Supported (tested) host OS:" normal
+        for host_os in "${SUPPORTED_HOST_OS[@]}"; do
+          log "$host_os" normal 2
         done
+        echo
+
+        log "Supported (tested) host architecture:" normal
+        for host_arch in "${SUPPORTED_HOST_ARCH[@]}"; do
+          log "$host_arch" normal 2
+        done
+
         exit 0
         ;;
       --)
@@ -370,6 +384,43 @@ function get_opts() {
 
     shift
   done
+}
+
+function checkget_host() {
+  if ! type -p uname > /dev/null 2>&1; then
+    log "unsupported host OS: doesn't have command: uname" error
+    log "use [-f | --force] flag to skip host verification" errorn
+    exit 1
+  fi
+
+  HOST_OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+  HOST_ARCH=$(uname -m)
+
+  if ! is_array_contains_element "$HOST_OS" "${SUPPORTED_HOST_OS[*]}"; then
+    log "Unsupported host OS: $HOST_OS, only the followings are supported: " \
+      error
+
+    for os in "${SUPPORTED_HOST_OS[@]}"; do
+      log "$os" errorn 2
+    done
+
+    echo
+    log "use [-f | --force] flag to skip host verification" errorn
+    exit 1
+  fi
+
+  if ! is_array_contains_element "$HOST_ARCH" "${SUPPORTED_HOST_ARCH[*]}"; then
+    log "Unsupported host architecture: $HOST_ARCH, only the followings are supported: " \
+      error
+
+    for arch in "${SUPPORTED_HOST_ARCH[@]}"; do
+      log "$arch" errorn 2
+    done
+
+    echo
+    log "use [-f | --force] flag to skip host verification" errorn
+    exit 1
+  fi
 }
 
 function checkset_opts() {
@@ -393,20 +444,21 @@ function checkset_opts() {
         oss[0]="$OS"
       fi
 
+      local -n os_array_name=${SUPPORTED_OS_MAP[$PROVIDER]}
       for ((i = 0; i < ${#oss[@]}; i++)); do
         local os
         os=${oss[$i]}
 
-        if ! is_array_contains_element "$os" "${!SUPPORTED_OS[*]}"; then
-          log "Unsupported os '$os', can only be one of:" error
+        if ! is_array_contains_element "$os" "${!os_array_name[*]}"; then
+          log "Unsupported os '$os' for provider '$PROVIDER', can only be one of:" error
 
-          for j in "${!SUPPORTED_OS[@]}"; do
-            log "$j: ${SUPPORTED_OS[$j]}" errorn 2
+          for j in "${!os_array_name[@]}"; do
+            log "$j: ${os_array_name[$j]}" errorn 2
           done
 
           exit 1
         else
-          BOXES[i]=${SUPPORTED_OS[$os]}
+          BOXES[i]=${os_array_name[$os]}
         fi
       done
 
@@ -454,7 +506,15 @@ function checkset_opts() {
       fi
 
       local total_memory
-      total_memory="$(free -m | awk 'NR==2{print $2}')"
+      case $HOST_OS in
+        darwin)
+          total_memory="$(sysctl -n hw.memsize | \
+            awk '{printf "%.0f\n", $1/1024/1024}')"
+          ;;
+        *)
+          total_memory="$(free -m | awk 'NR==2{print $2}')"
+          ;;
+      esac
 
       if [ "$MEMORY" -gt "$total_memory" ]; then
         log "Memory can not be more than what's available memory on the system \
@@ -523,6 +583,9 @@ $no_nfs_conf
             libvirt__network_name: "uvgrant",
             libvirt__dhcp_enabled: false,
             libvirt__guest_ipv6: "no"
+        when 'parallels'
+          node.vm.network :private_network,
+            ip: "#{ipv4}"
       end
 
       node.vm.provider :libvirt do |virt|
@@ -530,6 +593,12 @@ $no_nfs_conf
         virt.host = "#{node.vm.hostname}"
         virt.memory = $MEMORY
         virt.cpus = $CPU
+      end
+
+      node.vm.provider "parallels" do |prl|
+        prl.name = "#{node.vm.hostname}"
+        prl.memory = $MEMORY
+        prl.cpus = $CPU
       end
     end
   end
@@ -585,6 +654,7 @@ function main() {
   : "${IPV4_CIDR:="172.28.128.0/24"}"
   : "${VAGRANT_ARGS:=}"
   : "${OS:="debian12"}"
+  : "${SKIP_HOST_VERIFY:=false}"
 
   # derived from checkset_opts
   NUMBER_OF_NODES=
@@ -597,6 +667,11 @@ function main() {
   BOX_SET=false
 
   get_opts "$@"
+
+  HOST_OS="unknown"
+  HOST_ARCH="unknown"
+  $SKIP_HOST_VERIFY || checkget_host
+
   checkset_opts provider
   $BOX_SET || checkset_opts os
   checkset_opts ipv4_cidr
