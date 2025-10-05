@@ -20,17 +20,9 @@ local indent_line_filetypes = {
   "html", "css", "htmldjango",
   "javascript", "javascriptreact", "tsx", "typescript",
   "yaml", "json", "jsonc", "yaml.ansible",
-  "rust", "java", "c", "make", "go", "ruby",
-  "python",
-  "lua", "sh"
-}
-
--- Define what file types should load LSP.
-local lsp_filetypes = {
+  "rust", "java", "c", "make", "go",
   "lua", "sh", "python", "ruby",
-  "rust", "java",
-  "javascript", "tsx", "jsx", "html", "css", "scss", "ejs", "json", "javascriptreact",
-  "yaml", "yaml.ansible"
+  "groovy", "terraform"
 }
 
 -- Lazy vim configuration.
@@ -181,7 +173,7 @@ require("lazy").setup({
   -- cmp, the actual impletation for the completion menu.
 	{
 		"hrsh7th/nvim-cmp",
-	dependencies = {
+    dependencies = {
       -- Bridge cmp (completion) with lsp.
 			"hrsh7th/cmp-nvim-lsp",
       -- Bridge cmp with nvim-snippy (snippets).
@@ -192,8 +184,9 @@ require("lazy").setup({
 			"hrsh7th/cmp-path",
 			"hrsh7th/cmp-cmdline",
 
-      -- Snippets.
+      -- Snippet engine.
 			"dcampos/nvim-snippy",
+
       -- Snippet sources.
       "honza/vim-snippets",
 		},
@@ -221,7 +214,6 @@ require("lazy").setup({
   -- Comment.
 	{
 		"numToStr/Comment.nvim",
-		ft = lsp_filetypes,
 		config = function()
 			require("plugin-config.lsp.comment")
 		end,
@@ -245,6 +237,7 @@ require("lazy").setup({
 	  ft = { "markdown" },
 	  init = function()
       vim.g.mkdp_filetypes = { "markdown" }
+      vim.g.mkdp_browser = 'zen'
 	  end,
 	},
 	{
