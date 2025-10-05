@@ -284,3 +284,53 @@ vim.lsp.config.ansiblels = {
 	},
 }
 vim.lsp.enable("ansiblels")
+
+-- Terraform
+vim.lsp.config.terraformls = {
+  filetypes = { "terraform", "terraform-vars" },
+  cmd = { "terraform-ls", "serve" },
+	capabilities = capabilities,
+  root_markers = { ".terraform", ".git" },
+  on_attach = on_attach
+}
+vim.lsp.enable("terraformls")
+
+-- Docker and docker compose
+vim.lsp.config.docker_compose_language_service = {
+  filetypes = { "yaml.docker-compose", "docker-compose" },
+  cmd = { "docker-compose-langserver", "--stdio" },
+  root_markers = { "docker-compose.yaml", "docker-compose.yml", "compose.yaml", "compose.yml" },
+  on_attach = on_attach
+}
+vim.lsp.enable('docker_compose_language_service')
+
+vim.lsp.config.dockerls = {
+  cmd = { "docker-langserver", "--stdio" },
+  filetypes = { "dockerfile" },
+  root_markers = { "Dockerfile" },
+  settings = {
+    docker = {
+      languageserver = {
+        formatter = {
+          ignoreMultilineInstructions = true
+        }
+      }
+    }
+  },
+  on_attach = on_attach
+}
+vim.lsp.enable('dockerls')
+
+-- Groovy (Jenkins)
+-- local home = vim.fn.expand("$HOME")
+-- vim.lsp.config.groovyls = {
+--   filetypes = { "groovy" },
+--   cmd = {
+--     "java",
+--     "-jar",
+--     home .. "/.local/share/nvim/mason/packages/groovy-language-server/build/libs/groovy-language-server-all.jar",
+--   },
+--   capabilities = capabilities,
+--   on_attach = on_attach,
+-- }
+-- vim.lsp.enable("groovyls")
