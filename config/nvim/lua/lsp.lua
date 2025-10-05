@@ -51,6 +51,13 @@ local on_attach = function(client, bufnr)
   end
 end
 
+local on_attach_noformat = function(client, bufnr)
+	client.server_capabilities.documentFormattingProvider = false
+  if client.server_capabilities.documentSymbolProvider then
+    nvim_navic.attach(client, bufnr)
+  end
+end
+
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(ev)
     local bufnr = ev.buf
@@ -125,7 +132,6 @@ vim.lsp.enable("rust_analyzer")
 -- Interpreted languages
 ------------------------
 -- lua
--- NOTE: Sluggish, do not recommend
 vim.lsp.config.lua_ls = {
   filetypes = { "lua" },
   cmd = { "lua-language-server" },
@@ -137,9 +143,7 @@ vim.lsp.config.lua_ls = {
       },
     },
   },
-	on_attach = function(client, bufnr)
-		client.server_capabilities.documentFormattingProvider = false
-	end,
+  on_attach = on_attach_noformat,
 	capabilities = capabilities,
 }
 vim.lsp.enable("lua_ls")
@@ -193,9 +197,7 @@ vim.lsp.config.ts_ls = {
 		hostInfo = "neovim",
 	},
   root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
-	on_attach = function(client, bufnr)
-		client.server_capabilities.documentFormattingProvider = false
-	end,
+	on_attach = on_attach_noformat,
 	capabilities = capabilities,
 }
 
@@ -213,9 +215,7 @@ vim.lsp.config.htmlls = {
 	},
 	single_file_support = true,
 	capabilities = capabilities,
-	on_attach = function(client, bufnr)
-		client.server_capabilities.documentFormattingProvider = false
-	end,
+  on_attach = on_attach
 }
 
 -- CSS
@@ -235,9 +235,7 @@ vim.lsp.config.cssls = {
 	},
 	single_file_support = true,
 	capabilities = capabilities,
-	on_attach = function(client, bufnr)
-		client.server_capabilities.documentFormattingProvider = false
-	end,
+  on_attach = on_attach,
 }
 
 -- JSON
@@ -245,21 +243,23 @@ vim.lsp.config.jsonls = {
   filetypes = { "json", "jsonc" },
   cmd = { "vscode-json-language-server", "--stdio" },
 	capabilities = capabilities,
-	on_attach = function(client, bufnr)
-		client.server_capabilities.documentFormattingProvider = false
-	end,
+  init_options = {
+    provideFormatter = true
+  },
+  on_attach = on_attach
 }
 
 vim.lsp.enable({ "ts_ls", "cssls", "htmlls", "jsonls" })
 
+
+-- Ops
+-------------------
 -- Ansible
 vim.lsp.config.ansiblels = {
   filetypes = { "yaml.ansible", "ansible" },
   cmd = { "ansible-language-server", "--stdio" },
 	capabilities = capabilities,
-	on_attach = function(client, bufnr)
-		client.server_capabilities.documentFormattingProvider = false
-	end,
+	on_attach = on_attach_noformat,
   root_markers = { "ansible.cfg", ".ansible-lint" },
   single_file_support = true,
 	settings = {
