@@ -5,13 +5,13 @@ if not todo_comments then return end
 todo_comments.setup({
 	signs = true,
 	keywords = {
-		FIX = { icon = "" },
-		TODO = { icon = "" },
-		HACK = { icon = "" },
-		WARN = { icon = "" },
-		PERF = { icon = "" },
-		NOTE = { icon = "" },
-		TEST = { icon = "" },
+		FIX = { icon = "" },
+		TODO = { icon = "" },
+		HACK = { icon = "" },
+		WARN = { icon = "" },
+		PERF = { icon = "" },
+		NOTE = { icon = "" },
+		TEST = { icon = "" },
 	},
 	highlight = {
 		before = "",

@@ -12,6 +12,7 @@ local function on_attach(bufnr)
   nvimtree_api.config.mappings.default_on_attach(bufnr)
   keymap("n", "u", nvimtree_api.tree.change_root_to_parent, opts "Up")
   keymap("n", "w", function() nvimtree_api.tree.collapse_all({keep_buffers = true}) end, opts "Collapse keep buffer")
+  keymap("n", "?", nvimtree_api.tree.toggle_help, opts "Help")
 end
 
 nvimtree.setup({
@@ -28,6 +29,9 @@ nvimtree.setup({
 		preserve_window_proportions = true,
 		cursorline = true,
 	},
+  filters = {
+    dotfiles = true,
+  },
 	modified = {
 		enable = true,
 		show_on_dirs = true,
@@ -79,22 +83,22 @@ nvimtree.setup({
 				modified = true,
 			},
 			glyphs = {
-				default = "",
+        default = "",
 				symlink = "",
-				bookmark = "",
+				bookmark = "",
         modified = "",
-				folder = {
-					arrow_closed = "",
-					arrow_open = "",
-					default = "",
-					open = "ﱮ",
-					empty = "",
-					empty_open = "",
-					symlink = "",
-					symlink_open = "",
-				},
+				-- folder = {
+				-- 	arrow_closed = "",
+				-- 	arrow_open = "",
+				-- 	default = "",
+				-- 	open = "ﱮ",
+				-- 	empty = "",
+				-- 	empty_open = "",
+				-- 	symlink = "",
+				-- 	symlink_open = "",
+				-- },
 				git = {
-					unstaged = "",
+          unstaged = "",
 					staged = "",
 					unmerged = "",
 					renamed = "",
@@ -127,9 +131,11 @@ end
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
 
 vim.cmd([[
-  :hi     NvimTreeNormal              guifg=#d5c4a1
-  :hi     NvimTreeOpenedFile          guifg=#ebdbb2
-  :hi     NvimTreeFolderName          guifg=#83a598
-  :hi     NvimTreeOpenedFolderName    guifg=#83a598
+  " :hi     NvimTreeNormal              guifg=#d5c4a1
+  " :hi     NvimTreeOpenedFile          guifg=#ebdbb2
+  :hi     NvimTreeFolderName          guifg=#83a598 cterm=bold gui=bold
+  :hi     NvimTreeOpenedFolderName    guifg=#83a598 cterm=bold gui=bold
+  :hi     NvimTreeEmptyFolderName     guifg=#83a598 cterm=bold gui=bold
   :hi     NvimTreeRootFolder          guifg=#d19097
+
 ]])

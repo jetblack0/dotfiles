@@ -184,7 +184,7 @@ ins_left({ "progress", color = { fg = colors.fg, gui = "bold" } })
 ins_left({
 	"diagnostics",
 	sources = { "nvim_diagnostic" },
-	symbols = { error = " ", warn = " ", info = " ", hint = " " },
+	symbols = { error = " ", warn = "󰃤 ", info = "󰋽 ", hint = " " },
 	-- color = { fg = colors.darkblue, gui = "bold"},
   diagnostics_color = {
     error = 'DiagnosticSignError',
