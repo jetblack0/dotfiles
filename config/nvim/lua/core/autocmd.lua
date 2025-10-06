@@ -48,6 +48,13 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- Terraform
+vim.cmd([[silent! autocmd! filetypedetect BufRead,BufNewFile *.tf]])
+vim.cmd([[autocmd BufRead,BufNewFile *.hcl set filetype=hcl]])
+vim.cmd([[autocmd BufRead,BufNewFile .terraformrc,terraform.rc set filetype=hcl]])
+vim.cmd([[autocmd BufRead,BufNewFile *.tf,*.tfvars set filetype=terraform]])
+vim.cmd([[autocmd BufRead,BufNewFile *.tfstate,*.tfstate.backup set filetype=json]])
+
 
 -- Change indentation width based on their file types.
 vim.cmd[[autocmd FileType sh,html,htmldjango,text,yuck,json,javascript,javascriptreact,lua,xml,ruby,jinja,yaml.ansible setlocal expandtab shiftwidth=2 tabstop=2]]

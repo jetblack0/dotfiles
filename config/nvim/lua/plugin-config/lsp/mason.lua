@@ -10,7 +10,8 @@ local must_have_servers = {
 	"rust_analyzer",
 	"lua_ls", "bashls",
 	"ts_ls", "html", "cssls", "jsonls",
-	"ansiblels"
+	"ansiblels", "terraformls"
+  -- "groovyls"
 }
 
 local mason_config = {
