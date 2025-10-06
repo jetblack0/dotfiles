@@ -9,9 +9,10 @@ conform.setup({
     lua = { "stylua" },
     sh = { "shfmt" },
     ruby = { "rubyfmt" },
+    -- groovy = { "npm-groovy-lint" },
   },
 })
 
 -- Keybindings.
-local opts = { noremap = true, silent = true }
-vim.keymap.set("n", "<leader>f", function() conform.format() end, opts)
+local opts = { noremap = true, silent = false }
+vim.keymap.set("n", "<leader>f", function() conform.format({ lsp_fallback = true }) end, opts)
