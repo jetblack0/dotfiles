@@ -58,7 +58,7 @@ nvimtree.setup({
 		symlink_destination = false,
 		indent_width = 2,
 		highlight_opened_files = "all",
-		highlight_git = false,
+		highlight_git = "none",
 
 		indent_markers = {
 			enable = true,
@@ -83,7 +83,7 @@ nvimtree.setup({
 				modified = true,
 			},
 			glyphs = {
-        default = "",
+				default = "",
 				symlink = "",
 				bookmark = "",
         modified = "",
@@ -98,7 +98,7 @@ nvimtree.setup({
 				-- 	symlink_open = "",
 				-- },
 				git = {
-          unstaged = "",
+					unstaged = "",
 					staged = "",
 					unmerged = "",
 					renamed = "",
@@ -106,7 +106,7 @@ nvimtree.setup({
 					deleted = "",
 					ignored = "◌",
 				},
-			},
+      },
 		},
 	},
 })

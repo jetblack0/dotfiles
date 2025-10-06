@@ -6,7 +6,7 @@ if not cmp then return end
 if not snippy then return end
 
 local kind_icons = {
-  Text = " ",
+	Text = " ",
 	Method = "󰆧 ",
 	Function = "  ",
 	Constructor = " ",
@@ -104,7 +104,7 @@ cmp.setup({
 		end,
 	},
 	sources = {
-		-- { name = "nvim_lsp" },
+		{ name = "nvim_lsp" },
 		-- { name = "snippy" },
 		{ name = "buffer" },
 		{ name = "path" },
@@ -179,14 +179,14 @@ cmp.setup.cmdline(":", {
 -- Settings for different filetypes
 -----------------------------------
 -- For certain filetypes.
-cmp.setup.filetype({ "rust", "lua", "sh", "javascript", "markdown", "python", "ruby" }, {
-	sources = {
-		{ name = "nvim_lsp" },
- 		{ name = "snippy" },
-		{ name = "buffer" },
-		{ name = "path" },
-	},
-})
+-- cmp.setup.filetype({ "rust", "lua", "sh", "javascript", "markdown", "python", "ruby", "groovy" }, {
+-- 	sources = {
+-- 		{ name = "nvim_lsp" },
+--  		-- { name = "snippy" },
+-- 		{ name = "buffer" },
+-- 		{ name = "path" },
+-- 	},
+-- })
 
 cmp.setup.filetype({ "yaml.ansible", "jinja" }, {
 	sources = {
@@ -218,6 +218,9 @@ cmp.setup.filetype({ "css", "html" }, {
 
 -- Highlights for the completion menu 
 vim.api.nvim_set_hl(0, "CmpNormal", { bg = "#3C3836" })
+
+
+-- Snippet sources
 
 
 -- Additional keybindings
