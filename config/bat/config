@@ -7,7 +7,7 @@
 
 # NOTE: bat reads theme files from $(bat --config-dir)/themes/*.tmTheme.
 # Theme files and usage for Catppuccin can be found at: https://github.com/catppuccin/bat
---theme="catppuccin-mocha"
+--theme="gruvbox-dark"
 # --theme="base16"
 
 # Enable this to use italic text on the terminal. This is not supported on all
