@@ -204,9 +204,23 @@ eval "$(zoxide init --cmd cd zsh)"
 case "$(uname -s)" in
 	Darwin)
 		alias tldr="tldr -p linux"
-		export PATH=/opt/homebrew/bin:$PATH
-		# alias manw="manwebb"
-		# alias man="gman"
+		eval "$(brew shellenv)"
+		alias stat="gstat"
+		alias awk="gawk"
+		alias tr="gtr"
+		alias df="gdf"
+		alias sort="gsort"
+		alias head="ghead"
+		alias tail="gtail"
+		alias uniq="guniq"
+		alias wc="gwc"
+		alias du="gdu"
+		alias nohup="gnohup"
+		alias uname="guname"
+		alias who="gwho"
+		alias whoami="gwhoami"
+		alias uptime="guptime"
+		alias seq="gseq"
 		;;
 	*)
 		alias cgtop="systemd-cgtop"
