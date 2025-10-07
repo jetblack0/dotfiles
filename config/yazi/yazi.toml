@@ -9,26 +9,28 @@ image_quality = 50
 
 [opener]
 edit = [
-	{ run = 'nvim "$@"', block = true },
+	{ run = 'nvim "$@"', block = true, for = "unix" },
 ]
 video = [
 	{ run = 'mpv "$@"', orphan = true, for = "unix" },
 ]
 book = [
 	# open zathura into a Hyprland group, only works when there is a group window at the top  
-	{ run = 'zathura "$@" && hyprclt dispatch moveintogroup u', orphan = true },
+	{ run = 'zathura "$@" && hyprclt dispatch moveintogroup u', orphan = true, for = "linux" },
+	{ run = 'zathura "$@"', orphan = true, for = "macos" },
 ]
 image = [
-	{ run = 'nsxiv "$@"', orphan = true },
+	{ run = 'nsxiv "$@"', orphan = true, for = "linux" },
 ]
 audio = [
-	{ run = 'mpv --audio-display=no "$@"' },
+	{ run = 'mpv --audio-display=no "$@"', for = "unix" },
 ]
 do-nothing = [
 	{ run = ':' },
 ]
 fallback-open = [
-	{ run = 'xdg-open "$@"' },
+	{ run = 'xdg-open "$@"', for = "linux" },
+	{ run = 'open "$@"', for = "macos" },
 ]
 
 [open]
