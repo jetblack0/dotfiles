@@ -1,0 +1,17 @@
+set selection-clipboard clipboard
+set recolor "true"
+
+map u scroll half-up
+map d scroll half-down
+map D toggle_page_mode
+map I recolor
+
+# set scroll-step 0
+# set scroll-hstep 0
+# set zoom-step 1
+
+# map j scroll up 10
+# map k scroll down 10
+
+# map Button4 abort
+# map Button5 abort
