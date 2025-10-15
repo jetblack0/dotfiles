@@ -17,7 +17,7 @@ telescope.setup{
 				["<Tab>"] = "toggle_selection",
 				["<a-Tab>"] = "toggle_selection",
 				["<c-c>"] = false,
-				["<leader>c"] = "close",
+				-- ["<leader>c"] = "close",
 				["<c-o>"] = "select_default",
 			},
 			n = {
