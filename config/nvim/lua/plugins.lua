@@ -22,7 +22,7 @@ local indent_line_filetypes = {
   "yaml", "json", "jsonc", "yaml.ansible",
   "rust", "java", "c", "make", "go",
   "lua", "sh", "python", "ruby",
-  "groovy", "terraform"
+  "groovy", "terraform",
 }
 
 -- Lazy vim configuration.
@@ -149,7 +149,7 @@ require("lazy").setup({
 
   -- Programming (LSP)
   --------------------
-    {
+  {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     dependencies = {
       "williamboman/mason.nvim",
@@ -244,4 +244,13 @@ require("lazy").setup({
 		"mzlogin/vim-markdown-toc",
 		ft = { "markdown" }
 	},
+  -- Ops
+  -- Jenkins
+  --[[ NOTE: Ensure you have JENKINS_USER_ID, JENKINS_URL, and also either
+  JENKINS_API_TOKEN or JENKINS_PASSWORD set. ]]
+	-- {
+	-- 	"ckipp01/nvim-jenkinsfile-linter",
+	-- 	ft = { "groovy.jenkinsfile" }
+	-- },
+
 }, lazy_config)

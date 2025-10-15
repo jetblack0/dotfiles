@@ -322,15 +322,15 @@ vim.lsp.config.dockerls = {
 vim.lsp.enable('dockerls')
 
 -- Groovy (Jenkins)
--- local home = vim.fn.expand("$HOME")
--- vim.lsp.config.groovyls = {
---   filetypes = { "groovy" },
---   cmd = {
---     "java",
---     "-jar",
---     home .. "/.local/share/nvim/mason/packages/groovy-language-server/build/libs/groovy-language-server-all.jar",
---   },
---   capabilities = capabilities,
---   on_attach = on_attach,
--- }
--- vim.lsp.enable("groovyls")
+local home = vim.fn.expand("$HOME")
+vim.lsp.config.groovyls = {
+  filetypes = { "groovy" },
+  cmd = {
+    "java",
+    "-jar",
+    home .. "/.local/share/nvim/mason/packages/groovy-language-server/build/libs/groovy-language-server-all.jar",
+  },
+  capabilities = capabilities,
+  on_attach = on_attach,
+}
+vim.lsp.enable("groovyls")

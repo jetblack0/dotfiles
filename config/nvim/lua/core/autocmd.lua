@@ -56,6 +56,9 @@ vim.cmd([[au BufRead,BufNewFile .terraformrc,terraform.rc setlocal filetype=hcl]
 vim.cmd([[au BufRead,BufNewFile *.tf,*.tfvars setlocal filetype=terraform]])
 vim.cmd([[au BufRead,BufNewFile *.tfstate,*.tfstate.backup setlocal filetype=json]])
 
+-- Jenkins
+vim.cmd([[au BufRead,BufNewFile *Jenkinsfile*,*jenkinsfile* setlocal filetype=groovy]])
+
 -- Docker and Docker compose
 vim.cmd([[au BufRead,BufNewFile compose.yaml,compose.yml,docker-compose.yaml,docker-compose.yml setlocal filetype=yaml.docker-compose]])
 vim.cmd([[au BufRead,BufNewFile Dockerfile setlocal filetype=dockerfile]])

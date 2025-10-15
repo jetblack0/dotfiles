@@ -196,7 +196,7 @@ cmp.setup.filetype({ "yaml.ansible", "jinja" }, {
 	},
 })
 
-cmp.setup.filetype({ "css", "html" }, {
+cmp.setup.filetype({ "css", "html", "python", "groovy" }, {
 	sources = {
 		{ name = "nvim_lsp" },
  		{ name = "snippy" },
