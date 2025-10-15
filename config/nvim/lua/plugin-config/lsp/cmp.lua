@@ -1,9 +1,9 @@
 local helpers = require("utils.helpers")
 local cmp = helpers.safe_require("cmp")
-local snippy = helpers.safe_require("snippy")
+local luasnip = require("luasnip")
 
 if not cmp then return end
-if not snippy then return end
+if not luasnip then return end
 
 local kind_icons = {
 	Text = " ",
@@ -34,6 +34,9 @@ local kind_icons = {
 }
 
 
+require("luasnip.loaders.from_vscode").lazy_load()
+require("luasnip.loaders.from_vscode").lazy_load({ paths = { "./snippets/luasnip" } })
+
 -- Global Settings
 ------------------
 cmp.setup({
@@ -44,7 +47,7 @@ cmp.setup({
 	-- get error if we don't use snippet engine
 	snippet = {
 		expand = function(args)
-			snippy.expand_snippet(args.body)
+			luasnip.expand_snippet(args.body)
 		end,
 	},
 	mapping = {
@@ -94,7 +97,7 @@ cmp.setup({
 			-- show the sources name
 			vim_item.menu = ({
 				nvim_lsp = "[LSP]",
-				snippy = "[Snippet]",
+				luasnip = "[Snippet]",
 				buffer = "[Buffer]",
 				path = "[Path]",
 				-- emmet_vim = "[emmet]",
@@ -105,7 +108,7 @@ cmp.setup({
 	},
 	sources = {
 		{ name = "nvim_lsp" },
-		-- { name = "snippy" },
+		{ name = "luasnip" },
 		{ name = "buffer" },
 		{ name = "path" },
 	},
@@ -182,7 +185,7 @@ cmp.setup.cmdline(":", {
 -- cmp.setup.filetype({ "rust", "lua", "sh", "javascript", "markdown", "python", "ruby", "groovy" }, {
 -- 	sources = {
 -- 		{ name = "nvim_lsp" },
---  		-- { name = "snippy" },
+--  		-- { name = "luasnip" },
 -- 		{ name = "buffer" },
 -- 		{ name = "path" },
 -- 	},
@@ -196,10 +199,10 @@ cmp.setup.filetype({ "yaml.ansible", "jinja" }, {
 	},
 })
 
-cmp.setup.filetype({ "css", "html", "python", "groovy" }, {
+cmp.setup.filetype({ "css", "html" }, {
 	sources = {
 		{ name = "nvim_lsp" },
- 		{ name = "snippy" },
+ 		{ name = "luasnip" },
 		-- { name = "emmet_vim" },
 		{ name = "buffer" },
 		{ name = "path" },
@@ -209,7 +212,7 @@ cmp.setup.filetype({ "css", "html", "python", "groovy" }, {
 -- cmp.setup.filetype({ "java" }, {
 -- 	sources = {
 -- 		{ name = "nvim_lsp" },
--- 		{ name = "snippy" },
+-- 		{ name = "luasnip" },
 -- 		{ name = "buffer" },
 -- 		{ name = "path" },
 -- 	},

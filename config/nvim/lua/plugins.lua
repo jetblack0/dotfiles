@@ -177,7 +177,7 @@ require("lazy").setup({
       -- Bridge cmp (completion) with lsp.
 			"hrsh7th/cmp-nvim-lsp",
       -- Bridge cmp with nvim-snippy (snippets).
-			"dcampos/cmp-snippy",
+			"saadparwaiz1/cmp_luasnip",
 
       -- Completion sources.
 			"hrsh7th/cmp-buffer",
@@ -185,10 +185,16 @@ require("lazy").setup({
 			"hrsh7th/cmp-cmdline",
 
       -- Snippet engine.
-			"dcampos/nvim-snippy",
+			-- "dcampos/nvim-snippy",
+      {
+        "L3MON4D3/LuaSnip",
+        version = "v2.*",
+        build = "make install_jsregexp"
+      },
 
       -- Snippet sources.
       "honza/vim-snippets",
+      "rafamadriz/friendly-snippets"
 		},
 		config = function()
 			require("plugin-config.lsp.cmp")
