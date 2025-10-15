@@ -193,6 +193,9 @@ alias handbrakecli="HandBrakeCLI"
 alias suod="sudo"
 alias sduo="sudo"
 
+# ops -------
+alias aws="aws --profile henryvale.henry-chi"
+
 
 
 # Integration --------------------------
