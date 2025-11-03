@@ -86,3 +86,7 @@ keymap("v", "p", "\"_dP", default_map_opts)
 -- Move text up and down
 keymap("x", "<a-j>", ":move '>+1<CR>gv-gv", default_map_opts)
 keymap("x", "<a-k>", ":move '<-2<CR>gv-gv", default_map_opts)
+
+
+
+keymap("n", "K", "<Nop>", { noremap = true, silent = true })
