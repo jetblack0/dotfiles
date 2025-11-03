@@ -2,6 +2,7 @@
 local helpers = require("utils.helpers")
 local nvim_navic = helpers.safe_require("nvim-navic")
 local cmp_nvim_lsp = helpers.safe_require("cmp_nvim_lsp")
+local yaml_schema = helpers.safe_require('utils.yaml-schemas')
 
 
 ----------------
@@ -48,6 +49,10 @@ local on_attach = function(client, bufnr)
 	client.server_capabilities.documentFormattingProvider = true
   if client.server_capabilities.documentSymbolProvider then
     nvim_navic.attach(client, bufnr)
+  end
+
+  if client.name == 'yamlls' then
+    vim.keymap.set('n', '<leader>t', function() require("utils.yaml-schemas").list_schemas() end, { silent = false })
   end
 end
 
@@ -135,9 +140,15 @@ vim.lsp.enable("rust_analyzer")
 vim.lsp.config.lua_ls = {
   filetypes = { "lua" },
   cmd = { "lua-language-server" },
-  root_markers = { ".luarc.json", ".git", vim.uv.cwd() },
+  root_markers = { ".luarc.json", ".luacheckrc", ".stylua.toml", ".git", vim.uv.cwd() },
   settings = {
     Lua = {
+      runtime = { version = 'LuaJIT' },
+      hint = { enable = true },
+      diagnostics = {
+        disable = { 'undefined-global' },
+        globals = { 'vim' },
+      },
       telemetry = {
         enable = false,
       },
@@ -251,6 +262,33 @@ vim.lsp.config.jsonls = {
 
 vim.lsp.enable({ "ts_ls", "cssls", "htmlls", "jsonls" })
 
+vim.lsp.config.yamlls = {
+  filetypes = { "yaml" },
+  cmd = { "yaml-language-server", "--stdio" },
+  settings = {
+    redhat = { telemetry = { enabled = false } },
+    yaml = {
+      keyOrdering = false,
+      validate = true,
+      completion = {
+        enable = true
+      },
+      format = {
+        enable = true
+      },
+      schemaStore = {
+        enable = false,
+        url = "",
+      },
+      -- schemas = require('schemastore').yaml.schemas(),
+      schemas = yaml_schema.as_lsp_schemas(),
+    },
+  },
+	capabilities = capabilities,
+  on_attach = on_attach,
+}
+vim.lsp.enable("yamlls")
+
 
 -- Ops
 -------------------
@@ -317,6 +355,13 @@ vim.lsp.config.dockerls = {
       }
     }
   },
+  -- on_attach = function(client, bufnr)
+  --   client.server_capabilities.semanticTokensProvider = nil
+  --   client.server_capabilities.documentFormattingProvider = true
+  --   if client.server_capabilities.documentSymbolProvider then
+  --     nvim_navic.attach(client, bufnr)
+  --   end
+  -- end
   on_attach = on_attach
 }
 vim.lsp.enable('dockerls')

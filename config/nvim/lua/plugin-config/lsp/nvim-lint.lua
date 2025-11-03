@@ -4,7 +4,7 @@ local nvim_lint = helpers.safe_require("lint")
 if not nvim_lint then return end
 
 nvim_lint.linters_by_ft = {
-  lua = { "luacheck" },
+  -- lua = { "luacheck" },
   -- NOTE: Could not ignroe non-zero exit code
   -- groovy = { "npm-groovy-lint" },
   -- sh = { "shellcheck" },

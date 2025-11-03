@@ -74,3 +74,7 @@ end, { desc = "Telescope command history" })
 vim.keymap.set("n", "<leader>b", function()
 	telescope_built_in.buffers()
 end, { desc = "Telescope buffer selection menu" })
+
+
+-- plugins
+telescope.load_extension("ui-select")

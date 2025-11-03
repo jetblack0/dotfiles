@@ -7,11 +7,15 @@ if not mason_lspconfig then return end
 
 -- Define LSPs that Mason will automatically install.
 local must_have_servers = {
+  -- Devs
 	"rust_analyzer",
 	"lua_ls", "bashls", "basedpyright",
 	"ts_ls", "html", "cssls", "jsonls",
-	"ansiblels", "terraformls", "dockerls", "docker_compose_language_service"
-  -- "groovyls"
+
+  -- Ops
+	"ansiblels", "terraformls", "dockerls",
+  "docker_compose_language_service", "yamlls",
+  "groovyls"
 }
 
 local mason_config = {

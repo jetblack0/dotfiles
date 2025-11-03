@@ -19,7 +19,7 @@ vim.opt.rtp:prepend(lazypath)
 local indent_line_filetypes = {
   "html", "css", "htmldjango",
   "javascript", "javascriptreact", "tsx", "typescript",
-  "yaml", "json", "jsonc", "yaml.ansible",
+  "yaml*", "json", "jsonc", "yaml.ansible", "yml",
   "rust", "java", "c", "make", "go",
   "lua", "sh", "python", "ruby",
   "groovy", "terraform",
@@ -130,7 +130,8 @@ require("lazy").setup({
 	{
 		'nvim-telescope/telescope.nvim', tag = '0.1.8',
 		dependencies = {
-			'nvim-lua/plenary.nvim'
+			'nvim-lua/plenary.nvim',
+			'nvim-telescope/telescope-ui-select.nvim'
 		},
 		config = function()
 			require("plugin-config.telescope")
@@ -259,4 +260,17 @@ require("lazy").setup({
 	-- 	ft = { "groovy.jenkinsfile" }
 	-- },
 
+  -- yaml
+  -- {
+  --   "cenk1cenk2/schema-companion.nvim",
+  --   dependencies = {
+  --     { "nvim-lua/plenary.nvim" },
+  --   },
+  --   config = function()
+  --     require("plugin-config.lsp.schema-companion")
+  --   end,
+  -- },
+  -- {
+  --   "b0o/schemastore.nvim",
+  -- }
 }, lazy_config)
