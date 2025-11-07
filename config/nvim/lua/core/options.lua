@@ -91,6 +91,7 @@ local global_variables = {
   netrw_keepdir = 0,
   -- Suppose to split to the right, but doesn't work apparently.  
   netrw_altv = 1,
+  loaded_netrwPlugin = 1,
 }
 
 for k, v in pairs(options) do
