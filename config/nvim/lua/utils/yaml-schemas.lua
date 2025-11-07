@@ -17,6 +17,11 @@ M.defined_schemas = {
     file_pattern = ".github/workflows/*.{yml,yaml}"
   },
   {
+    name = "GitLab CI",
+    url = "https://gitlab.com/gitlab-org/gitlab-foss/-/raw/master/app/assets/javascripts/editor/schema/ci.json",
+    file_pattern = "**/*.gitlab-ci.{yml,yaml}",
+  },
+  {
     name = "Kustomization",
     uri = "https://www.schemastore.org/kustomization.json",
     file_pattern = "kustomization.{yaml,yml}"
