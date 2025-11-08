@@ -6,6 +6,7 @@ M.colorscheme_conf = {
   gruvbox = function()
     local gruvbox = helpers.safe_require("gruvbox")
     if not gruvbox then
+      vim.notify("color scheme gruvbox not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
       vim.cmd("colorscheme " .. fallback_colorscheme)
       return
     end
@@ -66,6 +67,7 @@ M.colorscheme_conf = {
   catppuccin_light = function()
     local catppuccin = helpers.safe_require("catppuccin")
     if not catppuccin then
+      vim.notify("color scheme catppuccin not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
       vim.cmd("colorscheme " .. fallback_colorscheme)
       return
     end
@@ -84,7 +86,6 @@ M.colorscheme_conf = {
       styles = {
         comments = { "italic" },
         conditionals = { "italic" },
-        conditionals = {},
         loops = {},
         functions = {},
         keywords = {},
@@ -112,6 +113,7 @@ M.colorscheme_conf = {
   catppuccin_dark = function()
     local catppuccin = helpers.safe_require("catppuccin")
     if not catppuccin then
+      vim.notify("color scheme catppuccin not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
       vim.cmd("colorscheme " .. fallback_colorscheme)
       return
     end
@@ -129,7 +131,6 @@ M.colorscheme_conf = {
       styles = {
         comments = { "italic" },
         conditionals = { "italic" },
-        conditionals = {},
         loops = {},
         functions = {},
         keywords = {},
@@ -157,6 +158,7 @@ M.colorscheme_conf = {
   rosepine_dark = function()
     local rosepine = helpers.safe_require("rose-pine")
     if not rosepine then
+      vim.notify("color scheme rose-pine not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
       vim.cmd("colorscheme " .. fallback_colorscheme)
       return
     end

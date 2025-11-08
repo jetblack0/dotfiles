@@ -161,9 +161,9 @@ M.list_schemas = function()
     return s.name
   end, M.defined_schemas)
 
-  vim.ui.select(items, { title = "Select YAML Schema", prompt = "Select schema❯ " }, function(selection)
+  vim.ui.select(items, { title = "Select YAML Schema", prompt = "Select yaml schema" }, function(selection)
     if not selection then
-      vim.notify("Canceled.", vim.log.levels.WARN)
+      vim.notify("Selection canceled.", vim.log.levels.WARN)
       return
     end
 
