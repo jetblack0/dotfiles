@@ -144,7 +144,7 @@ require("lazy").setup({
       require("plugin-config.lsp.illuminate")
     end,
   },
-  -- cmp, the actual impletation for the completion menu.
+  -- completion.
 	{
 		"saghen/blink.cmp",
     version = '1.*',
@@ -186,9 +186,13 @@ require("lazy").setup({
 			require("plugin-config.lsp.comment")
 		end,
 	},
-  -- Other neat stuff for programming.
+  -- Other nice stuff.
   {
     "SmiteshP/nvim-navic",
+    event = "LspAttach",
+    config = function()
+			require("plugin-config.lsp.navic")
+    end
   },
 
 
