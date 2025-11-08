@@ -6,7 +6,8 @@ if not blink then return end
 blink.setup {
   keymap = {
     preset = "default",
-    ["<Tab>"] = { "select_and_accept", "fallback" },
+    ["<Tab>"] = { "select_and_accept", "snippet_forward" },
+    ['<S-Tab>'] = { 'snippet_backward' },
     ["<a-k>"] = { "select_prev", "fallback" },
     ["<a-j>"] = { "select_next", "fallback" },
     ["<C-u>"] = { "scroll_documentation_up", "fallback" },
@@ -21,8 +22,7 @@ blink.setup {
     ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
     ["<a-l>"] = { "snippet_forward", "fallback" },
     ["<a-h>"] = { "snippet_backward", "fallback" },
-    -- ["<Tab>"] = { "snippet_forward", "fallback" },
-    ['<S-Tab>'] = { 'snippet_backward', 'show', 'select_prev', 'fallback' },
+    -- ["<Tab>"] = { "snippet_forward" },
   },
 
   sources = {

@@ -32,14 +32,26 @@ keymap("n", "gH", ":cd %:p:h<CR>", default_map_opts)
 -- Window and tabs
 ------------------
 -- Create and navigate between tabs.
-keymap("n", "<c-w>n", "gt<CR>", default_map_opts)
-keymap("n", "<c-w>N", "gT<CR>", default_map_opts)
+keymap('n', '<C-w><c-n>', ':tabnext<CR>', default_map_opts)
+keymap('n', '<C-w>n', ':tabnext<CR>', default_map_opts)
+keymap('n', '<C-w><c-N>', ':tabprevious<CR>', default_map_opts)
+keymap('n', '<C-w>N', ':tabprevious<CR>', default_map_opts)
 keymap("n", "<c-w>t", ":tabnew<CR>", default_map_opts)
+keymap("n", "<c-w><c-t>", ":tabnew<CR>", default_map_opts)
 
 
 -- Splits
 ---------
 -- Resize splits.
+keymap("n", "<c-w>l", ":wincmd l<CR>", default_map_opts)
+keymap("n", "<c-w><c-l>", ":wincmd l<CR>", default_map_opts)
+keymap("n", "<c-w>h", ":wincmd h<CR>", default_map_opts)
+keymap("n", "<c-w><c-h>", ":wincmd h<CR>", default_map_opts)
+keymap("n", "<c-w>j", ":wincmd j<CR>", default_map_opts)
+keymap("n", "<c-w><c-j>", ":wincmd j<CR>", default_map_opts)
+keymap("n", "<c-w>k", ":wincmd k<CR>", default_map_opts)
+keymap("n", "<c-w><c-k>", ":wincmd k<CR>", default_map_opts)
+
 keymap("n", "<a-h>", ":vertical resize -3<CR>", default_map_opts)
 keymap("n", "<a-l>", ":vertical resize +3<CR>", default_map_opts)
 keymap("n", "<a-j>", ":resize -3<CR>", default_map_opts)
