@@ -43,12 +43,34 @@ snacks.setup({
     enabled = true
   },
 
+  picker = {
+    enabled = true,
+    win = {
+      input = {
+        keys = {
+          ["/"] = "toggle_focus",
+          ["<a-j>"] = { "list_down", mode = { "i", "n" } },
+          ["<a-k>"] = { "list_up", mode = { "i", "n" } },
+          ["<c-d>"] = { "list_scroll_down", mode = { "i", "n" } },
+          ["<c-u>"] = { "list_scroll_up", mode = { "i", "n" } },
+          ["<c-y>"] = { "preview_scroll_up", mode = { "i", "n" } },
+          ["<c-e>"] = { "preview_scroll_down", mode = { "i", "n" } },
+          ["G"] = { "list_bottom", mode = { "i", "n" } },
+          ["gg"] = { "list_top", mode = { "i", "n" } },
+          ["<CR>"] = { "confirm", mode = { "n", "i" } },
+          ["<Esc>"] = { "cancel", mode = { "n" } },
+          ["<C-c>"] = { "cancel", mode = "i" },
+          ["?"] = "toggle_help_input",
+        }
+      }
+    }
+  },
+
   scroll = { enabled = false },
   statuscolumn = { enabled = false },
   words = { enabled = false },
   dashboard = { enabled = false },
   explorer = { enabled = false },
-  picker = { enabled = false },
   scope = { enabled = false },
 })
 

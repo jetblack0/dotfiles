@@ -16,6 +16,10 @@ telescope.setup{
 				["<a-k>"] = "move_selection_previous",
 				["<Tab>"] = "toggle_selection",
 				["<a-Tab>"] = "toggle_selection",
+        ["<c-y>"] = "preview_scrolling_up",
+        ["<c-e>"] = "preview_scrolling_down",
+        ["<c-u>"] = "results_scrolling_up",
+        ["<c-d>"] = "results_scrolling_down",
 				["<c-c>"] = false,
 				-- ["<leader>c"] = "close",
 				["<c-o>"] = "select_default",
@@ -24,6 +28,10 @@ telescope.setup{
 				["<c-h>"] = "which_key",
 				["<a-j>"] = "move_selection_next",
 				["<a-k>"] = "move_selection_previous",
+        ["<c-y>"] = "preview_scrolling_up",
+        ["<c-e>"] = "preview_scrolling_down",
+        ["<c-u>"] = "results_scrolling_up",
+        ["<c-d>"] = "results_scrolling_down",
 				["<Tab>"] = "toggle_selection",
 				["<a-Tab>"] = "toggle_selection",
         ["<Esc>"] = "close",
@@ -41,6 +49,7 @@ vim.keymap.set("n", "<leader>q", function()
     layout_config = {
       width = 0.8,
       height = 0.9,
+      scroll_speed = 1,
       preview_cutoff = 26,
       vertical = {
         preview_height = 0.4,
@@ -55,6 +64,7 @@ vim.keymap.set("n", "<leader>w", function()
     layout_config = {
       width = 0.8,
       height = 0.8,
+      scroll_speed = 1,
       preview_cutoff = 100,
       horizontal = {
         preview_width = 0.55,
@@ -77,4 +87,4 @@ end, { desc = "Telescope buffer selection menu" })
 
 
 -- plugins
-telescope.load_extension("ui-select")
+-- telescope.load_extension("ui-select")
