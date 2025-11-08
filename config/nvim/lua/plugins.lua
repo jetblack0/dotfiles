@@ -61,6 +61,8 @@ local lazy_config = {
   },
 }
 
+vim.g['colortheme'] = "gruvbox"
+
 -- List of plugins. Note that for plugins that have many keybindings,
 -- those keybindings are configured in their own configuration files.
 -- If a plugin only processes one or two keybindings, then they are
@@ -68,13 +70,11 @@ local lazy_config = {
 require("lazy").setup({
   -- UI
   -----
-  {
-    "ellisonleao/gruvbox.nvim",
-    priority = 1000,
-    config = function()
-      require("plugin-config.gruvbox")
-    end,
-  },
+  -- Colorschemes
+  { "rose-pine/neovim", name = "rose-pine", lazy = true },
+  { "catppuccin/nvim", name = "catppuccin", lazy = true },
+  { "ellisonleao/gruvbox.nvim", lazy = true },
+  { "sainnhe/gruvbox-material", lazy = true },
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = {
@@ -254,3 +254,6 @@ require("lazy").setup({
 	-- 	ft = { "groovy.jenkinsfile" }
 	-- },
 }, lazy_config)
+
+require("plugin-config.colorscheme").colorscheme_conf[vim.g['colortheme']]()
+vim.keymap.set('n', '<leader>1', function() require("plugin-config.colorscheme").colorscheme_selector() end, { silent = false })

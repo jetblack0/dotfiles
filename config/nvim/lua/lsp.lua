@@ -28,16 +28,6 @@ vim.diagnostic.config({
 	},
 })
 
--- Set color for diagnostic signs
-vim.api.nvim_set_hl(0, 'DiagnosticSignError', { fg='#eb6f92'} )
-vim.api.nvim_set_hl(0, 'DiagnosticSignWarn', { fg='#f6c177'} )
-vim.api.nvim_set_hl(0, 'DiagnosticSignInfo', { fg='#31748f'} )
-vim.api.nvim_set_hl(0, 'DiagnosticSignHint', { fg='#83a598'} )
-
--- Set background color for the popup window 
-vim.api.nvim_set_hl(0, 'NormalFloat', { bg='#393633'} )
-
-
 
 ---------------------
 -- LSP configurations

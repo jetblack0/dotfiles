@@ -17,10 +17,3 @@ illuminate.configure({
     },
     under_cursor = false,
 })
-
-vim.api.nvim_set_hl(0, "IlluminatedWordRead", { bg = "#45475A" })
-vim.api.nvim_set_hl(0, "IlluminatedWordText", { bg = "#45475A" })
-vim.api.nvim_set_hl(0, "IlluminatedWordWrite", { bg = "#45475A" })
-
--- NOTE: By default keymaps <a-n> and <a-p> are added to move between references. 
-

@@ -129,13 +129,3 @@ local function open_nvim_tree(data)
 end
 
 vim.api.nvim_create_autocmd({ "VimEnter" }, { callback = open_nvim_tree })
-
-vim.cmd([[
-  " :hi     NvimTreeNormal              guifg=#d5c4a1
-  " :hi     NvimTreeOpenedFile          guifg=#ebdbb2
-  :hi     NvimTreeFolderName          guifg=#83a598 cterm=bold gui=bold
-  :hi     NvimTreeOpenedFolderName    guifg=#83a598 cterm=bold gui=bold
-  :hi     NvimTreeEmptyFolderName     guifg=#83a598 cterm=bold gui=bold
-  :hi     NvimTreeRootFolder          guifg=#d19097
-
-]])
