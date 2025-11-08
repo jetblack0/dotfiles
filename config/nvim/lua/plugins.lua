@@ -15,16 +15,6 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Define which file types should the plguin be loaded.
-local indent_line_filetypes = {
-  "html", "css", "htmldjango",
-  "javascript", "javascriptreact", "tsx", "typescript",
-  "yaml*", "json", "jsonc", "yaml.ansible", "yml",
-  "rust", "java", "c", "make", "go",
-  "lua", "sh", "python", "ruby",
-  "groovy", "terraform",
-}
-
 -- Lazy vim configuration.
 local lazy_config = {
 	ui = {
@@ -63,10 +53,6 @@ local lazy_config = {
 
 vim.g['colortheme'] = "gruvbox"
 
--- List of plugins. Note that for plugins that have many keybindings,
--- those keybindings are configured in their own configuration files.
--- If a plugin only processes one or two keybindings, then they are
--- configured here.
 require("lazy").setup({
   -- UI
   -----
@@ -84,15 +70,10 @@ require("lazy").setup({
 			require("plugin-config.lualine")
 		end,
 	},
-  {
-    "sphamba/smear-cursor.nvim",
-    config = function()
-      require("plugin-config.smear-cursor")
-    end,
-  },
 
-  -- System enhancement
-  ---------------------
+
+  -- Enhancement
+  --------------
 	{
 		"nvim-tree/nvim-tree.lua",
 		dependencies = {
@@ -123,21 +104,11 @@ require("lazy").setup({
 			require("plugin-config.todo-comment")
 		end,
 	},
-  {
-    "lukas-reineke/indent-blankline.nvim",
-    main = "ibl",
-		ft = indent_line_filetypes,
-		config = function ()
-			require("plugin-config.indent-blankline")
-		end
-    ---@module "ibl"
-    ---@type ibl.config
-  },
 	{
 		'nvim-telescope/telescope.nvim', tag = '0.1.8',
 		dependencies = {
 			'nvim-lua/plenary.nvim',
-			'nvim-telescope/telescope-ui-select.nvim'
+      'nvim-telescope/telescope-ui-select.nvim'
 		},
 		config = function()
 			require("plugin-config.telescope")
@@ -253,6 +224,26 @@ require("lazy").setup({
 	-- 	"ckipp01/nvim-jenkinsfile-linter",
 	-- 	ft = { "groovy.jenkinsfile" }
 	-- },
+
+
+  -- Quality of life
+  ------------------
+  {
+    "rachartier/tiny-glimmer.nvim",
+    event = "VeryLazy",
+    priority = 10,
+    config = function()
+      require("plugin-config.qol.tiny-glimmer")
+    end,
+  },
+  {
+    "folke/snacks.nvim",
+    priority = 1000,
+    lazy = false,
+    config = function()
+      require("plugin-config.qol.snacks")
+    end,
+  }
 }, lazy_config)
 
 require("plugin-config.colorscheme").colorscheme_conf[vim.g['colortheme']]()
