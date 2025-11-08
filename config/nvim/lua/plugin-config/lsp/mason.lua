@@ -43,3 +43,5 @@ mason_lspconfig.setup({
 	ensure_installed = must_have_servers,
 	automatic_installation = true,
 })
+
+vim.api.nvim_set_keymap("n", "<leader>3", ":Mason<CR>", { noremap = true, silent = false })

@@ -66,9 +66,6 @@ require("lazy").setup({
 		dependencies = {
 			"nvim-tree/nvim-web-devicons",
 		},
-		config = function()
-			require("plugin-config.lualine")
-		end,
 	},
 
 
@@ -245,5 +242,6 @@ require("lazy").setup({
   }
 }, lazy_config)
 
+vim.api.nvim_set_keymap("n", "<leader>2", ":Lazy<CR>", { noremap = true, silent = false })
 require("plugin-config.colorscheme").colorscheme_conf[vim.g['colortheme']]()
 vim.keymap.set('n', '<leader>1', function() require("plugin-config.colorscheme").colorscheme_selector() end, { silent = false })

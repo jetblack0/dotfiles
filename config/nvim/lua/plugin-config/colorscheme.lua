@@ -2,6 +2,31 @@ local helpers = require("utils.helpers")
 local fallback_colorscheme = "habamax"
 
 local M = {}
+
+local lualine_colors = {
+  bg = '#3C3836',
+  fg = '#D1CFC0',
+  yellow = '#FABD2F',
+  cyan = '#689D6A',
+  darkblue = '#081633',
+  green = '#98971A',
+  orange = '#D79921',
+  violet = '#a9a1e1',
+  magenta = '#D3869B',
+  blue = '#83a598',
+  red = '#cc241d',
+  pink = '#D19097',
+
+  red_diff = '#eb6f92',
+  green_diff = '#31748f',
+  orange_diff = '#f6c177',
+
+  green_diff_light = '#40A02B',
+  orange_diff_light = '#DF8E1D',
+  red_diff_light = '#D20F39',
+}
+
+
 M.colorscheme_conf = {
   gruvbox = function()
     local gruvbox = helpers.safe_require("gruvbox")
@@ -60,6 +85,8 @@ M.colorscheme_conf = {
       }
     })
 
+    require("plugin-config.lualine")(lualine_colors)
+
     vim.g['colortheme'] = "gruvbox"
     vim.cmd("colorscheme gruvbox")
   end,
@@ -106,6 +133,8 @@ M.colorscheme_conf = {
       },
     })
 
+    require("plugin-config.lualine")(lualine_colors)
+
     vim.g['colortheme'] = "catppuccin_light"
     vim.cmd("colorscheme catppuccin")
   end,
@@ -151,6 +180,31 @@ M.colorscheme_conf = {
       },
     })
 
+    lualine_colors = {
+      bg = '#1C1E26',
+      fg = '#bbc2cf',
+      yellow = '#ECBE7B',
+      cyan = '#008080',
+      darkblue = '#081633',
+      green = '#98be65',
+      orange = '#FF8800',
+      violet = '#a9a1e1',
+      magenta = '#c678dd',
+      blue = '#51afef',
+      red = '#ec5f67',
+      pink = '#F35588',
+
+      red_diff = '#eb6f92',
+      green_diff = '#31748f',
+      orange_diff = '#f6c177',
+
+      green_diff_light = '#40A02B',
+      orange_diff_light = '#DF8E1D',
+      red_diff_light = '#D20F39',
+    }
+
+    require("plugin-config.lualine")(lualine_colors)
+
     vim.g['colortheme'] = "catppuccin_dark"
     vim.cmd("colorscheme catppuccin")
   end,
@@ -171,6 +225,8 @@ M.colorscheme_conf = {
         transparency = true,
       },
     })
+
+    require("plugin-config.lualine")(lualine_colors)
 
     vim.g['colortheme'] = "rosepine_dark"
 		vim.cmd("colorscheme rose-pine")
@@ -199,6 +255,8 @@ M.colorscheme_conf = {
     vim.api.nvim_set_hl(0, "NvimTreeOpenedFolderName", { fg = "#83a598", bold = true })
     vim.api.nvim_set_hl(0, "NvimTreeEmptyFolderName", { fg = "#83a598", bold = true })
     vim.api.nvim_set_hl(0, "NvimTreeRootFolder", { fg = "#d19097" })
+
+    require("plugin-config.lualine")(lualine_colors)
   end,
 }
 
@@ -213,8 +271,6 @@ M.colorscheme_selector = function ()
 
     local fn = M.colorscheme_conf[selection]
     if fn then
-      -- NOTE: Right now lualine uses hardcoded hex color, better switching to native theme
-      -- require'lualine'.setup{options={theme='my_theme'}}
       fn()
     else
       vim.notify("Invalid option: " .. selection, vim.log.levels.ERROR)
