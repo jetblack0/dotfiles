@@ -1,7 +1,7 @@
 -- LSP server configuration and keybindings.
 local helpers = require("utils.helpers")
 local nvim_navic = helpers.safe_require("nvim-navic")
-local cmp_nvim_lsp = helpers.safe_require("cmp_nvim_lsp")
+local blink = helpers.safe_require("blink.cmp")
 local yaml_schema = helpers.safe_require('utils.yaml-schemas')
 
 
@@ -42,7 +42,7 @@ vim.api.nvim_set_hl(0, 'NormalFloat', { bg='#393633'} )
 ---------------------
 -- LSP configurations
 ---------------------
-local capabilities = cmp_nvim_lsp.default_capabilities(vim.lsp.protocol.make_client_capabilities())
+local capabilities = blink.get_lsp_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 local on_attach = function(client, bufnr)

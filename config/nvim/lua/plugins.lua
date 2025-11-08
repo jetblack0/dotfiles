@@ -84,6 +84,12 @@ require("lazy").setup({
 			require("plugin-config.lualine")
 		end,
 	},
+  {
+    "sphamba/smear-cursor.nvim",
+    config = function()
+      require("plugin-config.smear-cursor")
+    end,
+  },
 
   -- System enhancement
   ---------------------
@@ -173,20 +179,9 @@ require("lazy").setup({
   },
   -- cmp, the actual impletation for the completion menu.
 	{
-		"hrsh7th/nvim-cmp",
+		"saghen/blink.cmp",
+    version = '1.*',
     dependencies = {
-      -- Bridge cmp (completion) with lsp.
-			"hrsh7th/cmp-nvim-lsp",
-      -- Bridge cmp with nvim-snippy (snippets).
-			"saadparwaiz1/cmp_luasnip",
-
-      -- Completion sources.
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"hrsh7th/cmp-cmdline",
-
-      -- Snippet engine.
-			-- "dcampos/nvim-snippy",
       {
         "L3MON4D3/LuaSnip",
         version = "v2.*",
@@ -194,11 +189,10 @@ require("lazy").setup({
       },
 
       -- Snippet sources.
-      "honza/vim-snippets",
       "rafamadriz/friendly-snippets"
 		},
 		config = function()
-			require("plugin-config.lsp.cmp")
+			require("plugin-config.lsp.blink")
 		end,
 	},
   -- Lint and format.
@@ -259,18 +253,4 @@ require("lazy").setup({
 	-- 	"ckipp01/nvim-jenkinsfile-linter",
 	-- 	ft = { "groovy.jenkinsfile" }
 	-- },
-
-  -- yaml
-  -- {
-  --   "cenk1cenk2/schema-companion.nvim",
-  --   dependencies = {
-  --     { "nvim-lua/plenary.nvim" },
-  --   },
-  --   config = function()
-  --     require("plugin-config.lsp.schema-companion")
-  --   end,
-  -- },
-  -- {
-  --   "b0o/schemastore.nvim",
-  -- }
 }, lazy_config)
