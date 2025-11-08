@@ -1,7 +1,7 @@
 local helpers = require("utils.helpers")
 local lualine = helpers.safe_require("lualine")
 local web_devicons = helpers.safe_require("nvim-web-devicons")
-local nvim_navic = helpers.safe_require("nvim-navic")
+-- local nvim_navic = helpers.safe_require("nvim-navic")
 
 if not lualine then return end
 
@@ -22,9 +22,9 @@ return function(colors)
       local gitdir = vim.fn.finddir(".git", filepath .. ";")
       return gitdir and #gitdir > 0 and #gitdir < #filepath
     end,
-    is_navic_available = function ()
-      return nvim_navic.is_available
-    end
+    -- is_navic_available = function()
+    --   return nvim_navic.is_available
+    -- end,
   }
 
   -- Config
@@ -126,27 +126,6 @@ return function(colors)
 
   ins_left({ "progress", color = { fg = colors.fg, gui = "bold" } })
 
-  --[[ ins_left {
-    -- Lsp server name .
-    function()
-      local msg = 'No Active Lsp'
-      local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-      local clients = vim.lsp.get_active_clients()
-      if next(clients) == nil then
-        return msg
-      end
-      for _, client in ipairs(clients) do
-        local filetypes = client.config.filetypes
-        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-          return client.name
-        end
-      end
-      return msg
-    end,
-    -- icon = ' LSP:',
-    color = { fg = colors.fg },
-  } ]]
-
   -- Add components to right sections
   ins_left({
     "diagnostics",
@@ -165,12 +144,35 @@ return function(colors)
   })
 
   ins_right({
-    function ()
-      return nvim_navic.get_location()
-    end,
-    cond = is_navic_available,
+    -- Lsp server name.
+    cond = is_lsp_available,
+    icon = '󰅩',
     color = { fg = colors.blue, gui = "bold" },
+
+    function()
+      local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
+      local clients = vim.lsp.get_clients()
+
+      -- if next(client) == nil then
+      --   return ""
+      -- end
+
+      for _, client in ipairs(clients) do
+        local filetypes = client.config.filetypes
+        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+          return client.name
+        end
+      end
+    end,
   })
+
+  -- ins_right({
+  --   function ()
+  --     return nvim_navic.get_location()
+  --   end,
+  --   cond = is_navic_available,
+  --   color = { fg = colors.blue, gui = "bold" },
+  -- })
 
   ins_right({
     "branch",
