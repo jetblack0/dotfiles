@@ -11,7 +11,7 @@ tiny_glimmer.setup({
 	refresh_interval_ms = 8,
 
 	overwrite = {
-		auto_map = true,
+		auto_map = false,
 		yank = {
 			enabled = true,
 			default_animation = "fade",
