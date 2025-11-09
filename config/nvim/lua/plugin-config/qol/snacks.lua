@@ -66,6 +66,15 @@ snacks.setup({
     }
   },
 
+  image = {
+    enabled = true,
+    cache = vim.fn.stdpath("cache") .. "/snacks/image",
+    formats = {
+      "png", "jpg", "jpeg", "gif", "bmp", "webp",
+      "tiff", "heic", "avif", "icns",
+    },
+  },
+
   scroll = { enabled = false },
   statuscolumn = { enabled = false },
   words = { enabled = false },
