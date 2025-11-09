@@ -15,7 +15,7 @@ local must_have_servers = {
   -- Ops
 	"ansiblels", "terraformls", "dockerls",
   "docker_compose_language_service", "yamlls",
-  "groovyls"
+  "groovyls", "nginx_language_server"
 }
 
 local mason_config = {

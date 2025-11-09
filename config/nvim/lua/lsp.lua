@@ -369,3 +369,12 @@ vim.lsp.config.groovyls = {
   on_attach = on_attach,
 }
 vim.lsp.enable("groovyls")
+
+-- Nginx
+vim.lsp.config.nginx_language_server = {
+  filetypes = { "nginx" },
+  cmd = { "nginx-language-server" },
+  capabilities = capabilities,
+  on_attach = on_attach,
+}
+vim.lsp.enable("nginx_language_server")
