@@ -1,6 +1,5 @@
 -- LSP server configuration and keybindings.
 local helpers = require("utils.helpers")
-local nvim_navic = helpers.safe_require("nvim-navic")
 local blink = helpers.safe_require("blink.cmp")
 local yaml_schema = helpers.safe_require('utils.yaml-schemas')
 
@@ -37,9 +36,6 @@ capabilities.textDocument.completion.completionItem.snippetSupport = true
 
 local on_attach = function(client, bufnr)
 	client.server_capabilities.documentFormattingProvider = true
-  if client.server_capabilities.documentSymbolProvider then
-    nvim_navic.attach(client, bufnr)
-  end
 
   if client.name == 'yamlls' then
     vim.keymap.set('n', '<leader>t', function() require("utils.yaml-schemas").list_schemas() end, { silent = false })
@@ -48,9 +44,6 @@ end
 
 local on_attach_noformat = function(client, bufnr)
 	client.server_capabilities.documentFormattingProvider = false
-  if client.server_capabilities.documentSymbolProvider then
-    nvim_navic.attach(client, bufnr)
-  end
 end
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -345,13 +338,6 @@ vim.lsp.config.dockerls = {
       }
     }
   },
-  -- on_attach = function(client, bufnr)
-  --   client.server_capabilities.semanticTokensProvider = nil
-  --   client.server_capabilities.documentFormattingProvider = true
-  --   if client.server_capabilities.documentSymbolProvider then
-  --     nvim_navic.attach(client, bufnr)
-  --   end
-  -- end
   on_attach = on_attach
 }
 vim.lsp.enable('dockerls')

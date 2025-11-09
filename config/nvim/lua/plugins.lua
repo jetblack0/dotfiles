@@ -188,10 +188,9 @@ require("lazy").setup({
 	},
   -- Other nice stuff.
   {
-    "SmiteshP/nvim-navic",
-    event = "LspAttach",
+    'Bekaboo/dropbar.nvim',
     config = function()
-			require("plugin-config.lsp.navic")
+			require("plugin-config.lsp.dropbar")
     end
   },
 
