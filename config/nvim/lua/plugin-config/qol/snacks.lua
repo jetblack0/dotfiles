@@ -90,6 +90,10 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+
+-- Keymaps
+--------------------
+-- indent
 vim.g.snacks_scope = false
 vim.keymap.set("n", "<leader>o", function()
   vim.g.snacks_scope = not vim.g.snacks_scope
@@ -99,3 +103,14 @@ vim.keymap.set("n", "<leader>o", function()
     vim.notify("indent scope disabled", vim.log.levels.WARN)
   end
 end, { desc = "Toggle my snack indent scope" })
+
+-- buffer
+vim.keymap.set("n", "<c-w>d", function()
+  Snacks.bufdelete()
+  vim.notify("Deleted current buffer", vim.log.levels.WARN)
+end, { desc = "Delete current buffer" })
+
+vim.keymap.set("n", "<c-w>D", function()
+  Snacks.bufdelete.others()
+  vim.notify("Deleted all buffers except the curent one", vim.log.levels.WARN)
+end, { desc = "Delete current buffer" })
