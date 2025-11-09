@@ -81,6 +81,11 @@ M.colorscheme_conf = {
         DiagnosticSignWarn = { fg = '#f6c177' },
         DiagnosticSignInfo = { fg = '#31748f' },
         DiagnosticSignHint = { fg = '#83a598' },
+
+        LualineDiagnosticSignError = { fg = '#eb6f92', bg = lualine_colors.bg },
+        LualineDiagnosticSignWarn = { fg = '#f6c177', bg = lualine_colors.bg },
+        LualineDiagnosticSignInfo = { fg = '#31748f', bg = lualine_colors.bg },
+        LualineDiagnosticSignHint = { fg = '#83a598', bg = lualine_colors.bg },
         NormalFloat = { bg = '#393633' },
       }
     })
