@@ -75,6 +75,20 @@ snacks.setup({
     },
   },
 
+  dim = {
+    enabled = true,
+  },
+  zen = {
+    enabled = true,
+    toggles = {
+      dim = true,
+      git_signs = true,
+      mini_diff_signs = true,
+      diagnostics = false,
+      inlay_hints = false,
+    },
+  },
+
   scroll = { enabled = false },
   statuscolumn = { enabled = false },
   words = { enabled = false },
@@ -113,4 +127,10 @@ end, { desc = "Delete current buffer" })
 vim.keymap.set("n", "<c-w>D", function()
   Snacks.bufdelete.others()
   vim.notify("Deleted all buffers except the curent one", vim.log.levels.WARN)
+end, { desc = "Delete current buffer" })
+
+-- zen mode
+vim.keymap.set("n", "<leader>z", function()
+  vim.g.snacks_scope = true
+  Snacks.zen.zen()
 end, { desc = "Delete current buffer" })
