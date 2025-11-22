@@ -73,6 +73,13 @@ snacks.setup({
       "png", "jpg", "jpeg", "gif", "bmp", "webp",
       "tiff", "heic", "avif", "icns",
     },
+    doc = {
+      enabled = true,
+      inline = false,
+      float = false,
+      max_width = 60,
+      max_height = 20,
+    }
   },
 
   dim = {
@@ -134,3 +141,9 @@ vim.keymap.set("n", "<leader>z", function()
   vim.g.snacks_scope = true
   Snacks.zen.zen()
 end, { desc = "Delete current buffer" })
+
+-- image
+vim.keymap.set("n", "<leader>p", function()
+  Snacks.image.hover()
+end, { desc = "Show hovered image" })
+
