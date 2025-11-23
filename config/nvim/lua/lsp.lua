@@ -71,7 +71,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     keymap("n", "<leader>h", function() lsp.buf.hover({ border = "single", max_height = 30, max_width = 120 }) end, opt("Toggle hover"))
     keymap("n", "<leader>D", lsp.buf.declaration, opt("Go to declaration"))
     keymap("n", "<leader>d", lsp.buf.definition, opt("Go to definition"))
-    keymap("n", "<leader>g", lsp.buf.references, opt("Show References"))
+    keymap("n", "<leader>G", lsp.buf.references, opt("Show References"))
     keymap("n", "<leader>i", function() lsp.buf.implementation({ border = "single" })  end, opt("Go to implementation"))
     keymap("n", "<Leader>L", lsp.codelens.run, opt("Run CodeLens"))
 

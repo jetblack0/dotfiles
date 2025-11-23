@@ -139,6 +139,14 @@ require("lazy").setup({
 
   -- Programming (LSP)
   --------------------
+  -- Git
+	{
+		"lewis6991/gitsigns.nvim",
+    version = "*",
+    config = function()
+      require("plugin-config.git.gitsigns")
+    end,
+	},
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     dependencies = {
