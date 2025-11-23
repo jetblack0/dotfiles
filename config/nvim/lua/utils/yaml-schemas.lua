@@ -2,6 +2,10 @@ local M = {}
 
 M.defined_schemas = {
   {
+    name = "lazygit",
+    uri = "https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json",
+  },
+  {
     name = "bitbucket-pipelines",
     uri = "https://api.bitbucket.org/schemas/pipelines-configuration",
     file_pattern = "bitbucket-pipelines.{yml,yaml}"
