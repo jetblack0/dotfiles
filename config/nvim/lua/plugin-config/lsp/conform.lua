@@ -15,4 +15,4 @@ conform.setup({
 
 -- Keybindings.
 local opts = { noremap = true, silent = false }
-vim.keymap.set("n", "<leader>f", function() conform.format({ lsp_fallback = true }) end, opts)
+vim.keymap.set("n", "<leader>F", function() conform.format({ lsp_fallback = true }) end, opts)

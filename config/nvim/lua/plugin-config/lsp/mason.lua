@@ -1,22 +1,10 @@
 local helpers = require("utils.helpers")
 local mason = helpers.safe_require("mason")
 local mason_lspconfig = helpers.safe_require("mason-lspconfig")
+local lsputils = helpers.safe_require('utils.lsp')
 
 if not mason then return end
 if not mason_lspconfig then return end
-
--- Define LSPs that Mason will automatically install.
-local must_have_servers = {
-  -- Devs
-	"rust_analyzer",
-	"lua_ls", "bashls", "basedpyright",
-	"ts_ls", "html", "cssls", "jsonls",
-
-  -- Ops
-	"ansiblels", "terraformls", "dockerls",
-  "docker_compose_language_service", "yamlls",
-  "groovyls", "nginx_language_server"
-}
 
 local mason_config = {
   ui = {
@@ -40,7 +28,7 @@ local mason_config = {
 
 mason.setup(mason_config)
 mason_lspconfig.setup({
-	ensure_installed = must_have_servers,
+	ensure_installed = lsputils.ensured_installed,
 	automatic_installation = true,
 })
 

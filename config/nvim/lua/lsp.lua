@@ -2,6 +2,7 @@
 local helpers = require("utils.helpers")
 local blink = helpers.safe_require("blink.cmp")
 local yaml_schema = helpers.safe_require('utils.yaml-schemas')
+local lsputils = helpers.safe_require('utils.lsp')
 
 
 ----------------
@@ -40,10 +41,6 @@ local on_attach = function(client, bufnr)
   if client.name == 'yamlls' then
     vim.keymap.set('n', '<leader>t', function() require("utils.yaml-schemas").list_schemas() end, { silent = false })
   end
-end
-
-local on_attach_noformat = function(client, bufnr)
-	client.server_capabilities.documentFormattingProvider = false
 end
 
 vim.api.nvim_create_autocmd("LspAttach", {
@@ -114,7 +111,6 @@ vim.lsp.config.rust_analyzer = {
 	capabilities = capabilities,
   on_attach = on_attach,
 }
-vim.lsp.enable("rust_analyzer")
 
 
 -- Interpreted languages
@@ -137,10 +133,9 @@ vim.lsp.config.lua_ls = {
       },
     },
   },
-  on_attach = on_attach_noformat,
+  on_attach = on_attach,
 	capabilities = capabilities,
 }
-vim.lsp.enable("lua_ls")
 
 -- Bash
 vim.lsp.config.bashls = {
@@ -155,7 +150,6 @@ vim.lsp.config.bashls = {
 	capabilities = capabilities,
   on_attach = on_attach,
 }
-vim.lsp.enable("bashls")
 
 -- Python
 vim.lsp.config.ruff = {
@@ -178,7 +172,6 @@ vim.lsp.config.basedpyright = {
 	capabilities = capabilities,
 	on_attach = on_attach,
 }
-vim.lsp.enable({ "ruff", "basedpyright" })
 
 
 -- Markup languages
@@ -191,7 +184,7 @@ vim.lsp.config.ts_ls = {
 		hostInfo = "neovim",
 	},
   root_markers = { "tsconfig.json", "jsconfig.json", "package.json", ".git" },
-	on_attach = on_attach_noformat,
+	on_attach = on_attach,
 	capabilities = capabilities,
 }
 
@@ -243,7 +236,6 @@ vim.lsp.config.jsonls = {
   on_attach = on_attach
 }
 
-vim.lsp.enable({ "ts_ls", "cssls", "htmlls", "jsonls" })
 
 vim.lsp.config.yamlls = {
   filetypes = { "yaml" },
@@ -270,7 +262,6 @@ vim.lsp.config.yamlls = {
 	capabilities = capabilities,
   on_attach = on_attach,
 }
-vim.lsp.enable("yamlls")
 
 
 -- Ops
@@ -280,7 +271,7 @@ vim.lsp.config.ansiblels = {
   filetypes = { "yaml.ansible", "ansible" },
   cmd = { "ansible-language-server", "--stdio" },
 	capabilities = capabilities,
-	on_attach = on_attach_noformat,
+	on_attach = on_attach,
   root_markers = { "ansible.cfg", ".ansible-lint" },
   single_file_support = true,
 	settings = {
@@ -304,7 +295,6 @@ vim.lsp.config.ansiblels = {
     }
 	},
 }
-vim.lsp.enable("ansiblels")
 
 -- Terraform
 vim.lsp.config.terraformls = {
@@ -314,7 +304,6 @@ vim.lsp.config.terraformls = {
   root_markers = { ".terraform", ".git" },
   on_attach = on_attach
 }
-vim.lsp.enable("terraformls")
 
 -- Docker and docker compose
 vim.lsp.config.docker_compose_language_service = {
@@ -323,7 +312,6 @@ vim.lsp.config.docker_compose_language_service = {
   root_markers = { "docker-compose.yaml", "docker-compose.yml", "compose.yaml", "compose.yml" },
   on_attach = on_attach
 }
-vim.lsp.enable('docker_compose_language_service')
 
 vim.lsp.config.dockerls = {
   cmd = { "docker-langserver", "--stdio" },
@@ -340,7 +328,6 @@ vim.lsp.config.dockerls = {
   },
   on_attach = on_attach
 }
-vim.lsp.enable('dockerls')
 
 -- Groovy (Jenkins)
 local home = vim.fn.expand("$HOME")
@@ -354,7 +341,6 @@ vim.lsp.config.groovyls = {
   capabilities = capabilities,
   on_attach = on_attach,
 }
-vim.lsp.enable("groovyls")
 
 -- Nginx
 vim.lsp.config.nginx_language_server = {
@@ -363,4 +349,20 @@ vim.lsp.config.nginx_language_server = {
   capabilities = capabilities,
   on_attach = on_attach,
 }
-vim.lsp.enable("nginx_language_server")
+
+
+---------------------------------
+-- Enable clients
+---------------------------------
+for server_name, v in pairs(lsputils.enabled_servers) do
+  if helpers.command_exists(v["cmd"]) then
+    vim.lsp.enable(server_name)
+  else
+    local msg = string.format(
+      "Executable '%s' for server '%s' not found! Server will not be enabled",
+      lsp_executable,
+      server_name
+    )
+    vim.notify(msg, vim.log.levels.WARN, { title = "Nvim-config" })
+  end
+end
