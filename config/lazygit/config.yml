@@ -1,0 +1,58 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+
+notARepository: skip
+
+gui:
+  showIcons: true
+  showFileIcons: true
+  nerdFontsVersion: "3"
+
+keybinding:
+  universal:
+    quit: q
+    prevItem: k
+    nextItem: j
+    prevItem-alt: <disabled>
+    nextItem-alt: <disabled>
+
+    prevPage: <c-u>
+    nextPage: <c-d>
+
+    gotoTop: <
+    gotoBottom: '>'
+    gotoBottom-alt: G
+
+    prevBlock: K
+    nextBlock: J
+    prevBlock-alt: <disabled>
+    nextBlock-alt: <disabled>
+    prevBlock-alt2: <disabled>
+    nextBlock-alt2: <disabled>
+
+    scrollLeft: <left>
+    scrollRight: <right>
+
+    scrollUpMain: <c-y>
+    scrollDownMain: <c-e>
+    scrollUpMain-alt1: <disabled>
+    scrollDownMain-alt1: <disabled>
+    scrollUpMain-alt2: <disabled>
+    scrollDownMain-alt2: <disabled>
+    # scrollUpMain-alt2: <c-u>
+    # scrollDownMain-alt2: <c-d>
+
+    nextTab: <tab>
+    prevTab: <backtab>
+
+    focusMainView: L
+
+    openFile: <disabled>
+    goInto: o
+
+  files:
+    collapseAll: W
+
+  main:
+    toggleSelectHunk: a
+    pickBothHunks: b
+    editSelectHunk: E
