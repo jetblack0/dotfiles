@@ -109,15 +109,6 @@ require("lazy").setup({
 		end,
 	},
 	{
-		'nvim-telescope/telescope.nvim', tag = '0.1.8',
-		dependencies = {
-			'nvim-lua/plenary.nvim',
-		},
-		config = function()
-			require("plugin-config.telescope")
-		end,
-	},
-	{
 		"NvChad/nvim-colorizer.lua",
 		cmd = "ColorizerToggle",
 		keys = {

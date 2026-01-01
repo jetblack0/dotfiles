@@ -210,3 +210,41 @@ end, { desc = "Toggle zen mode" })
 vim.keymap.set("n", "<leader>p", function()
   Snacks.image.hover()
 end, { desc = "Show hovered image" })
+
+-- explorer
+vim.keymap.set("n", "<c-b>", function()
+  Snacks.explorer()
+end, { desc = "File Explorer" })
+
+vim.keymap.set("n", "F", function()
+  Snacks.explorer.reveal()
+end, { desc = "Locate the current buffer" })
+
+-- telescope
+vim.keymap.set("n", "<leader>e", function()
+	Snacks.picker()
+end, { desc = "Snacks picker" })
+
+vim.keymap.set("n", "<leader>q", function()
+	Snacks.picker.files()
+end, { desc = "Snacks file picker" })
+
+vim.keymap.set("n", "<leader>r", function()
+	Snacks.picker.command_history()
+end, { desc = "Snacks command history" })
+
+vim.keymap.set("n", "<leader>w", function()
+	Snacks.picker.grep()
+end, { desc = "Snacks live grep" })
+
+vim.keymap.set("n", "<leader>gl", function()
+	Snacks.picker.git_log()
+end, { desc = "Snacks git log" })
+
+vim.keymap.set("n", "<leader>gL", function()
+	Snacks.picker.git_log_file()
+end, { desc = "Snacks git logfile" })
+
+vim.keymap.set("n", "<leader>gg", function()
+	Snacks.picker.git_status()
+end, { desc = "Snacks git status" })
