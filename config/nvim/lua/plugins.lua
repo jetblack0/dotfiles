@@ -71,15 +71,6 @@ require("lazy").setup({
 
   -- Enhancement
   --------------
-	{
-		"nvim-tree/nvim-tree.lua",
-		dependencies = {
-			"nvim-tree/nvim-web-devicons",
-		},
-		config = function()
-			require("plugin-config.nvimtree")
-		end,
-	},
   {
     "mikavilpas/yazi.nvim",
     version = "*", -- use the latest stable version

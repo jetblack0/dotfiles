@@ -75,6 +75,10 @@ M.colorscheme_conf = {
         NvimTreeEmptyFolderName = { fg = "#83a598", bold = true },
         NvimTreeRootFolder = { fg = "#d19097" },
 
+        -- Snacks explorer
+        Directory = { fg = "#83a598", bold = true },
+        -- SnacksPickerGitStatusModified = { fg = "#f6c177" },
+
         BlinkCmpMenuSelection = { bg = "#32302f" },
 
         DiagnosticSignError = { fg = '#eb6f92' },

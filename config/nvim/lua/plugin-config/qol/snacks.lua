@@ -45,6 +45,29 @@ snacks.setup({
 
   picker = {
     enabled = true,
+
+    icons = {
+      git = {
+        enabled   = true,
+        commit    = " 󰜘",
+        staged    = " ",
+        added     = " ",
+        deleted   = " ",
+        ignored   = " ◌",
+        modified  = " ",
+        renamed   = " ",
+        unmerged  = " ",
+        untracked = " ",
+      },
+      diagnostics = {
+        Error = " ",
+        Warn  = "󰃤 ",
+        Hint  = " ",
+        Info  = "󰋽 ",
+      },
+    },
+
+
     win = {
       input = {
         keys = {
@@ -58,12 +81,54 @@ snacks.setup({
           ["G"] = { "list_bottom", mode = { "i", "n" } },
           ["gg"] = { "list_top", mode = { "i", "n" } },
           ["<CR>"] = { "confirm", mode = { "n", "i" } },
+          ["l"] = { "confirm", mode = { "n" } },
           ["<Esc>"] = { "cancel", mode = { "n" } },
           ["<C-c>"] = { "cancel", mode = "i" },
           ["?"] = "toggle_help_input",
         }
+      },
+      list = {
+        keys = {
+          ["<c-y>"] = { "preview_scroll_up", mode = { "i", "n" } },
+          ["<c-e>"] = { "preview_scroll_down", mode = { "i", "n" } },
+        }
+      },
+    },
+
+    sources = {
+      explorer = {
+        diagnostics = false,
+        git_status = true,
+        git_status_open = false,
+        git_untracked = true,
+        win = {
+          list = {
+            keys = {
+              ["H"] = "explorer_up",
+              ["o"] = "confirm",
+              ["W"] = "explorer_close_all",
+              ["f"] = "explorer_focus",
+              ["."] = "toggle_hidden",
+              [">"] = "toggle_toggle_ignored",
+              ["O"] = "explorer_open",
+              ["<leader>w"] = "picker_grep",
+              ["<leader>gn"] = "explorer_git_next",
+              ["<leader>gp"] = "explorer_git_prev",
+              ['<c-t>'] = { 'tab', mode = { 'i', 'n' } },
+              ['<c-b>'] = { function ()
+                Snacks.explorer()
+              end, mode = { 'i', 'n' } },
+            },
+          },
+        },
       }
     }
+  },
+
+  explorer = {
+    enabled = true,
+    replace_netrw = true,
+    trash = true,
   },
 
   image = {
@@ -100,7 +165,6 @@ snacks.setup({
   statuscolumn = { enabled = false },
   words = { enabled = false },
   dashboard = { enabled = false },
-  explorer = { enabled = false },
   scope = { enabled = false },
 })
 
@@ -140,10 +204,9 @@ end, { desc = "Delete current buffer" })
 vim.keymap.set("n", "<leader>z", function()
   vim.g.snacks_scope = true
   Snacks.zen.zen()
-end, { desc = "Delete current buffer" })
+end, { desc = "Toggle zen mode" })
 
 -- image
 vim.keymap.set("n", "<leader>p", function()
   Snacks.image.hover()
 end, { desc = "Show hovered image" })
-
