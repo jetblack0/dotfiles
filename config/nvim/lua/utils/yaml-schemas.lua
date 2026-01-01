@@ -51,6 +51,11 @@ M.defined_schemas = {
     file_pattern = "thanos*.{yml,yaml}"
   },
   {
+    name = "Loki configs",
+    uri = "https://www.schemastore.org/loki.json",
+    file_pattern = "loki*.{yml,yaml}"
+  },
+  {
     name = "Argo application",
     uri = "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj.io/application_v1alpha1.json",
     file_pattern = "*application*.yml"
