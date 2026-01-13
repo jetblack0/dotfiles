@@ -89,8 +89,11 @@ snacks.setup({
       },
       list = {
         keys = {
+          ["/"] = false,
+          ["<c-f>"] = "toggle_focus",
           ["<c-y>"] = { "preview_scroll_up", mode = { "i", "n" } },
           ["<c-e>"] = { "preview_scroll_down", mode = { "i", "n" } },
+          ["<c-x>"] = { "edit_split", mode = { "i", "n" } },
         }
       },
     },
