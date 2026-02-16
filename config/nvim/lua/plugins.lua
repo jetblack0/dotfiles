@@ -51,7 +51,7 @@ local lazy_config = {
   },
 }
 
-vim.g['colortheme'] = "gruvbox"
+vim.g['colortheme'] = "gruvbox_shokry"
 
 require("lazy").setup({
   -- UI
@@ -59,8 +59,9 @@ require("lazy").setup({
   -- Colorschemes
   { "rose-pine/neovim", name = "rose-pine", lazy = true },
   { "catppuccin/nvim", name = "catppuccin", lazy = true },
-  { "ellisonleao/gruvbox.nvim", lazy = true },
+  -- { "ellisonleao/gruvbox.nvim", lazy = true },
   { "sainnhe/gruvbox-material", lazy = true },
+  { "https://gitlab.com/motaz-shokry/gruvbox.nvim", name = "gruvbox_shokry", lazy = true },
 	{
 		"nvim-lualine/lualine.nvim",
 		dependencies = {

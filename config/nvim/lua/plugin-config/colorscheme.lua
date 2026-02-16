@@ -28,70 +28,99 @@ local lualine_colors = {
 
 
 M.colorscheme_conf = {
-  gruvbox = function()
-    local gruvbox = helpers.safe_require("gruvbox")
-    if not gruvbox then
-      vim.notify("color scheme gruvbox not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
+  -- gruvbox = function()
+  --   local gruvbox = helpers.safe_require("gruvbox")
+  --   if not gruvbox then
+  --     vim.notify("color scheme gruvbox not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
+  --     vim.cmd("colorscheme " .. fallback_colorscheme)
+  --     return
+  --   end
+  --
+  --   gruvbox.setup({
+  --     transparent_mode = true,
+  --     underline = true,
+  --     bold = true,
+  --     strikethrough = true,
+  --     italic = {
+  --       strings = true,
+  --       emphasis = true,
+  --       comments = true,
+  --       operators = false,
+  --       folds = true,
+  --     },
+  --
+  --     overrides = {
+  --       -- Override some highlights for Markdown.
+  --       ["@markup.strong.markdown_inline"] = { fg = "#D19097", bold = true },
+  --       ["@markup.italic.markdown_inline"] = { fg = "#D19097", italic = true },
+  --       ["@markup.raw.block.markdown"] = { fg = "#8ec07c", italic = true },
+  --       ["@markup.raw.markdown_inline"] = { fg = "#8ec07c", italic = true },
+  --       -- Headings.
+  --       ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
+  --       ["@markup.heading.5.markdown"] = { fg = "#a9a1e1", bold = true },
+  --       ["@markup.heading.4.markdown"] = { fg = "#fabd2f", bold = true },
+  --       ["@markup.heading.3.markdown"] = { fg = "#fe8019", bold = true },
+  --       ["@markup.heading.2.markdown"] = { fg = "#b8bb26", bold = true },
+  --       ["@markup.heading.1.markdown"] = { fg = "#fb4934", bold = true },
+  --
+  --       IlluminatedWordRead = { bg = "#45475A" },
+  --       IlluminatedWordText = { bg = "#45475A" },
+  --       IlluminatedWordWrite = { bg = "#45475A" },
+  --
+  --       NvimTreeOpenedHL = { bold = true },
+  --       NvimTreeIndentMarker = { fg = "#6c7087", bold = true },
+  --       NvimTreeOpenedFile = { fg = "#e8dcb7", bold = true },
+  --       NvimTreeFolderName = { fg = "#83a598", bold = true },
+  --       NvimTreeOpenedFolderName = { fg = "#83a598", bold = true },
+  --       NvimTreeEmptyFolderName = { fg = "#83a598", bold = true },
+  --       NvimTreeRootFolder = { fg = "#d19097" },
+  --
+  --       -- Snacks explorer
+  --       Directory = { fg = "#83a598", bold = true },
+  --       -- SnacksPickerGitStatusModified = { fg = "#f6c177" },
+  --
+  --       BlinkCmpMenuSelection = { bg = "#32302f" },
+  --
+  --       DiagnosticSignError = { fg = '#eb6f92' },
+  --       DiagnosticSignWarn = { fg = '#f6c177' },
+  --       DiagnosticSignInfo = { fg = '#31748f' },
+  --       DiagnosticSignHint = { fg = '#83a598' },
+  --
+  --       LualineDiagnosticSignError = { fg = '#eb6f92', bg = lualine_colors.bg },
+  --       LualineDiagnosticSignWarn = { fg = '#f6c177', bg = lualine_colors.bg },
+  --       LualineDiagnosticSignInfo = { fg = '#31748f', bg = lualine_colors.bg },
+  --       LualineDiagnosticSignHint = { fg = '#83a598', bg = lualine_colors.bg },
+  --       NormalFloat = { bg = '#393633' },
+  --     }
+  --   })
+  --
+  --   require("plugin-config.lualine")(lualine_colors)
+  --
+  --   vim.g['colortheme'] = "gruvbox"
+  --   vim.cmd("colorscheme gruvbox")
+  -- end,
+
+  gruvbox_shokry = function()
+    local gruvbox_shokry = helpers.safe_require("gruvbox")
+    if not gruvbox_shokry then
+      vim.notify("color scheme gruvbox shokry not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
       vim.cmd("colorscheme " .. fallback_colorscheme)
       return
     end
 
-    gruvbox.setup({
-      transparent_mode = true,
-      underline = true,
-      bold = true,
-      strikethrough = true,
-      italic = {
-        strings = true,
-        emphasis = true,
-        comments = true,
-        operators = false,
-        folds = true,
+    gruvbox_shokry.setup({
+      enable = {
+        terminal = true,
+        migrations = true,
+        devicons = true,
+        lualine = true,
       },
 
-      overrides = {
-        -- Override some highlights for Markdown.
-        ["@markup.strong.markdown_inline"] = { fg = "#D19097", bold = true },
-        ["@markup.italic.markdown_inline"] = { fg = "#D19097", italic = true },
-        ["@markup.raw.block.markdown"] = { fg = "#8ec07c", italic = true },
-        ["@markup.raw.markdown_inline"] = { fg = "#8ec07c", italic = true },
-        -- Headings.
-        ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
-        ["@markup.heading.5.markdown"] = { fg = "#a9a1e1", bold = true },
-        ["@markup.heading.4.markdown"] = { fg = "#fabd2f", bold = true },
-        ["@markup.heading.3.markdown"] = { fg = "#fe8019", bold = true },
-        ["@markup.heading.2.markdown"] = { fg = "#b8bb26", bold = true },
-        ["@markup.heading.1.markdown"] = { fg = "#fb4934", bold = true },
-
-        IlluminatedWordRead = { bg = "#45475A" },
-        IlluminatedWordText = { bg = "#45475A" },
-        IlluminatedWordWrite = { bg = "#45475A" },
-
-        NvimTreeOpenedHL = { bold = true },
-        NvimTreeIndentMarker = { fg = "#6c7087", bold = true },
-        NvimTreeOpenedFile = { fg = "#e8dcb7", bold = true },
-        NvimTreeFolderName = { fg = "#83a598", bold = true },
-        NvimTreeOpenedFolderName = { fg = "#83a598", bold = true },
-        NvimTreeEmptyFolderName = { fg = "#83a598", bold = true },
-        NvimTreeRootFolder = { fg = "#d19097" },
-
-        -- Snacks explorer
-        Directory = { fg = "#83a598", bold = true },
-        -- SnacksPickerGitStatusModified = { fg = "#f6c177" },
-
-        BlinkCmpMenuSelection = { bg = "#32302f" },
-
-        DiagnosticSignError = { fg = '#eb6f92' },
-        DiagnosticSignWarn = { fg = '#f6c177' },
-        DiagnosticSignInfo = { fg = '#31748f' },
-        DiagnosticSignHint = { fg = '#83a598' },
-
-        LualineDiagnosticSignError = { fg = '#eb6f92', bg = lualine_colors.bg },
-        LualineDiagnosticSignWarn = { fg = '#f6c177', bg = lualine_colors.bg },
-        LualineDiagnosticSignInfo = { fg = '#31748f', bg = lualine_colors.bg },
-        LualineDiagnosticSignHint = { fg = '#83a598', bg = lualine_colors.bg },
-        NormalFloat = { bg = '#393633' },
-      }
+      styles = {
+        bold = true,
+        italic = true,
+        transparency = true,
+      },
     })
 
     require("plugin-config.lualine")(lualine_colors)
