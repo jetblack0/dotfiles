@@ -130,6 +130,13 @@ require("lazy").setup({
       require("plugin-config.git.gitsigns")
     end,
 	},
+	{
+		"f-person/git-blame.nvim",
+    event = "VeryLazy",
+    config = function()
+      require("plugin-config.git.gitblame")
+    end,
+	},
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     dependencies = {
