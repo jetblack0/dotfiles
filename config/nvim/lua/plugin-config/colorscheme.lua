@@ -121,6 +121,22 @@ M.colorscheme_conf = {
         italic = true,
         transparency = true,
       },
+
+      highlight_groups = {
+        BlinkCmpMenu = { bg = "#32302f" },
+
+        LualineDiagnosticSignError = { link = "DiagnosticSignError" },
+        LualineDiagnosticSignWarn = { link = "DiagnosticSignWarn" },
+        LualineDiagnosticSignInfo = { link = "DiagnosticSignInfo" },
+        LualineDiagnosticSignHint = { link = "DiagnosticSignHint" },
+
+        ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
+        ["@markup.heading.5.markdown"] = { fg = "#a9a1e1", bold = true },
+        ["@markup.heading.4.markdown"] = { fg = "#fabd2f", bold = true },
+        ["@markup.heading.3.markdown"] = { fg = "#fe8019", bold = true },
+        ["@markup.heading.2.markdown"] = { fg = "#b8bb26", bold = true },
+        ["@markup.heading.1.markdown"] = { fg = "#fb4934", bold = true },
+      },
     })
 
     require("plugin-config.lualine")(lualine_colors)

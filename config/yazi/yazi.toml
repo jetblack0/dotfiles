@@ -1,11 +1,11 @@
 [mgr]
 ratio			= [ 1, 4, 3 ]
-# sort_by			= "alphabetical"
-# sort_reverse	= true
-# sort_dir_first	= true
+sort_by			= "mtime"
+sort_reverse	= true
+sort_dir_first	= true
 
 [preview]
-image_quality = 50
+image_quality = 70
 
 [opener]
 edit = [
@@ -21,6 +21,7 @@ book = [
 ]
 image = [
 	{ run = 'nsxiv "$@"', orphan = true, for = "linux" },
+	{ run = 'open "$@"', orphan = true, for = "macos" },
 ]
 audio = [
 	{ run = 'mpv --audio-display=no "$@"', for = "unix" },
