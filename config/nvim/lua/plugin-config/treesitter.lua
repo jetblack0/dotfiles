@@ -5,7 +5,7 @@ if not treesitter then return end
 
 local ensure_installed = {
   "html", "css", "javascript", "typescript", "tsx",
-  "json", "jsonc", "yaml",
+  "json", "yaml",
   "markdown", "markdown_inline",
   "c", "rust", "java", "nasm",
   "go", "gotmpl",
