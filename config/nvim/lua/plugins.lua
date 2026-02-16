@@ -249,6 +249,14 @@ require("lazy").setup({
     config = function()
       require("plugin-config.qol.snacks")
     end,
+  },
+  {
+    "TKasperczyk/snacks-gallery.nvim",
+    dependencies = { "folke/snacks.nvim" },
+    opts = {},
+    keys = {
+      { "<leader>gi", function() require("snacks-gallery").open() end, desc = "Gallery" },
+    },
   }
 }, lazy_config)
 
