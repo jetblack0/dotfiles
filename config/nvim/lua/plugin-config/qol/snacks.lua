@@ -6,7 +6,7 @@ if not snacks then return end
 local indent_line_filetypes = {
   "html", "css", "htmldjango",
   "javascript", "javascriptreact", "tsx", "typescript",
-  "yaml*", "json", "jsonc", "yaml.ansible", "yml",
+  "yaml*", "json", "jsonc", "yaml.ansible", "yml", "helm", "yaml.helm",
   "rust", "java", "c", "make", "go",
   "lua", "sh", "python", "ruby",
   "groovy", "terraform", "nginx"
