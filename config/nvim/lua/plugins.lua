@@ -98,10 +98,13 @@ require("lazy").setup({
 		end,
 	},
   {
-    "mbbill/undotree",
+    "XXiaoA/atone.nvim",
 		keys = {
-			{ "<leader>u", ":UndotreeToggle<CR>", "n", silent = true, noremap = true },
+			{ "<leader>u", ":Atone toggle<CR>", "n", silent = true, noremap = true },
 		},
+		config = function()
+			require("plugin-config.atone")
+		end,
   },
 	{
 		"folke/todo-comments.nvim",
