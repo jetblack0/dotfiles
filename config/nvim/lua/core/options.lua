@@ -39,6 +39,7 @@ local options = {
 	writebackup = false,
   -- folding.
   foldmethod = "manual",
+  foldcolumn = "1",
 
 
 	-- UI: highlights 
