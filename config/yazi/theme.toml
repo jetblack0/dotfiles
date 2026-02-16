@@ -586,16 +586,16 @@ prepend_rules = [
 
 [filetype]
 rules = [
-	{ mime = "inode/directory",	fg = "blue",	bold = true },
-	{ name = "*", is = "orphan", fg = "red", bg = "black", bold = true },
-	{ name = "*", is = "block", fg = "yellow", bg = "black", bold = true },
-	{ name = "*", is = "char", fg = "yellow", bg = "black", bold = true },
-	{ name = "*", is = "exec", fg = "green", bold = true },
-	{ name = "*", is = "fifo", fg = "yellow", bg = "black" },
-	{ name = "*", is = "link", fg = "cyan", bold = true },
-	{ name = "*", is = "orphan", fg = "red", bg = "black", bold = true },
-	{ name = "*", is = "sock", fg = "magenta", bold = true },
-	{ name = "*", is = "sticky", fg = "white", bg = "red" },
+	{ url = "*/", fg = "blue", bold = true },
+	{ mime = "*", is = "orphan", fg = "red", bg = "black", bold = true },
+	{ mime = "*", is = "block", fg = "yellow", bg = "black", bold = true },
+	{ mime = "*", is = "char", fg = "yellow", bg = "black", bold = true },
+	{ mime = "*", is = "exec", fg = "green", bold = true },
+	{ mime = "*", is = "fifo", fg = "yellow", bg = "black" },
+	{ mime = "*", is = "link", fg = "cyan", bold = true },
+	{ mime = "*", is = "orphan", fg = "red", bg = "black", bold = true },
+	{ mime = "*", is = "sock", fg = "magenta", bold = true },
+	{ mime = "*", is = "sticky", fg = "white", bg = "red" },
 
 	# Archives
 	{ mime = "application/zip", fg = "lightred", bold = true },
@@ -759,7 +759,7 @@ rules = [
 	{ name = "*PKGBUILD", fg = "lightyellow", bold = true },
 
 	{ name = "*application/javascript*", fg = "lightyellow", bold = true },
-	
+
 	# { name = "*.pdf", fg = "#f38ba8" },
 	# { name = "*.epub", fg = "#f38ba8" },
 ]
