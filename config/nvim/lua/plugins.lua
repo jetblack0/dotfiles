@@ -137,6 +137,14 @@ require("lazy").setup({
       require("plugin-config.git.gitblame")
     end,
 	},
+	{
+		"esmuellert/codediff.nvim",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    cmd = "CodeDiff",
+    config = function()
+      require("plugin-config.git.codediff")
+    end,
+	},
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
     dependencies = {
