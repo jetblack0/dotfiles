@@ -124,11 +124,14 @@ M.colorscheme_conf = {
 
       highlight_groups = {
         BlinkCmpMenu = { bg = "#32302f" },
+        BlinkCmpMenuSelection = { bg = "#504945" },
 
         LualineDiagnosticSignError = { link = "DiagnosticSignError" },
         LualineDiagnosticSignWarn = { link = "DiagnosticSignWarn" },
         LualineDiagnosticSignInfo = { link = "DiagnosticSignInfo" },
         LualineDiagnosticSignHint = { link = "DiagnosticSignHint" },
+
+        Comment = { fg = "#928374" },
 
         ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
         ["@markup.heading.5.markdown"] = { fg = "#a9a1e1", bold = true },
@@ -136,6 +139,8 @@ M.colorscheme_conf = {
         ["@markup.heading.3.markdown"] = { fg = "#fe8019", bold = true },
         ["@markup.heading.2.markdown"] = { fg = "#b8bb26", bold = true },
         ["@markup.heading.1.markdown"] = { fg = "#fb4934", bold = true },
+        ["@markup.strong.markdown_inline"] = { fg = "#D19097", bold = true },
+        ["@markup.italic.markdown_inline"] = { fg = "#D19097", italic = true },
       },
     })
 
