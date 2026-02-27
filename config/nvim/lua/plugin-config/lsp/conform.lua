@@ -9,6 +9,10 @@ conform.setup({
     lua = { "stylua" },
     sh = { "shfmt" },
     ruby = { "rubyfmt" },
+    python = {
+      -- 'ruff_fix',
+      'ruff_format',
+    },
     -- groovy = { "npm-groovy-lint" },
   },
 })
