@@ -8,6 +8,7 @@ local lsputils = helpers.safe_require('utils.lsp')
 ----------------
 -- Diagnostic UI
 ----------------
+WINDOW_BORDER_STYLE = "rounded"
 vim.diagnostic.config({
 	virtual_text = false,
   signs = {
@@ -25,8 +26,14 @@ vim.diagnostic.config({
 		focusable = true,
 		style = "minimal",
 		prefix = "",
+    border = WINDOW_BORDER_STYLE,
 	},
 })
+
+vim.lsp.handlers["textDocument/hover"] =
+  vim.lsp.with(vim.lsp.handlers.hover, { border = WINDOW_BORDER_STYLE })
+vim.lsp.handlers["textDocument/signatureHelp"] =
+  vim.lsp.with(vim.lsp.handlers.signature_help, { border = WINDOW_BORDER_STYLE })
 
 
 ---------------------
@@ -66,9 +73,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- keymap("n", "<Leader>f", vim.cmd.FormatToggle, opt("Toggle AutoFormat"))
     keymap("n", "<leader>a", lsp.buf.code_action, opt("Code Action"))
 
-    keymap("n", "<leader>H", lsp.buf.signature_help, opts)
+    keymap("n", "<leader>H", function() lsp.buf.signature_help({ border = WINDOW_BORDER_STYLE }) end, opts)
     keymap("i", "<a-m>", lsp.buf.signature_help, opts)
-    keymap("n", "<leader>h", function() lsp.buf.hover({ border = "single", max_height = 30, max_width = 120 }) end, opt("Toggle hover"))
+    keymap("n", "<leader>h", function() lsp.buf.hover({ border = WINDOW_BORDER_STYLE, max_height = 30, max_width = 120 }) end, opt("Toggle hover"))
     keymap("n", "<leader>D", lsp.buf.declaration, opt("Go to declaration"))
     keymap("n", "<leader>d", lsp.buf.definition, opt("Go to definition"))
     keymap("n", "<leader>G", lsp.buf.references, opt("Show References"))
