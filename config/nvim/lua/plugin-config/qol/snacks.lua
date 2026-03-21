@@ -67,6 +67,26 @@ snacks.setup({
       },
     },
 
+    layout = {
+      layout = {
+        backdrop = false,
+        row = 1,
+        width = 0.4,
+        min_width = 80,
+        height = 0.9,
+        border = "none",
+        box = "vertical",
+        { win = "preview", title = "{preview}", height = 0.6, border = true },
+        {
+          box = "vertical",
+          border = true,
+          title = "{title} {live} {flags}",
+          title_pos = "center",
+          { win = "input", height = 1, border = "bottom" },
+          { win = "list", border = "none" },
+        },
+      },
+    },
 
     win = {
       input = {
@@ -74,6 +94,7 @@ snacks.setup({
           ["/"] = "toggle_focus",
           ["<a-j>"] = { "list_down", mode = { "i", "n" } },
           ["<a-k>"] = { "list_up", mode = { "i", "n" } },
+          ["<a-n>"] = { "cycle_win", mode = { "i", "n" } },
           ["<c-d>"] = { "list_scroll_down", mode = { "i", "n" } },
           ["<c-u>"] = { "list_scroll_up", mode = { "i", "n" } },
           ["<c-y>"] = { "preview_scroll_up", mode = { "i", "n" } },
@@ -94,8 +115,14 @@ snacks.setup({
           ["<c-y>"] = { "preview_scroll_up", mode = { "i", "n" } },
           ["<c-e>"] = { "preview_scroll_down", mode = { "i", "n" } },
           ["<c-x>"] = { "edit_split", mode = { "i", "n" } },
+          ["<a-n>"] = { "cycle_win", mode = { "i", "n" } },
         }
       },
+      preview = {
+        keys = {
+          ["<a-n>"] = "cycle_win",
+        }
+      }
     },
 
     sources = {
@@ -104,10 +131,19 @@ snacks.setup({
         git_status = true,
         git_status_open = false,
         git_untracked = true,
+        layout = {
+          preset = "sidebar",
+          preview = false,
+          layout = {
+            position = "left",
+            width = 0.2,
+          },
+        },
         win = {
           list = {
             keys = {
               ["<a-h>"] = false,
+              ["<Esc>"] = false,
               ["H"] = "explorer_up",
               ["o"] = "confirm",
               ["W"] = "explorer_close_all",
