@@ -122,6 +122,16 @@ require("lazy").setup({
 			require("plugin-config.nvim-colorizer")
 		end,
 	},
+	{
+		"mrjones2014/smart-splits.nvim",
+    priority = 1000,
+    enabled = function()
+      return os.getenv("TMUX_PANE") ~= nil
+    end,
+		config = function()
+			require("plugin-config.smart-split")
+		end,
+	},
 
   -- Programming (LSP)
   --------------------
