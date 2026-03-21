@@ -107,6 +107,7 @@ snacks.setup({
         win = {
           list = {
             keys = {
+              ["<a-h>"] = false,
               ["H"] = "explorer_up",
               ["o"] = "confirm",
               ["W"] = "explorer_close_all",
