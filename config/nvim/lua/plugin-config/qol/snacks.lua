@@ -153,7 +153,7 @@ snacks.setup({
               ["O"] = "explorer_open",
               ["<leader>w"] = "picker_grep",
               ["<leader>gn"] = "explorer_git_next",
-              ["<leader>gp"] = "explorer_git_prev",
+              ["<leader>gN"] = "explorer_git_prev",
               ['<c-t>'] = { 'tab', mode = { 'i', 'n' } },
               ['<c-b>'] = { function ()
                 Snacks.explorer()
@@ -279,12 +279,16 @@ end, { desc = "Snacks live grep" })
 
 vim.keymap.set("n", "<leader>gl", function()
 	Snacks.picker.git_log()
-end, { desc = "Snacks git log" })
+end, { desc = "Snacks show git log" })
 
 vim.keymap.set("n", "<leader>gL", function()
 	Snacks.picker.git_log_file()
-end, { desc = "Snacks git logfile" })
+end, { desc = "Snacks show git log for this file" })
 
 vim.keymap.set("n", "<leader>gg", function()
 	Snacks.picker.git_status()
-end, { desc = "Snacks git status" })
+end, { desc = "Snacks show git status" })
+
+vim.keymap.set("n", "<leader>gb", function()
+	Snacks.picker.git_branches()
+end, { desc = "Snacks show git branches" })

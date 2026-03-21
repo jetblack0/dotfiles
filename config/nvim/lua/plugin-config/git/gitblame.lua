@@ -10,5 +10,5 @@ gitblame.setup({
     virtual_text_column = 1,
 })
 
-vim.api.nvim_set_keymap("n", "<leader>gb", ":GitBlameToggle<CR>", { noremap = true, silent = false })
+vim.api.nvim_set_keymap("n", "<leader>gB", ":GitBlameToggle<CR>", { noremap = true, silent = false })
 vim.g["gitblame_highlight_group"] = "@comment"
