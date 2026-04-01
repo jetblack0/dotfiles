@@ -42,11 +42,16 @@ vim.lsp.handlers["textDocument/signatureHelp"] =
 local capabilities = blink.get_lsp_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
+local opts = { silent = false }
+local function opt(desc, others)
+  return vim.tbl_extend("force", opts, { desc = desc }, others or {})
+end
+
 local on_attach = function(client, bufnr)
 	client.server_capabilities.documentFormattingProvider = true
 
   if client.name == 'yamlls' then
-    vim.keymap.set('n', '<leader>t', function() require("utils.yaml-schemas").list_schemas() end, { silent = false })
+    vim.keymap.set('n', '<leader>t', function() require("utils.yaml-schemas").list_schemas() end, opt("List available YAML/JSON schemas"))
   end
 end
 
@@ -62,10 +67,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     local keymap = vim.keymap.set
     local lsp = vim.lsp
-    local opts = { silent = false }
-    local function opt(desc, others)
-      return vim.tbl_extend("force", opts, { desc = desc }, others or {})
-    end
 
     keymap("n", "<leader>j", function() vim.diagnostic.jump({ count = 1, float = true }) end, opt("Next Diagnostic"))
     keymap("n", "<leader>k", function() vim.diagnostic.jump({ count =-1, float = true }) end, opt("Prev Diagnostic"))

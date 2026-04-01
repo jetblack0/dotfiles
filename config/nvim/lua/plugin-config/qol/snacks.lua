@@ -96,6 +96,7 @@ snacks.setup({
           ["<a-k>"] = { "list_up", mode = { "i", "n" } },
           ["<a-n>"] = { "cycle_win", mode = { "i", "n" } },
           ["<c-d>"] = { "list_scroll_down", mode = { "i", "n" } },
+          ["<a-m>"] = { "toggle_maximize", mode = { "i", "n" } },
           ["<c-u>"] = { "list_scroll_up", mode = { "i", "n" } },
           ["<c-y>"] = { "preview_scroll_up", mode = { "i", "n" } },
           ["<c-e>"] = { "preview_scroll_down", mode = { "i", "n" } },
@@ -116,17 +117,20 @@ snacks.setup({
           ["<c-e>"] = { "preview_scroll_down", mode = { "i", "n" } },
           ["<c-x>"] = { "edit_split", mode = { "i", "n" } },
           ["<a-n>"] = { "cycle_win", mode = { "i", "n" } },
+          ["<a-m>"] = { "toggle_maximize", mode = { "i", "n" } },
         }
       },
       preview = {
         keys = {
           ["<a-n>"] = "cycle_win",
+          ["<a-m>"] = { "toggle_maximize", mode = { "i", "n" } },
         }
       }
     },
 
     sources = {
       explorer = {
+        ignored = true,
         diagnostics = false,
         git_status = true,
         git_status_open = false,
@@ -144,6 +148,8 @@ snacks.setup({
             keys = {
               ["<a-h>"] = false,
               ["<Esc>"] = false,
+              ["<c-j>"] = false,
+              ["<c-k>"] = false,
               ["H"] = "explorer_up",
               ["o"] = "confirm",
               ["W"] = "explorer_close_all",
