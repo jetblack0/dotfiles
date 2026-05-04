@@ -133,7 +133,7 @@ M.colorscheme_conf = {
 
         SnacksIndentScope = { fg = "#9ccfd8", bold = true },
 
-        Comment = { fg = "#D19097" },
+        Comment = { fg = "#928374" },
 
         ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
         ["@markup.heading.5.markdown"] = { fg = "#a9a1e1", bold = true },

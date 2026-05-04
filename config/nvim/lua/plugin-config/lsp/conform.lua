@@ -18,5 +18,8 @@ conform.setup({
 })
 
 -- Keybindings.
-local opts = { noremap = true, silent = false }
-vim.keymap.set("", "<leader>F", function() conform.format({ async = true, lsp_fallback = true }) end, opts)
+vim.keymap.set("", "<leader>F", function() conform.format({ async = true, lsp_fallback = true }) end, {
+  desc = "Conform format",
+  noremap = true,
+  silent = false
+})

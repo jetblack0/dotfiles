@@ -69,14 +69,14 @@ vim.api.nvim_create_autocmd("LspAttach", {
     -- keymap("n", "<Leader>f", vim.cmd.FormatToggle, opt("Toggle AutoFormat"))
     keymap("n", "<leader>a", lsp.buf.code_action, opt("Code Action"))
 
-    keymap("n", "<leader>H", function() lsp.buf.signature_help({ border = WINDOW_BORDER_STYLE }) end, opts)
-    keymap("i", "<a-h>", function() lsp.buf.signature_help({ border = WINDOW_BORDER_STYLE }) end, opts)
-    keymap("n", "<leader>h", function() lsp.buf.hover({ border = WINDOW_BORDER_STYLE, max_height = 30, max_width = 120 }) end, opt("Toggle hover"))
-    keymap("n", "<leader>D", lsp.buf.declaration, opt("Go to declaration"))
-    keymap("n", "<leader>d", lsp.buf.definition, opt("Go to definition"))
-    keymap("n", "<leader>G", lsp.buf.references, opt("Show References"))
-    keymap("n", "<leader>i", function() lsp.buf.implementation({ border = "single" })  end, opt("Go to implementation"))
-    keymap("n", "<Leader>L", lsp.codelens.run, opt("Run CodeLens"))
+    keymap("n", "<leader>H", function() lsp.buf.signature_help({ border = WINDOW_BORDER_STYLE }) end, opt("LSP signature help (normal)"))
+    keymap("i", "<a-h>", function() lsp.buf.signature_help({ border = WINDOW_BORDER_STYLE }) end, opt("LSP signature help (input)"))
+    keymap("n", "<leader>h", function() lsp.buf.hover({ border = WINDOW_BORDER_STYLE, max_height = 30, max_width = 120 }) end, opt("LSP toggle hover"))
+    keymap("n", "<leader>D", lsp.buf.declaration, opt("LSP go to declaration"))
+    keymap("n", "<leader>d", lsp.buf.definition, opt("LSP go to definition"))
+    keymap("n", "<leader>G", lsp.buf.references, opt("LSP show References"))
+    keymap("n", "<leader>i", function() lsp.buf.implementation({ border = "single" })  end, opt("LSP show to implementation"))
+    keymap("n", "<Leader>L", lsp.codelens.run, opt("LSP run CodeLens"))
 
     pcall(vim.keymap.del, "n", "K", { buffer = ev.buf })
   end,

@@ -32,4 +32,8 @@ mason_lspconfig.setup({
 	automatic_installation = true,
 })
 
-vim.api.nvim_set_keymap("n", "<leader>3", ":Mason<CR>", { noremap = true, silent = false })
+vim.api.nvim_set_keymap("n", "<leader>3", ":Mason<CR>", {
+  desc = 'Open up Mason',
+  noremap = true,
+  silent = false
+})
