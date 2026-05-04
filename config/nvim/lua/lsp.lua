@@ -30,11 +30,6 @@ vim.diagnostic.config({
 	},
 })
 
-vim.lsp.handlers["textDocument/hover"] =
-  vim.lsp.with(vim.lsp.handlers.hover, { border = WINDOW_BORDER_STYLE })
-vim.lsp.handlers["textDocument/signatureHelp"] =
-  vim.lsp.with(vim.lsp.handlers.signature_help, { border = WINDOW_BORDER_STYLE })
-
 
 ---------------------
 -- LSP configurations
@@ -75,7 +70,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     keymap("n", "<leader>a", lsp.buf.code_action, opt("Code Action"))
 
     keymap("n", "<leader>H", function() lsp.buf.signature_help({ border = WINDOW_BORDER_STYLE }) end, opts)
-    keymap("i", "<a-m>", lsp.buf.signature_help, opts)
+    keymap("i", "<a-h>", function() lsp.buf.signature_help({ border = WINDOW_BORDER_STYLE }) end, opts)
     keymap("n", "<leader>h", function() lsp.buf.hover({ border = WINDOW_BORDER_STYLE, max_height = 30, max_width = 120 }) end, opt("Toggle hover"))
     keymap("n", "<leader>D", lsp.buf.declaration, opt("Go to declaration"))
     keymap("n", "<leader>d", lsp.buf.definition, opt("Go to definition"))
