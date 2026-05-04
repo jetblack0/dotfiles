@@ -100,7 +100,7 @@ require("lazy").setup({
   {
     "XXiaoA/atone.nvim",
 		keys = {
-			{ "<leader>u", ":Atone toggle<CR>", "n", silent = true, noremap = true },
+			{ "<leader>u", ":Atone toggle<CR>", "n", desc = "Toggle atone undo tree", silent = true, noremap = true },
 		},
 		config = function()
 			require("plugin-config.atone")
@@ -130,6 +130,13 @@ require("lazy").setup({
     end,
 		config = function()
 			require("plugin-config.smart-split")
+		end,
+	},
+	{
+		"folke/which-key.nvim",
+    event = 'VimEnter',
+		config = function()
+			require("plugin-config.which-key")
 		end,
 	},
 
@@ -238,7 +245,7 @@ require("lazy").setup({
 	  cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
 	  build = "cd app && npm install",
 		keys = {
-			{ "<leader>m", ":MarkdownPreviewToggle<CR>", "n", silent = true, noremap = true },
+			{ "<leader>m", ":MarkdownPreviewToggle<CR>", "n", desc = "Toogle markdown preview", silent = true, noremap = true },
 		},
 	  ft = { "markdown" },
 	  init = function()
@@ -288,6 +295,12 @@ require("lazy").setup({
   }
 }, lazy_config)
 
-vim.api.nvim_set_keymap("n", "<leader>2", ":Lazy<CR>", { noremap = true, silent = false })
+vim.api.nvim_set_keymap("n", "<leader>2", ":Lazy<CR>", {
+  desc = 'Open up Lazy',
+  noremap = true,
+  silent = false
+})
 require("plugin-config.colorscheme").colorscheme_conf[vim.g['colortheme']]()
-vim.keymap.set('n', '<leader>1', function() require("plugin-config.colorscheme").colorscheme_selector() end, { silent = false })
+vim.keymap.set('n', '<leader>1', function()
+  require("plugin-config.colorscheme").colorscheme_selector() 
+end, { desc = 'Open up theme selector', silent = false })
