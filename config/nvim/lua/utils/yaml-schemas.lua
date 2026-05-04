@@ -60,6 +60,17 @@ M.defined_schemas = {
     uri = "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj.io/application_v1alpha1.json",
     file_pattern = "*application*.yml"
   },
+  -- docker
+  {
+    name = "Docker compose",
+    uri = "https://raw.githubusercontent.com/compose-spec/compose-go/master/schema/compose-spec.json",
+    file_pattern = "{compose,composes}.{yml,yaml}"
+  },
+  {
+    name = "Docker bake",
+    uri = "https://www.schemastore.org/docker-bake.json",
+    file_pattern = "docker-bake.*"
+  },
   -- Kubernetes
   {
     name = "Helm Chart.yaml",

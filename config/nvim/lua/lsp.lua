@@ -314,12 +314,12 @@ vim.lsp.config.terraformls = {
 }
 
 -- Docker and docker compose
-vim.lsp.config.docker_compose_language_service = {
-  filetypes = { "yaml.docker-compose", "docker-compose" },
-  cmd = { "docker-compose-langserver", "--stdio" },
-  root_markers = { "docker-compose.yaml", "docker-compose.yml", "compose.yaml", "compose.yml" },
-  on_attach = on_attach
-}
+-- vim.lsp.config.docker_compose_language_service = {
+--   filetypes = { "yaml.docker-compose", "docker-compose" },
+--   cmd = { "docker-compose-langserver", "--stdio" },
+--   root_markers = { "docker-compose.yaml", "docker-compose.yml", "compose.yaml", "compose.yml" },
+--   on_attach = on_attach
+-- }
 
 vim.lsp.config.dockerls = {
   cmd = { "docker-langserver", "--stdio" },
