@@ -131,7 +131,9 @@ M.colorscheme_conf = {
         LualineDiagnosticSignInfo = { link = "DiagnosticSignInfo" },
         LualineDiagnosticSignHint = { link = "DiagnosticSignHint" },
 
-        Comment = { fg = "#928374" },
+        SnacksIndentScope = { fg = "#9ccfd8", bold = true },
+
+        Comment = { fg = "#D19097" },
 
         ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
         ["@markup.heading.5.markdown"] = { fg = "#a9a1e1", bold = true },

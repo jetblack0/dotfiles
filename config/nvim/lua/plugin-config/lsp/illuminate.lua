@@ -15,5 +15,5 @@ illuminate.configure({
       "packer",
       "Netrw",
     },
-    under_cursor = false,
+    under_cursor = true,
 })

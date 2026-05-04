@@ -20,6 +20,7 @@ snacks.setup({
     enabled = false,
     indent = {
       char = "╎",
+      hl = "SnacksIndent",
     },
     scope = {
       enabled = true,
@@ -30,7 +31,7 @@ snacks.setup({
       hl = "SnacksIndentScope",
     },
     animate = {
-      enabled = false
+      enabled = true
     }
   },
   input = {
@@ -88,6 +89,11 @@ snacks.setup({
       },
     },
 
+    previewers = {
+      diff = {
+      }
+    },
+
     win = {
       input = {
         keys = {
@@ -130,8 +136,8 @@ snacks.setup({
 
     sources = {
       explorer = {
-        ignored = true,
-        diagnostics = false,
+        ignored = false,
+        diagnostics = true,
         git_status = true,
         git_status_open = false,
         git_untracked = true,
