@@ -52,15 +52,15 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 -- Terraform
 vim.cmd([[silent! autocmd! filetypedetect BufRead,BufNewFile *.tf]])
 vim.cmd([[au BufRead,BufNewFile *.hcl setlocal filetype=hcl]])
-vim.cmd([[au BufRead,BufNewFile .terraformrc,terraform.rc setlocal filetype=hcl]])
+vim.cmd([[au BufRead,BufNewFile .terraformrc,terraform.rc,*.alloy setlocal filetype=hcl]])
 vim.cmd([[au BufRead,BufNewFile *.tf,*.tfvars setlocal filetype=terraform]])
 vim.cmd([[au BufRead,BufNewFile *.tfstate,*.tfstate.backup setlocal filetype=json]])
 
 -- Jenkins
-vim.cmd([[au BufRead,BufNewFile *Jenkinsfile*,*jenkinsfile* setlocal filetype=groovy]])
+vim.cmd([[au BufRead,BufNewFile *Jenkinsfile*,*jenkinsfile*,*.groovy setlocal filetype=groovy]])
 
 -- Docker and Docker compose
-vim.cmd([[au BufRead,BufNewFile compose.yaml,compose.yml,docker-compose.yaml,docker-compose.yml setlocal filetype=yaml.docker-compose]])
+-- vim.cmd([[au BufRead,BufNewFile compose.yaml,compose.yml,docker-compose.yaml,docker-compose.yml setlocal filetype=yaml.docker-compose]])
 vim.cmd([[au BufRead,BufNewFile Dockerfile setlocal filetype=dockerfile]])
 
 -- go template
@@ -77,7 +77,7 @@ vim.filetype.add({
 
 
 -- Change indentation width based on their file types.
-vim.cmd[[autocmd FileType sh,html,htmldjango,text,yuck,json,javascript,javascriptreact,lua,xml,ruby,jinja,yaml.ansible,helm,yaml.helm setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType sh,html,htmldjango,text,yuck,json,typescript,javascript,javascriptreact,lua,xml,ruby,jinja,yaml.ansible,helm,yaml.helm,groovy setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType markdown,java setlocal expandtab shiftwidth=4 tabstop=4]]
 
 
