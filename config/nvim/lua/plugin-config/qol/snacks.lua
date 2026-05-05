@@ -310,3 +310,7 @@ end, { desc = "Snacks show git status" })
 vim.keymap.set("n", "<leader>gb", function()
 	Snacks.picker.git_branches()
 end, { desc = "Snacks show git branches" })
+
+vim.keymap.set({ "n", "t" }, "<c-w>f", function ()
+  Snacks.zen.zoom()
+end, { desc = "Snacks toggle maximizing a window" })

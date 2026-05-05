@@ -66,10 +66,6 @@ keymap("n", "<a-l>", ":vertical resize +3<CR>", default_map_opts)
 keymap("n", "<a-j>", ":resize -3<CR>", default_map_opts)
 keymap("n", "<a-k>", ":resize +3<CR>", default_map_opts)
 
--- Split full screen.
-keymap("n", "<a-.>", "<c-w>_<c-w>|", default_map_opts)
-keymap("n", "<a-/>", "<c-w>=", default_map_opts)
-
 
 -- Folding
 ----------
