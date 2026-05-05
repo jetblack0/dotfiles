@@ -219,8 +219,8 @@ snacks.setup({
     },
   },
 
+  statuscolumn = { enabled = true },
   scroll = { enabled = false },
-  statuscolumn = { enabled = false },
   words = { enabled = false },
   dashboard = { enabled = false },
   scope = { enabled = false },
@@ -248,7 +248,7 @@ vim.keymap.set("n", "<leader>o", function()
 end, { desc = "Toggle my snack indent scope" })
 
 -- buffer
-vim.keymap.set("n", "<c-w>d", function()
+vim.keymap.set("n", "<c-w>D", function()
   Snacks.bufdelete()
   vim.notify("Deleted current buffer", vim.log.levels.WARN)
 end, { desc = "Delete current buffer" })
@@ -270,7 +270,7 @@ vim.keymap.set("n", "<leader>p", function()
 end, { desc = "Show hovered image" })
 
 -- explorer
-vim.keymap.set("n", "<c-b>", function()
+vim.keymap.set({ "n", "t" }, "<c-b>", function()
   Snacks.explorer()
 end, { desc = "File Explorer" })
 
@@ -311,6 +311,6 @@ vim.keymap.set("n", "<leader>gb", function()
 	Snacks.picker.git_branches()
 end, { desc = "Snacks show git branches" })
 
-vim.keymap.set({ "n", "t" }, "<c-w>f", function ()
+vim.keymap.set({ "n", "t" }, "<c-f>", function ()
   Snacks.zen.zoom()
 end, { desc = "Snacks toggle maximizing a window" })

@@ -11,10 +11,10 @@ smart_splits.setup({
 -- vim.keymap.set('n', '<A-k>', smart_splits.resize_up)
 -- vim.keymap.set('n', '<A-l>', smart_splits.resize_right)
 -- moving between splits
-vim.keymap.set('n', '<C-h>', smart_splits.move_cursor_left)
-vim.keymap.set('n', '<C-j>', smart_splits.move_cursor_down)
-vim.keymap.set('n', '<C-k>', smart_splits.move_cursor_up)
-vim.keymap.set('n', '<C-l>', smart_splits.move_cursor_right)
+vim.keymap.set({ 'n', 't' }, '<C-h>', smart_splits.move_cursor_left)
+vim.keymap.set({ 'n', 't' }, '<C-j>', smart_splits.move_cursor_down)
+vim.keymap.set({ 'n', 't' }, '<C-k>', smart_splits.move_cursor_up)
+vim.keymap.set({ 'n', 't' }, '<C-l>', smart_splits.move_cursor_right)
 -- swapping buffers between windows
 vim.keymap.set('n', '<leader><a-h>', smart_splits.swap_buf_left)
 vim.keymap.set('n', '<leader><a-j>', smart_splits.swap_buf_down)

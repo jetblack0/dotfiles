@@ -1,11 +1,14 @@
 -- Keybindings for neovim. Note that some plugin specific 
 -- keybindings are configured in the plugin-config
 -- directory.
--- Principle: Use Control and Alt for nvim built-in functions.
+-- Use Control and Alt for nvim built-in functions.
 -- Reserve the leader key for plugins.
 
-local default_map_opts = { noremap = true, silent = false }
-local keymap = vim.api.nvim_set_keymap
+local default_map_opts = { noremap = true, silent = true }
+local function opt(desc, others)
+  return vim.tbl_extend("force", default_map_opts, { desc = desc }, others or {})
+end
+local keymap = vim.keymap.set
 
 -- Use space key as the leader key. 
 keymap("", "<Space>", "<Nop>", default_map_opts)
@@ -32,39 +35,54 @@ keymap("n", "gH", ":cd %:p:h<CR>", default_map_opts)
 -- Window and tabs
 ------------------
 -- Create and navigate between tabs.
-keymap('n', '<C-w><c-n>', ':tabnext<CR>', default_map_opts)
-keymap('n', '<C-w>n', ':tabnext<CR>', default_map_opts)
-keymap('n', '<C-n>', ':tabnext<CR>', default_map_opts)
-keymap('n', 'L', ':tabnext<CR>', default_map_opts)
-keymap('n', '<C-w><c-N>', ':tabprevious<CR>', default_map_opts)
-keymap('n', '<C-w>N', ':tabprevious<CR>', default_map_opts)
-keymap('n', '<C-p>', ':tabprevious<CR>', default_map_opts)
-keymap('n', 'H', ':tabprevious<CR>', default_map_opts)
-keymap("n", "<c-w>t", ":tabnew<CR>", default_map_opts)
-keymap("n", "<c-w><c-t>", ":tabnew<CR>", default_map_opts)
+keymap({"n", "t"}, '<C-w><c-n>', function() vim.cmd.tabnext() end, default_map_opts)
+keymap({"n", "t"}, '<C-w>n', function() vim.cmd.tabnext() end, default_map_opts)
+keymap({"n", "t"}, '<C-n>', function() vim.cmd.tabnext() end, default_map_opts)
+keymap({"n", "t"}, 'L', function() vim.cmd.tabnext() end, default_map_opts)
+keymap({"n", "t"}, '<C-w><c-N>', function() vim.cmd.tabprevious() end, default_map_opts)
+keymap({"n", "t"}, '<C-w>N', function() vim.cmd.tabprevious() end, default_map_opts)
+keymap({"n", "t"}, '<C-p>', function() vim.cmd.tabprevious() end, default_map_opts)
+keymap({"n", "t"}, 'H', function() vim.cmd.tabprevious() end, default_map_opts)
+keymap({"n", "t"}, "<c-w>t", function() vim.cmd.tabnew() end, default_map_opts)
+keymap({"n", "t"}, "<c-w><c-t>", function() vim.cmd.tabnew() end, default_map_opts)
 for i = 1, 9 do
-  keymap("n", "<C-w>" .. i, i .. "gt", default_map_opts)
+  keymap("n", "<C-w>" .. i, i .. "gt", opt("Go to the " .. i .. "th window"))
 end
 
 
 -- Splits
 ---------
 -- Focus splits.
-keymap("n", "<c-w>l", ":wincmd l<CR>", default_map_opts)
-keymap("n", "<c-w>h", ":wincmd h<CR>", default_map_opts)
-keymap("n", "<c-w>j", ":wincmd j<CR>", default_map_opts)
-keymap("n", "<c-w>k", ":wincmd k<CR>", default_map_opts)
+keymap({"n", "t"}, "<c-w>l", function() vim.cmd.wincmd("l") end, default_map_opts)
+keymap({"n", "t"}, "<c-w>h", function() vim.cmd.wincmd("h") end, default_map_opts)
+keymap({"n", "t"}, "<c-w>j", function() vim.cmd.wincmd("j") end, default_map_opts)
+keymap({"n", "t"}, "<c-w>k", function() vim.cmd.wincmd("k") end, default_map_opts)
 
 -- Resize splits.
-keymap("n", "<c-w><c-l>", ":wincmd l<CR>", default_map_opts)
-keymap("n", "<c-w><c-h>", ":wincmd h<CR>", default_map_opts)
-keymap("n", "<c-w><c-j>", ":wincmd j<CR>", default_map_opts)
-keymap("n", "<c-w><c-k>", ":wincmd k<CR>", default_map_opts)
+keymap({"n", "t"}, "<c-w><c-l>", function() vim.cmd.wincmd("l") end, default_map_opts)
+keymap({"n", "t"}, "<c-w><c-h>", function() vim.cmd.wincmd("h") end, default_map_opts)
+keymap({"n", "t"}, "<c-w><c-j>", function() vim.cmd.wincmd("j") end, default_map_opts)
+keymap({"n", "t"}, "<c-w><c-k>", function() vim.cmd.wincmd("k") end, default_map_opts)
 
-keymap("n", "<a-h>", ":vertical resize -3<CR>", default_map_opts)
-keymap("n", "<a-l>", ":vertical resize +3<CR>", default_map_opts)
-keymap("n", "<a-j>", ":resize -3<CR>", default_map_opts)
-keymap("n", "<a-k>", ":resize +3<CR>", default_map_opts)
+keymap({"n", "t"}, "<a-h>", function()
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_width(win, vim.api.nvim_win_get_width(win) - 3)
+end, default_map_opts)
+
+keymap({"n", "t"}, "<a-l>", function()
+  local win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_width(win, vim.api.nvim_win_get_width(win) + 3)
+end, default_map_opts)
+
+keymap({"n", "t"}, "<a-j>", function()
+ local win = vim.api.nvim_get_current_win()
+ vim.api.nvim_win_set_height(win, vim.api.nvim_win_get_height(win) - 3)
+end, default_map_opts)
+
+keymap({"n", "t"}, "<a-k>", function()
+  local win = vim.api.nvim_get_current_win()
+vim.api.nvim_win_set_height(win, vim.api.nvim_win_get_height(win) + 3)
+end, default_map_opts)
 
 
 -- Folding
@@ -107,3 +125,6 @@ keymap("x", "<a-k>", ":move '<-2<CR>gv-gv", default_map_opts)
 
 
 keymap("n", "K", "<Nop>", { noremap = true, silent = true })
+keymap("n", "<c-w>q", "<Nop>", { noremap = true, silent = true })
+vim.keymap.del('n', '<c-w>d')
+vim.keymap.del('n', '<c-w><c-d>')
