@@ -132,6 +132,7 @@ M.colorscheme_conf = {
         LualineDiagnosticSignHint = { link = "DiagnosticSignHint" },
 
         SnacksIndentScope = { fg = "#9ccfd8", bold = true },
+        StatusLineTerm = { bg = lualine_colors.bg },
 
         Comment = { fg = "#928374" },
 

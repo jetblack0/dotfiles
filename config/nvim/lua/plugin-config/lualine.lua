@@ -144,6 +144,10 @@ return function(colors)
   })
 
   ins_right({
+    require("opencode").statusline,
+  })
+
+  ins_right({
     -- Lsp server name.
     cond = is_lsp_available,
     icon = '󰅩',

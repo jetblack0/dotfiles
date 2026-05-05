@@ -70,7 +70,7 @@ require("lazy").setup({
 	},
 
 
-  -- Enhancement
+  -- Base
   --------------
   {
     "mikavilpas/yazi.nvim",
@@ -235,6 +235,15 @@ require("lazy").setup({
 			require("plugin-config.lsp.dropbar")
     end
   },
+  -- AI
+  {
+    "nickjvandyke/opencode.nvim",
+    version = "*",
+    config = function()
+			require("plugin-config.ai.opencode")
+    end
+  },
+
 
 
   -- Language Specific

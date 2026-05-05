@@ -25,7 +25,7 @@ local options = {
 	-- System: Others
 	-----------------
 	-- Disable mouse
-	mouse = "",
+	-- mouse = "",
 	-- ttymouse = "",
 	-- Use system clipboard
 	clipboard = "unnamedplus",

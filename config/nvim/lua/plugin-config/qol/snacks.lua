@@ -1,6 +1,7 @@
 local helpers = require("utils.helpers")
 local snacks = helpers.safe_require("snacks")
-if not snacks then return end
+local opencode = helpers.safe_require("opencode")
+if not snacks and opencode then return end
 
 -- Define which file types should the plguin be loaded.
 local indent_line_filetypes = {
@@ -46,6 +47,10 @@ snacks.setup({
 
   picker = {
     enabled = true,
+
+    actions = {
+      opencode_send = function(...) return opencode.snacks_picker_send(...) end,
+    },
 
     icons = {
       git = {
@@ -97,6 +102,7 @@ snacks.setup({
     win = {
       input = {
         keys = {
+          ["<a-a>"] = { "opencode_send", mode = { "n", "i" } },
           ["/"] = "toggle_focus",
           ["<a-j>"] = { "list_down", mode = { "i", "n" } },
           ["<a-k>"] = { "list_up", mode = { "i", "n" } },
