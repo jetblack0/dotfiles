@@ -67,6 +67,8 @@ local options = {
 	splitright = true,
 	-- Status line.
   laststatus = 3,
+  -- Hide the brief blank statusline frame on WinEnter (smart-splits #179).
+  -- fillchars = { stl = " ", stlnc = " " },
 }
 
 -- Global variables.

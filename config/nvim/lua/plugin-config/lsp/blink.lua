@@ -58,8 +58,9 @@ blink.setup {
       },
     },
     keymap = {
-      ['<Tab>'] = { 'show', "select_and_accept" },
-      ['<S-Tab>'] = { 'show', "select_and_accept" },
+      -- ['<Tab>'] = { 'show', "select_and_accept" },
+      ['<Tab>'] = { 'show_and_insert_or_accept_single', 'select_next' },
+      ['<S-Tab>'] = { 'show_and_insert_or_accept_single', 'select_prev' },
       ["<a-k>"] = { "select_prev", "fallback" },
       ["<a-j>"] = { "select_next", "fallback" },
       ["<a-e>"] = { "cancel", "fallback" },

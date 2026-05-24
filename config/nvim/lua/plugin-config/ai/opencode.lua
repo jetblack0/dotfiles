@@ -32,7 +32,7 @@ vim.g.opencode_opts = {
 vim.o.autoread = true
 
 vim.keymap.set({ "n", "x" }, "<C-s>a", function()
-	opencode.ask("@this: ", { submit = true })
+	opencode.ask("@this: ", { submit = false })
 end, { desc = "Ask opencode" })
 
 vim.keymap.set({ "n", "x" }, "<C-s>e", function()
