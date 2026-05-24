@@ -134,6 +134,10 @@ M.colorscheme_conf = {
         SnacksIndentScope = { fg = "#9ccfd8", bold = true },
         StatusLineTerm = { bg = lualine_colors.bg },
 
+        IlluminatedWordRead = { bg = "#45475A", underline = false },
+        IlluminatedWordText = { bg = "#45475A", underline = false },
+        IlluminatedWordWrite = { bg = "#45475A", underline = false },
+
         Comment = { fg = "#928374" },
 
         ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
