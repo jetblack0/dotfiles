@@ -78,6 +78,11 @@ M.defined_schemas = {
     file_pattern = "Chart.yaml",
   },
   {
+    name = "eksctl schema",
+    uri = "https://raw.githubusercontent.com/weaveworks/eksctl/main/pkg/apis/eksctl.io/v1alpha5/assets/schema.json",
+    file_pattern = "eksconfig.yaml",
+  },
+  {
     name = "Kubernetes (v1.30) - All-in-one",
     uri = "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/v1.30.0-standalone/all.json",
   },
