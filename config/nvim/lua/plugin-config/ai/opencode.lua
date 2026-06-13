@@ -1,6 +1,5 @@
 local helpers = require("utils.helpers")
 local opencode = helpers.safe_require("opencode")
-local opencode_terminal = helpers.safe_require("opencode.terminal")
 local snacks_terminal = helpers.safe_require("snacks.terminal")
 if not opencode and snacks_terminal and opencode_terminal then return end
 
@@ -9,9 +8,6 @@ local snacks_terminal_opts = {
   win = {
     position = 'right',
     enter = false,
-    on_win = function(win)
-      opencode_terminal.setup(win.win)
-    end,
   },
 }
 
@@ -19,12 +15,6 @@ vim.g.opencode_opts = {
   server = {
     start = function()
       snacks_terminal.open(opencode_cmd, snacks_terminal_opts)
-    end,
-    stop = function()
-      snacks_terminal.get(opencode_cmd, snacks_terminal_opts):close()
-    end,
-    toggle = function()
-      snacks_terminal.toggle(opencode_cmd, snacks_terminal_opts)
     end,
   },
 }
@@ -40,7 +30,7 @@ vim.keymap.set({ "n", "x" }, "<C-s>e", function()
 end, { desc = "Execute opencode action" })
 
 vim.keymap.set({ "n", "t" }, "<C-s>b", function()
-	opencode.toggle()
+	snacks_terminal.toggle(opencode_cmd, snacks_terminal_opts)
 end, { desc = "Toggle opencode" })
 
 vim.keymap.set({ "n", "x" }, "go", function()
