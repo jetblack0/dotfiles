@@ -8,10 +8,10 @@ smart_splits.setup({
   multiplexer_integration = os.getenv("SMART_SPLITS_DISABLE") == "1" and false or nil,
 })
 
-vim.keymap.set({ 'n', 't' }, '<a-1>', smart_splits.resize_left)
-vim.keymap.set({ 'n', 't' }, '<a-2>', smart_splits.resize_down)
-vim.keymap.set({ 'n', 't' }, '<a-3>', smart_splits.resize_up)
-vim.keymap.set({ 'n', 't' }, '<a-4>', smart_splits.resize_right)
+-- vim.keymap.set({ 'n', 't' }, '<a-1>', smart_splits.resize_left)
+-- vim.keymap.set({ 'n', 't' }, '<a-2>', smart_splits.resize_down)
+-- vim.keymap.set({ 'n', 't' }, '<a-3>', smart_splits.resize_up)
+-- vim.keymap.set({ 'n', 't' }, '<a-4>', smart_splits.resize_right)
 -- moving between splits
 vim.keymap.set({ 'n', 't' }, '<C-h>', smart_splits.move_cursor_left)
 vim.keymap.set({ 'n', 't' }, '<C-j>', smart_splits.move_cursor_down)
