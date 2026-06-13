@@ -31,6 +31,28 @@ keymap("n", "gh", ":execute ':cd' process_dir<CR>", default_map_opts)
 --- Go to the directory of the current buffer.
 keymap("n", "gH", ":cd %:p:h<CR>", default_map_opts)
 
+-- Copy a file:line reference to the system clipboard for sharing with AI agents.
+-- Normal mode: ~/path/to/file
+-- Visual mode: ~/path/to/file:L4:  (single line)  or  ~/path/to/file:L4-L7:  (range)
+local function yank_file_ref(with_range)
+  if vim.fn.expand("%:t") == "" then
+    vim.notify("Buffer has no file", vim.log.levels.WARN)
+    return
+  end
+  local path = vim.fn.fnamemodify(vim.fn.expand("%:p"), ":~")
+  local ref = path
+  if with_range then
+    local s, e = vim.fn.line("v"), vim.fn.line(".")
+    if s > e then s, e = e, s end
+    ref = s == e and string.format("%s:L%d:", path, s)
+                  or string.format("%s:L%d-L%d:", path, s, e)
+  end
+  vim.fn.setreg("+", ref)
+  vim.notify("Copied: " .. ref)
+end
+keymap("n", "<leader>yp", function() yank_file_ref(false) end, opt("Copy file path to clipboard"))
+keymap("x", "<leader>yp", function() yank_file_ref(true)  end, opt("Copy file path + line range to clipboard"))
+
 
 -- Window and tabs
 ------------------

@@ -9,7 +9,7 @@ local ensure_installed = {
   "markdown", "markdown_inline",
   "c", "rust", "java", "nasm",
   "go", "gotmpl",
-  "bash", "lua",
+  "bash", "lua", "regex",
   "helm", "groovy", "terraform",
   "python", "requirements", "htmldjango", "jinja", "jinja_inline"
 }

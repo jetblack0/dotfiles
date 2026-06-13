@@ -1,7 +1,7 @@
 local helpers = require("utils.helpers")
 local snacks = helpers.safe_require("snacks")
-local opencode = helpers.safe_require("opencode")
-if not snacks and opencode then return end
+-- local opencode = helpers.safe_require("opencode")
+-- if not snacks and opencode then return end
 
 -- Define which file types should the plguin be loaded.
 local indent_line_filetypes = {
@@ -163,6 +163,7 @@ snacks.setup({
               ["<c-j>"] = false,
               ["<c-k>"] = false,
               ["H"] = "explorer_up",
+              -- ["<Space>"] = "select_and_next",
               ["o"] = "confirm",
               ["W"] = "explorer_close_all",
               ["f"] = "explorer_focus",
