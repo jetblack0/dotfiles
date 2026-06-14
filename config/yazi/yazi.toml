@@ -49,14 +49,14 @@ prepend_rules = [
 	{ mime = "video/*",					use = "video" },
 
 	{ mime = "audio/*",					use = "audio" },
-	{ name = "*.html",					use = [ "open", "edit" ] },
+	{ url  = "*.html",					use = [ "open", "edit" ] },
 ]
 append_rules = [
-	{ name = "*",						use = "fallback-open" },
+	{ url = "*",						use = "fallback-open" },
 ]
 
 [plugin]
 prepend_previewers = [
-	{ name = "*.srt", run = "code" },
+	{ url  = "*.srt", run = "code" },
 	{ mime = "{application/*zip,tar,bzip2,7z-compressed,rar,xz}", run = "ouch" },
 ]

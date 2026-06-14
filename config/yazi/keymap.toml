@@ -1,6 +1,6 @@
 # A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
 # If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
-"$schema" = "https://yazi-rs.github.io/schemas/keymap.json"
+#:schema https://yazi-rs.github.io/schemas/keymap.json
 
 [mgr]
 keymap = [
@@ -257,12 +257,12 @@ keymap = [
 	{ on = [ "~" ], run = "help", desc = "open help" }
 ]
 
-[completion]
+[cmp]
 
 keymap = [
 	{ on = [ "<C-q>" ],   run = "close",                                      desc = "cancel completion" },
 	{ on = [ "<Tab>" ],   run = "close --submit",                             desc = "submit the completion" },
-	{ on = [ "<Enter>" ], run = [ "close --submit", "close_input --submit" ], desc = "submit the completion and input" },
+	{ on = [ "<Enter>" ], run = [ "close --submit", "input:close --submit" ], desc = "submit the completion and input" },
 
 	{ on = [ "<A-k>" ], run = "arrow -1", desc = "move cursor up" },
 	{ on = [ "<A-j>" ], run = "arrow 1",  desc = "move cursor down" },
