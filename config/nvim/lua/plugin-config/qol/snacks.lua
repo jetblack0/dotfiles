@@ -50,6 +50,35 @@ snacks.setup({
 
     actions = {
       opencode_send = function(...) return opencode.snacks_picker_send(...) end,
+
+      codediff_commit = function(picker, item)
+        local commit = item.commit
+        picker:close()
+        vim.schedule(function()
+          vim.cmd("CodeDiff " .. commit .. "^ " .. commit)
+        end)
+      end,
+
+      codediff_worktree = function(picker, item)
+        local commit = item.commit
+        picker:close()
+        vim.schedule(function()
+          vim.cmd("CodeDiff " .. commit)
+        end)
+      end,
+
+      codediff_range = function(picker)
+        local sel = picker:selected()
+        local a, b = sel[1].commit, sel[2].commit
+        if not a or not b then
+          vim.notify("codediff_range: selected items have no .commit field", vim.log.levels.ERROR)
+          return
+        end
+        picker:close()
+        vim.schedule(function()
+          vim.cmd("CodeDiff " .. a .. " " .. b)
+        end)
+      end,
     },
 
     icons = {
@@ -141,6 +170,53 @@ snacks.setup({
     },
 
     sources = {
+      git_log = {
+        win = {
+          input = {
+            keys = {
+              ["<c-j>"] = {
+                "codediff_worktree",
+                mode = { "i", "n" },
+                desc = "CodeDiff: working tree vs this commit",
+              },
+              ["<c-k>"] = {
+                "codediff_commit",
+                mode = { "i", "n" },
+                desc = "CodeDiff: changes introduced by this commit (parent^ vs commit)",
+              },
+              ["<c-l>"] = {
+                "codediff_range",
+                mode = { "i", "n" },
+                desc = "CodeDiff: range diff between 2 commits (mark both with <Tab>)",
+              },
+            },
+          },
+        },
+      },
+      git_log_file = {
+        win = {
+          input = {
+            keys = {
+              ["<c-j>"] = {
+                "codediff_worktree",
+                mode = { "i", "n" },
+                desc = "CodeDiff: working tree vs this commit",
+              },
+              ["<c-k>"] = {
+                "codediff_commit",
+                mode = { "i", "n" },
+                desc = "CodeDiff: changes introduced by this commit (parent^ vs commit)",
+              },
+              ["<c-l>"] = {
+                "codediff_range",
+                mode = { "i", "n" },
+                desc = "CodeDiff: range diff between 2 commits (mark both with <Tab>)",
+              },
+            },
+          },
+        },
+      },
+
       explorer = {
         ignored = false,
         diagnostics = true,

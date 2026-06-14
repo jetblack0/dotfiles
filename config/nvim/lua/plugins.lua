@@ -160,7 +160,7 @@ require("lazy").setup({
 	{
 		"esmuellert/codediff.nvim",
     dependencies = { "MunifTanjim/nui.nvim" },
-    cmd = "CodeDiff",
+    -- cmd = "CodeDiff",
     config = function()
       require("plugin-config.git.codediff")
     end,
