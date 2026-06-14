@@ -69,6 +69,13 @@ snacks.setup({
 
       codediff_range = function(picker)
         local sel = picker:selected()
+        if #sel ~= 2 then
+          vim.notify(
+            "CodeDiff range: select exactly 2 commits with <Tab> (got " .. #sel .. ")",
+            vim.log.levels.WARN
+          )
+          return
+        end
         local a, b = sel[1].commit, sel[2].commit
         if not a or not b then
           vim.notify("codediff_range: selected items have no .commit field", vim.log.levels.ERROR)
