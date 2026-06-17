@@ -36,7 +36,12 @@ snacks.setup({
     }
   },
   input = {
-    enabled = true
+    enabled = true,
+    win = {
+      keys = {
+        n_esc = false,
+      },
+    },
   },
   notifier = {
     enabled = true
