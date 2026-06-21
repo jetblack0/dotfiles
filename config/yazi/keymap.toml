@@ -37,7 +37,7 @@ keymap = [
 	{ on = [ "G" ],      run = "arrow bot",  desc = "move cursor to the bottom" },
 
 	# Selection
-	{ on = [ "<Space>" ], run = [ "toggle", "arrow 1" ],        desc = "toggle the current selection state" },
+	{ on = [ "<Tab>" ],   run = [ "toggle", "arrow 1" ],        desc = "toggle the current selection state" },
 	{ on = [ "v" ],       run = "visual_mode",                  desc = "enter visual mode (selection mode)" },
 	{ on = [ "V" ],       run = "visual_mode --unset",          desc = "enter visual mode (unset mode)" },
 	{ on = [ "<C-a>" ],   run = "toggle_all --state=on",        desc = "select all files" },
@@ -64,13 +64,13 @@ keymap = [
 	{ on = [ "<Enter>" ], run = 'shell --interactive',								desc = "run a shell command" },
 	# { on = [ ":" ],         run = "shell --block",              desc = "Run a shell command (block the UI until the command finishes)" },
 	{ on = [ "." ],            run = "hidden toggle",           desc = "toggle the visibility of hidden files" },
-	{ on = [ "w", "q" ], run = "search fd",               desc = "search files by name using fd" },
-	{ on = [ "w", "Q" ], run = "plugin fzf",              desc = "jump to a directory, or reveal a file using fzf" },
-	{ on = [ "w", "w" ], run = "search rg",               desc = "search files by content using ripgrep" },
-	{ on = [ "w", "f" ], run = "filter --smart",          desc = "filter files" },
-	{ on = [ "w", "c" ], run = "search none",             desc = "cancel the ongoing search" },
+	{ on = [ "<Space>", "q" ], run = "search fd",               desc = "search files by name using fd" },
+	{ on = [ "<Space>", "a" ], run = "search rg",               desc = "search files by content using ripgrep" },
+	{ on = [ "<Space>", "Q" ], run = "plugin fzf",              desc = "jump to a directory, or reveal a file using fzf" },
+	{ on = [ "<Space>", "f" ], run = "filter --smart",          desc = "filter files" },
+	{ on = [ "<Space>", "c" ], run = "search none",             desc = "cancel the ongoing search" },
 
-	{ on = [ "w", "Z" ],            run = "plugin zoxide",           desc = "jump to a directory using zoxide" },
+	{ on = [ "<Space>", "Z" ],            run = "plugin zoxide",           desc = "jump to a directory using zoxide" },
 
 	# Linemode
 	{ on = [ "b", "s" ], run = "linemode size",        desc = "set linemode to size" },
