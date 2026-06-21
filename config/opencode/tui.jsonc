@@ -1,23 +1,21 @@
 {
   "$schema": "https://opencode.ai/tui.json",
   "keybinds": {
-	// general
-	// ==============
+    // general
+    // ==============
     "leader": "ctrl+s",
     "app_exit": "ctrl+c",
-	"display_thinking": "<leader>t",
-	"sidebar_toggle": "<leader>v",
-	"status_view": "<leader>s",
+    "display_thinking": "<leader>t",
+    "sidebar_toggle": "<leader>v",
+    "status_view": "<leader>s",
     "tips_toggle": "<leader>h",
-	"tool_details": "none",
-	"theme_list": "none",
+    "tool_details": "none",
+    "theme_list": "none",
     "editor_open": "<leader>e",
     "scrollbar_toggle": "none",
-    "username_toggle": "none",
-
-	// sessions
-	// ==============
-	"session_interrupt": "backspace",
+    // sessions
+    // ==============
+    // "session_interrupt": "backspace",
     "session_export": "<leader>x",
     "session_new": "<leader>n",
     "session_list": "<leader>l",
@@ -27,7 +25,7 @@
     "session_share": "none",
     "session_unshare": "none",
     "session_compact": "<leader>c",
-    "session_child_first": "<leader>j",
+    "session_child_first": "<leader>down",
     "session_child_cycle": "h",
     "session_child_cycle_reverse": "l",
     "session_parent": "k",
@@ -39,8 +37,8 @@
     "messages_half_page_down": "ctrl+d",
     "messages_first": "ctrl+g,home",
     "messages_last": "ctrl+shift+g,end",
-    "messages_next": "ctrl+j",
-    "messages_previous": "ctrl+k",
+    "messages_next": "<leader>j",
+    "messages_previous": "<leader>k",
     "messages_copy": "<leader>y",
     "messages_undo": "<leader>u",
     "messages_redo": "<leader>r",
