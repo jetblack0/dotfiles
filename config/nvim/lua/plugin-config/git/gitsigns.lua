@@ -20,11 +20,15 @@ gitsigns.setup {
     end
 
     keymap("n", "<leader>gs", function() gitsigns.toggle_signs() end, opt("Toggle git sign"))
-    keymap("n", "<leader>gc", function() gitsigns.stage_hunk() end, opt("Git sign toggle stage hunk"))
+    keymap("n", "<leader>gc", function()
+      gitsigns.stage_hunk()
+      git_util.refresh_explorer_git()
+    end, opt("Git sign toggle stage hunk"))
     keymap("v", "<leader>gc", function()
       local s, e = vim.fn.line("v"), vim.fn.line(".")
       if s > e then s, e = e, s end
       gitsigns.stage_hunk({ s, e })
+      git_util.refresh_explorer_git()
     end, opt("Git sign stage all hunks in visual selection"))
     keymap("n", "<leader>gp", function()
       vim.schedule(function()
