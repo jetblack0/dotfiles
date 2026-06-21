@@ -69,15 +69,25 @@ export NUGET_PACKAGES="$XDG_CACHE_HOME"/NuGetPackages
 export DOTNET_CLI_HOME="$XDG_DATA_HOME"/dotnet
 # sqlite
 export SQLITE_HISTORY="$XDG_CACHE_HOME"/sqlite_history
+# mysql
+export MYSQL_HISTFILE="$XDG_DATA_HOME"/mysql_history
+# redis
+export REDISCLI_HISTFILE="$XDG_DATA_HOME"/redis/rediscli_history
 # python
 export PYTHONSTARTUP="$XDG_CONFIG_HOME"/python/pythonrc
+# terminal info
+export TERMINFO="$XDG_DATA_HOME"/terminfo
+export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:/usr/share/terminfo
 # Android adb
 export ANDROID_USER_HOME="$XDG_DATA_HOME"/android
 # AWS
 export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
+export AWS_PAGER=""
 # Minikube
 export MINIKUBE_HOME="$XDG_DATA_HOME"/minikube
+# Claude
+export CLAUDE_CODE_DISABLE_ALTERNATE_SCREEN=1
 # Others
 export CUDA_CACHE_PATH="$XDG_CACHE_HOME"/nv
 
@@ -104,6 +114,7 @@ export FZF_ALT_C_COMMAND='rg --hidden --sort-files --files --null 2> /dev/null |
 export DELTA_PAGER="less"
 
 # man page
+export LESS=-Ri
 export LESS_TERMCAP_mb=$'\e[1;31m'     # begin bold
 # export LESS_TERMCAP_md=$'\e[1;36m'     # begin blink (light green)
 export LESS_TERMCAP_md=$'\e[1;32m'     # begin blink (light green)
@@ -113,3 +124,6 @@ export LESS_TERMCAP_me=$'\e[0m'        # reset bold/blink
 export LESS_TERMCAP_se=$'\e[0m'        # reset reverse video
 export LESS_TERMCAP_ue=$'\e[0m'        # reset underline
 export GROFF_NO_SGR=1                  # for konsole and gnome-terminal
+
+export LOKI_ADDR="https://loki.ops.unazoomer.com"
+export LOKI_ORG_ID="app"

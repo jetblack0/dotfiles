@@ -31,8 +31,8 @@ zinit wait lucid for \
 
 # snippets -----
 zinit snippet OMZP::aws
-# zinit snippet OMZP::argocd
-# zinit snippet OMZP::terraform
+zinit snippet OMZP::argocd
+zinit snippet OMZP::terraform
 # zinit snippet OMZP::kubectl
 
 # local plugins -----
@@ -194,7 +194,7 @@ alias suod="sudo"
 alias sduo="sudo"
 
 # ops -------
-alias aws="aws --profile henryvale.henry-chi"
+# alias aws="aws --profile henryvale.henry-chi"
 
 
 
@@ -203,11 +203,18 @@ alias aws="aws --profile henryvale.henry-chi"
 eval "$(fzf --zsh)"
 eval "$(zoxide init --cmd cd zsh)"
 
-
-case "$(uname -s)" in
-	Darwin)
+case "$OSTYPE" in
+	darwin*)
 		alias tldr="tldr -p linux"
 		eval "$(brew shellenv)"
+
+		export PATH="/opt/homebrew/opt/mysql-client/bin:$PATH"
+		export PATH="/opt/homebrew/opt/util-linux/bin:$PATH"
+		export PATH="/opt/homebrew/opt/util-linux/sbin:$PATH"
+		export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+		export LDFLAGS="-L/opt/homebrew/opt/util-linux/lib"
+		export CPPFLAGS="-I/opt/homebrew/opt/util-linux/include"
+
 		alias stat="gstat"
 		alias awk="gawk"
 		alias tr="gtr"

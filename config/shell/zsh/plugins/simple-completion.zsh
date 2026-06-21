@@ -14,7 +14,7 @@
 # +---------+
 
 # Load more completions
-fpath=($DOTFILES/zsh/plugins/zsh-completions/src $fpath)
+fpath=($XDG_CONFIG_HOME/shell/zsh/plugins/completions $fpath)
 
 # Should be called before compinit
 zmodload zsh/complist
