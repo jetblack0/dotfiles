@@ -178,15 +178,6 @@ require("lazy").setup({
       vim.cmd("MasonToolsInstall")
     end,
   },
-  {
-    -- Highlights other uses of the word under the cursor using LSP,
-    -- linters and so on.
-    "RRethy/vim-illuminate",
-    config = function()
-      require("plugin-config.lsp.illuminate")
-    end,
-  },
-  -- completion.
 	{
 		"saghen/blink.cmp",
     version = '1.*',

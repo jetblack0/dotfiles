@@ -138,6 +138,10 @@ M.colorscheme_conf = {
         IlluminatedWordText = { bg = "#45475A", underline = false },
         IlluminatedWordWrite = { bg = "#45475A", underline = false },
 
+        LspReferenceRead = { bg = "#504945", underline = false },
+        LspReferenceText = { bg = "#504945", underline = false },
+        LspReferenceWrite = { bg = "#504945", underline = false },
+
         Comment = { fg = "#928374" },
 
         ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },

@@ -310,7 +310,23 @@ snacks.setup({
 
   statuscolumn = { enabled = true },
   scroll = { enabled = false },
-  words = { enabled = false },
+  words = {
+    enabled = true,
+    debounce = 300,
+    notify_jump = false,
+    notify_end = false,
+    filter = function(buf)
+      local denylist = {
+        dirvish = true,
+        fugitive = true,
+        NvimTree = true,
+        packer = true,
+        Netrw = true,
+      }
+      if denylist[vim.bo[buf].filetype] then return false end
+      return vim.g.snacks_words ~= false and vim.b[buf].snacks_words ~= false
+    end,
+  },
   dashboard = { enabled = false },
   scope = { enabled = false },
 })
