@@ -1,5 +1,6 @@
 local helpers = require("utils.helpers")
 local gitsigns = helpers.safe_require("gitsigns")
+local git_util = require("utils.git")
 
 if not gitsigns then return end
 
@@ -55,3 +56,75 @@ gitsigns.setup {
     end, opt("Previous hunk"))
   end
 }
+
+vim.keymap.set("n", "<leader>ga", function()
+  local file = vim.fn.expand("%:p")
+  if file == "" then
+    vim.notify("Buffer has no file", vim.log.levels.WARN)
+    return
+  end
+  local rel = vim.fn.fnamemodify(file, ":.")
+
+  local status = vim.system({ "git", "status", "--porcelain", "--", file }, { text = true }):wait()
+  if status.code ~= 0 then
+    vim.notify("git status failed: " .. (status.stderr or ""), vim.log.levels.ERROR)
+    return
+  end
+  local line = status.stdout or ""
+  if line == "" then
+    vim.notify("Clean — nothing to stage or unstage", vim.log.levels.INFO)
+    return
+  end
+  local x, y = line:sub(1, 1), line:sub(2, 2)
+
+  local function refresh()
+    pcall(gitsigns.refresh)
+    git_util.refresh_explorer_git(file)
+  end
+
+  local function unstage()
+    local cmd = (x == "A")
+      and { "git", "rm", "--cached", "--quiet", "--", file }
+      or { "git", "restore", "--staged", "--", file }
+    local r = vim.system(cmd, { text = true }):wait()
+    if r.code == 0 then
+      vim.notify("Unstaged: " .. rel, vim.log.levels.INFO)
+      refresh()
+    else
+      vim.notify("Unstage failed: " .. ((r.stderr or "") .. (r.stdout or "")), vim.log.levels.ERROR)
+    end
+  end
+
+  if x == "?" then
+    local r = vim.system({ "git", "add", "--", file }, { text = true }):wait()
+    if r.code == 0 then
+      vim.notify("Staged untracked file: " .. rel, vim.log.levels.INFO)
+      refresh()
+    else
+      vim.notify("git add failed: " .. ((r.stderr or "") .. (r.stdout or "")), vim.log.levels.ERROR)
+    end
+  elseif y == " " then
+    unstage()
+  else
+    local hunks = gitsigns.get_hunks() or {}
+    if #hunks > 0 then
+      local n = #hunks
+      gitsigns.stage_buffer(function(err)
+        if err then
+          vim.notify("stage_buffer: " .. tostring(err), vim.log.levels.ERROR)
+        else
+          vim.notify("Staged " .. n .. " hunk" .. (n == 1 and "" or "s") .. " in buffer", vim.log.levels.INFO)
+          git_util.refresh_explorer_git(file)
+        end
+      end)
+    else
+      local r = vim.system({ "git", "add", "--", file }, { text = true }):wait()
+      if r.code == 0 then
+        vim.notify("Staged: " .. rel, vim.log.levels.INFO)
+        refresh()
+      else
+        vim.notify("git add failed: " .. ((r.stderr or "") .. (r.stdout or "")), vim.log.levels.ERROR)
+      end
+    end
+  end
+end, { silent = false, desc = "Toggle staging for buffer (stage/unstage)" })
