@@ -375,11 +375,27 @@ vim.keymap.set("n", "<leader>p", function()
 end, { desc = "Show hovered image" })
 
 -- explorer
+local function explorer_initializing()
+  local ok, pending = pcall(function()
+    for _, p in ipairs(Snacks.picker.get({ source = "explorer", tab = false })) do
+      local shown = p.layout ~= nil and p.layout:valid()
+      local age_ms = (vim.uv.hrtime() - (p.start_time or 0)) / 1e6
+      if not shown and not p.closed and age_ms < 2000 then
+        return true
+      end
+    end
+    return false
+  end)
+  return ok and pending == true
+end
+
 vim.keymap.set({ "n", "t" }, "<c-b>", function()
+  if explorer_initializing() then return end
   Snacks.explorer()
 end, { desc = "File Explorer" })
 
 vim.keymap.set("n", "F", function()
+  if explorer_initializing() then return end
   Snacks.explorer.reveal()
 end, { desc = "Locate the current buffer" })
 
