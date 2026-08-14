@@ -149,6 +149,7 @@ require("lazy").setup({
     config = function()
       require("plugin-config.git.gitsigns")
       require("plugin-config.git.commit")
+      require("plugin-config.git.push")
     end,
 	},
 	{
