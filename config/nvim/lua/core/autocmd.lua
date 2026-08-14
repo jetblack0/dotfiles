@@ -77,7 +77,7 @@ vim.filetype.add({
 
 
 -- Change indentation width based on their file types.
-vim.cmd[[autocmd FileType sh,html,htmldjango,text,yuck,json,jsonc,typescript,javascript,javascriptreact,lua,xml,ruby,jinja,yaml.ansible,helm,yaml.helm,groovy setlocal expandtab shiftwidth=2 tabstop=2]]
+vim.cmd[[autocmd FileType sh,html,htmldjango,text,yuck,json,jsonc,typescript,javascript,javascriptreact,lua,xml,ruby,jinja,yaml.ansible,helm,yaml.helm,groovy,nix setlocal expandtab shiftwidth=2 tabstop=2]]
 vim.cmd[[autocmd FileType markdown,java setlocal expandtab shiftwidth=4 tabstop=4]]
 
 
