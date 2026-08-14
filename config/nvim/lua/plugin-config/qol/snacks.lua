@@ -13,6 +13,27 @@ local indent_line_filetypes = {
   "groovy", "terraform", "nginx", "nix"
 }
 
+-- Fix snacks explorer icons showing partially staged files as fully staged.
+local function worktree_icon(item, picker)
+  local xy = item.status
+  if type(xy) ~= "string" or #xy < 2 or xy:sub(2, 2) == " " then
+    return nil
+  end
+
+  local git = require("snacks.picker.source.git")
+  local ok, status = pcall(git.git_status, xy)
+  if not ok or not status.staged or status.unmerged then
+    return nil
+  end
+
+  local ok_wt, worktree = pcall(git.git_status, " " .. xy:sub(2, 2))
+  local name = ok_wt and worktree.status or "modified"
+  local icons = picker.opts.icons.git
+  -- Keep the icon exactly as configured, leading space included.
+  return icons[name] or icons.modified,
+    "SnacksPickerGitStatus" .. name:sub(1, 1):upper() .. name:sub(2)
+end
+
 snacks.setup({
   bigfile = {
     enabled = true
@@ -244,18 +265,46 @@ snacks.setup({
         git_status_open = false,
         git_untracked = true,
 
-        -- Keep the status colour on files, but not on directories.
+        format = function(item, picker)
+          local ret = Snacks.picker.format.file(item, picker)
+          local icon, hl = worktree_icon(item, picker)
+          if not icon then
+            return ret
+          end
+          -- Append to the git icon, identified by its highlight: diagnostics
+          -- can also render right-aligned.
+          for _, entry in ipairs(ret) do
+            local vt = entry.virt_text
+            if vt and vt[1] and type(vt[1][2]) == "string" and vt[1][2]:find("^SnacksPickerGitStatus") then
+              entry.virt_text = { vt[1], { icon, hl }, { " " } }
+              break
+            end
+          end
+          return ret
+        end,
+
+        -- Swap in this version to keep the status colour on files, but not on
+        -- directories. Needs `formatters.file.git_status_hl = true` above.
         -- format = function(item, picker)
-        --   if not item.dir then
-        --     return Snacks.picker.format.file(item, picker)
-        --   end
         --   local formatter = picker.opts.formatters.file
         --   local saved = formatter.git_status_hl
-        --   formatter.git_status_hl = false
-        --   item.filename_hl = nil -- drop anything stamped on by an earlier render
+        --   if item.dir then
+        --     formatter.git_status_hl = false
+        --     item.filename_hl = nil -- drop anything stamped on by an earlier render
+        --   end
         --   local ok, ret = pcall(Snacks.picker.format.file, item, picker)
         --   formatter.git_status_hl = saved
         --   if not ok then error(ret) end
+        --   local icon, hl = worktree_icon(item, picker)
+        --   if icon then
+        --     for _, entry in ipairs(ret) do
+        --       local vt = entry.virt_text
+        --       if vt and vt[1] and type(vt[1][2]) == "string" and vt[1][2]:find("^SnacksPickerGitStatus") then
+        --         entry.virt_text = { vt[1], { icon, hl }, { " " } }
+        --         break
+        --       end
+        --     end
+        --   end
         --   return ret
         -- end,
 
