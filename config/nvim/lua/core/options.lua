@@ -1,12 +1,12 @@
--- Local options, equvlient to running the set command in vim script.
+-- Local options.
 local options = {
 	-- System: Performance
-	----------------------
+	-- ---------------------------------------------
 	-- ttyfast = true,
 	-- lazyredraw = true,
 
 	-- System: Indentations
-	-----------------------
+	-- ---------------------------------------------
 	autoindent = true,
 	smartindent = true,
 	-- Show tab as four space wide, but still a \t.
@@ -17,21 +17,21 @@ local options = {
 	shiftwidth = 4,
 	
 	-- System: Searching
-	--------------------
+	-- ---------------------------------------------
 	-- Case insensitive search unless capital letters are used.
 	ignorecase = true,
 	smartcase = true,
 
 	-- System: Others
-	-----------------
+	-- ---------------------------------------------
 	-- Disable mouse
 	mouse = "",
 	-- ttymouse = "",
 	-- Use system clipboard
 	clipboard = "unnamedplus",
 	
-	-- System: Uncertain
-	--------------------
+	-- System: Others
+	-- ---------------------------------------------
 	-- hidden = true,
 	--[[ wildmenu = true,
 	wildmode = "list:longest,full", ]]
@@ -42,8 +42,8 @@ local options = {
   foldcolumn = "1",
 
 
-	-- UI: highlights 
-	----------------- 
+	-- UI: highlights
+	-- ---------------------------------------------
 	-- True color.
 	termguicolors = true,
 	-- Remove highlighting after search is done.
@@ -51,7 +51,7 @@ local options = {
 	incsearch = true,
 	
 	-- UI: Sign column
-	------------------
+	-- ---------------------------------------------
 	-- Always draw sign column.
 	signcolumn = "yes",
 	-- Minimal width to use for the sign column.
@@ -61,7 +61,7 @@ local options = {
 	relativenumber = true,
 
 	-- UI: Others
-	-------------
+	-- ---------------------------------------------
 	-- Splits open at the bottom and right, override the default position.
 	splitbelow = true,
 	splitright = true,
@@ -74,9 +74,9 @@ local options = {
 -- Global variables.
 local global_variables = {
 	-- System: Netrw
+	-- ---------------------------------------------
 	-- Configures how Netrw shoule be opened with the vim . command.
 	-- See :h netrw-browser-var.
-	----------------------------------------------------------------
 	-- Use tree view by default.
 	netrw_liststyle = 3,
   -- Default window size for Netrw.

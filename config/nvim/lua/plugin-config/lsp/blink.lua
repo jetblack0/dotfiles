@@ -74,10 +74,8 @@ blink.setup {
 }
 
 
-
-
 -- Additional keybindings
--------------------------
+-- ---------------------------------------------
 -- vim.keymap.set("n", "<leader>z", function()
 --   blink.setup.buffer({ enabled = false }) 
 --     vim.notify("Turn off cmp", vim.log.levels.INFO, { title = "Autocomplete" })

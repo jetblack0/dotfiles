@@ -1,9 +1,12 @@
--- Keybindings for neovim. Note that some plugin specific 
--- keybindings are configured in the plugin-config
--- directory.
--- Use Control and Alt for nvim built-in functions.
+-- Most plugin specific keybindings are configured
+-- in the plugin-config directory.
+--
+-- Control and Alt for nvim built-in functions.
 -- Reserve the leader key for plugins.
 
+
+-- Meta
+-- ---------------------------------------------
 local default_map_opts = { noremap = true, silent = true }
 local function opt(desc, others)
   return vim.tbl_extend("force", default_map_opts, { desc = desc }, others or {})
@@ -14,12 +17,15 @@ local keymap = vim.keymap.set
 keymap("", "<Space>", "<Nop>", default_map_opts)
 vim.g.mapleader = " "
 
-----------------------------------
--- Normal Mode -------------------
-----------------------------------
+-- Unbind some of the default keys.
+keymap("n", "K", "<Nop>", { noremap = true, silent = true })
+keymap("n", "<c-w>q", "<Nop>", { noremap = true, silent = true })
+vim.keymap.del('n', '<c-w>d')
+vim.keymap.del('n', '<c-w><c-d>')
+
 
 -- System
----------
+-- ---------------------------------------------
 -- Use capital U as redo 
 keymap("n", "U", ":redo<CR>", default_map_opts)
 -- Open spell check.
@@ -55,7 +61,7 @@ keymap("x", "<leader>yp", function() yank_file_ref(true)  end, opt("Copy file pa
 
 
 -- Window and tabs
-------------------
+-- ---------------------------------------------
 -- Create and navigate between tabs.
 keymap({"n", "t"}, '<C-w><c-n>', function() vim.cmd.tabnext() end, default_map_opts)
 keymap({"n", "t"}, '<C-w>n', function() vim.cmd.tabnext() end, default_map_opts)
@@ -73,7 +79,7 @@ end
 
 
 -- Splits
----------
+-- ---------------------------------------------
 -- Focus splits.
 keymap({"n", "t"}, "<c-w>l", function() vim.cmd.wincmd("l") end, default_map_opts)
 keymap({"n", "t"}, "<c-w>h", function() vim.cmd.wincmd("h") end, default_map_opts)
@@ -108,7 +114,7 @@ end, default_map_opts)
 
 
 -- Folding
-----------
+-- ---------------------------------------------
 -- NOTE: maybe map them to something else someday.
 -- zf{motion}	Create a fold over a range
 -- zd	Delete the fold at cursor
@@ -120,11 +126,8 @@ end, default_map_opts)
 -- zM	Close all folds
 
 
-
-----------------------------------
--- Virtual Mode ------------------
-----------------------------------
-
+-- Virtual Mode
+-- ---------------------------------------------
 -- Keep in virual mode when indenting lines
 keymap("v", "<", "<gv", default_map_opts)
 keymap("v", ">", ">gv", default_map_opts)
@@ -135,18 +138,8 @@ keymap("v", "<a-k>", ":m '<-2<CR>gv=gv", default_map_opts)
 keymap("v", "p", "\"_dP", default_map_opts)
 
 
-
-----------------------------------
--- Virtual Block Mode ------------
-----------------------------------
-
+-- Virtual Block Mode
+-- ---------------------------------------------
 -- Move text up and down
 keymap("x", "<a-j>", ":move '>+1<CR>gv-gv", default_map_opts)
 keymap("x", "<a-k>", ":move '<-2<CR>gv-gv", default_map_opts)
-
-
-
-keymap("n", "K", "<Nop>", { noremap = true, silent = true })
-keymap("n", "<c-w>q", "<Nop>", { noremap = true, silent = true })
-vim.keymap.del('n', '<c-w>d')
-vim.keymap.del('n', '<c-w><c-d>')

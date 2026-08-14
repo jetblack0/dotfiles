@@ -5,9 +5,8 @@ local yaml_schema = helpers.safe_require('utils.yaml-schemas')
 local lsputils = helpers.safe_require('utils.lsp')
 
 
-----------------
 -- Diagnostic UI
-----------------
+-- ---------------------------------------------
 WINDOW_BORDER_STYLE = "rounded"
 vim.diagnostic.config({
 	virtual_text = false,
@@ -31,9 +30,8 @@ vim.diagnostic.config({
 })
 
 
----------------------
 -- LSP configurations
----------------------
+-- ---------------------------------------------
 local capabilities = blink.get_lsp_capabilities(vim.lsp.protocol.make_client_capabilities())
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
@@ -84,11 +82,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 
 
----------------------------------
 -- Server specific configurations
----------------------------------
+-- ---------------------------------------------
+
+
 -- Complied languages
----------------------
+-- ---------------------------------------------
 -- Rust
 vim.lsp.config.rust_analyzer = {
   filetypes = { "rust" },
@@ -117,7 +116,7 @@ vim.lsp.config.rust_analyzer = {
 
 
 -- Interpreted languages
-------------------------
+-- ---------------------------------------------
 -- lua
 vim.lsp.config.lua_ls = {
   filetypes = { "lua" },
@@ -176,9 +175,6 @@ vim.lsp.config.basedpyright = {
 	on_attach = on_attach,
 }
 
-
--- Markup languages
--------------------
 -- Typescript and Javascript
 vim.lsp.config.ts_ls = {
 	cmd = { "typescript-language-server", "--stdio" },
@@ -191,6 +187,9 @@ vim.lsp.config.ts_ls = {
 	capabilities = capabilities,
 }
 
+
+-- Markup languages
+-- ---------------------------------------------
 -- HTML/CSS
 vim.lsp.config.htmlls = {
 	cmd = { "vscode-html-language-server", "--stdio" },
@@ -268,7 +267,7 @@ vim.lsp.config.yamlls = {
 
 
 -- Ops
--------------------
+-- ---------------------------------------------
 -- Ansible
 vim.lsp.config.ansiblels = {
   filetypes = { "yaml.ansible", "ansible" },
@@ -368,9 +367,8 @@ vim.lsp.config.nginx_language_server = {
 }
 
 
----------------------------------
 -- Enable clients
----------------------------------
+-- ---------------------------------------------
 for server_name, v in pairs(lsputils.enabled_servers) do
   if helpers.command_exists(v["cmd"]) then
     vim.lsp.enable(server_name)
