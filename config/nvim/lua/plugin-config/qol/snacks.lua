@@ -6,7 +6,7 @@ local snacks = helpers.safe_require("snacks")
 -- Define which file types should the plguin be loaded.
 local indent_line_filetypes = {
   "html", "css", "htmldjango",
-  "javascript", "javascriptreact", "tsx", "typescript",
+  "javascript", "javascriptreact", "typescriptreact", "typescript",
   "yaml*", "json", "jsonc", "yaml.ansible", "yml", "helm", "yaml.helm",
   "rust", "java", "c", "make", "go",
   "lua", "sh", "python", "ruby",

@@ -1,6 +1,3 @@
--- Autocommands, filetype detection and per-filetype indentation.
-
-
 -- General
 -- ---------------------------------------------
 -- Don't continue comments onto the next line, and don't auto-wrap code.
@@ -35,11 +32,7 @@ vim.api.nvim_create_autocmd("BufWinEnter", {
 
 -- External changes
 -- ---------------------------------------------
--- Pick up changes made to open files by anything outside nvim: an AI agent, a
--- `git checkout`, a formatter run in another pane. `autoread` alone isn't
--- enough -- nvim only compares mtimes when something asks it to, so a buffer
--- (and therefore gitsigns' signs, diagnostics, treesitter) can sit stale
--- indefinitely. These triggers ask it to.
+-- Pick up changes made to open files by anything outside nvim.
 local external_changes = vim.api.nvim_create_augroup("external_changes", { clear = true })
 
 -- CursorHoldI is deliberately absent: on a locally-modified buffer `checktime`
@@ -47,17 +40,14 @@ local external_changes = vim.api.nvim_create_augroup("external_changes", { clear
 vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
   group = external_changes,
   callback = function()
-    -- `checktime` aborts a command line that is being typed.
     if vim.fn.mode() == "c" then return end
-    -- Real files only: skip terminals, prompts and scratch buffers.
     if vim.bo.buftype ~= "" then return end
     vim.cmd("checktime")
   end,
   desc = "Check for external file changes and reload",
 })
 
--- Say so when a buffer is swapped out from under the cursor, so silently
--- reloaded content is never a surprise.
+-- Say so when a buffer is swapped out from under the cursor.
 vim.api.nvim_create_autocmd("FileChangedShellPost", {
   group = external_changes,
   callback = function(args)
@@ -80,13 +70,9 @@ vim.api.nvim_create_autocmd("FileChangedShellPost", {
 
 -- Filetype detection
 -- ---------------------------------------------
--- Everything nvim doesn't map (or maps differently to what we want). Patterns
--- are Lua patterns matched against the full path; `priority` breaks ties, so
--- Ansible layouts win over the Helm `templates/` patterns.
 vim.filetype.add({
   extension = {
-    -- Terraform / OpenTofu. Plain `.tfvars` is `terraform-vars` by default;
-    -- treating it as `terraform` keeps highlighting and formatting uniform.
+    -- Terraform / OpenTofu.
     tf = "terraform",
     tfvars = "terraform",
     tfstate = "json",
@@ -101,7 +87,7 @@ vim.filetype.add({
   },
   filename = {
     [".terraformrc"] = "hcl",
-    ["terraform.rc"] = "hcl", -- would be `rc` otherwise
+    ["terraform.rc"] = "hcl",
     ["Dockerfile"] = "dockerfile",
   },
   pattern = {
@@ -113,15 +99,13 @@ vim.filetype.add({
     [".*/templates/.*%.tpl"] = "helm",
     [".*/templates/.*%.ya?ml"] = "helm",
     ["helmfile.*%.ya?ml"] = "helm",
-    -- Terraform state backups: `.backup` hides the real extension.
+    -- Terraform state backups.
     [".*%.tfstate%.backup"] = "json",
-    -- Jenkinsfiles carrying a prefix or suffix, e.g. `deploy.Jenkinsfile`.
     [".*[Jj]enkinsfile.*"] = "groovy",
   },
 })
 
--- Any YAML inside an Ansible project is Ansible YAML. This can't be a pattern:
--- it depends on an `ansible.cfg` existing somewhere up the tree.
+-- Any YAML inside an Ansible project is yaml.ansible.
 vim.api.nvim_create_autocmd("BufReadPost", {
   pattern = { "*.yml", "*.yaml" },
   callback = function(args)
@@ -137,7 +121,7 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   desc = "Detect Ansible YAML by a nearby ansible.cfg",
 })
 
--- Docker Compose, if the dedicated language server is ever re-enabled.
+-- Docker Compose.
 -- vim.filetype.add({
 --   filename = {
 --     ["compose.yaml"] = "yaml.docker-compose",
@@ -150,15 +134,13 @@ vim.api.nvim_create_autocmd("BufReadPost", {
 
 -- Indentation
 -- ---------------------------------------------
--- Filetypes that override their ftplugin's default indent width. Anything not
--- listed keeps whatever its ftplugin sets.
 local two_space_filetypes = {
   "sh", "text", "yuck",
-  "html", "htmldjango", "xml",
+  "html", "htmldjango", "xml", "css",
   "json", "jsonc",
-  "javascript", "javascriptreact", "typescript",
+  "javascript", "javascriptreact", "typescript", "typescriptreact",
   "lua", "ruby", "nix", "groovy",
-  "jinja", "helm", "yaml.helm", "yaml.ansible",
+  "jinja", "yaml", "helm", "yaml.helm", "yaml.ansible",
 }
 
 local four_space_filetypes = {
