@@ -18,6 +18,7 @@ M.enabled_servers = {
   yamlls =                          { cmd = "yaml-language-server", mason = "yamlls" },
   ansiblels =                       { cmd = "ansible-language-server", mason = "ansiblels" },
   terraformls =                     { cmd = "terraform-ls", mason = "terraformls" },
+  -- nil_ls =                          { cmd = "nil" },
   dockerls =                        { cmd = "docker-langserver", mason = "dockerls" },
   groovyls =                        { cmd = "java", mason = "groovyls" },
   -- nginx_language_server =           { cmd = "nginx-language-server", mason = "nginx_language_server" },

@@ -308,6 +308,20 @@ vim.lsp.config.terraformls = {
   on_attach = on_attach
 }
 
+-- Nix (oxalica/nil).
+vim.lsp.config.nil_ls = {
+  filetypes = { "nix" },
+  cmd = { "nil" },
+  capabilities = capabilities,
+  root_markers = { "flake.nix", "shell.nix", ".git" },
+  on_attach = on_attach,
+  settings = {
+    ["nil"] = {
+      formatting = { command = { "nixfmt" } },
+    },
+  },
+}
+
 -- Docker and docker compose
 -- vim.lsp.config.docker_compose_language_service = {
 --   filetypes = { "yaml.docker-compose", "docker-compose" },
