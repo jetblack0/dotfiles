@@ -10,7 +10,7 @@ local indent_line_filetypes = {
   "yaml*", "json", "jsonc", "yaml.ansible", "yml", "helm", "yaml.helm",
   "rust", "java", "c", "make", "go",
   "lua", "sh", "python", "ruby",
-  "groovy", "terraform", "nginx"
+  "groovy", "terraform", "nginx", "nix"
 }
 
 snacks.setup({

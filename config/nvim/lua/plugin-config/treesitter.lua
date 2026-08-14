@@ -10,7 +10,7 @@ local ensure_installed = {
   "c", "rust", "java", "nasm",
   "go", "gotmpl",
   "bash", "lua", "regex",
-  "helm", "groovy", "terraform",
+  "helm", "groovy", "terraform", "nix",
   "python", "requirements", "htmldjango", "jinja", "jinja_inline"
 }
 
