@@ -128,3 +128,19 @@ vim.keymap.set("n", "<leader>ga", function()
     end
   end
 end, { silent = false, desc = "Toggle staging for buffer (stage/unstage)" })
+
+-- Re-read git state on focus so gitsigns isn't stale.
+local last_git_reload = 0
+vim.api.nvim_create_autocmd("FocusGained", {
+  group = vim.api.nvim_create_augroup("gitsigns_reload_on_focus", { clear = true }),
+  callback = function()
+    local now = vim.uv.hrtime()
+    if now - last_git_reload < 1e9 then return end
+    last_git_reload = now
+
+    local ok, gs_config = pcall(require, "gitsigns.config")
+    local base = ok and gs_config.config and gs_config.config.base or nil
+    pcall(gitsigns.change_base, base, true)
+  end,
+  desc = "Re-read git state after external git operations",
+})
