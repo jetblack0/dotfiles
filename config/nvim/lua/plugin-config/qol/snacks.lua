@@ -140,6 +140,19 @@ snacks.setup({
       }
     },
 
+    formatters = {
+      file = {
+        -- Never tint a name by its git status -- not files, not directories.
+        -- The right-aligned git icon is the indicator; colouring the names too
+        -- turns a repo with many changes into a wall of colour. Directories are
+        -- the worst of it, since status propagates up to every parent.
+        --
+        -- Set this back to `true` and uncomment the `format` function in the
+        -- `explorer` source below to instead keep colours on files only.
+        git_status_hl = false,
+      },
+    },
+
     win = {
       input = {
         keys = {
@@ -235,6 +248,32 @@ snacks.setup({
         git_status = true,
         git_status_open = false,
         git_untracked = true,
+
+        -- ALTERNATIVE to `formatters.file.git_status_hl = false` above: keep the
+        -- status colour on files, but not on directories -- where it's worst,
+        -- since status propagates up to every parent. To use this, set
+        -- `git_status_hl` back to `true` and uncomment the block below.
+        --
+        -- Why a formatter and not a highlight group: `file_git_status` stamps
+        -- the colour onto the name (`item.filename_hl`) AND emits the icon in
+        -- one call, from the same highlight -- so retinting the group would
+        -- wash out the icon too. Flipping the option per item is the only way
+        -- to split them.
+        --
+        -- format = function(item, picker)
+        --   if not item.dir then
+        --     return Snacks.picker.format.file(item, picker)
+        --   end
+        --   local formatter = picker.opts.formatters.file
+        --   local saved = formatter.git_status_hl
+        --   formatter.git_status_hl = false
+        --   item.filename_hl = nil -- drop anything stamped on by an earlier render
+        --   local ok, ret = pcall(Snacks.picker.format.file, item, picker)
+        --   formatter.git_status_hl = saved
+        --   if not ok then error(ret) end
+        --   return ret
+        -- end,
+
         layout = {
           preset = "sidebar",
           preview = false,
