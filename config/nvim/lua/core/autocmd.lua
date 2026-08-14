@@ -14,6 +14,40 @@ augroup remember_folds
 	autocmd BufWinEnter *.* silent! loadview
 augroup END]]
 
+-- Pick up changes made to open files by anything outside nvim: an AI agent, a
+-- `git checkout`, a formatter run in another pane. `autoread` alone isn't
+-- enough -- nvim only compares mtimes when something asks it to, so a buffer
+-- (and therefore gitsigns' signs, diagnostics, treesitter) can sit stale
+-- indefinitely. These triggers ask it to.
+local external_changes = vim.api.nvim_create_augroup("external_changes", { clear = true })
+
+-- CursorHoldI is deliberately absent: on a locally-modified buffer `checktime`
+-- raises the W12 conflict prompt, which must not interrupt insert mode.
+vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "TermLeave" }, {
+  group = external_changes,
+  callback = function()
+    -- `checktime` aborts a command line that is being typed.
+    if vim.fn.mode() == "c" then return end
+    -- Real files only: skip terminals, prompts and scratch buffers.
+    if vim.bo.buftype ~= "" then return end
+    vim.cmd("checktime")
+  end,
+  desc = "Check for external file changes and reload",
+})
+
+-- Say so when a buffer is swapped out from under the cursor, so silently
+-- reloaded content is never a surprise.
+vim.api.nvim_create_autocmd("FileChangedShellPost", {
+  group = external_changes,
+  callback = function(args)
+    vim.notify(
+      ("Reloaded from disk: %s"):format(vim.fn.fnamemodify(args.file, ":t")),
+      vim.log.levels.INFO
+    )
+  end,
+  desc = "Notify when a buffer was reloaded from disk",
+})
+
 
 -- System-specific
 ------------------
