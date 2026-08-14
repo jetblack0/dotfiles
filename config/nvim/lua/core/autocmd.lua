@@ -1,19 +1,40 @@
--- System
----------
--- Highlight a selection on yank
--- vim.cmd[[au TextYankPost * silent! lua vim.highlight.on_yank {on_visual=false, timeout=250}]]
+-- Autocommands, filetype detection and per-filetype indentation.
 
--- Disables automatic commenting on newline:
-vim.cmd[[autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o]]
 
--- Save and load view automatically
-vim.cmd[[
-augroup remember_folds
-	autocmd!
-	autocmd BufWinLeave *.* mkview
-	autocmd BufWinEnter *.* silent! loadview
-augroup END]]
+-- General
+-- ---------------------------------------------
+-- Don't continue comments onto the next line, and don't auto-wrap code.
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "*",
+  callback = function()
+    vim.opt_local.formatoptions:remove({ "c", "r", "o" })
+  end,
+  desc = "Disable automatic commenting on newline",
+})
 
+-- Highlight a selection on yank.
+-- vim.api.nvim_create_autocmd("TextYankPost", {
+--   callback = function() vim.hl.on_yank({ on_visual = false, timeout = 250 }) end,
+-- })
+
+-- Remember folds between sessions.
+local folds = vim.api.nvim_create_augroup("remember_folds", { clear = true })
+vim.api.nvim_create_autocmd("BufWinLeave", {
+  group = folds,
+  pattern = "*.*",
+  command = "mkview",
+  desc = "Save the view (folds, cursor) on leaving a window",
+})
+vim.api.nvim_create_autocmd("BufWinEnter", {
+  group = folds,
+  pattern = "*.*",
+  command = "silent! loadview",
+  desc = "Restore the saved view on entering a window",
+})
+
+
+-- External changes
+-- ---------------------------------------------
 -- Pick up changes made to open files by anything outside nvim: an AI agent, a
 -- `git checkout`, a formatter run in another pane. `autoread` alone isn't
 -- enough -- nvim only compares mtimes when something asks it to, so a buffer
@@ -49,30 +70,62 @@ vim.api.nvim_create_autocmd("FileChangedShellPost", {
 })
 
 
--- System-specific
-------------------
--- Change fcitx5 input to english when press escape.
+-- Input method
+-- ---------------------------------------------
+-- Switch fcitx5 back to English when leaving insert mode.
 -- vim.cmd[[let fcitx5state=system("fcitx5-remote")]]
 -- vim.cmd[[autocmd InsertLeave * :silent let fcitx5state=system("fcitx5-remote")[0] | silent !fcitx5-remote -c]]
 -- vim.cmd[[autocmd InsertEnter * :silent if fcitx5state == 2 | call system("fcitx5-remote -o") | endif]]
 
 
--- Programming languages
-------------------------
--- Change filetypes for template language.
--- Ansible
-vim.cmd[[au BufRead,BufNewFile */playbooks/*.yml setlocal ft=yaml.ansible]]
-vim.cmd[[au BufRead,BufNewFile */playbooks/*.yaml setlocal ft=yaml.ansible]]
-vim.cmd[[au BufRead,BufNewFile */roles/*/tasks/*.yml setlocal ft=yaml.ansible]]
-vim.cmd[[au BufRead,BufNewFile */roles/*/tasks/*.yaml setlocal ft=yaml.ansible]]
-vim.cmd[[au BufRead,BufNewFile */roles/*/handlers/*.yml setlocal ft=yaml.ansible]]
-vim.cmd[[au BufRead,BufNewFile */roles/*/handlers/*.yaml setlocal ft=yaml.ansible]]
-vim.cmd[[au BufRead,BufNewFile *.j2 setlocal ft=jinja]]
+-- Filetype detection
+-- ---------------------------------------------
+-- Everything nvim doesn't map (or maps differently to what we want). Patterns
+-- are Lua patterns matched against the full path; `priority` breaks ties, so
+-- Ansible layouts win over the Helm `templates/` patterns.
+vim.filetype.add({
+  extension = {
+    -- Terraform / OpenTofu. Plain `.tfvars` is `terraform-vars` by default;
+    -- treating it as `terraform` keeps highlighting and formatting uniform.
+    tf = "terraform",
+    tfvars = "terraform",
+    tfstate = "json",
+    alloy = "hcl",
+    hcl = "hcl",
+    -- Templating.
+    j2 = "jinja",
+    ejs = "html",
+    gotmpl = "gotmpl",
+    -- Jenkins.
+    groovy = "groovy",
+  },
+  filename = {
+    [".terraformrc"] = "hcl",
+    ["terraform.rc"] = "hcl", -- would be `rc` otherwise
+    ["Dockerfile"] = "dockerfile",
+  },
+  pattern = {
+    -- Ansible: playbooks, plus role tasks and handlers.
+    [".*/playbooks/.*%.ya?ml"] = { "yaml.ansible", { priority = 10 } },
+    [".*/roles/.*/tasks/.*%.ya?ml"] = { "yaml.ansible", { priority = 10 } },
+    [".*/roles/.*/handlers/.*%.ya?ml"] = { "yaml.ansible", { priority = 10 } },
+    -- Helm charts.
+    [".*/templates/.*%.tpl"] = "helm",
+    [".*/templates/.*%.ya?ml"] = "helm",
+    ["helmfile.*%.ya?ml"] = "helm",
+    -- Terraform state backups: `.backup` hides the real extension.
+    [".*%.tfstate%.backup"] = "json",
+    -- Jenkinsfiles carrying a prefix or suffix, e.g. `deploy.Jenkinsfile`.
+    [".*[Jj]enkinsfile.*"] = "groovy",
+  },
+})
+
+-- Any YAML inside an Ansible project is Ansible YAML. This can't be a pattern:
+-- it depends on an `ansible.cfg` existing somewhere up the tree.
 vim.api.nvim_create_autocmd("BufReadPost", {
-  pattern = "*.yml,*.yaml",
+  pattern = { "*.yml", "*.yaml" },
   callback = function(args)
-    local fname = args.file
-    local dir = vim.fn.fnamemodify(fname, ":p:h")
+    local dir = vim.fn.fnamemodify(args.file, ":p:h")
     while dir ~= "/" do
       if vim.fn.filereadable(dir .. "/ansible.cfg") == 1 then
         vim.bo[args.buf].filetype = "yaml.ansible"
@@ -81,42 +134,53 @@ vim.api.nvim_create_autocmd("BufReadPost", {
       dir = vim.fn.fnamemodify(dir, ":h")
     end
   end,
+  desc = "Detect Ansible YAML by a nearby ansible.cfg",
 })
 
--- Terraform
-vim.cmd([[silent! autocmd! filetypedetect BufRead,BufNewFile *.tf]])
-vim.cmd([[au BufRead,BufNewFile *.hcl setlocal filetype=hcl]])
-vim.cmd([[au BufRead,BufNewFile .terraformrc,terraform.rc,*.alloy setlocal filetype=hcl]])
-vim.cmd([[au BufRead,BufNewFile *.tf,*.tfvars setlocal filetype=terraform]])
-vim.cmd([[au BufRead,BufNewFile *.tfstate,*.tfstate.backup setlocal filetype=json]])
+-- Docker Compose, if the dedicated language server is ever re-enabled.
+-- vim.filetype.add({
+--   filename = {
+--     ["compose.yaml"] = "yaml.docker-compose",
+--     ["compose.yml"] = "yaml.docker-compose",
+--     ["docker-compose.yaml"] = "yaml.docker-compose",
+--     ["docker-compose.yml"] = "yaml.docker-compose",
+--   },
+-- })
 
--- Jenkins
-vim.cmd([[au BufRead,BufNewFile *Jenkinsfile*,*jenkinsfile*,*.groovy setlocal filetype=groovy]])
 
--- Docker and Docker compose
--- vim.cmd([[au BufRead,BufNewFile compose.yaml,compose.yml,docker-compose.yaml,docker-compose.yml setlocal filetype=yaml.docker-compose]])
-vim.cmd([[au BufRead,BufNewFile Dockerfile setlocal filetype=dockerfile]])
+-- Indentation
+-- ---------------------------------------------
+-- Filetypes that override their ftplugin's default indent width. Anything not
+-- listed keeps whatever its ftplugin sets.
+local two_space_filetypes = {
+  "sh", "text", "yuck",
+  "html", "htmldjango", "xml",
+  "json", "jsonc",
+  "javascript", "javascriptreact", "typescript",
+  "lua", "ruby", "nix", "groovy",
+  "jinja", "helm", "yaml.helm", "yaml.ansible",
+}
 
--- go template
-vim.filetype.add({
-  extension = {
-    gotmpl = 'gotmpl',
-  },
-  pattern = {
-    [".*/templates/.*%.tpl"] = "helm",
-    [".*/templates/.*%.ya?ml"] = "helm",
-    ["helmfile.*%.ya?ml"] = "helm",
-  },
+local four_space_filetypes = {
+  "markdown", "java",
+}
+
+local function set_indent(width)
+  return function()
+    vim.opt_local.expandtab = true
+    vim.opt_local.shiftwidth = width
+    vim.opt_local.tabstop = width
+  end
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = two_space_filetypes,
+  callback = set_indent(2),
+  desc = "Indent with two spaces",
 })
 
-
--- Change indentation width based on their file types.
-vim.cmd[[autocmd FileType sh,html,htmldjango,text,yuck,json,jsonc,typescript,javascript,javascriptreact,lua,xml,ruby,jinja,yaml.ansible,helm,yaml.helm,groovy,nix setlocal expandtab shiftwidth=2 tabstop=2]]
-vim.cmd[[autocmd FileType markdown,java setlocal expandtab shiftwidth=4 tabstop=4]]
-
-
--- Treat ejs as html
-vim.cmd[[au BufNewFile,BufRead *.ejs set filetype=html]]
-
--- Seems neovim doesn't automatically recognize different asm syntax
--- vim.cmd[[au BufNewFile,BufRead *.asm set filetype=nasm]]
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = four_space_filetypes,
+  callback = set_indent(4),
+  desc = "Indent with four spaces",
+})
