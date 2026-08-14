@@ -56,6 +56,14 @@ M.defined_schemas = {
     file_pattern = "loki*.{yml,yaml}"
   },
   {
+    name = "OpenTelemetry Collector",
+    uri = "https://raw.githubusercontent.com/dash0hq/otelbin/main/packages/otelbin/src/components/monaco-editor/schema.json",
+    file_pattern = {
+      "{collector,otel-collector,otelcol,otelcol-config}.{yml,yaml}",
+      "{collector,otel,otelcol}/{collector,agent,gateway,config}.{yml,yaml}",
+    },
+  },
+  {
     name = "Argo application",
     uri = "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/argoproj.io/application_v1alpha1.json",
     file_pattern = "*application*.yml"
