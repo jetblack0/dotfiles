@@ -1,0 +1,12 @@
+# Startup session
+# ---------------------------------------------
+# Opened at kitty startup, via `startup_session startup.session` in kitty.conf.
+new_tab notes
+launch
+
+new_tab work
+launch
+
+new_tab personal
+launch
+# ---------------------------------------------
