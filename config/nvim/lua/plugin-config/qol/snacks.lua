@@ -260,6 +260,10 @@ snacks.setup({
 
       explorer = {
         ignored = false,
+        -- Opening the explorer shouldn't yank the cursor to the current file;
+        -- `F` reveals on demand.
+        follow_file = false,
+
         diagnostics = true,
         git_status = true,
         git_status_open = false,
