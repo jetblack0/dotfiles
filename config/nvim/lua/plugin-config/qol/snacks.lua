@@ -347,7 +347,7 @@ snacks.setup({
               ["W"] = "explorer_close_all",
               ["f"] = "explorer_focus",
               ["."] = "toggle_hidden",
-              [">"] = "toggle_toggle_ignored",
+              [">"] = "toggle_ignored",
               ["O"] = "explorer_open",
               ["<leader>w"] = "picker_grep",
               ["<leader>gn"] = "explorer_git_next",
