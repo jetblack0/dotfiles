@@ -80,9 +80,7 @@ snacks.setup({
     actions = {
       opencode_send = function(...) return opencode.snacks_picker_send(...) end,
 
-      -- Like explorer_focus / explorer_up, but move nvim's cwd too so the new
-      -- root outlives the explorer. snacks' own DirChanged handler re-roots and
-      -- refreshes, so neither needs to call find() itself.
+      -- Move nvim's cwd so the new root outlives the explorer.
       explorer_focus_cd = function(picker)
         vim.cmd.cd(picker:dir())
       end,
@@ -177,8 +175,7 @@ snacks.setup({
 
     formatters = {
       file = {
-        -- Never tint a name by its git status -- not files, not directories.
-        -- The right-aligned git icon is the indicator.
+        -- Never tint a name by its git status.
         git_status_hl = false,
       },
     },
@@ -287,16 +284,11 @@ snacks.setup({
           last_explorer = { cwd = cwd, file = item and item.file or nil, open = open }
         end,
 
-        -- `Snacks.explorer.reveal` passes its own on_show, so `F` still wins.
         on_show = function(picker)
           local state = last_explorer
           if not state or state.cwd ~= picker:cwd() then return end
           -- snacks re-expands the path to the current buffer on every open,
           -- which undoes a `W`. Put the tree back the way it was left.
-          -- Flip the flag directly rather than tree:open(): that re-walks every
-          -- parent, and recreates nodes for directories deleted meanwhile.
-          -- `nodes` is keyed by the same string as `node.path`, so index it
-          -- rather than tree:node(), which normalises the path twice.
           local tree = require("snacks.explorer.tree")
           tree:close_all(state.cwd)
           for _, path in ipairs(state.open) do
@@ -317,8 +309,7 @@ snacks.setup({
           if not icon then
             return ret
           end
-          -- Append to the git icon, identified by its highlight: diagnostics
-          -- can also render right-aligned.
+          -- Append to the git icon.
           for _, entry in ipairs(ret) do
             local vt = entry.virt_text
             if vt and vt[1] and type(vt[1][2]) == "string" and vt[1][2]:find("^SnacksPickerGitStatus") then
@@ -373,7 +364,7 @@ snacks.setup({
               -- ["<Space>"] = "select_and_next",
               ["o"] = "confirm",
               ["W"] = "explorer_close_all",
-              ["f"] = "explorer_focus_cd",
+              ["L"] = "explorer_focus_cd",
               ["."] = "toggle_hidden",
               [">"] = "toggle_ignored",
               ["O"] = "explorer_open",
