@@ -70,15 +70,49 @@ local function tmux_has_pane(dir_key)
   return tmux_pane_exists(parse_tmux_layout(layout), DIR_NAME[dir_key])
 end
 
+local function window_in_direction(dir_key)
+  local cur = vim.api.nvim_get_current_win()
+  local pos = vim.fn.win_screenpos(vim.fn.win_id2win(cur))
+  local me = {
+    y = pos[1], x = pos[2],
+    h = vim.api.nvim_win_get_height(cur), w = vim.api.nvim_win_get_width(cur),
+  }
+
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if win ~= cur and vim.api.nvim_win_get_config(win).relative == '' then
+      local p = vim.fn.win_screenpos(vim.fn.win_id2win(win))
+      local it = {
+        y = p[1], x = p[2],
+        h = vim.api.nvim_win_get_height(win), w = vim.api.nvim_win_get_width(win),
+      }
+      local h_overlap = it.x < me.x + me.w and it.x + it.w > me.x
+      local v_overlap = it.y < me.y + me.h and it.y + it.h > me.y
+      if dir_key == 'j' and h_overlap and it.y >= me.y + me.h then return win end
+      if dir_key == 'k' and h_overlap and it.y + it.h <= me.y then return win end
+      if dir_key == 'l' and v_overlap and it.x >= me.x + me.w then return win end
+      if dir_key == 'h' and v_overlap and it.x + it.w <= me.x then return win end
+    end
+  end
+end
+
 local function smart_move(dir_key, mux_fn)
   return function()
     local in_float = vim.api.nvim_win_get_config(0).relative ~= ''
 
-    if not in_float and vim.fn.winnr() ~= vim.fn.winnr(dir_key) then
+    -- 1. Another nvim window lies that way: move natively. smart-splits adds
+    --    nothing here, and going through it flickers the statusline.
+    if in_float then
+      local target = window_in_direction(dir_key)
+      if target then
+        vim.api.nvim_set_current_win(target)
+        return
+      end
+    elseif vim.fn.winnr() ~= vim.fn.winnr(dir_key) then
       vim.cmd.wincmd(dir_key)
       return
     end
 
+    -- At an nvim edge. Only hand over to tmux when a pane really exists.
     if tmux_has_pane(dir_key) == false then
       if not in_float then
         wrap_within_nvim(dir_key)
@@ -86,6 +120,7 @@ local function smart_move(dir_key, mux_fn)
       return
     end
 
+    -- 2. A real tmux pane that way (or tmux unreachable).
     mux_fn()
   end
 end
