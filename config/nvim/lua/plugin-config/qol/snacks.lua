@@ -281,7 +281,12 @@ snacks.setup({
           tree:walk(tree:find(cwd), function(node)
             if node.dir and node.open then open[#open + 1] = node.path end
           end, { all = true })
-          last_explorer = { cwd = cwd, file = item and item.file or nil, open = open }
+          last_explorer = {
+            cwd = cwd,
+            file = item and item.file or nil,
+            open = open,
+            offset = picker.list.cursor - picker.list.top,
+          }
         end,
 
         on_show = function(picker)
@@ -295,7 +300,19 @@ snacks.setup({
             local node = tree.nodes[path]
             if node then node.open = true end
           end
-          require("snacks.explorer.actions").update(picker, { target = state.file, refresh = true })
+
+          picker.list:set_target()
+          picker:find({
+            on_done = function()
+              if not state.file then return end
+              for item, idx in picker:iter() do
+                if item.file == state.file then
+                  picker.list:view(idx, idx - state.offset)
+                  return
+                end
+              end
+            end,
+          })
         end,
 
         diagnostics = true,
