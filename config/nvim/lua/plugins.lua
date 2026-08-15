@@ -20,10 +20,6 @@ local lazy_config = {
 	ui = {
 		border = "rounded"
 	},
-  spec = {
-    { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-    { import = "plugins" },
-  },
   defaults = {
     lazy = false,
     -- Always use the latest git commit.
@@ -285,6 +281,7 @@ require("lazy").setup({
     lazy = false,
     config = function()
       require("plugin-config.qol.snacks")
+      require("plugin-config.qol.cheatsheet")
     end,
   },
   {
