@@ -3,103 +3,30 @@ local fallback_colorscheme = "habamax"
 
 local M = {}
 
-local lualine_colors = {
-  bg = '#3C3836',
-  fg = '#D1CFC0',
-  yellow = '#FABD2F',
-  cyan = '#689D6A',
-  darkblue = '#081633',
-  green = '#98971A',
-  orange = '#D79921',
-  violet = '#a9a1e1',
-  magenta = '#D3869B',
-  blue = '#83a598',
-  red = '#cc241d',
-  pink = '#D19097',
+local statusbar_colors = {
+  ground = 'none',    -- the bar itself -- inherit the terminal
 
-  red_diff = '#eb6f92',
-  green_diff = '#31748f',
-  orange_diff = '#f6c177',
+  accent = '#D19097', -- identity only: the filename, and the branch chip
+  ink    = '#1d2021', -- text on the accent chip
+  quiet  = '#9c8f91', -- the position, and any other secondary text
+  rule   = '#7c6f64', -- the " | " between groups on the left
 
-  green_diff_light = '#40A02B',
-  orange_diff_light = '#DF8E1D',
-  red_diff_light = '#D20F39',
+  chip1  = '#3c3836', -- diff
+  chip2  = '#504945', -- lsp
+  text   = '#d5c4a1', -- text on chip2
+
+  diag_error = '#eb6f92',
+  diag_warn  = '#f6c177',
+  diag_info  = '#7daea3',
+  diag_hint  = '#83a598',
+
+  diff_added    = '#a9b665',
+  diff_modified = '#d8a657',
+  diff_removed  = '#ea6962',
 }
 
 
 M.colorscheme_conf = {
-  -- gruvbox = function()
-  --   local gruvbox = helpers.safe_require("gruvbox")
-  --   if not gruvbox then
-  --     vim.notify("color scheme gruvbox not installed, fallback to " .. fallback_colorscheme, vim.log.levels.ERROR)
-  --     vim.cmd("colorscheme " .. fallback_colorscheme)
-  --     return
-  --   end
-  --
-  --   gruvbox.setup({
-  --     transparent_mode = true,
-  --     underline = true,
-  --     bold = true,
-  --     strikethrough = true,
-  --     italic = {
-  --       strings = true,
-  --       emphasis = true,
-  --       comments = true,
-  --       operators = false,
-  --       folds = true,
-  --     },
-  --
-  --     overrides = {
-  --       -- Override some highlights for Markdown.
-  --       ["@markup.strong.markdown_inline"] = { fg = "#D19097", bold = true },
-  --       ["@markup.italic.markdown_inline"] = { fg = "#D19097", italic = true },
-  --       ["@markup.raw.block.markdown"] = { fg = "#8ec07c", italic = true },
-  --       ["@markup.raw.markdown_inline"] = { fg = "#8ec07c", italic = true },
-  --       -- Headings.
-  --       ["@markup.heading.6.markdown"] = { fg = "#D1CFC0", bold = true },
-  --       ["@markup.heading.5.markdown"] = { fg = "#a9a1e1", bold = true },
-  --       ["@markup.heading.4.markdown"] = { fg = "#fabd2f", bold = true },
-  --       ["@markup.heading.3.markdown"] = { fg = "#fe8019", bold = true },
-  --       ["@markup.heading.2.markdown"] = { fg = "#b8bb26", bold = true },
-  --       ["@markup.heading.1.markdown"] = { fg = "#fb4934", bold = true },
-  --
-  --       IlluminatedWordRead = { bg = "#45475A" },
-  --       IlluminatedWordText = { bg = "#45475A" },
-  --       IlluminatedWordWrite = { bg = "#45475A" },
-  --
-  --       NvimTreeOpenedHL = { bold = true },
-  --       NvimTreeIndentMarker = { fg = "#6c7087", bold = true },
-  --       NvimTreeOpenedFile = { fg = "#e8dcb7", bold = true },
-  --       NvimTreeFolderName = { fg = "#83a598", bold = true },
-  --       NvimTreeOpenedFolderName = { fg = "#83a598", bold = true },
-  --       NvimTreeEmptyFolderName = { fg = "#83a598", bold = true },
-  --       NvimTreeRootFolder = { fg = "#d19097" },
-  --
-  --       -- Snacks explorer
-  --       Directory = { fg = "#83a598", bold = true },
-  --       -- SnacksPickerGitStatusModified = { fg = "#f6c177" },
-  --
-  --       BlinkCmpMenuSelection = { bg = "#32302f" },
-  --
-  --       DiagnosticSignError = { fg = '#eb6f92' },
-  --       DiagnosticSignWarn = { fg = '#f6c177' },
-  --       DiagnosticSignInfo = { fg = '#31748f' },
-  --       DiagnosticSignHint = { fg = '#83a598' },
-  --
-  --       LualineDiagnosticSignError = { fg = '#eb6f92', bg = lualine_colors.bg },
-  --       LualineDiagnosticSignWarn = { fg = '#f6c177', bg = lualine_colors.bg },
-  --       LualineDiagnosticSignInfo = { fg = '#31748f', bg = lualine_colors.bg },
-  --       LualineDiagnosticSignHint = { fg = '#83a598', bg = lualine_colors.bg },
-  --       NormalFloat = { bg = '#393633' },
-  --     }
-  --   })
-  --
-  --   require("plugin-config.lualine")(lualine_colors)
-  --
-  --   vim.g['colortheme'] = "gruvbox"
-  --   vim.cmd("colorscheme gruvbox")
-  -- end,
-
   gruvbox_shokry = function()
     local gruvbox_shokry = helpers.safe_require("gruvbox")
     if not gruvbox_shokry then
@@ -126,13 +53,7 @@ M.colorscheme_conf = {
         BlinkCmpMenu = { bg = "#32302f" },
         BlinkCmpMenuSelection = { bg = "#504945" },
 
-        LualineDiagnosticSignError = { link = "DiagnosticSignError" },
-        LualineDiagnosticSignWarn = { link = "DiagnosticSignWarn" },
-        LualineDiagnosticSignInfo = { link = "DiagnosticSignInfo" },
-        LualineDiagnosticSignHint = { link = "DiagnosticSignHint" },
-
         SnacksIndentScope = { fg = "#9ccfd8", bold = true },
-        StatusLineTerm = { bg = lualine_colors.bg },
 
         IlluminatedWordRead = { bg = "#45475A", underline = false },
         IlluminatedWordText = { bg = "#45475A", underline = false },
@@ -155,7 +76,7 @@ M.colorscheme_conf = {
       },
     })
 
-    require("plugin-config.lualine")(lualine_colors)
+    require("plugin-config.lualine")(statusbar_colors)
 
     vim.g['colortheme'] = "gruvbox"
     vim.cmd("colorscheme gruvbox")
@@ -203,7 +124,29 @@ M.colorscheme_conf = {
       },
     })
 
-    require("plugin-config.lualine")(lualine_colors)
+    local latte_statusbar = {
+      ground = 'none',
+
+      accent = '#933d46', -- darkened rose
+      ink    = '#eff1f5', -- base
+      quiet  = '#5c5f77', -- subtext1
+      rule   = '#7c7f93', -- overlay2
+
+      chip1  = '#ccd0da', -- surface0
+      chip2  = '#bcc0cc', -- surface1
+      text   = '#4a4d67', -- text
+
+      diag_error = '#d20f39', -- red, verbatim
+      diag_warn  = '#966014', -- yellow, darkened
+      diag_info  = '#1e66f5', -- blue, verbatim
+      diag_hint  = '#13787e', -- teal, darkened
+
+      diff_added    = '#28651b', -- green, darkened
+      diff_modified = '#7d4f10', -- yellow, darkened
+      diff_removed  = '#b30d31', -- red, darkened
+    }
+
+    require("plugin-config.lualine")(latte_statusbar)
 
     vim.g['colortheme'] = "catppuccin_light"
     vim.cmd("colorscheme catppuccin")
@@ -250,30 +193,29 @@ M.colorscheme_conf = {
       },
     })
 
-    lualine_colors = {
-      bg = '#1C1E26',
-      fg = '#bbc2cf',
-      yellow = '#ECBE7B',
-      cyan = '#008080',
-      darkblue = '#081633',
-      green = '#98be65',
-      orange = '#FF8800',
-      violet = '#a9a1e1',
-      magenta = '#c678dd',
-      blue = '#51afef',
-      red = '#ec5f67',
-      pink = '#F35588',
+    local catppuccin_statusbar = {
+      ground = 'none',
 
-      red_diff = '#eb6f92',
-      green_diff = '#31748f',
-      orange_diff = '#f6c177',
+      accent = '#f5c2e7', -- pink
+      ink    = '#1e1e2e', -- base
+      quiet  = '#a6adc8', -- subtext0
+      rule   = '#6c7086', -- overlay0
 
-      green_diff_light = '#40A02B',
-      orange_diff_light = '#DF8E1D',
-      red_diff_light = '#D20F39',
+      chip1  = '#313244', -- surface0
+      chip2  = '#45475a', -- surface1
+      text   = '#bac2de', -- subtext1
+
+      diag_error = '#f38ba8', -- red
+      diag_warn  = '#f9e2af', -- yellow
+      diag_info  = '#89b4fa', -- blue
+      diag_hint  = '#94e2d5', -- teal
+
+      diff_added    = '#a6e3a1', -- green
+      diff_modified = '#f9e2af', -- yellow
+      diff_removed  = '#f38ba8', -- red
     }
 
-    require("plugin-config.lualine")(lualine_colors)
+    require("plugin-config.lualine")(catppuccin_statusbar)
 
     vim.g['colortheme'] = "catppuccin_dark"
     vim.cmd("colorscheme catppuccin")
@@ -296,7 +238,7 @@ M.colorscheme_conf = {
       },
     })
 
-    require("plugin-config.lualine")(lualine_colors)
+    require("plugin-config.lualine")(statusbar_colors)
 
     vim.g['colortheme'] = "rosepine_dark"
 		vim.cmd("colorscheme rose-pine")
@@ -326,7 +268,7 @@ M.colorscheme_conf = {
     vim.api.nvim_set_hl(0, "NvimTreeEmptyFolderName", { fg = "#83a598", bold = true })
     vim.api.nvim_set_hl(0, "NvimTreeRootFolder", { fg = "#d19097" })
 
-    require("plugin-config.lualine")(lualine_colors)
+    require("plugin-config.lualine")(statusbar_colors)
   end,
 }
 
