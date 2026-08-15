@@ -34,6 +34,9 @@ local function worktree_icon(item, picker)
     "SnacksPickerGitStatus" .. name:sub(1, 1):upper() .. name:sub(2)
 end
 
+-- Remember last cursor position restore on the next open.
+local last_explorer_file = nil
+
 snacks.setup({
   bigfile = {
     enabled = true
@@ -263,6 +266,17 @@ snacks.setup({
         -- Opening the explorer shouldn't yank the cursor to the current file;
         -- `F` reveals on demand.
         follow_file = false,
+
+        on_close = function(picker)
+          local item = picker:current()
+          last_explorer_file = item and item.file or nil
+        end,
+
+        on_show = function(picker)
+          if last_explorer_file then
+            require("snacks.explorer.actions").update(picker, { target = last_explorer_file })
+          end
+        end,
 
         diagnostics = true,
         git_status = true,
