@@ -144,9 +144,9 @@ return function(colors)
     always_visible = false,
   })
 
-  ins_right({
-    require("opencode").statusline,
-  })
+  -- ins_right({
+  --   require("opencode").statusline,
+  -- })
 
   ins_right({
     -- Lsp server name.
