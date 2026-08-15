@@ -15,6 +15,9 @@ vim.api.nvim_create_autocmd("FileType", {
 -- })
 
 -- Remember folds between sessions.
+-- Without removing `curdir`, mkview bakes an `lcd` into every view file and
+-- loadview replays it, silently re-rooting the window and the explorer.
+vim.opt.viewoptions:remove("curdir")
 local folds = vim.api.nvim_create_augroup("remember_folds", { clear = true })
 vim.api.nvim_create_autocmd("BufWinLeave", {
   group = folds,
