@@ -34,8 +34,8 @@ local function worktree_icon(item, picker)
     "SnacksPickerGitStatus" .. name:sub(1, 1):upper() .. name:sub(2)
 end
 
--- Remember last cursor position restore on the next open.
-local last_explorer_file = nil
+-- Remember cursor and expanded dirs, restore on the next open.
+local last_explorer = nil
 
 snacks.setup({
   bigfile = {
@@ -268,14 +268,31 @@ snacks.setup({
         follow_file = false,
 
         on_close = function(picker)
-          local item = picker:current()
-          last_explorer_file = item and item.file or nil
+          local tree = require("snacks.explorer.tree")
+          local cwd, item, open = picker:cwd(), picker:current(), {}
+          tree:walk(tree:find(cwd), function(node)
+            if node.dir and node.open then open[#open + 1] = node.path end
+          end, { all = true })
+          last_explorer = { cwd = cwd, file = item and item.file or nil, open = open }
         end,
 
+        -- `Snacks.explorer.reveal` passes its own on_show, so `F` still wins.
         on_show = function(picker)
-          if last_explorer_file then
-            require("snacks.explorer.actions").update(picker, { target = last_explorer_file })
+          local state = last_explorer
+          if not state or state.cwd ~= picker:cwd() then return end
+          -- snacks re-expands the path to the current buffer on every open,
+          -- which undoes a `W`. Put the tree back the way it was left.
+          -- Flip the flag directly rather than tree:open(): that re-walks every
+          -- parent, and recreates nodes for directories deleted meanwhile.
+          -- `nodes` is keyed by the same string as `node.path`, so index it
+          -- rather than tree:node(), which normalises the path twice.
+          local tree = require("snacks.explorer.tree")
+          tree:close_all(state.cwd)
+          for _, path in ipairs(state.open) do
+            local node = tree.nodes[path]
+            if node then node.open = true end
           end
+          require("snacks.explorer.actions").update(picker, { target = state.file, refresh = true })
         end,
 
         diagnostics = true,
