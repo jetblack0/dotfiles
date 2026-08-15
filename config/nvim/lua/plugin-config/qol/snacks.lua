@@ -80,10 +80,15 @@ snacks.setup({
     actions = {
       opencode_send = function(...) return opencode.snacks_picker_send(...) end,
 
-      -- Like explorer_focus, but moves nvim's cwd too so the new root outlives
-      -- the explorer. snacks' own DirChanged handler re-roots and refreshes.
+      -- Like explorer_focus / explorer_up, but move nvim's cwd too so the new
+      -- root outlives the explorer. snacks' own DirChanged handler re-roots and
+      -- refreshes, so neither needs to call find() itself.
       explorer_focus_cd = function(picker)
         vim.cmd.cd(picker:dir())
+      end,
+
+      explorer_up_cd = function(picker)
+        vim.cmd.cd(vim.fs.dirname(picker:cwd()))
       end,
 
       codediff_commit = function(picker, item)
@@ -364,7 +369,7 @@ snacks.setup({
               ["<Esc>"] = false,
               ["<c-j>"] = false,
               ["<c-k>"] = false,
-              ["H"] = "explorer_up",
+              ["H"] = "explorer_up_cd",
               -- ["<Space>"] = "select_and_next",
               ["o"] = "confirm",
               ["W"] = "explorer_close_all",
