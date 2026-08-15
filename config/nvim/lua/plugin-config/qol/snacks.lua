@@ -469,7 +469,12 @@ end, { desc = "File Explorer" })
 
 vim.keymap.set("n", "F", function()
   if explorer_initializing() then return end
-  Snacks.explorer.reveal()
+  -- Pressed from inside the explorer, buf 0 is its nameless scratch buffer and
+  -- there'd be nothing to reveal. Target the window it was opened from.
+  local picker = Snacks.picker.get({ source = "explorer" })[1]
+  local win = picker and picker.main
+  local buf = win and vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) or 0
+  Snacks.explorer.reveal({ buf = buf })
 end, { desc = "Locate the current buffer" })
 
 -- telescope
