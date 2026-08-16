@@ -281,10 +281,18 @@ snacks.setup({
           tree:walk(tree:find(cwd), function(node)
             if node.dir and node.open then open[#open + 1] = node.path end
           end, { all = true })
+          -- `.` and `>` flip these, but they live on the picker, so a fresh one
+          -- filters hidden/ignored files out again -- taking the cursor target
+          -- with them.
+          local toggles = {}
+          for name in pairs(picker.opts.toggles or {}) do
+            toggles[name] = picker.opts[name] or false
+          end
           last_explorer = {
             cwd = cwd,
             file = item and item.file or nil,
             open = open,
+            toggles = toggles,
             offset = picker.list.cursor - picker.list.top,
           }
         end,
@@ -299,6 +307,11 @@ snacks.setup({
           for _, path in ipairs(state.open) do
             local node = tree.nodes[path]
             if node then node.open = true end
+          end
+
+          -- The finder reads these when it runs, so set them before the find.
+          for name, value in pairs(state.toggles) do
+            picker.opts[name] = value
           end
 
           picker.list:set_target()
