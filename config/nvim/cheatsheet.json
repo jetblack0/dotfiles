@@ -1,0 +1,62 @@
+[
+  {
+    "name": "Git",
+    "keys": [
+      {
+        "key": "<leader>gs",
+        "mode": "n",
+        "desc": "Toggle git sign"
+      }
+    ]
+  },
+  {
+    "name": "Explorer",
+    "keys": [
+      {
+        "key": "F",
+        "mode": "n",
+        "desc": "Reveal the current buffer in the tree"
+      },
+      {
+        "key": "H",
+        "mode": "n",
+        "desc": "Root up one directory"
+      },
+      {
+        "key": "L",
+        "mode": "n",
+        "desc": "Set root to directory under cursor"
+      },
+      {
+        "key": "y",
+        "mode": "n",
+        "desc": "Yank file(s) + absolute path to + register"
+      },
+      {
+        "key": "p",
+        "mode": "n",
+        "desc": "Copy a file: y on it, then p in target dir"
+      },
+      {
+        "key": "m",
+        "mode": "n",
+        "desc": "Move: <Tab>-select files, then m on target dir"
+      },
+      {
+        "key": "O",
+        "mode": "n",
+        "desc": "Open with external program"
+      },
+      {
+        "key": ".",
+        "mode": "n",
+        "desc": "Toggle hidden files"
+      },
+      {
+        "key": ">",
+        "mode": "n",
+        "desc": "Toggle git-ignored files"
+      }
+    ]
+  }
+]
