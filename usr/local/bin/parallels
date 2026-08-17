@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o pipefail
+
+function get_opts() {
+  while [ $# -gt 0 ]; do
+    case $1 in
+      -h|--help)
+        echo "kaicheng.qi@antalpha.com"
+        exit 0
+      ;;
+      -c|--count)
+        [ -z "$2" ] && {
+          echo "Argument for times to run the command (-c, --count) is empty, exit" >&2
+          echo "Hint: -c 10" >&2
+          exit 1
+        }
+
+        JOB_COUNT=$2
+        shift
+      ;;
+      --)
+        shift
+        COMMAND=("$@")
+        break
+      ;;
+      --*|-*)
+        echo "unrecognized option: $1" >&2
+        echo "Help: kaicheng.qi@antalpha.com"
+        exit 1
+      ;;
+      *)
+        COMMAND=("$@")
+        shift
+        break
+      ;;
+    esac
+
+    shift
+  done
+}
+
+function run_job() {
+  local id=$1 
+  local start end elapsed status
+  local pgid
+
+  start=$(date +%s.%N)
+
+  set +e
+  (
+    setsid "${COMMAND[@]}"
+  ) &> log/job-"$id".log &
+  set -e
+
+  pgid=$!
+  echo "$pgid" > ".data/job-${id}.pgid"
+
+  wait "$pgid"
+  status=$? 
+
+  end=$(date +%s.%N)
+  elapsed=$(awk -v s="$start" -v e="$end" 'BEGIN { print e - s }')
+
+  echo "$status"  > ".data/job-${id}.status"
+  echo "$elapsed" > ".data/job-${id}.time"
+}
+
+function collect_results() {
+  for ((i = 0; i < JOB_COUNT; i++)); do
+    STATUS_CODES[i]="-1"
+    TIMINGS[i]="-1"
+    PGIDS[i]="-1"
+
+    [ -f ".data/job-$i.status" ] && STATUS_CODES[i]=$(cat ".data/job-$i.status")
+    [ -f ".data/job-$i.time" ] && TIMINGS[i]=$(cat ".data/job-$i.time")
+    [ -f ".data/job-$i.pgid" ] && PGIDS[i]=$(cat ".data/job-$i.pgid")
+  done
+}
+
+function print_results() {
+  {
+    printf "%s,%s,%s\n" "JOB" "EXIT CODE" "ELAPSED TIME"
+
+    for ((i = 0; i < JOB_COUNT; i++)); do
+      printf "%s,%s,%s\n" "$i" "${STATUS_CODES[$i]}" "${TIMINGS[$i]}"
+    done
+  } | column -t -s ,
+}
+
+function cleanup_data() {
+  [ -d .data ] && rm -rf .data
+}
+
+function cleanup_trap() {
+  collect_results
+  echo -e "\ncleaning up subprocesses: ${PGIDS[*]}" >&2
+  for pgid in "${PGIDS[@]}"; do
+    if [ "$pgid" != "-1" ]; then
+      kill -TERM -- "-$pgid" 2>/dev/null || true
+    fi
+  done
+
+  wait 2>/dev/null || true
+
+  cleanup_data 
+  # 128 + SIGINT
+  exit $((128 + 2))
+}
+
+function main() {
+  STATUS_CODES=()
+  TIMINGS=()
+  PGIDS=()
+
+  # passed via flags
+  JOB_COUNT=3
+  COMMAND=()
+
+  get_opts "$@"
+
+  [ ! -d log ] && mkdir -p log
+  [ ! -d .data ] && mkdir -p .data
+
+  for ((i = 0; i < JOB_COUNT; i++)); do
+    run_job "$i" &
+  done
+  wait
+ 
+  collect_results
+  print_results
+  cleanup_data
+}
+
+trap cleanup_trap INT TERM
+main "$@"
