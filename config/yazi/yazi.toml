@@ -1,62 +1,75 @@
+# File list
+# ---------------------------------------------
 [mgr]
-ratio			= [ 1, 4, 3 ]
-sort_by			= "mtime"
-sort_reverse	= true
-sort_dir_first	= true
+ratio          = [ 1, 4, 3 ]           # parent : current : preview
+sort_by        = "mtime"
+sort_reverse   = true                  # newest first
+sort_dir_first = true
+# ---------------------------------------------
 
+
+# Preview
+# ---------------------------------------------
 [preview]
-image_quality = 70
+image_quality = 70                     # 50-90, lower is faster to decode
+# ---------------------------------------------
 
+
+# Openers
+# ---------------------------------------------
 [opener]
 edit = [
 	{ run = 'nvim "$@"', block = true, for = "unix" },
 ]
-video = [
-	{ run = 'mpv "$@"', orphan = true, for = "unix" },
-]
-book = [
-	# open zathura into a Hyprland group, only works when there is a group window at the top  
-	{ run = 'zathura "$@" && hyprclt dispatch moveintogroup u', orphan = true, for = "linux" },
-	{ run = 'zathura "$@"', orphan = true, for = "macos" },
-]
 image = [
 	{ run = 'nsxiv "$@"', orphan = true, for = "linux" },
-	{ run = 'open "$@"', orphan = true, for = "macos" },
+	{ run = 'open "$@"',  orphan = true, for = "macos" },
+]
+video = [
+	{ run = 'mpv "$@"', orphan = true, for = "unix" },
 ]
 audio = [
 	{ run = 'mpv --audio-display=no "$@"', for = "unix" },
 ]
-do-nothing = [
-	{ run = ':' },
+book = [
+	{ run = 'zathura "$@"', orphan = true, for = "unix" },
 ]
+# Hand anything unrecognised to the desktop.
 fallback-open = [
 	{ run = 'xdg-open "$@"', for = "linux" },
-	{ run = 'open "$@"', for = "macos" },
+	{ run = 'open "$@"',     for = "macos" },
 ]
+# ---------------------------------------------
 
+
+# Open rules
+# ---------------------------------------------
+# First match wins, so specific mimes must stay above the wildcards.
 [open]
 prepend_rules = [
-	{ mime = "text/*",					use = "edit" },
-	{ mime = "application/json",		use = "edit" },
-	{ mime = "application/json",		use = "edit" },
-	{ mime = "application/javascript",	use = "edit" },
+	{ mime = "text/*",                 use = "edit" },
+	{ mime = "application/json",       use = "edit" },
+	{ mime = "application/javascript", use = "edit" },
 
-	{ mime = "application/pdf",			use = "book" },
-	{ mime = "image/vnd.djvu",			use = "book" },
-	{ mime = "image/*",					use = "image" },
-	{ mime = "application/epub*",		use = "book" },
+	{ mime = "application/pdf",   use = "book" },
+	{ mime = "application/epub*", use = "book" },
+	{ mime = "image/vnd.djvu",    use = "book" },
 
-	{ mime = "video/*",					use = "video" },
-
-	{ mime = "audio/*",					use = "audio" },
-	{ url  = "*.html",					use = [ "open", "edit" ] },
+	{ mime = "image/*", use = "image" },
+	{ mime = "video/*", use = "video" },
+	{ mime = "audio/*", use = "audio" },
 ]
 append_rules = [
-	{ url = "*",						use = "fallback-open" },
+	{ url = "*", use = "fallback-open" },
 ]
+# ---------------------------------------------
 
+
+# Previewers
+# ---------------------------------------------
 [plugin]
+# Archive contents as a tree. Needs `ouch` on PATH.
 prepend_previewers = [
-	{ url  = "*.srt", run = "code" },
-	{ mime = "{application/*zip,tar,bzip2,7z-compressed,rar,xz}", run = "ouch" },
+	{ mime = "application/{*zip,tar,bzip2,7z*,rar,xz,zstd,java-archive}", run = "ouch" },
 ]
+# ---------------------------------------------

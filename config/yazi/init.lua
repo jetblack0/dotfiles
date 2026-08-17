@@ -1,27 +1,24 @@
--- hide status bar
--- function Status:render() return {} end
---
--- local old_manager_render = Manager.render
--- function Manager:render(area)
--- 	return old_manager_render(self, ui.Rect { x = area.x, y = area.y, w = area.w, h = area.h + 1 })
--- end
-
+-- Plugins
+-- ---------------------------------------------
+-- Bundled with yazi: remembers yanked files across instances.
 require("session"):setup {
 	sync_yanked = true,
 }
 
+-- `l` enters directories and opens files with one key.
 require("smart-enter"):setup {
 	open_multi = true,
 }
 
--- rounded border. NOTE: run `ya pack -a yazi-rs/plugins#full-border` to install the plugin
+-- Rounded border around every pane.
+-- ya pkg add yazi-rs/plugins:full-border
 require("full-border"):setup()
+-- ---------------------------------------------
 
--- show more stuff in header
+
+-- Header
+-- ---------------------------------------------
 Header:children_add(function()
-	if ya.target_family() ~= "unix" then
-		return ui.Line {}
-	end
 	return ui.Span("󱙝  "):fg("gray"):bold(true)
-	-- return ui.Span(ya.user_name() .. "@" .. ya.host_name() .. ":"):fg("blue")
 end, 500, Header.LEFT)
+-- ---------------------------------------------
