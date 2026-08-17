@@ -1,0 +1,94 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$HERE/../.." && pwd)"
+
+SAFE_TERM=xterm-256color
+
+usage() {
+    cat <<EOF
+usage: ${0##*/} <command> <distro>
+
+commands:
+  build    (re)build the image: a stock <distro> with only ansible added
+  start    replace the container with a fresh one, copy the repo in at
+           ~/dotfiles, and open a shell inside
+  shell    open another shell in the running container
+  stop     remove the container
+
+distros:
+$(ls "$HERE/distros" | sed 's/^/  /')
+EOF
+}
+
+die() { echo "${0##*/}: $*" >&2; exit 1; }
+
+cmd="${1:-}"
+distro="${2:-}"
+
+case "$cmd" in ''|help|-h|--help) usage; exit 0 ;; esac
+[ -n "$distro" ] || die "missing distro (try: ${0##*/} help)"
+[ -d "$HERE/distros/$distro" ] || die "unknown distro '$distro' (try: ${0##*/} help)"
+
+img="dotfiles-lab/$distro"
+ctr="dotfiles-lab-$distro"
+
+build() {
+  docker build -t "$img" "$HERE/distros/$distro"
+}
+
+running() {
+  [ "$(docker inspect -f '{{.State.Running}}' "$ctr" 2>/dev/null)" = true ]
+}
+
+# Copy what a fresh clone would contain, plus new files not yet committed,
+# and nothing that is gitignored.
+copy_repo() {
+    # Without these, macOS tar smuggles in Apple xattrs (com.apple.provenance)
+    # that Linux refuses to extract.
+    local tarflags=(--no-xattrs)
+    tar --version | grep -q bsdtar && tarflags+=(--no-mac-metadata)
+
+    docker exec "$ctr" mkdir -p /root/dotfiles
+    git -C "$REPO" ls-files -z --cached --others --exclude-standard \
+        | while IFS= read -r -d '' f; do
+              [ -e "$REPO/$f" ] && printf '%s\0' "$f"   # the index can list deleted files
+          done \
+        | tar -C "$REPO" "${tarflags[@]}" --null -T - -cf - \
+        | docker cp - "$ctr:/root/dotfiles"
+}
+
+shell() {
+    running || die "no running container -- run: ${0##*/} start $distro"
+    local tty=(-i); [ -t 0 ] && tty=(-it)   # -t breaks under scripts/CI with no tty
+    docker exec "${tty[@]}" -e TERM="$SAFE_TERM" -w /root/dotfiles "$ctr" bash
+}
+
+start() {
+    docker image inspect "$img" >/dev/null 2>&1 || build
+    docker rm -f "$ctr" >/dev/null 2>&1 || true
+    docker run -d --name "$ctr" --hostname "lab-$distro" "$img" >/dev/null
+    copy_repo
+    echo "fresh $distro box, repo copied to ~/dotfiles -- try:"
+    echo "    ansible-playbook ansible/local.yml"
+    shell
+}
+
+stop() {
+    if docker inspect "$ctr" >/dev/null 2>&1; then
+        docker rm -f "$ctr" >/dev/null
+        echo "removed $ctr"
+    else
+        echo "nothing to remove"
+    fi
+}
+
+case "$cmd" in
+    build) build ;;
+    start) start ;;
+    shell) shell ;;
+    stop)  stop ;;
+    *) die "unknown command '$cmd' (try: ${0##*/} help)" ;;
+esac
