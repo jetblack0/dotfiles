@@ -1,0 +1,20 @@
+---
+# Tools available under the same name.
+# ---------------------------------------------
+packages_common:
+  - bat
+  - btop
+  - fd
+  - fzf
+  - git
+  - jq
+  - lazygit
+  - neovim
+  - ripgrep
+  - tmux
+  - yazi
+
+# Platform-only tools, or tools under a different name.
+# ---------------------------------------------
+packages_archlinux: []
+packages_darwin: []

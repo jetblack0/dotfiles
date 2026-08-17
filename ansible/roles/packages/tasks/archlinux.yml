@@ -1,0 +1,7 @@
+---
+- name: Install packages with pacman
+  become: true
+  community.general.pacman:
+    name: "{{ packages_common + packages_archlinux }}"
+    state: present
+    update_cache: true

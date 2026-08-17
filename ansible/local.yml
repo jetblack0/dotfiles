@@ -1,0 +1,7 @@
+---
+- name: Set up a unix box
+  hosts: localhost
+  connection: local
+
+  roles:
+    - packages

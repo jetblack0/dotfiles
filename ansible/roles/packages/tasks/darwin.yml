@@ -1,0 +1,6 @@
+---
+# Homebrew refuses to run as root, so no become here.
+- name: Install packages with Homebrew
+  community.general.homebrew:
+    name: "{{ packages_common + packages_darwin }}"
+    state: present
