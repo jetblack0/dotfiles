@@ -54,7 +54,9 @@ copy_repo() {
     docker exec "$ctr" mkdir -p /root/dotfiles
     git -C "$REPO" ls-files -z --cached --others --exclude-standard \
         | while IFS= read -r -d '' f; do
-              [ -e "$REPO/$f" ] && printf '%s\0' "$f"   # the index can list deleted files
+              # -e skips files deleted from the index; -h keeps symlinks
+              # whose targets do not exist on the host
+              { [ -e "$REPO/$f" ] || [ -h "$REPO/$f" ]; } && printf '%s\0' "$f"
           done \
         | tar -C "$REPO" "${tarflags[@]}" --null -T - -cf - \
         | docker cp - "$ctr:/root/dotfiles"
