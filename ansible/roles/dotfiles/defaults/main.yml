@@ -1,0 +1,11 @@
+---
+# Resolved relative to the playbook so that both push (ansible-playbook)
+# and pull (ansible-pull) modes find it.
+dotfiles_src: "{{ playbook_dir | dirname }}/config"
+
+# Where the managed directories land.
+dotfiles_dest: "{{ ansible_facts['user_dir'] }}/.config"
+
+# Directories about to be changed are snapshotted here first, one folder per
+# playbook run.
+dotfiles_backup: "{{ ansible_facts['user_dir'] }}/.local/state/dotfiles/backup/{{ ansible_facts['date_time']['iso8601_basic_short'] }}"

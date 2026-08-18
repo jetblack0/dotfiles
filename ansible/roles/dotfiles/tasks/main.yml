@@ -1,0 +1,20 @@
+---
+# Every top-level directory under config/ is one managed unit: installed and
+# updated as a whole. Anything else in ~/.config is never touched.
+- name: Discover the directories the repo manages
+  ansible.builtin.find:
+    paths: "{{ dotfiles_src }}"
+    file_type: directory
+    recurse: false
+  register: dotfiles_found
+
+- name: Ensure the destination exists
+  ansible.builtin.file:
+    path: "{{ dotfiles_dest }}"
+    state: directory
+
+- name: Sync each managed directory
+  ansible.builtin.include_tasks: sync.yml
+  loop: "{{ dotfiles_found.files | map(attribute='path') | map('basename') | sort }}"
+  loop_control:
+    loop_var: dotfiles_dir
