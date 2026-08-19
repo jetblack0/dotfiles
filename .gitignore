@@ -1,0 +1,7 @@
+config/config/*/example*
+**/.git
+
+# session context for ai assistants
+.ctx/
+
+.DS_Store
