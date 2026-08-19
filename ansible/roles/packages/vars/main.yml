@@ -1,0 +1,30 @@
+---
+# Per-manager views derived from `packages` (see defaults/main.yml).
+# Resolution per entry and platform:
+#   arch:   aur -> AUR;  pacman false -> skipped;  pacman/name -> pacman
+#   macos:  cask -> cask;  brew false -> skipped;  brew/name -> formula
+packages_enabled: "{{ packages | rejectattr('name', 'in', packages_exclude) | list }}"
+
+packages_pacman: >-
+  {{ (packages_enabled | rejectattr('aur', 'defined')
+                       | selectattr('pacman', 'defined')
+                       | rejectattr('pacman', 'sameas', false)
+                       | map(attribute='pacman') | list)
+   + (packages_enabled | rejectattr('aur', 'defined')
+                       | rejectattr('pacman', 'defined')
+                       | map(attribute='name') | list) }}
+
+packages_aur: "{{ packages_enabled | selectattr('aur', 'defined') | map(attribute='aur') | list }}"
+
+packages_brew: >-
+  {{ (packages_enabled | rejectattr('cask', 'defined')
+                       | selectattr('brew', 'defined')
+                       | rejectattr('brew', 'sameas', false)
+                       | map(attribute='brew') | list)
+   + (packages_enabled | rejectattr('cask', 'defined')
+                       | rejectattr('brew', 'defined')
+                       | map(attribute='name') | list) }}
+
+packages_casks: "{{ packages_enabled | selectattr('cask', 'defined') | map(attribute='cask') | list }}"
+
+packages_taps: "{{ packages_enabled | selectattr('tap', 'defined') | map(attribute='tap') | unique | list }}"

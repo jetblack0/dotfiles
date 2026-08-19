@@ -1,20 +1,90 @@
 ---
-# Tools available under the same name.
+# One entry per tool. `name` is the package name under every manager
+# unless a manager key says otherwise:
+#   pacman: <name> | false    different name on arch / not installed there
+#   aur:    <name>            comes from the AUR instead of pacman
+#   brew:   <name> | false    different name on macos / not installed there
+#   cask:   <name>            homebrew cask instead of a formula
+#   tap:    <user/repo>       third-party tap providing the formula
+# The per-manager lists are derived in vars/main.yml.
 # ---------------------------------------------
-packages_common:
-  - bat
-  - btop
-  - fd
-  - fzf
-  - git
-  - jq
-  - lazygit
-  - neovim
-  - ripgrep
-  - tmux
-  - yazi
+packages:
+  # shell, terminal & files
+  - { name: bat }
+  - { name: dua-cli }
+  - { name: eza }
+  - { name: fd }
+  - { name: fzf }
+  - { name: jq }
+  - { name: kitty-terminfo, brew: false }
+  - { name: ouch }
+  - { name: ripgrep }
+  - { name: tmux }
+  - { name: yazi }
+  - { name: zoxide }
 
-# Platform-only tools, or tools under a different name.
+  # system monitors & info
+  - { name: bottom }
+  - { name: btop }
+  - { name: fastfetch }
+
+  # git & code
+  - { name: git }
+  - { name: git-delta }
+  - { name: lazygit }
+  - { name: tokei }
+
+  # editor & docs
+  - { name: neovim }
+  - { name: glow }
+  - { name: tealdeer }
+
+  # mail & feeds
+  - { name: aerc }
+  - { name: newsboat }
+
+  # secrets
+  - { name: pass }
+
+  # basics macOS already ships
+  - { name: curl, brew: false }
+  - { name: man-db, brew: false }
+  - { name: man-pages, brew: false }
+  - { name: openssh, brew: false }
+  - { name: rsync, brew: false }
+  - { name: unzip, brew: false } # mason unpacks LSP archives with it
+  - { name: zsh, brew: false }
+
+  # nvim toolchain: mason installs LSPs with these.
+  - { name: jdk17-openjdk, brew: false }
+  - { name: nodejs, brew: node }
+  - { name: npm, brew: false } # brew's node ships npm
+  - { name: python }
+  - { name: python-pip, brew: false } # brew's python ships pip
+  - { name: tree-sitter-cli, brew: tree-sitter }
+
+  # python tooling
+  - { name: uv }
+
+  # cloud & devops
+  - { name: ansible }
+  - { name: argocd }
+  - { name: aws-cli, brew: awscli }
+  - { name: colima, pacman: false } # backs the docker cli on macos
+  - { name: docker } # engine on arch, plain cli on macos
+  - { name: docker-compose }
+  - { name: helm }
+  - { name: kubectl }
+  - { name: opentofu }
+
+  # ai
+  - { name: claude-code, aur: claude-code, cask: claude-code@latest }
+  - { name: ollama }
+  - { name: opencode, tap: anomalyco/tap }
+
+  # misc
+  - { name: xdg-ninja, aur: xdg-ninja }
+
+# Entries to skip by canonical name, e.g. on a distro that lacks them.
 # ---------------------------------------------
-packages_archlinux: []
-packages_darwin: []
+packages_exclude: []
