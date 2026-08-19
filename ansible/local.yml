@@ -4,5 +4,5 @@
   connection: local
 
   roles:
-    - packages
-    - dotfiles
+    - { role: packages, tags: packages }
+    - { role: dotfiles, tags: dotfiles }
