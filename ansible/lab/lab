@@ -5,7 +5,8 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
 
-SAFE_TERM=xterm-256color
+LAB_TERM="${TERM:-xterm-256color}"
+LAB_COLORTERM="${COLORTERM:-truecolor}"
 
 usage() {
     cat <<EOF
@@ -51,7 +52,7 @@ copy_repo() {
     local tarflags=(--no-xattrs)
     tar --version | grep -q bsdtar && tarflags+=(--no-mac-metadata)
 
-    docker exec "$ctr" mkdir -p /root/dotfiles
+    docker exec "$ctr" mkdir -p /home/dev/dotfiles
     git -C "$REPO" ls-files -z --cached --others --exclude-standard \
         | while IFS= read -r -d '' f; do
               # -e skips files deleted from the index; -h keeps symlinks
@@ -59,13 +60,14 @@ copy_repo() {
               { [ -e "$REPO/$f" ] || [ -h "$REPO/$f" ]; } && printf '%s\0' "$f"
           done \
         | tar -C "$REPO" "${tarflags[@]}" --null -T - -cf - \
-        | docker cp - "$ctr:/root/dotfiles"
+        | docker cp - "$ctr:/home/dev/dotfiles"
+    docker exec -u root "$ctr" chown -R dev:dev /home/dev/dotfiles
 }
 
 shell() {
     running || die "no running container -- run: ${0##*/} start $distro"
     local tty=(-i); [ -t 0 ] && tty=(-it)   # -t breaks under scripts/CI with no tty
-    docker exec "${tty[@]}" -e TERM="$SAFE_TERM" -w /root/dotfiles "$ctr" bash
+    docker exec "${tty[@]}" -e TERM="$LAB_TERM" -e COLORTERM="$LAB_COLORTERM" -w /home/dev/dotfiles "$ctr" bash
 }
 
 start() {
@@ -74,7 +76,12 @@ start() {
     docker run -d --name "$ctr" --hostname "lab-$distro" "$img" >/dev/null
     copy_repo
     echo "fresh $distro box, repo copied to ~/dotfiles -- try:"
-    echo "    ansible-playbook ansible/local.yml"
+    # Arch Linux ARM trails mainline: skip the packages it does not carry.
+    if [ "$distro" = archlinux ] && [ "$(docker version --format '{{.Server.Arch}}')" = arm64 ]; then
+        echo "    ansible-playbook ansible/local.yml -e '{\"packages_exclude\": [\"ollama\", \"opencode\"]}'"
+    else
+        echo "    ansible-playbook ansible/local.yml"
+    fi
     shell
 }
 
