@@ -15,6 +15,9 @@
 
 - name: Sync each managed directory
   ansible.builtin.include_tasks: sync.yml
-  loop: "{{ dotfiles_found.files | map(attribute='path') | map('basename') | sort }}"
+  loop: >-
+    {{ dotfiles_found.files | map(attribute='path') | map('basename')
+     | difference(dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))
+     | sort }}
   loop_control:
     loop_var: dotfiles_dir

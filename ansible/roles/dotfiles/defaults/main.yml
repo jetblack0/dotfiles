@@ -9,3 +9,22 @@ dotfiles_dest: "{{ ansible_facts['user_dir'] }}/.config"
 # Directories about to be changed are snapshotted here first, one folder per
 # playbook run.
 dotfiles_backup: "{{ ansible_facts['user_dir'] }}/.local/state/dotfiles/backup/{{ ansible_facts['date_time']['iso8601_basic_short'] }}"
+
+# Directories masked from a given platform.
+dotfiles_mask:
+  archlinux: []
+  darwin:
+    - dunst
+    - fontconfig
+    - foot
+    - gtk-2.0
+    - gtk-3.0
+    - hypr
+    - Kvantum
+    - nsxiv
+    - qt5ct
+    - rofi
+    - systemd
+    - waybar
+    - X11
+    - zathura
