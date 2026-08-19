@@ -11,6 +11,7 @@
 packages:
   # shell, terminal & files
   - { name: bat }
+  - { name: dash, brew: false } # /usr/bin/sh on arch
   - { name: dua-cli }
   - { name: eza }
   - { name: fd }
