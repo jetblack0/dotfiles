@@ -1,7 +1,7 @@
 ---
 # Resolved relative to the playbook so that both push (ansible-playbook)
 # and pull (ansible-pull) modes find it.
-dotfiles_src: "{{ playbook_dir | dirname }}/config"
+dotfiles_src: "{{ playbook_dir | dirname }}/config/config"
 
 # Where the managed directories land.
 dotfiles_dest: "{{ ansible_facts['user_dir'] }}/.config"
