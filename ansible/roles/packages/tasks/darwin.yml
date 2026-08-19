@@ -1,6 +1,44 @@
 ---
-# Homebrew refuses to run as root, so no become here.
+# Homebrew refuses to run as root, so no become on any brew task.
+- name: Check whether Homebrew is installed
+  ansible.builtin.shell: >-
+    command -v brew
+    || test -x /opt/homebrew/bin/brew
+    || test -x /usr/local/bin/brew
+  register: packages_brew_check
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+# The official installer; it uses sudo internally, so on a machine where
+# sudo wants a password run `sudo -v` in the same terminal first.
+- name: Install Homebrew
+  ansible.builtin.shell: >-
+    /bin/bash -c
+    "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  environment:
+    NONINTERACTIVE: "1"
+  when: packages_brew_check.rc != 0
+
+- name: Tap third-party repositories
+  community.general.homebrew_tap:
+    name: "{{ packages_taps }}"
+  when: packages_taps | length > 0
+
+# Homebrew refuses to load formulae from untrusted third-party taps.
+- name: Trust the third-party taps
+  ansible.builtin.command: brew trust {{ item }}
+  loop: "{{ packages_taps }}"
+  register: packages_brew_trust
+  changed_when: "'Already trusted' not in packages_brew_trust.stdout"
+
 - name: Install packages with Homebrew
   community.general.homebrew:
-    name: "{{ packages_common + packages_darwin }}"
+    name: "{{ packages_brew }}"
     state: present
+
+- name: Install cask packages with Homebrew
+  community.general.homebrew_cask:
+    name: "{{ packages_casks }}"
+    state: present
+  when: packages_casks | length > 0

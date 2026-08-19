@@ -2,6 +2,64 @@
 - name: Install packages with pacman
   become: true
   community.general.pacman:
-    name: "{{ packages_common + packages_archlinux }}"
+    name: "{{ packages_pacman }}"
     state: present
     update_cache: true
+
+# AUR
+# ---------------------------------------------
+- name: Install AUR build prerequisites
+  become: true
+  community.general.pacman:
+    name:
+      - base-devel
+      - git
+      - sudo
+    state: present
+
+- name: Create the AUR build user
+  become: true
+  ansible.builtin.user:
+    name: aur_builder
+    system: true
+    create_home: true
+    home: /var/lib/aur_builder
+
+- name: Allow the AUR build user to run pacman
+  become: true
+  ansible.builtin.copy:
+    content: "aur_builder ALL=(ALL) NOPASSWD: /usr/bin/pacman\n"
+    dest: /etc/sudoers.d/aur_builder
+    mode: "0440"
+    validate: visudo -cf %s
+
+- name: Check whether paru is installed
+  ansible.builtin.command: paru --version
+  register: packages_paru_check
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+# Built from source rather than paru-bin.
+- name: Build and install paru
+  become: true
+  become_user: aur_builder
+  ansible.builtin.shell:
+    cmd: |
+      set -e
+      rm -rf "$HOME/paru"
+      git clone https://aur.archlinux.org/paru.git "$HOME/paru"
+      cd "$HOME/paru"
+      makepkg -si --noconfirm
+      rm -rf "$HOME/paru"
+    creates: /usr/bin/paru
+  when: packages_paru_check.rc != 0
+
+- name: Install packages from the AUR
+  become: true
+  become_user: aur_builder
+  ansible.builtin.command:
+    argv: "{{ ['paru', '-S', '--needed', '--noconfirm'] + packages_aur }}"
+  register: packages_paru_install
+  changed_when: "'there is nothing to do' not in packages_paru_install.stdout"
+  when: packages_aur | length > 0
