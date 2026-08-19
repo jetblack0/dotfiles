@@ -55,11 +55,23 @@
     creates: /usr/bin/paru
   when: packages_paru_check.rc != 0
 
+# Only ever install what is missing: handing paru the full list would
+# rebuild a package on every AUR version bump, turning each run into a
+# surprise upgrade. Updates stay a deliberate `paru -Syu`.
+- name: Check which AUR packages are already installed
+  ansible.builtin.command:
+    argv: "{{ ['pacman', '-Qq'] + packages_aur }}"
+  register: packages_aur_query
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  when: packages_aur | length > 0
+
 - name: Install packages from the AUR
   become: true
   become_user: aur_builder
   ansible.builtin.command:
-    argv: "{{ ['paru', '-S', '--needed', '--noconfirm'] + packages_aur }}"
-  register: packages_paru_install
-  changed_when: "'there is nothing to do' not in packages_paru_install.stdout"
-  when: packages_aur | length > 0
+    argv: "{{ ['paru', '-S', '--needed', '--noconfirm'] + packages_aur_missing }}"
+  vars:
+    packages_aur_missing: "{{ packages_aur | difference(packages_aur_query.stdout_lines | default([])) }}"
+  when: packages_aur | length > 0 and packages_aur_missing | length > 0
