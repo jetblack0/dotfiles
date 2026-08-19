@@ -1,0 +1,8 @@
+---
+- name: Install the system-wide zsh environment
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_src }}/zsh/zshenv"
+    dest: /etc/zshenv
+    mode: "0644"
+    remote_src: true

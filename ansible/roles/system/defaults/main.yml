@@ -1,0 +1,3 @@
+---
+# The repo's etc/ tree.
+system_src: "{{ playbook_dir | dirname }}/config/etc"

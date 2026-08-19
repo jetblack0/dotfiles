@@ -1,0 +1,10 @@
+---
+- name: Fail on unsupported platforms
+  ansible.builtin.fail:
+    msg: >-
+      Unsupported platform '{{ ansible_facts['os_family'] }}':
+      this playbook only targets Arch Linux and macOS.
+  when: ansible_facts['os_family'] not in ['Archlinux', 'Darwin']
+
+- name: Configure the system
+  ansible.builtin.include_tasks: "{{ ansible_facts['os_family'] | lower }}.yml"

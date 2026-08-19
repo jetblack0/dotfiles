@@ -1,0 +1,117 @@
+---
+- name: Install the system-wide zsh environment
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_src }}/zsh/zshenv"
+    dest: /etc/zsh/zshenv
+    mode: "0644"
+    remote_src: true
+
+- name: Change the login shell to zsh
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    shell: /usr/bin/zsh
+
+- name: Point sh at dash
+  become: true
+  ansible.builtin.file:
+    src: dash
+    dest: /usr/bin/sh
+    state: link
+    force: true
+
+- name: Ensure the pacman hook directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/pacman.d/hooks
+    state: directory
+    mode: "0755"
+
+# The bash package owns /usr/bin/sh, so every bash upgrade resets the
+# symlink; this hook points it back at dash after each transaction.
+- name: Keep sh pointing at dash across bash upgrades
+  become: true
+  ansible.builtin.copy:
+    src: dash-as-sh.hook
+    dest: /etc/pacman.d/hooks/dash-as-sh.hook
+    mode: "0644"
+
+# The regexps match the stock commented lines as well as values the user
+# already set, so these converge no matter what state the file is in.
+- name: Enable the en_US locale
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/locale.gen
+    regexp: '^#?\s*en_US\.UTF-8 UTF-8'
+    line: en_US.UTF-8 UTF-8
+  register: system_locale_gen
+
+- name: Check which locales are generated
+  ansible.builtin.command: locale -a
+  register: system_locales
+  changed_when: false
+  check_mode: false
+
+- name: Generate the en_US locale
+  become: true
+  ansible.builtin.command: locale-gen
+  when: system_locale_gen is changed or system_locales.stdout is not search("en_US.utf8")
+
+- name: Default LANG to the en_US locale
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/locale.conf
+    regexp: '^LANG='
+    line: LANG=en_US.UTF-8
+    create: true
+    mode: "0644"
+
+- name: Turn on pacman colors
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^#?\s*Color'
+    line: Color
+    insertafter: '^\[options\]'
+
+- name: Download packages in parallel
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/pacman.conf
+    regexp: '^#?\s*ParallelDownloads'
+    line: ParallelDownloads = 5
+    insertafter: '^\[options\]'
+
+# makepkg sources /etc/makepkg.conf.d/*.conf on its own; $(nproc) is
+# evaluated at build time.
+- name: Let makepkg build on all cores
+  become: true
+  ansible.builtin.copy:
+    content: |
+      MAKEFLAGS="-j$(nproc)"
+    dest: /etc/makepkg.conf.d/makeflags.conf
+    mode: "0644"
+
+- name: Trim the ssd weekly
+  become: true
+  ansible.builtin.systemd_service:
+    name: fstrim.timer
+    enabled: true
+
+- name: Ensure the journald drop-in directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/systemd/journald.conf.d
+    state: directory
+    mode: "0755"
+
+# the default cap is 10% of the filesystem, up to 4G of logs.
+- name: Cap the journal size
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Journal]
+      SystemMaxUse=500M
+    dest: /etc/systemd/journald.conf.d/size.conf
+    mode: "0644"
