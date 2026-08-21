@@ -1,0 +1,185 @@
+#!/usr/bin/env bash
+# Disposable macOS VMs for testing the darwin side of the playbooks, via
+# tart (Virtualization.framework, Apple Silicon only).
+#
+# Same rules as ./lab: the guest is a stock image plus ansible and an ssh
+# key (baked into a local template once by `build`), no host directory is
+# shared, and the repo is *copied* in over ssh.
+#
+# The base image download is ~25 GB (one-time, cached by tart), and
+# Apple's EULA/Virtualization.framework allows at most 2 macOS VMs
+# running per host.
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$HERE/../.." && pwd)"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/mac"
+
+# sequoia rather than tahoe: a guest newer than the host is the shaky
+# path under Virtualization.framework, and sequoia matches the macs this
+# playbook actually targets today
+IMAGE=ghcr.io/cirruslabs/macos-sequoia-base:latest
+TEMPLATE=dotfiles-lab-mac-template
+VM=dotfiles-lab-mac
+
+usage() {
+    cat <<EOF
+usage: ${0##*/} <command> [arg]
+
+commands:
+  build   pull the base image (~25 GB, once) and bake a local template:
+          our ssh key, passwordless sudo, ansible via the bundled brew
+  start   clone the template into a fresh vm (instant, copy-on-write),
+          boot it, copy the repo to ~/dotfiles and open a shell
+          (pass --headless as the second argument to skip the vm window)
+  shell   open another shell in the running vm
+  stop    stop and delete the vm (the template and image cache stay)
+
+The guest is the cirruslabs sequoia base image: user 'admin', brew
+preinstalled. Unlike linux, the primary macos user is uid 501 -- which is
+exactly what the playbook should meet on a real mac.
+EOF
+}
+
+die() { echo "${0##*/}: $*" >&2; exit 1; }
+
+cmd="${1:-}"
+arg="${2:-}"
+
+case "$cmd" in ''|help|-h|--help) usage; exit 0 ;; esac
+command -v tart >/dev/null || die "tart not found (see the lab README)"
+
+ssh_opts=(-i "$CACHE/key" -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+          -o ServerAliveInterval=15)
+
+exists()  { tart list --quiet 2>/dev/null | grep -qx "$1"; }
+running() { tart list 2>/dev/null | awk -v vm="$1" '$0 ~ vm && /running/' | grep -q .; }
+
+# never fails: tart ip exits non-zero while the vm has no address yet,
+# which under set -e would kill the boot wait loop on its first poll
+vm_ip() { tart ip "$1" 2>/dev/null || true; }
+
+vm_ssh() {  # vm_ssh <vm> [-t] cmd...
+    local target="$1"; shift
+    local tty=()
+    [ "${1:-}" = -t ] && { tty=(-t); shift; }
+    ssh "${tty[@]}" "${ssh_opts[@]}" "admin@$(vm_ip "$target")" "$@"
+}
+
+boot() {  # boot <vm> [--headless] -- run detached, wait for ssh
+    local target="$1" graphics=()
+    [ "${2:-}" = --headless ] && graphics=(--no-graphics)
+    (tart run "$target" "${graphics[@]}" >/dev/null 2>&1 &)
+    echo -n "waiting for ssh"
+    # a port probe, not an ssh login: during build the key is not planted
+    # yet, so authenticated ssh cannot be the readiness signal
+    local i ip
+    for i in $(seq 1 120); do
+        ip="$(vm_ip "$target")"
+        if [ -n "$ip" ] && nc -z -w 2 "$ip" 22 2>/dev/null; then
+            echo " up"; return 0
+        fi
+        echo -n .; sleep 5
+    done
+    die "vm never came up (try: tart run $target)"
+}
+
+build() {
+    [ -f "$CACHE/key" ] || { mkdir -p "$CACHE"; ssh-keygen -q -t ed25519 -N "" -f "$CACHE/key"; }
+    running "$TEMPLATE" && tart stop "$TEMPLATE"
+    exists "$TEMPLATE" && tart delete "$TEMPLATE"
+
+    echo "cloning $IMAGE (first time downloads ~25 GB)"
+    tart clone "$IMAGE" "$TEMPLATE"
+    boot "$TEMPLATE" --headless
+
+    # the stock image only takes passwords; plant our key with expect
+    # (ships with macos), then everything else runs over key auth
+    local ip; ip="$(vm_ip "$TEMPLATE")"
+    /usr/bin/expect -f - "$ip" "$(cat "$CACHE/key.pub")" <<'EOF'
+set timeout 60
+set ip  [lindex $argv 0]
+set key [lindex $argv 1]
+spawn ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+    admin@$ip "mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '$key' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+expect "assword:" { send "admin\r" }
+expect eof
+catch wait result
+exit [lindex $result 3]
+EOF
+
+    echo "provisioning the template"
+    # labs cannot answer sudo prompts, hence NOPASSWD (mirrors ./lab)
+    vm_ssh "$TEMPLATE" "echo admin | sudo -S sh -c \
+        'echo \"admin ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/admin && chmod 440 /etc/sudoers.d/admin'"
+
+    # public resolvers: the guest's NAT DNS forwarder breaks when the
+    # HOST resolves through 127.0.0.1 (local dns tools, vpns) -- queries
+    # time out while direct ones work fine
+    vm_ssh "$TEMPLATE" "sudo networksetup -setdnsservers Ethernet 1.1.1.1 8.8.8.8"
+    # full paths: a non-interactive ssh command has no login-shell PATH.
+    # retried because first-boot downloads over a flaky network are
+    # exactly where one dns hiccup should not sink a 25 GB investment
+    local try
+    for try in 1 2 3; do
+        vm_ssh "$TEMPLATE" "/opt/homebrew/bin/brew install ansible" && break
+        [ "$try" = 3 ] && die "brew install ansible kept failing (network?)"
+        echo "brew install failed (attempt $try), retrying in 15s"
+        sleep 15
+    done
+    vm_ssh "$TEMPLATE" "/opt/homebrew/bin/ansible --version | head -1"
+
+    tart stop "$TEMPLATE"
+    echo "template ready -- ${0##*/} start"
+}
+
+copy_repo() {
+    local tarflags=(--no-xattrs --no-mac-metadata)
+    git -C "$REPO" ls-files -z --cached --others --exclude-standard \
+        | while IFS= read -r -d '' f; do
+              { [ -e "$REPO/$f" ] || [ -h "$REPO/$f" ]; } && printf '%s\0' "$f"
+          done \
+        | tar -C "$REPO" "${tarflags[@]}" --null -T - -czf - \
+        | vm_ssh "$VM" 'rm -rf ~/dotfiles && mkdir -p ~/dotfiles && tar -xzf - -C ~/dotfiles'
+}
+
+shell() {
+    running "$VM" || die "no running vm -- run: ${0##*/} start"
+    if [ -t 0 ]; then
+        vm_ssh "$VM" -t 'cd ~/dotfiles 2>/dev/null; exec zsh -l'
+    else
+        vm_ssh "$VM" zsh -l
+    fi
+}
+
+start() {
+    exists "$TEMPLATE" || die "no template yet -- run: ${0##*/} build"
+    running "$VM" && tart stop "$VM"
+    exists "$VM" && tart delete "$VM"
+    tart clone "$TEMPLATE" "$VM"
+    boot "$VM" "$arg"
+    copy_repo
+    echo "fresh macos vm, repo copied to ~/dotfiles -- try:"
+    echo "    ansible-playbook ansible/local.yml"
+    shell
+}
+
+stop() {
+    if exists "$VM"; then
+        running "$VM" && tart stop "$VM"
+        tart delete "$VM"
+        echo "removed $VM"
+    else
+        echo "nothing to remove"
+    fi
+}
+
+case "$cmd" in
+    build) build ;;
+    start) start ;;
+    shell) shell ;;
+    stop)  stop ;;
+    *) die "unknown command '$cmd' (try: ${0##*/} help)" ;;
+esac
