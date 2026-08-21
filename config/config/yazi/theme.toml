@@ -3,10 +3,6 @@
 [mgr]
 cwd = { fg = "magenta", bold = true }
 
-# Syntax highlighting in the preview pane, shared with bat.
-syntect_theme = "~/.config/bat/themes/gruvbox-dark.tmTheme"
-# ---------------------------------------------
-
 
 # Mode indicator
 # ---------------------------------------------
