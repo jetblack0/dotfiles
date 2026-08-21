@@ -17,6 +17,7 @@ packages:
   - { name: fd }
   - { name: fzf }
   - { name: jq }
+  - { name: kitty, cask: kitty }
   - { name: kitty-terminfo, brew: false }
   - { name: ouch }
   - { name: ripgrep }
