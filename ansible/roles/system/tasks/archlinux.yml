@@ -98,6 +98,7 @@
   ansible.builtin.systemd_service:
     name: fstrim.timer
     enabled: true
+    state: "{{ (ansible_facts['service_mgr'] == 'systemd') | ternary('started', omit) }}"
 
 - name: Ensure the journald drop-in directory exists
   become: true
