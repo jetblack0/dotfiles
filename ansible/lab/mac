@@ -22,6 +22,7 @@ CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/mac"
 IMAGE=ghcr.io/cirruslabs/macos-sequoia-base:latest
 TEMPLATE=dotfiles-lab-mac-template
 VM=dotfiles-lab-mac
+RELAY_PORT=8890
 
 usage() {
     cat <<EOF
@@ -50,7 +51,7 @@ arg="${2:-}"
 case "$cmd" in ''|help|-h|--help) usage; exit 0 ;; esac
 command -v tart >/dev/null || die "tart not found (see the lab README)"
 
-ssh_opts=(-i "$CACHE/key" -o StrictHostKeyChecking=no
+ssh_opts=(-i "$CACHE/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
           -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
           -o ServerAliveInterval=15)
 
@@ -67,6 +68,23 @@ vm_ssh() {  # vm_ssh <vm> [-t] cmd...
     [ "${1:-}" = -t ] && { tty=(-t); shift; }
     ssh "${tty[@]}" "${ssh_opts[@]}" "admin@$(vm_ip "$target")" "$@"
 }
+
+# guests reach the internet through this host-side relay: their raw nat
+# path skips the host's vpn (github resets), while host-originated
+# traffic rides it. bound to the bridge address, so only guests reach it.
+relay_up() {  # relay_up <gateway-ip>
+    [ -f "$CACHE/relay.pid" ] && kill -0 "$(cat "$CACHE/relay.pid")" 2>/dev/null && return 0
+    python3 "$HERE/lib/relay.py" "$1" "$RELAY_PORT" >/dev/null 2>&1 &
+    echo $! > "$CACHE/relay.pid"
+}
+
+relay_down() {
+    [ -f "$CACHE/relay.pid" ] && kill "$(cat "$CACHE/relay.pid")" 2>/dev/null
+    rm -f "$CACHE/relay.pid"
+    return 0
+}
+
+gw_of() { local ip; ip="$(vm_ip "$1")"; echo "${ip%.*}.1"; }
 
 boot() {  # boot <vm> [--headless] -- run detached, wait for ssh
     local target="$1" graphics=()
@@ -102,13 +120,17 @@ build() {
 set timeout 60
 set ip  [lindex $argv 0]
 set key [lindex $argv 1]
-spawn ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+spawn ssh -o PubkeyAuthentication=no -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
     admin@$ip "mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '$key' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
 expect "assword:" { send "admin\r" }
 expect eof
 catch wait result
 exit [lindex $result 3]
 EOF
+
+    # fail loudly if the plant did not take: a silent failure here once
+    # shipped a template with no key and no provisioning at all
+    vm_ssh "$TEMPLATE" true || die "key auth still failing after the plant"
 
     echo "provisioning the template"
     # labs cannot answer sudo prompts, hence NOPASSWD (mirrors ./lab)
@@ -122,9 +144,11 @@ EOF
     # full paths: a non-interactive ssh command has no login-shell PATH.
     # retried because first-boot downloads over a flaky network are
     # exactly where one dns hiccup should not sink a 25 GB investment
-    local try
+    local gw try
+    gw="$(gw_of "$TEMPLATE")"
+    relay_up "$gw"
     for try in 1 2 3; do
-        vm_ssh "$TEMPLATE" "/opt/homebrew/bin/brew install ansible" && break
+        vm_ssh "$TEMPLATE" "http_proxy=http://$gw:$RELAY_PORT https_proxy=http://$gw:$RELAY_PORT /opt/homebrew/bin/brew install ansible" && break
         [ "$try" = 3 ] && die "brew install ansible kept failing (network?)"
         echo "brew install failed (attempt $try), retrying in 15s"
         sleep 15
@@ -160,6 +184,19 @@ start() {
     exists "$VM" && tart delete "$VM"
     tart clone "$TEMPLATE" "$VM"
     boot "$VM" "$arg"
+
+    # every login shell in the guest rides the host network from here on
+    local gw; gw="$(gw_of "$VM")"
+    relay_up "$gw"
+    # /etc/zprofile, not ~/.zprofile: the playbook's /etc/zshenv moves
+    # ZDOTDIR into ~/.config, after which ~/.zprofile is never read again
+    vm_ssh "$VM" 'grep -q lab-relay /etc/zprofile 2>/dev/null || sudo tee -a /etc/zprofile >/dev/null' <<EOF
+# lab-relay: ride the host network (vpn included), not the raw nat
+export http_proxy=http://$gw:$RELAY_PORT https_proxy=http://$gw:$RELAY_PORT
+export HTTP_PROXY=\$http_proxy HTTPS_PROXY=\$https_proxy
+export no_proxy=localhost,127.0.0.1 NO_PROXY=localhost,127.0.0.1
+EOF
+
     copy_repo
     echo "fresh macos vm, repo copied to ~/dotfiles -- try:"
     echo "    ansible-playbook ansible/local.yml"
@@ -170,6 +207,7 @@ stop() {
     if exists "$VM"; then
         running "$VM" && tart stop "$VM"
         tart delete "$VM"
+        relay_down
         echo "removed $VM"
     else
         echo "nothing to remove"
