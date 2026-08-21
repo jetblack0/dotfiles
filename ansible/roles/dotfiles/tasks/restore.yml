@@ -1,0 +1,81 @@
+---
+# Puts the snapshots taken by sync.yml back into ~/.config -- the undo
+# button for anyone who tried these dotfiles and wants their own back.
+#
+# Each directory is restored from its OLDEST snapshot: that is the state
+# it had before the playbook ever touched it, no matter how many runs
+# happened since. Directories the playbook created from scratch have no
+# snapshot and are left in place -- nothing of yours is in them.
+
+- name: Look for backup snapshots
+  ansible.builtin.find:
+    paths: "{{ dotfiles_backup_root }}"
+    file_type: directory
+    recurse: false
+  register: dotfiles_restore_runs
+
+- name: Fail when there is nothing to restore
+  ansible.builtin.fail:
+    msg: "No backups under {{ dotfiles_backup_root }} -- nothing to restore."
+  when: dotfiles_restore_runs.files | length == 0
+
+- name: List the snapshotted directories
+  ansible.builtin.find:
+    paths: "{{ dotfiles_restore_runs.files | map(attribute='path') | sort }}"
+    file_type: directory
+    recurse: false
+  register: dotfiles_restore_found
+
+# Sorted newest-first, then dict() keeps the LAST occurrence per name --
+# which is the oldest snapshot, the pre-playbook original.
+- name: Pick the oldest snapshot of each directory
+  ansible.builtin.set_fact:
+    dotfiles_restore_map: >-
+      {{ dict(dotfiles_restore_found.files | map(attribute='path')
+              | sort(reverse=true) | map('basename')
+              | zip(dotfiles_restore_found.files | map(attribute='path')
+              | sort(reverse=true))) }}
+
+# compare.py rather than `diff -rq`: diff is not guaranteed on a minimal
+# system, python is what ansible itself runs on
+- name: Check which directories differ from their snapshot
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_facts['python']['executable'] }}"
+      - "{{ role_path }}/files/compare.py"
+      - "{{ item.value }}"
+      - "{{ dotfiles_dest }}/{{ item.key }}"
+  loop: "{{ dotfiles_restore_map | dict2items | sort(attribute='key') }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: dotfiles_restore_diff
+  changed_when: false
+  failed_when: dotfiles_restore_diff.rc not in [0, 1, 2]
+
+- name: Remove the current version of each differing directory
+  ansible.builtin.file:
+    path: "{{ dotfiles_dest }}/{{ item.item.key }}"
+    state: absent
+  loop: "{{ dotfiles_restore_diff.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+  when: item.rc != 0
+
+# cp -a for the same reason sync.yml uses it: symlinks, modes and times
+# come back exactly as they were snapshotted.
+- name: Put the snapshot back
+  ansible.builtin.command:
+    argv: [cp, -a, "{{ item.item.value }}", "{{ dotfiles_dest }}/{{ item.item.key }}"]
+  loop: "{{ dotfiles_restore_diff.results }}"
+  loop_control:
+    label: "{{ item.item.key }}"
+  when: item.rc != 0
+
+- name: Report what happened
+  ansible.builtin.debug:
+    msg: >-
+      Restored {{ dotfiles_restore_diff.results | rejectattr('rc', 'eq', 0) | map(attribute='item.key') | sort | join(', ')
+                  if dotfiles_restore_diff.results | rejectattr('rc', 'eq', 0) | list | length > 0
+                  else 'nothing -- everything already matches the snapshots' }}.
+      The snapshots stay under {{ dotfiles_backup_root }}; delete them yourself
+      once you are sure.

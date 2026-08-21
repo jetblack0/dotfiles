@@ -1,0 +1,12 @@
+---
+# The undo button: put the dotfiles snapshots taken by the dotfiles role
+# back into ~/.config. See roles/dotfiles/tasks/restore.yml for the rules.
+- name: Restore the pre-playbook dotfiles
+  hosts: localhost
+  connection: local
+
+  tasks:
+    - name: Restore from the backup snapshots
+      ansible.builtin.import_role:
+        name: dotfiles
+        tasks_from: restore

@@ -7,8 +7,9 @@ dotfiles_src: "{{ playbook_dir | dirname }}/config/config"
 dotfiles_dest: "{{ ansible_facts['user_dir'] }}/.config"
 
 # Directories about to be changed are snapshotted here first, one folder per
-# playbook run.
-dotfiles_backup: "{{ ansible_facts['user_dir'] }}/.local/state/dotfiles/backup/{{ ansible_facts['date_time']['iso8601_basic_short'] }}"
+# playbook run (restore.yml puts them back).
+dotfiles_backup_root: "{{ ansible_facts['user_dir'] }}/.local/state/dotfiles/backup"
+dotfiles_backup: "{{ dotfiles_backup_root }}/{{ ansible_facts['date_time']['iso8601_basic_short'] }}"
 
 # Directories masked from a given platform.
 dotfiles_mask:
