@@ -21,3 +21,6 @@
      | sort }}
   loop_control:
     loop_var: dotfiles_dir
+
+- name: Initialize the yazi plugins
+  ansible.builtin.import_tasks: yazi.yml

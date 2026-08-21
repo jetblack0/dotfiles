@@ -1,0 +1,29 @@
+---
+- name: Work out which yazi plugins should be installed
+  ansible.builtin.set_fact:
+    dotfiles_yazi_plugins: >-
+      {{ lookup('ansible.builtin.file', dotfiles_src ~ '/yazi/package.toml')
+         | regex_findall('use\s*=\s*"([^"]+)"')
+         | map('regex_replace', '^.*[:/]', '')
+         | map('regex_replace', '$', '.yazi')
+         | sort }}
+
+- name: See which of them are already there
+  ansible.builtin.find:
+    paths: "{{ dotfiles_dest }}/yazi/plugins"
+    file_type: directory
+    recurse: false
+  register: dotfiles_yazi_installed
+
+- name: Install the yazi plugins
+  when: >-
+    dotfiles_yazi_plugins
+    | difference(dotfiles_yazi_installed.files | map(attribute='path') | map('basename'))
+    | length > 0
+  ansible.builtin.command:
+    argv: [ya, pkg, install]
+  environment:
+    # brew's bin is not on ansible's non-login PATH
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+  register: dotfiles_yazi_pkg
+  changed_when: dotfiles_yazi_pkg.rc == 0
