@@ -56,7 +56,7 @@ esac
 vm="$CACHE/$distro"
 base="$CACHE/base/$distro.qcow2"
 qemu="qemu-system-$guest_arch"
-ssh_opts=(-p "$SSH_PORT" -i "$vm/key" -o StrictHostKeyChecking=no
+ssh_opts=(-p "$SSH_PORT" -i "$vm/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
           -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
           -o ServerAliveInterval=15)
 
