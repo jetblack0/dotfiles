@@ -49,6 +49,7 @@ packages:
 
   # basics macOS already ships
   - { name: curl, brew: false }
+  - { name: diffutils, brew: false } # git/nvim shell out to diff
   - { name: man-db, brew: false }
   - { name: man-pages, brew: false }
   - { name: openssh, brew: false }
@@ -62,7 +63,7 @@ packages:
   - { name: npm, brew: false } # brew's node ships npm
   - { name: python }
   - { name: python-pip, brew: false } # brew's python ships pip
-  - { name: tree-sitter-cli, brew: tree-sitter }
+  - { name: tree-sitter-cli } # NOT brew's tree-sitter: that is library-only
 
   # python tooling
   - { name: uv }
