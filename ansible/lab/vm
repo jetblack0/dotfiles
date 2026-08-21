@@ -1,0 +1,227 @@
+#!/usr/bin/env bash
+# Disposable QEMU virtual machines for testing the playbooks end to end,
+# desktop included: a real boot, a real login and a real DRM display
+# (virtio-gpu).
+#
+# Same rules as ./lab: the guest is a stock cloud image plus the primary
+# user and ansible (cloud-init provisions both), no host directory is
+# shared, and the repo is *copied* in over ssh.
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$HERE/../.." && pwd)"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/vm"
+SSH_PORT=2222
+
+usage() {
+    cat <<EOF
+usage: ${0##*/} <command> <distro> [arg]
+
+commands:
+  start       boot a fresh vm, provision the primary user and ansible via
+              cloud-init, copy the repo to ~/dotfiles and open a shell
+              (pass --headless as the third argument to skip the window)
+  shell       open another shell in the running vm
+  screenshot  dump the virtual monitor to a png ([arg] = output file)
+  stop        power the vm off and remove its state
+
+distros:
+  archlinux   the official x86_64 cloud image -- mainline arch, so unlike
+              the container lab nothing needs to be excluded
+
+The vm runs accelerated when host and guest architectures match (kvm on
+linux, hvf on macos) and falls back to slow emulation otherwise. State
+lives under $CACHE.
+EOF
+}
+
+die() { echo "${0##*/}: $*" >&2; exit 1; }
+
+cmd="${1:-}"
+distro="${2:-}"
+arg="${3:-}"
+
+case "$cmd" in ''|help|-h|--help) usage; exit 0 ;; esac
+[ -n "$distro" ] || die "missing distro (try: ${0##*/} help)"
+
+case "$distro" in
+    archlinux)
+        guest_arch=x86_64
+        img_url="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+        ;;
+    *) die "unknown distro '$distro' (try: ${0##*/} help)" ;;
+esac
+
+vm="$CACHE/$distro"
+base="$CACHE/base/$distro.qcow2"
+qemu="qemu-system-$guest_arch"
+ssh_opts=(-p "$SSH_PORT" -i "$vm/key" -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+          -o ServerAliveInterval=15)
+
+running() { [ -f "$vm/pid" ] && kill -0 "$(cat "$vm/pid")" 2>/dev/null; }
+
+vm_ssh() {  # vm_ssh [-t] cmd...
+    local tty=()
+    [ "${1:-}" = -t ] && { tty=(-t); shift; }
+    ssh "${tty[@]}" "${ssh_opts[@]}" dev@127.0.0.1 "$@"
+}
+
+accel_args() {
+    if [ "$(uname -m)" = "$guest_arch" ]; then
+        case "$(uname -s)" in
+            Darwin) echo "-accel hvf -cpu host" ;;
+            Linux)  echo "-accel kvm -cpu host" ;;
+        esac
+    else
+        # cross-arch emulation: correct but slow, fine for occasional runs
+        echo "-accel tcg -cpu max"
+    fi
+}
+
+make_seed() {
+    ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
+    mkdir -p "$vm/seed"
+    # replaces the image's default user, so ours gets uid 1000
+    cat > "$vm/seed/user-data" <<EOF
+#cloud-config
+users:
+  - name: dev
+    groups: wheel
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - $(cat "$vm/key.pub")
+runcmd:
+  - pacman -Syu --noconfirm ansible
+EOF
+    printf 'instance-id: lab-vm-%s\nlocal-hostname: lab-vm-%s\n' \
+        "$distro" "$distro" > "$vm/seed/meta-data"
+
+    # cloud-init's nocloud source wants an iso labeled cidata
+    if command -v hdiutil >/dev/null; then
+        hdiutil makehybrid -quiet -iso -joliet -default-volume-name cidata \
+            -o "$vm/seed.iso" "$vm/seed"
+    elif command -v xorriso >/dev/null; then
+        xorriso -as mkisofs -quiet -V cidata -J -r -o "$vm/seed.iso" "$vm/seed"
+    elif command -v mkisofs >/dev/null; then
+        mkisofs -quiet -V cidata -J -r -o "$vm/seed.iso" "$vm/seed"
+    else
+        die "need hdiutil, xorriso or mkisofs to build the cloud-init seed"
+    fi
+}
+
+copy_repo() {
+    # what a fresh clone would contain plus new files not yet committed;
+    # macOS tar needs to be told not to smuggle in apple metadata
+    local tarflags=(--no-xattrs)
+    tar --version | grep -q bsdtar && tarflags+=(--no-mac-metadata)
+
+    git -C "$REPO" ls-files -z --cached --others --exclude-standard \
+        | while IFS= read -r -d '' f; do
+              { [ -e "$REPO/$f" ] || [ -h "$REPO/$f" ]; } && printf '%s\0' "$f"
+          done \
+        | tar -C "$REPO" "${tarflags[@]}" --null -T - -czf - \
+        | vm_ssh 'rm -rf ~/dotfiles && mkdir -p ~/dotfiles && tar -xzf - -C ~/dotfiles'
+}
+
+shell() {
+    running || die "no running vm -- run: ${0##*/} start $distro"
+    if [ -t 0 ]; then
+        vm_ssh -t 'cd ~/dotfiles 2>/dev/null; exec bash'
+    else
+        vm_ssh bash
+    fi
+}
+
+start() {
+    command -v "$qemu" >/dev/null \
+        || die "$qemu not found (install qemu: brew install qemu / pacman -S qemu-desktop)"
+    running && stop
+    rm -rf "$vm"
+    mkdir -p "$vm" "$CACHE/base"
+
+    if [ ! -f "$base" ]; then
+        echo "downloading $img_url"
+        curl -fL --progress-bar -o "$base.part" "$img_url" && mv "$base.part" "$base"
+    fi
+
+    qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
+    make_seed
+
+    local display=()
+    [ "$arg" = --headless ] && display=(-display none)
+    # shellcheck disable=SC2046
+    "$qemu" \
+        -name "lab-vm-$distro" -machine q35 -m 4096 -smp 4 \
+        $(accel_args) \
+        -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
+        -cdrom "$vm/seed.iso" \
+        -device virtio-gpu-pci -device virtio-rng-pci \
+        -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" \
+        -qmp "unix:$vm/qmp.sock,server,nowait" \
+        -serial "file:$vm/serial.log" \
+        -pidfile "$vm/pid" \
+        "${display[@]}" &
+
+    sleep 2
+    running || die "qemu did not start (see $vm/serial.log)"
+
+    echo -n "waiting for ssh"
+    local i
+    for i in $(seq 1 120); do
+        vm_ssh -o ConnectTimeout=2 true 2>/dev/null && break
+        echo -n .; sleep 5
+        [ "$i" = 120 ] && die "vm never came up (see $vm/serial.log)"
+    done
+    echo " up"
+
+    echo "waiting for cloud-init to install ansible (slow under emulation)"
+    vm_ssh sudo cloud-init status --wait >/dev/null
+
+    copy_repo
+    echo "fresh $distro vm, repo copied to ~/dotfiles -- try:"
+    echo "    ansible-playbook ansible/local.yml"
+    shell
+}
+
+stop() {
+    if running; then
+        kill "$(cat "$vm/pid")"
+        echo "stopped lab-vm-$distro"
+    else
+        echo "nothing to stop"
+    fi
+}
+
+screenshot() {
+    running || die "no running vm -- run: ${0##*/} start $distro"
+    local out="${arg:-$vm/screen.png}"
+    python3 - "$vm/qmp.sock" "$out" <<'EOF'
+import json, socket, sys
+s = socket.socket(socket.AF_UNIX)
+s.connect(sys.argv[1])
+f = s.makefile("rw")
+json.loads(f.readline())  # greeting
+def cmd(c):
+    f.write(json.dumps(c) + "\n"); f.flush()
+    while True:
+        r = json.loads(f.readline())
+        if "return" in r or "error" in r:
+            return r
+cmd({"execute": "qmp_capabilities"})
+r = cmd({"execute": "screendump",
+         "arguments": {"filename": sys.argv[2], "format": "png"}})
+sys.exit(0 if "return" in r else 1)
+EOF
+    echo "$out"
+}
+
+case "$cmd" in
+    start)      start ;;
+    shell)      shell ;;
+    stop)       stop ;;
+    screenshot) screenshot ;;
+    *) die "unknown command '$cmd' (try: ${0##*/} help)" ;;
+esac
