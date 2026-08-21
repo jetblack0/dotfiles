@@ -31,6 +31,10 @@
   loop: "{{ packages_taps }}"
   register: packages_brew_trust
   changed_when: "'Already trusted' not in packages_brew_trust.stdout"
+  environment:
+    # the homebrew modules know these prefixes on their own; a raw brew
+    # command does not, and ansible does not run in a login shell
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
 
 - name: Install packages with Homebrew
   community.general.homebrew:
