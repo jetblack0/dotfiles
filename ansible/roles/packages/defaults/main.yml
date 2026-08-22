@@ -25,6 +25,11 @@ packages:
   - { name: yazi }
   - { name: zoxide }
 
+  # fonts kitty asks for by name
+  - { name: noto-fonts-cjk, cask: font-noto-sans-cjk }
+  - { name: ttf-jetbrains-mono-nerd, cask: font-jetbrains-mono-nerd-font }
+  - { name: ttf-udev-gothic, aur: ttf-udev-gothic, cask: font-udev-gothic-nf }
+
   # system monitors & info
   - { name: bottom }
   - { name: btop }
