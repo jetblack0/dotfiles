@@ -269,13 +269,44 @@ vim.lsp.config.yamlls = {
 -- Ops
 -- ---------------------------------------------
 -- Ansible
+local ansible_lint_fatal = {
+  ["args"] = true,
+  ["internal-error"] = true,
+  ["jinja[invalid]"] = true,
+  ["load-failure"] = true,
+  ["no-free-form"] = true,
+  ["parser-error"] = true,
+  ["schema"] = true,
+  ["syntax-check"] = true,
+  ["var-naming[no-jinja]"] = true,
+  ["var-naming[no-reserved]"] = true,
+  ["var-naming[pattern]"] = true,
+}
+
+local publish_diagnostics = vim.lsp.handlers["textDocument/publishDiagnostics"]
+
+local function ansible_diagnostics(err, result, ctx)
+  for _, d in ipairs(result and result.diagnostics or {}) do
+    -- Codes are "rule" or "rule[subrule]" and a subrule can be listed alone.
+    local code = type(d.code) == "string" and d.code or ""
+    local fatal = ansible_lint_fatal[code] or ansible_lint_fatal[code:gsub("%[.*", "")]
+    if d.source == "ansible-lint" and not fatal
+      and d.severity == vim.lsp.protocol.DiagnosticSeverity.Error then
+      d.severity = vim.lsp.protocol.DiagnosticSeverity.Warning
+    end
+  end
+  return publish_diagnostics(err, result, ctx)
+end
+
 vim.lsp.config.ansiblels = {
   filetypes = { "yaml.ansible", "ansible" },
   cmd = { "ansible-language-server", "--stdio" },
 	capabilities = capabilities,
 	on_attach = on_attach,
-  root_markers = { "ansible.cfg", ".ansible-lint" },
-  single_file_support = true,
+  root_markers = { "ansible.cfg", ".ansible-lint", "galaxy.yml", ".git" },
+  handlers = {
+    ["textDocument/publishDiagnostics"] = ansible_diagnostics,
+  },
 	settings = {
     ansible = {
       ansible = {
@@ -284,14 +315,12 @@ vim.lsp.config.ansiblels = {
       executionEnvironment = {
         enabled = false
       },
-      python = {
-        interpreterPath = "python"
-      },
       validation = {
         enabled = true,
         lint = {
           enabled = true,
-          path = "ansible-lint --profile basic --offline"
+          path = "ansible-lint",
+          arguments = ""
         }
       }
     }
