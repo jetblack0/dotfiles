@@ -569,6 +569,10 @@ vim.keymap.set("n", "<leader>q", function()
 	Snacks.picker.files()
 end, { desc = "Snacks file picker" })
 
+vim.keymap.set("n", "<leader>b", function()
+	Snacks.picker.buffers()
+end, { desc = "Snacks buffer picker" })
+
 vim.keymap.set("n", "<leader>r", function()
 	Snacks.picker.command_history()
 end, { desc = "Snacks command history" })
