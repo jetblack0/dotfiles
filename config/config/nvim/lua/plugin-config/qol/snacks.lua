@@ -34,8 +34,42 @@ local function worktree_icon(item, picker)
     "SnacksPickerGitStatus" .. name:sub(1, 1):upper() .. name:sub(2)
 end
 
--- Remember cursor and expanded dirs, restore on the next open.
+-- Remember cursor, scroll, expanded dirs and toggles, restore on the next open.
 local last_explorer = nil
+
+-- Toggles live on the picker, so a fresh one loses them.
+local function explorer_snapshot(picker, with_tree)
+  local cwd, item, open = picker:cwd(), picker:current(), nil
+  local toggles = {}
+  for name in pairs(picker.opts.toggles or {}) do
+    toggles[name] = picker.opts[name] or false
+  end
+  if with_tree then
+    local tree = require("snacks.explorer.tree")
+    open = {}
+    tree:walk(tree:find(cwd), function(node)
+      if node.dir and node.open then open[#open + 1] = node.path end
+    end, { all = true })
+  end
+  return {
+    cwd = cwd,
+    file = item and item.file or nil,
+    open = open,
+    toggles = toggles,
+    offset = picker.list.cursor - picker.list.top,
+  }
+end
+
+-- Opening the explorer in a new tab builds a second picker while the first one
+-- is still open, so last_explorer holds whatever the previous close left. A
+-- live sibling is the better source.
+local function explorer_sibling(picker)
+  for _, p in ipairs(Snacks.picker.get({ source = "explorer", tab = false })) do
+    if p ~= picker and not p.closed and p:cwd() == picker:cwd() then
+      return p
+    end
+  end
+end
 
 snacks.setup({
   bigfile = {
@@ -276,37 +310,24 @@ snacks.setup({
         follow_file = false,
 
         on_close = function(picker)
-          local tree = require("snacks.explorer.tree")
-          local cwd, item, open = picker:cwd(), picker:current(), {}
-          tree:walk(tree:find(cwd), function(node)
-            if node.dir and node.open then open[#open + 1] = node.path end
-          end, { all = true })
-          -- `.` and `>` flip these, but they live on the picker, so a fresh one
-          -- filters hidden/ignored files out again -- taking the cursor target
-          -- with them.
-          local toggles = {}
-          for name in pairs(picker.opts.toggles or {}) do
-            toggles[name] = picker.opts[name] or false
-          end
-          last_explorer = {
-            cwd = cwd,
-            file = item and item.file or nil,
-            open = open,
-            toggles = toggles,
-            offset = picker.list.cursor - picker.list.top,
-          }
+          last_explorer = explorer_snapshot(picker, true)
         end,
 
         on_show = function(picker)
-          local state = last_explorer
+          local sibling = explorer_sibling(picker)
+          local state = sibling and explorer_snapshot(sibling, false) or last_explorer
           if not state or state.cwd ~= picker:cwd() then return end
+
           -- snacks re-expands the path to the current buffer on every open,
-          -- which undoes a `W`. Put the tree back the way it was left.
-          local tree = require("snacks.explorer.tree")
-          tree:close_all(state.cwd)
-          for _, path in ipairs(state.open) do
-            local node = tree.nodes[path]
-            if node then node.open = true end
+          -- which undoes a `W`. Put the tree back the way it was left. A
+          -- sibling's tree is already ours, so there is nothing to rebuild.
+          if state.open then
+            local tree = require("snacks.explorer.tree")
+            tree:close_all(state.cwd)
+            for _, path in ipairs(state.open) do
+              local node = tree.nodes[path]
+              if node then node.open = true end
+            end
           end
 
           -- The finder reads these when it runs, so set them before the find.
