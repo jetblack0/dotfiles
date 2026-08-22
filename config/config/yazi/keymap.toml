@@ -71,8 +71,8 @@ keymap = [
 	{ on = [ "r" ], run = "rename --cursor=before_ext",         desc = "rename, cursor before the extension" },
 	{ on = [ "R" ], run = "rename --cursor=start --empty=stem", desc = "rename, replacing the whole stem" },
 
-	# Quoting "$@" keeps names with spaces in one piece.
-	{ on = [ "E" ],       run = "shell 'ouch decompress \"$@\"'", desc = "decompress archives" },
+	# %s expands to the selected paths, already quoted by yazi.
+	{ on = [ "E" ],       run = "shell 'ouch decompress %s'", desc = "decompress archives" },
 	{ on = [ "<Enter>" ], run = "shell --interactive",            desc = "run a shell command" },
 
 	{ on = [ "i" ], run = "spot", desc = "show spot dialog" },

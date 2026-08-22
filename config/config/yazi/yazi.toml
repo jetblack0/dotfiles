@@ -19,25 +19,25 @@ image_quality = 70                     # 50-90, lower is faster to decode
 # ---------------------------------------------
 [opener]
 edit = [
-	{ run = 'nvim "$@"', block = true, for = "unix" },
+	{ run = 'nvim %s', block = true, for = "unix" },
 ]
 image = [
-	{ run = 'nsxiv "$@"', orphan = true, for = "linux" },
-	{ run = 'open "$@"',  orphan = true, for = "macos" },
+	{ run = 'nsxiv %s', orphan = true, for = "linux" },
+	{ run = 'open %s',  orphan = true, for = "macos" },
 ]
 video = [
-	{ run = 'mpv "$@"', orphan = true, for = "unix" },
+	{ run = 'mpv %s', orphan = true, for = "unix" },
 ]
 audio = [
-	{ run = 'mpv --audio-display=no "$@"', for = "unix" },
+	{ run = 'mpv --audio-display=no %s', for = "unix" },
 ]
 book = [
-	{ run = 'zathura "$@"', orphan = true, for = "unix" },
+	{ run = 'zathura %s', orphan = true, for = "unix" },
 ]
 # Hand anything unrecognised to the desktop.
 fallback-open = [
-	{ run = 'xdg-open "$@"', for = "linux" },
-	{ run = 'open "$@"',     for = "macos" },
+	{ run = 'xdg-open %s', for = "linux" },
+	{ run = 'open %s',     for = "macos" },
 ]
 # ---------------------------------------------
 
