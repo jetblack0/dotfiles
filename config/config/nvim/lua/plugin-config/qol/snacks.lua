@@ -519,11 +519,6 @@ vim.keymap.set("n", "<c-w>D", function()
   vim.notify("Deleted current buffer", vim.log.levels.WARN)
 end, { desc = "Delete current buffer" })
 
-vim.keymap.set("n", "<c-w>D", function()
-  Snacks.bufdelete.others()
-  vim.notify("Deleted all buffers except the curent one", vim.log.levels.WARN)
-end, { desc = "Delete current buffer" })
-
 -- zen mode
 vim.keymap.set("n", "<leader>z", function()
   vim.g.snacks_scope = true
