@@ -1,0 +1,12 @@
+---
+skip_list:
+  - name[template]
+  - no-handler
+  - var-naming[no-role-prefix]
+
+warn_list:
+  - no-changed-when
+  - risky-file-permissions
+
+exclude_paths:
+  - lab/
