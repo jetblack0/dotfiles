@@ -1,0 +1,84 @@
+---
+- name: Fail on unsupported platforms
+  ansible.builtin.fail:
+    msg: >-
+      Unsupported platform '{{ ansible_facts['os_family'] }}':
+      this playbook only targets Arch Linux and macOS.
+  when: ansible_facts['os_family'] not in ['Archlinux', 'Darwin']
+
+- name: Remember which anatomy applies
+  ansible.builtin.set_fact:
+    zen_os: "{{ ansible_facts['os_family'] | lower }}"
+
+# The profile directory has a random name; the registry knows it. Zen is
+# only told a profile NAME to create, so it alone decides where things
+# live, and the registry is re-read afterwards.
+- name: Look for zen's profile registry
+  ansible.builtin.stat:
+    path: "{{ item }}/profiles.ini"
+  loop: "{{ zen_roots[zen_os] }}"
+  register: zen_ini
+
+- name: Create a profile when zen has none
+  ansible.builtin.command:
+    argv:
+      - "{{ zen_bin[zen_os] }}"
+      - -CreateProfile
+      - dotfiles
+  environment:
+    MOZ_HEADLESS: "1"
+  when: zen_ini.results | selectattr('stat.exists') | length == 0
+
+- name: Look again after creating
+  ansible.builtin.stat:
+    path: "{{ item }}/profiles.ini"
+  loop: "{{ zen_roots[zen_os] }}"
+  register: zen_ini
+
+- name: Read the registry
+  ansible.builtin.set_fact:
+    zen_root: "{{ (zen_ini.results | selectattr('stat.exists') | map(attribute='item') | first) }}"
+
+- name: Parse the registry
+  ansible.builtin.slurp:
+    src: "{{ zen_root }}/profiles.ini"
+  register: zen_ini_raw
+
+# Prefer the installation's default profile; a registry fresh from
+# -CreateProfile has no install section yet, so fall back to the first
+# (and only) profile entry.
+- name: Resolve the profile directory
+  ansible.builtin.set_fact:
+    zen_profile: >-
+      {{ zen_root ~ '/' ~
+         ((zen_ini_raw.content | b64decode
+           | regex_search('\[Install[^\]]*\]\r?\nDefault=(.+)', '\1'))
+          or (zen_ini_raw.content | b64decode
+              | regex_search('(?m)^Path=(.+)$', '\1'))) | first }}
+
+- name: Install the zen settings
+  ansible.builtin.copy:
+    src: "{{ zen_src }}/{{ item }}"
+    dest: "{{ zen_profile }}/{{ item }}"
+    mode: "0644"
+    remote_src: true
+  loop:
+    - user.js
+    - zen-keyboard-shortcuts.json
+
+- name: Ensure the distribution directory exists
+  become: "{{ zen_os == 'archlinux' }}"
+  ansible.builtin.file:
+    path: "{{ zen_policies_dir[zen_os] }}"
+    state: directory
+    mode: "0755"
+
+# Declarative extension installs; wiped by app updates on macos, which the
+# next converge simply puts back.
+- name: Install the extension policies
+  become: "{{ zen_os == 'archlinux' }}"
+  ansible.builtin.copy:
+    src: "{{ zen_src }}/policies.json"
+    dest: "{{ zen_policies_dir[zen_os] }}/policies.json"
+    mode: "0644"
+    remote_src: true

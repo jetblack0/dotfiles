@@ -1,0 +1,20 @@
+---
+zen_src: "{{ playbook_dir | dirname }}/config/zen"
+
+# Where zen may keep its profile registry, in lookup order: modern zen is
+# XDG-aware on linux and only falls back to ~/.zen when it already exists.
+zen_roots:
+  archlinux:
+    - "{{ ansible_facts['user_dir'] }}/.config/zen"
+    - "{{ ansible_facts['user_dir'] }}/.zen"
+  darwin:
+    - "{{ ansible_facts['user_dir'] }}/Library/Application Support/zen"
+
+zen_bin:
+  archlinux: /usr/bin/zen-browser
+  darwin: /Applications/Zen.app/Contents/MacOS/zen
+
+# policies.json lives with the installation, not the profile.
+zen_policies_dir:
+  archlinux: /opt/zen-browser-bin/distribution
+  darwin: /Applications/Zen.app/Contents/Resources/distribution
