@@ -46,6 +46,11 @@ packages:
   - { name: glow }
   - { name: tealdeer }
 
+  # documents
+  - { name: zathura, tap: homebrew-zathura/zathura }
+  - { name: zathura-pdf-poppler, tap: homebrew-zathura/zathura }
+  - { name: girara, pacman: false, tap: homebrew-zathura/zathura }
+
   # mail & feeds
   - { name: aerc }
   - { name: newsboat }
@@ -89,6 +94,9 @@ packages:
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }
   - { name: ollama }
   - { name: opencode, tap: anomalyco/tap }
+
+  # browser
+  - { name: zen-browser, aur: zen-browser-bin, cask: zen }
 
   # misc
   - { name: xdg-ninja, aur: xdg-ninja }
