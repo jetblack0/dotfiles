@@ -45,4 +45,33 @@
   community.general.homebrew_cask:
     name: "{{ packages_casks }}"
     state: present
+    # adopt apps that were installed manually (dmg) before the playbook
+    # took over -- brew otherwise refuses to touch an app it does not own
+    install_options: adopt
   when: packages_casks | length > 0
+
+- name: Check whether zathura still runs
+  ansible.builtin.command: zathura --version
+  register: packages_zathura_check
+  changed_when: false
+  failed_when: false
+  check_mode: false
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Rebuild zathura when girara broke it
+  ansible.builtin.command: brew reinstall zathura zathura-pdf-poppler
+  when: packages_zathura_check.rc != 0
+  environment:
+    PATH: "/opt/homebrew/bin:/usr/local/bin:{{ ansible_env.PATH }}"
+
+- name: Ensure zathura's plugin directory exists
+  ansible.builtin.file:
+    path: /opt/homebrew/opt/zathura/lib/zathura
+    state: directory
+
+- name: Link the pdf plugin into zathura
+  ansible.builtin.file:
+    src: /opt/homebrew/opt/zathura-pdf-poppler/libpdf-poppler.dylib
+    dest: /opt/homebrew/opt/zathura/lib/zathura/libpdf-poppler.dylib
+    state: link
