@@ -28,4 +28,3 @@ dotfiles_mask:
     - systemd
     - waybar
     - X11
-    - zathura
