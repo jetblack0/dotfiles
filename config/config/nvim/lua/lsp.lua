@@ -48,6 +48,11 @@ local on_attach = function(client, bufnr)
   end
 end
 
+-- Diagnostics also come from nvim-lint, so these must not wait for an LSP.
+vim.keymap.set("n", "<leader>j", function() vim.diagnostic.jump({ count = 1, float = true }) end, opt("Next Diagnostic"))
+vim.keymap.set("n", "<leader>k", function() vim.diagnostic.jump({ count =-1, float = true }) end, opt("Prev Diagnostic"))
+vim.keymap.set("n", "<leader>l", vim.diagnostic.open_float, opt("Open diagnostic in float"))
+
 vim.api.nvim_create_autocmd("LspAttach", {
   callback = function(ev)
     local bufnr = ev.buf
@@ -61,9 +66,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     local keymap = vim.keymap.set
     local lsp = vim.lsp
 
-    keymap("n", "<leader>j", function() vim.diagnostic.jump({ count = 1, float = true }) end, opt("Next Diagnostic"))
-    keymap("n", "<leader>k", function() vim.diagnostic.jump({ count =-1, float = true }) end, opt("Prev Diagnostic"))
-    keymap("n", "<leader>l", vim.diagnostic.open_float, opt("Open diagnostic in float"))
     -- keymap("n", "<Leader>f", vim.cmd.FormatToggle, opt("Toggle AutoFormat"))
     keymap("n", "<leader>a", lsp.buf.code_action, opt("Code Action"))
 
