@@ -14,6 +14,7 @@ conform.setup({
       'ruff_format',
     },
     -- groovy = { "npm-groovy-lint" },
+    nix = { "alejandra" },
     -- Uses OpenTofu's `tofu fmt` (canonical HCL, same output as
     -- `terraform fmt`). Doesn't rely on terraform-ls, which can't format
     -- without the `terraform` binary installed.
