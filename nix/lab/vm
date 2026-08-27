@@ -1,0 +1,304 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$HERE/../.." && pwd)"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/nixos"
+SSH_PORT=2223   # 2222 belongs to the ansible vm lab; both can run at once
+RELEASE=26.05   # the image's release; match stateVersion
+
+usage() {
+    cat <<EOF
+usage: ${0##*/} <command> [arg]
+
+commands:
+  start       boot a fresh vm, bring its network up and plant an ssh key
+              over the serial console, copy the repo to ~/dotfiles and
+              open a root shell (pass --headless to skip the window)
+  shell       open another shell in the running vm
+  sync        copy the repo into the running vm again, replacing
+              ~/dotfiles.
+  screenshot  dump the virtual monitor to a png ([arg] = output file)
+  stop        power the vm off and remove its state
+
+The guest is the official nixos $RELEASE incus vm image for the host's
+architecture, accelerated with kvm/hvf. The base image is cached under
+$CACHE (delete it to pick up a newer build).
+EOF
+}
+
+die() { echo "${0##*/}: $*" >&2; exit 1; }
+
+cmd="${1:-}"
+arg="${2:-}"
+
+case "$cmd" in ''|help|-h|--help) usage; exit 0 ;; esac
+
+case "$(uname -m)" in
+    arm64|aarch64) guest_arch=aarch64 ;;
+    x86_64)        guest_arch=x86_64 ;;
+    *) die "unsupported host architecture $(uname -m)" ;;
+esac
+
+vm="$CACHE/vm"
+base="$CACHE/base/nixos-$RELEASE-$guest_arch.qcow2"
+qemu="qemu-system-$guest_arch"
+img_url="https://hydra.nixos.org/job/nixos/release-$RELEASE/nixos.incusVirtualMachineImage.$guest_arch-linux/latest/download/1"
+ssh_opts=(-p "$SSH_PORT" -i "$vm/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
+          -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+          -o ServerAliveInterval=15)
+
+running() { [ -f "$vm/pid" ] && kill -0 "$(cat "$vm/pid")" 2>/dev/null; }
+
+vm_ssh() {  # vm_ssh [-t] cmd...
+    local tty=()
+    [ "${1:-}" = -t ] && { tty=(-t); shift; }
+    ssh "${tty[@]}" "${ssh_opts[@]}" root@127.0.0.1 "$@"
+}
+
+accel_args() {
+    # guest always matches the host, so acceleration is the norm
+    case "$(uname -s)" in
+        Darwin) echo "-accel hvf -cpu host" ;;
+        Linux)  if [ -w /dev/kvm ]; then echo "-accel kvm -cpu host"
+                else echo "-accel tcg -cpu max"; fi ;;
+    esac
+}
+
+machine_args() {
+    case "$guest_arch" in
+        aarch64) echo "-machine virt" ;;
+        x86_64)  echo "-machine q35" ;;
+    esac
+}
+
+first_existing() {
+    local f; for f in "$@"; do [ -f "$f" ] && { echo "$f"; return; }; done
+    return 1
+}
+
+# the image boots with systemd-boot from an EFI partition, so qemu needs
+# UEFI firmware; probe the locations brew and the usual distros use
+firmware_args() {
+    local share code vars
+    share="$(cd "$(dirname "$(command -v "$qemu")")/../share/qemu" && pwd)"
+    case "$guest_arch" in
+        aarch64)
+            code=$(first_existing "$share/edk2-aarch64-code.fd" \
+                                  /usr/share/edk2/aarch64/QEMU_CODE.fd \
+                                  /usr/share/AAVMF/AAVMF_CODE.fd)
+            vars=$(first_existing "$share/edk2-arm-vars.fd" \
+                                  /usr/share/edk2/aarch64/QEMU_VARS.fd \
+                                  /usr/share/AAVMF/AAVMF_VARS.fd)
+            ;;
+        x86_64)
+            code=$(first_existing "$share/edk2-x86_64-code.fd" \
+                                  /usr/share/edk2/x64/OVMF_CODE.4m.fd \
+                                  /usr/share/OVMF/OVMF_CODE_4M.fd \
+                                  /usr/share/OVMF/OVMF_CODE.fd)
+            vars=$(first_existing "$share/edk2-i386-vars.fd" \
+                                  /usr/share/edk2/x64/OVMF_VARS.4m.fd \
+                                  /usr/share/OVMF/OVMF_VARS_4M.fd \
+                                  /usr/share/OVMF/OVMF_VARS.fd)
+            ;;
+    esac
+    [ -n "${code:-}" ] && [ -n "${vars:-}" ] \
+        || die "no UEFI firmware found (install edk2-ovmf / qemu with edk2)"
+    cp "$vars" "$vm/vars.fd"
+    echo "-drive if=pflash,format=raw,readonly=on,file=$code" \
+         "-drive if=pflash,format=raw,file=$vm/vars.fd"
+}
+
+provision() {
+    python3 - "$vm/serial.sock" "$(cat "$vm/key.pub")" <<'EOF'
+import socket, sys, time
+
+s = socket.socket(socket.AF_UNIX)
+s.connect(sys.argv[1])
+s.settimeout(2.0)
+buf = b""
+
+def wait_for(tokens, timeout, nudge=None):
+    global buf
+    deadline = time.monotonic() + timeout
+    nudged = 0.0
+    while time.monotonic() < deadline:
+        if nudge and time.monotonic() - nudged > 5:
+            s.sendall(nudge); nudged = time.monotonic()
+        try:
+            data = s.recv(4096)
+            if not data:
+                sys.exit("serial connection closed")
+            buf += data
+        except socket.timeout:
+            sys.stderr.write("."); sys.stderr.flush()
+        for t in tokens:
+            i = buf.find(t)
+            if i >= 0:
+                buf = buf[i + len(t):]
+                return t
+    sys.exit("\ntimed out waiting for %s" % tokens)
+
+wait_for([b"login:"], 600, nudge=b"\r")
+s.sendall(b"root\r")
+# the prompt interleaves ansi escapes, so match the user@host it draws
+wait_for([b"root@nixos"], 60)
+# the quotes keep the sentinels out of the tty's echo of the command
+s.sendall(b"mkdir -p /root/.ssh && chmod 700 /root/.ssh"
+          b" && echo '" + sys.argv[2].encode() + b"' > /root/.ssh/authorized_keys"
+          b" && chmod 600 /root/.ssh/authorized_keys"
+          b" && nic=$(ls /sys/class/net | grep -v '^lo$' | head -1)"
+          b" && ip addr add 10.0.2.15/24 dev $nic && ip link set $nic up"
+          b" && ip route add default via 10.0.2.2"
+          b" && { rm -f /etc/resolv.conf;"
+          b" printf 'nameserver 10.0.2.3\\n' > /etc/resolv.conf; }"
+          b" && echo LAB-'OK' || echo LAB-'FAIL'\r")
+if wait_for([b"LAB-OK", b"LAB-FAIL"], 60) == b"LAB-FAIL":
+    sys.exit("\nprovisioning failed (see serial.log)")
+EOF
+}
+
+copy_repo() {
+    # what a fresh clone would contain plus new files not yet committed;
+    # macOS tar needs to be told not to smuggle in apple metadata
+    local tarflags=(--no-xattrs)
+    tar --version | grep -q bsdtar && tarflags+=(--no-mac-metadata)
+
+    # staged into a single-commit git repo before shipping: a fresh clone
+    # IS a git repo, and the flake needs one -- nix resolves ~/dotfiles/nix
+    # to git+file?dir=nix, which makes ../config part of the flake source,
+    # and a git flake only sees tracked files, so the copy tracks all of it
+    local stage
+    stage=$(mktemp -d)
+    # RETURN traps outlive their function in bash, so disarm after firing
+    trap 'rm -rf "$stage"; trap - RETURN' RETURN
+
+    git -C "$REPO" ls-files -z --cached --others --exclude-standard \
+        | while IFS= read -r -d '' f; do
+              { [ -e "$REPO/$f" ] || [ -h "$REPO/$f" ]; } && printf '%s\0' "$f"
+          done \
+        | tar -C "$REPO" "${tarflags[@]}" --null -T - -cf - \
+        | tar -xf - -C "$stage"
+    git -C "$stage" init -q -b main
+    git -C "$stage" add -A
+    git -C "$stage" -c user.name=lab -c user.email=lab@lab \
+        commit -q -m "lab copy"
+
+    # --no-same-owner: root extracting would preserve the host uid, and
+    # libgit2 refuses a repo not owned by whoever evaluates the flake
+    tar -C "$stage" "${tarflags[@]}" -czf - . \
+        | vm_ssh 'rm -rf ~/dotfiles && mkdir -p ~/dotfiles && tar -xzf - --no-same-owner -C ~/dotfiles'
+}
+
+shell() {
+    running || die "no running vm -- run: ${0##*/} start"
+    if [ -t 0 ]; then
+        vm_ssh -t 'cd ~/dotfiles 2>/dev/null; exec bash'
+    else
+        vm_ssh bash
+    fi
+}
+
+sync() {
+    running || die "no running vm -- run: ${0##*/} start"
+    copy_repo
+    echo "repo synced to ~/dotfiles"
+}
+
+start() {
+    command -v "$qemu" >/dev/null \
+        || die "$qemu not found (install qemu: brew install qemu / pacman -S qemu-desktop)"
+    running && stop
+    rm -rf "$vm"
+    mkdir -p "$vm" "$CACHE/base"
+
+    if [ ! -f "$base" ]; then
+        echo "downloading nixos $RELEASE incus vm image ($guest_arch)"
+        curl -fL --progress-bar -o "$base.part" "$img_url" && mv "$base.part" "$base"
+    fi
+
+    qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
+    ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
+
+    # resolved before the qemu line so a missing firmware dies loudly
+    local fw_args
+    fw_args=$(firmware_args)
+
+    local display=()
+    [ "$arg" = --headless ] && display=(-display none)
+    # shellcheck disable=SC2046,SC2086
+    "$qemu" \
+        -name lab-nixos -m 4096 -smp 4 \
+        $(machine_args) $(accel_args) $fw_args \
+        -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
+        -device virtio-gpu-pci -device virtio-rng-pci \
+        -device qemu-xhci -device usb-kbd -device usb-tablet \
+        -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" \
+        -chardev "socket,id=ser0,path=$vm/serial.sock,server=on,wait=off,logfile=$vm/serial.log" \
+        -serial chardev:ser0 \
+        -qmp "unix:$vm/qmp.sock,server,nowait" \
+        -pidfile "$vm/pid" \
+        "${display[@]}" &
+
+    sleep 2
+    running || die "qemu did not start (see $vm/serial.log)"
+
+    echo -n "waiting for the serial console (network + ssh key)"
+    provision
+    echo " done"
+
+    echo -n "waiting for ssh"
+    local i
+    for i in $(seq 1 60); do
+        vm_ssh -o ConnectTimeout=2 true 2>/dev/null && break
+        echo -n .; sleep 2
+        [ "$i" = 60 ] && die "vm never came up (see $vm/serial.log)"
+    done
+    echo " up"
+
+    copy_repo
+    echo "fresh nixos $RELEASE ($guest_arch) vm, repo copied to ~/dotfiles."
+    shell
+}
+
+stop() {
+    if running; then
+        kill "$(cat "$vm/pid")"
+        echo "stopped lab-nixos"
+    else
+        echo "nothing to stop"
+    fi
+}
+
+screenshot() {
+    running || die "no running vm -- run: ${0##*/} start"
+    local out="${arg:-$vm/screen.png}"
+    python3 - "$vm/qmp.sock" "$out" <<'EOF'
+import json, socket, sys
+s = socket.socket(socket.AF_UNIX)
+s.connect(sys.argv[1])
+f = s.makefile("rw")
+json.loads(f.readline())  # greeting
+def cmd(c):
+    f.write(json.dumps(c) + "\n"); f.flush()
+    while True:
+        r = json.loads(f.readline())
+        if "return" in r or "error" in r:
+            return r
+cmd({"execute": "qmp_capabilities"})
+r = cmd({"execute": "screendump",
+         "arguments": {"filename": sys.argv[2], "format": "png"}})
+sys.exit(0 if "return" in r else 1)
+EOF
+    echo "$out"
+}
+
+case "$cmd" in
+    start)      start ;;
+    shell)      shell ;;
+    sync)       sync ;;
+    stop)       stop ;;
+    screenshot) screenshot ;;
+    *) die "unknown command '$cmd' (try: ${0##*/} help)" ;;
+esac
