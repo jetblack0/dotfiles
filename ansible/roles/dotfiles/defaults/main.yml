@@ -30,6 +30,7 @@ dotfiles_mask:
     - gtk-3.0
     - hypr
     - Kvantum
+    - noctalia
     - nsxiv
     - qt5ct
     - rofi
