@@ -1,0 +1,58 @@
+# Noctalia
+# ---------------------------------------------
+# full reference: https://docs.noctalia.dev (`noctalia msg --help`)
+# ---------------------------------------------
+
+
+# Theme
+# ---------------------------------------------
+[theme]
+mode    = "dark"
+source  = "builtin"
+builtin = "Rosé Pine"
+
+
+# Shell
+# ---------------------------------------------
+[shell]
+font_family  = "CodeNewRoman Nerd Font Propo"
+polkit_agent = true
+
+
+# Bar
+# ---------------------------------------------
+[bar.main]
+position  = "top"
+thickness = 32
+radius    = 10
+
+start  = ["launcher", "workspaces"]
+center = ["clock"]
+end    = ["media", "tray", "notifications", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "control-center", "session"]
+
+
+# Idle
+# ---------------------------------------------
+[idle.behavior.lock]
+timeout = 600
+action  = "lock"
+enabled = true
+
+[idle.behavior.screen-off]
+timeout = 660
+action  = "screen_off"
+enabled = true
+
+
+# Lock screen
+# ---------------------------------------------
+# falls back to the desktop wallpaper.
+[lockscreen]
+enabled         = true
+blurred_desktop = false
+
+
+# Notifications
+# ---------------------------------------------
+[notification]
+enable_daemon = true
