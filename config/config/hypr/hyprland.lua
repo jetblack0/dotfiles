@@ -1,0 +1,5 @@
+require("conf.env")
+require("conf.monitors")
+require("conf.options")
+require("conf.animation")
+require("conf.binds")
