@@ -2,10 +2,6 @@
 # Disposable QEMU virtual machines for testing the playbooks end to end,
 # desktop included: a real boot, a real login and a real DRM display
 # (virtio-gpu).
-#
-# Same rules as ./lab: the guest is a stock cloud image plus the primary
-# user and ansible (cloud-init provisions both), no host directory is
-# shared, and the repo is *copied* in over ssh.
 
 set -euo pipefail
 
@@ -29,6 +25,9 @@ commands:
 distros:
   archlinux   the official x86_64 cloud image -- mainline arch, so unlike
               the container lab nothing needs to be excluded
+  archlinux-arm
+              an aarch64 image lib/build-arm-image assembles from the arch
+              linux arm rootfs tarball.
 
 The vm runs accelerated when host and guest architectures match (kvm on
 linux, hvf on macos) and falls back to slow emulation otherwise. State
@@ -50,6 +49,10 @@ case "$distro" in
         guest_arch=x86_64
         img_url="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
         ;;
+    archlinux-arm)
+        guest_arch=aarch64
+        img_url=            # no upstream image, lib/build-arm-image makes one
+        ;;
     *) die "unknown distro '$distro' (try: ${0##*/} help)" ;;
 esac
 
@@ -68,8 +71,21 @@ vm_ssh() {  # vm_ssh [-t] cmd...
     ssh "${tty[@]}" "${ssh_opts[@]}" dev@127.0.0.1 "$@"
 }
 
+firmware() {
+    local f
+    for f in /opt/homebrew/share/qemu/edk2-aarch64-code.fd \
+             /usr/share/qemu/edk2-aarch64-code.fd \
+             /usr/share/AAVMF/AAVMF_CODE.fd \
+             /usr/share/edk2/aarch64/QEMU_EFI.fd; do
+        [ -f "$f" ] && { echo "$f"; return; }
+    done
+    die "no aarch64 uefi firmware found (install qemu's edk2 firmware)"
+}
+
 accel_args() {
-    if [ "$(uname -m)" = "$guest_arch" ]; then
+    # uname says arm64 where qemu says aarch64
+    local host="$(uname -m)"; [ "$host" = arm64 ] && host=aarch64
+    if [ "$host" = "$guest_arch" ]; then
         case "$(uname -s)" in
             Darwin) echo "-accel hvf -cpu host" ;;
             Linux)  echo "-accel kvm -cpu host" ;;
@@ -143,21 +159,38 @@ start() {
     mkdir -p "$vm" "$CACHE/base"
 
     if [ ! -f "$base" ]; then
-        echo "downloading $img_url"
-        curl -fL --progress-bar -o "$base.part" "$img_url" && mv "$base.part" "$base"
+        if [ -n "$img_url" ]; then
+            echo "downloading $img_url"
+            curl -fL --progress-bar -o "$base.part" "$img_url" && mv "$base.part" "$base"
+        else
+            echo "no $distro image yet, building one"
+            "$HERE/lib/build-arm-image"
+        fi
     fi
 
     qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
     make_seed
 
+    # the virt machine has neither q35's ide to hang the seed off nor a
+    # ps/2 controller, so the seed rides on virtio and input over usb
+    local platform=(-machine q35 -cdrom "$vm/seed.iso")
+    if [ "$guest_arch" = aarch64 ]; then
+        dd if=/dev/zero of="$vm/vars.fd" bs=1m count=64 status=none
+        platform=(-machine virt
+                  -drive if=pflash,format=raw,readonly=on,file="$(firmware)"
+                  -drive if=pflash,format=raw,file="$vm/vars.fd"
+                  -drive if=virtio,file="$vm/seed.iso",format=raw,readonly=on
+                  -device qemu-xhci -device usb-kbd -device usb-tablet)
+    fi
+
     local display=()
     [ "$arg" = --headless ] && display=(-display none)
     # shellcheck disable=SC2046
     "$qemu" \
-        -name "lab-vm-$distro" -machine q35 -m 4096 -smp 4 \
+        -name "lab-vm-$distro" -m 4096 -smp 4 \
+        "${platform[@]}" \
         $(accel_args) \
         -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
-        -cdrom "$vm/seed.iso" \
         -device virtio-gpu-pci -device virtio-rng-pci \
         -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" \
         -qmp "unix:$vm/qmp.sock,server,nowait" \
@@ -177,7 +210,7 @@ start() {
     done
     echo " up"
 
-    echo "waiting for cloud-init to install ansible (slow under emulation)"
+    echo "waiting for cloud-init to install ansible"
     vm_ssh sudo cloud-init status --wait >/dev/null
 
     copy_repo

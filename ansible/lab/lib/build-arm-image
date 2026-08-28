@@ -1,0 +1,184 @@
+#!/usr/bin/env bash
+# Builds the aarch64 base image ../vm boots for the archlinux-arm distro.
+# Called automatically when that image is missing; run it by hand to rebuild.
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/vm"
+BASE="$CACHE/base"
+WORK="$CACHE/build-arm"
+
+ALARM_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
+ALARM_KEY="68B3537F39A313B3E574D06777193F152BDBE6A6"
+DEBIAN_URL="https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
+
+# 2222 is the vm lab, 2223 the nixos lab
+SSH_PORT=2224
+DISK_SIZE=12G
+
+die() { echo "${0##*/}: $*" >&2; exit 1; }
+log() { echo "==> $*"; }
+
+ssh_opts=(-p "$SSH_PORT" -i "$WORK/key" -o IdentitiesOnly=yes
+          -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+          -o LogLevel=ERROR -o ServerAliveInterval=15)
+
+builder_ssh() { ssh "${ssh_opts[@]}" build@127.0.0.1 "$@"; }
+
+firmware() {
+    local f
+    for f in /opt/homebrew/share/qemu/edk2-aarch64-code.fd \
+             /usr/share/qemu/edk2-aarch64-code.fd \
+             /usr/share/AAVMF/AAVMF_CODE.fd \
+             /usr/share/edk2/aarch64/QEMU_EFI.fd; do
+        [ -f "$f" ] && { echo "$f"; return; }
+    done
+    die "no aarch64 uefi firmware found (install qemu's edk2 firmware)"
+}
+
+fetch() {  # fetch <url> <destination>
+    [ -f "$2" ] && return
+    log "downloading ${1##*/}"
+    curl -fL --progress-bar -o "$2.part" "$1"
+    mv "$2.part" "$2"
+}
+
+# the tarball is only as trustworthy as this check, so it runs every build
+verify_tarball() {
+    local tar="$1" sig="$2" keyring="$WORK/keyring.gpg" home="$WORK/gnupg"
+
+    command -v gpg >/dev/null || die "gpg not found (brew install gnupg)"
+
+    log "verifying the rootfs signature"
+    rm -rf "$home"; mkdir -p "$home"; chmod 700 "$home"
+    tar -xzOf "$tar" usr/share/pacman/keyrings/archlinuxarm.gpg > "$keyring" \
+        || die "no pacman keyring inside the tarball"
+
+    gpg --homedir "$home" --quiet --import "$keyring" 2>/dev/null
+    gpg --homedir "$home" --list-keys "$ALARM_KEY" >/dev/null 2>&1 \
+        || die "the tarball's keyring lacks the published build key $ALARM_KEY"
+
+    gpg --homedir "$home" --status-fd 1 --verify "$sig" "$tar" 2>/dev/null \
+        | grep -q "^\[GNUPG:\] VALIDSIG $ALARM_KEY" \
+        || die "signature check failed for ${tar##*/}"
+    log "signature ok (arch linux arm build system)"
+}
+
+accel_args() {
+    case "$(uname -m):$(uname -s)" in
+        arm64:Darwin|aarch64:Darwin) echo "-accel hvf -cpu host" ;;
+        aarch64:Linux)               echo "-accel kvm -cpu host" ;;
+        *)                           echo "-accel tcg -cpu max" ;;
+    esac
+}
+
+make_seed() {
+    ssh-keygen -q -t ed25519 -N "" -f "$WORK/key"
+    mkdir -p "$WORK/seed"
+    cat > "$WORK/seed/user-data" <<EOF
+#cloud-config
+users:
+  - name: build
+    groups: sudo
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - $(cat "$WORK/key.pub")
+EOF
+    printf 'instance-id: arm-builder\nlocal-hostname: arm-builder\n' \
+        > "$WORK/seed/meta-data"
+
+    if command -v hdiutil >/dev/null; then
+        hdiutil makehybrid -quiet -iso -joliet -default-volume-name cidata \
+            -o "$WORK/seed.iso" "$WORK/seed"
+    elif command -v xorriso >/dev/null; then
+        xorriso -as mkisofs -quiet -V cidata -J -r -o "$WORK/seed.iso" "$WORK/seed"
+    elif command -v mkisofs >/dev/null; then
+        mkisofs -quiet -V cidata -J -r -o "$WORK/seed.iso" "$WORK/seed"
+    else
+        die "need hdiutil, xorriso or mkisofs to build the cloud-init seed"
+    fi
+}
+
+stop_builder() {
+    [ -f "$WORK/builder.pid" ] || return 0
+    kill "$(cat "$WORK/builder.pid")" 2>/dev/null || true
+    rm -f "$WORK/builder.pid"
+}
+
+start_builder() {
+    qemu-img create -q -f qcow2 -F qcow2 -b "$BASE/debian-13-arm64.qcow2" \
+        "$WORK/builder.qcow2" 16G
+    qemu-img create -q -f qcow2 "$WORK/target.qcow2" "$DISK_SIZE"
+
+    # uefi keeps its variables in a writable store beside the firmware
+    dd if=/dev/zero of="$WORK/vars.fd" bs=1m count=64 status=none
+
+    make_seed
+
+    log "booting the debian builder"
+    # shellcheck disable=SC2046
+    qemu-system-aarch64 \
+        -name arm-image-builder -machine virt -m 4096 -smp 4 \
+        $(accel_args) \
+        -drive if=pflash,format=raw,readonly=on,file="$(firmware)" \
+        -drive if=pflash,format=raw,file="$WORK/vars.fd" \
+        -drive if=virtio,file="$WORK/builder.qcow2",format=qcow2 \
+        -drive if=virtio,file="$WORK/target.qcow2",format=qcow2 \
+        -drive if=virtio,file="$WORK/seed.iso",format=raw,readonly=on \
+        -device virtio-rng-pci \
+        -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" \
+        -serial "file:$WORK/builder-serial.log" \
+        -pidfile "$WORK/builder.pid" \
+        -display none &
+
+    local i
+    echo -n "    waiting for the builder"
+    for i in $(seq 1 60); do
+        builder_ssh -o ConnectTimeout=2 true 2>/dev/null && break
+        echo -n .; sleep 5
+        [ "$i" = 60 ] && die "builder never came up (see $WORK/builder-serial.log)"
+    done
+    echo " up"
+    builder_ssh sudo cloud-init status --wait >/dev/null 2>&1 || true
+}
+
+main() {
+    command -v qemu-system-aarch64 >/dev/null \
+        || die "qemu-system-aarch64 not found (install qemu: brew install qemu)"
+
+    rm -rf "$WORK"
+    mkdir -p "$BASE" "$WORK"
+    trap stop_builder EXIT
+
+    fetch "$DEBIAN_URL" "$BASE/debian-13-arm64.qcow2"
+    fetch "$ALARM_URL" "$BASE/ArchLinuxARM-aarch64-latest.tar.gz"
+    fetch "$ALARM_URL.sig" "$BASE/ArchLinuxARM-aarch64-latest.tar.gz.sig"
+    verify_tarball "$BASE/ArchLinuxARM-aarch64-latest.tar.gz" \
+                   "$BASE/ArchLinuxARM-aarch64-latest.tar.gz.sig"
+
+    start_builder
+
+    log "installing the builder's tools"
+    builder_ssh sudo DEBIAN_FRONTEND=noninteractive apt-get -qq update >/dev/null
+    builder_ssh sudo DEBIAN_FRONTEND=noninteractive apt-get -qq install -y \
+        gdisk dosfstools e2fsprogs >/dev/null
+
+    log "copying the rootfs tarball into the builder"
+    builder_ssh 'cat > /tmp/alarm.tar.gz' < "$BASE/ArchLinuxARM-aarch64-latest.tar.gz"
+
+    log "assembling the disk"
+    builder_ssh "sudo bash -s" < "$HERE/build-arm-image.rootfs"
+
+    log "shutting the builder down"
+    builder_ssh sudo poweroff >/dev/null 2>&1 || true
+    sleep 5
+    stop_builder
+
+    mv "$WORK/target.qcow2" "$BASE/archlinux-arm.qcow2"
+    rm -f "$WORK/builder.qcow2" "$WORK/vars.fd"
+    log "built $BASE/archlinux-arm.qcow2"
+}
+
+main "$@"
