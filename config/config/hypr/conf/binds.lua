@@ -8,6 +8,45 @@ local nograb = { dont_inhibit = true }
 
 -- System
 -----------------------------------------------
+local media = { locked = true, repeating = true, dont_inhibit = true }
+
+-- shell surfaces
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), nograb)
+hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("noctalia msg panel-toggle session"), nograb)
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center"), nograb)
+hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard"), nograb)
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("noctalia msg bar-toggle"), { description = "toggle the bar" })
+
+-- session. lock is the only one bound directly; the rest live in the session
+-- panel above
+hl.bind(mainMod .. " + escape", hl.dsp.exec_cmd("noctalia msg session lock"))
+
+-- notifications
+hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("noctalia msg notification-clear-active"), nograb)
+hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("noctalia msg notification-invoke-latest"), nograb)
+hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), nograb)
+
+-- screenshots
+hl.bind("Print", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"), nograb)
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"), nograb)
+
+-- wallpapers
+hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd("noctalia msg wallpaper-random"), nograb)
+hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"), nograb)
+
+-- night light toggle
+hl.bind(mainMod .. " + SHIFT + Prior", hl.dsp.exec_cmd("noctalia msg nightlight-toggle"), nograb)
+
+-- volume and brightness
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("noctalia msg volume-up"), media)
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("noctalia msg volume-down"), media)
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("noctalia msg volume-mute"), { locked = true, dont_inhibit = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("noctalia msg mic-mute"), { locked = true, dont_inhibit = true })
+hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("noctalia msg brightness-up"), media)
+hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("noctalia msg brightness-down"), media)
+hl.bind(mainMod .. " + End", hl.dsp.exec_cmd("noctalia msg volume-up"), nograb)
+hl.bind(mainMod .. " + Delete", hl.dsp.exec_cmd("noctalia msg volume-down"), nograb)
+hl.bind(mainMod .. " + Home", hl.dsp.exec_cmd("noctalia msg volume-mute"), nograb)
 
 
 -- Layout
