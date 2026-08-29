@@ -130,10 +130,10 @@ vim.keymap.set({ 'n', 't' }, '<C-j>', smart_move('j', smart_splits.move_cursor_d
 vim.keymap.set({ 'n', 't' }, '<C-k>', smart_move('k', smart_splits.move_cursor_up))
 vim.keymap.set({ 'n', 't' }, '<C-l>', smart_move('l', smart_splits.move_cursor_right))
 -- swapping buffers between windows
-vim.keymap.set('n', '<leader><a-h>', smart_splits.swap_buf_left)
-vim.keymap.set('n', '<leader><a-j>', smart_splits.swap_buf_down)
-vim.keymap.set('n', '<leader><a-k>', smart_splits.swap_buf_up)
-vim.keymap.set('n', '<leader><a-l>', smart_splits.swap_buf_right)
+vim.keymap.set('n', '<leader><a-Left>', smart_splits.swap_buf_left)
+vim.keymap.set('n', '<leader><a-Down>', smart_splits.swap_buf_down)
+vim.keymap.set('n', '<leader><a-Up>', smart_splits.swap_buf_up)
+vim.keymap.set('n', '<leader><a-Right>', smart_splits.swap_buf_right)
 
 vim.keymap.set("x", "<a-j>", ":move '>+1<CR>gv-gv")
 vim.keymap.set("x", "<a-k>", ":move '<-2<CR>gv-gv")

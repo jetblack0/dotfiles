@@ -92,22 +92,22 @@ keymap({"n", "t"}, "<c-w><c-h>", function() vim.cmd.wincmd("h") end, default_map
 keymap({"n", "t"}, "<c-w><c-j>", function() vim.cmd.wincmd("j") end, default_map_opts)
 keymap({"n", "t"}, "<c-w><c-k>", function() vim.cmd.wincmd("k") end, default_map_opts)
 
-keymap({"n", "t"}, "<a-h>", function()
+keymap({"n", "t"}, "<a-Left>", function()
   local win = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_width(win, vim.api.nvim_win_get_width(win) - 3)
 end, default_map_opts)
 
-keymap({"n", "t"}, "<a-l>", function()
+keymap({"n", "t"}, "<a-Right>", function()
   local win = vim.api.nvim_get_current_win()
   vim.api.nvim_win_set_width(win, vim.api.nvim_win_get_width(win) + 3)
 end, default_map_opts)
 
-keymap({"n", "t"}, "<a-j>", function()
+keymap({"n", "t"}, "<a-Down>", function()
  local win = vim.api.nvim_get_current_win()
  vim.api.nvim_win_set_height(win, vim.api.nvim_win_get_height(win) - 3)
 end, default_map_opts)
 
-keymap({"n", "t"}, "<a-k>", function()
+keymap({"n", "t"}, "<a-Up>", function()
   local win = vim.api.nvim_get_current_win()
 vim.api.nvim_win_set_height(win, vim.api.nvim_win_get_height(win) + 3)
 end, default_map_opts)
