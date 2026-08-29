@@ -1,0 +1,13 @@
+---
+# Linux parallels vm
+# ---------------------------------------------
+#     ansible-playbook ansible/local.yml -e @ansible/hosts/mac-vm.yml
+#
+
+# Displays
+# ---------------------------------------------
+monitors:
+  - output: Virtual-1
+    mode: preferred
+    position: auto
+    scale: 1.6

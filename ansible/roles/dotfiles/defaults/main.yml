@@ -6,6 +6,9 @@ dotfiles_src: "{{ playbook_dir | dirname }}/config/config"
 # Where the managed directories land.
 dotfiles_dest: "{{ ansible_facts['user_dir'] }}/.config"
 
+# State the config reads but the sync must never overwrite.
+dotfiles_state: "{{ ansible_facts['user_dir'] }}/.local/state"
+
 # Directories about to be changed are snapshotted here first, one folder per
 # playbook run (restore.yml puts them back).
 dotfiles_backup_root: "{{ ansible_facts['user_dir'] }}/.local/state/dotfiles/backup"

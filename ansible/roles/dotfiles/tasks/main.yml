@@ -24,3 +24,6 @@
 
 - name: Initialize the yazi plugins
   ansible.builtin.import_tasks: yazi.yml
+
+- name: Render the per-host hypr state
+  ansible.builtin.import_tasks: hypr.yml
