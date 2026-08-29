@@ -1,0 +1,6 @@
+---
+- name: Create the runtime directories the shell config expects
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/{{ item }}"
+    state: directory
+  loop: "{{ home_dirs }}"

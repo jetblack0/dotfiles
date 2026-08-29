@@ -6,5 +6,6 @@
   roles:
     - { role: packages, tags: packages }
     - { role: system, tags: system }
+    - { role: home, tags: home }
     - { role: dotfiles, tags: dotfiles }
     - { role: zen, tags: zen }
