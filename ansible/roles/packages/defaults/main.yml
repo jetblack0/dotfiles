@@ -95,8 +95,9 @@ packages:
   - { name: ollama }
   - { name: opencode, tap: anomalyco/tap }
 
-  # browser
+  # desktop
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
+  - { name: noctalia, brew: false }
 
   # misc
   - { name: xdg-ninja, aur: xdg-ninja }
