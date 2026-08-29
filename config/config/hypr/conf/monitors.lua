@@ -1,8 +1,6 @@
 -- Monitors
 -----------------------------------------------
-local defaults = {
-	{ output = "", mode = "preferred", position = "auto", scale = 1 },
-}
+local FALLBACK = { output = "", mode = "preferred", position = "auto", scale = 1 }
 
 local function state_path()
 	local dir = os.getenv("XDG_STATE_HOME")
@@ -38,9 +36,19 @@ local function generated()
 	return list
 end
 
+local function states_fallback(list)
+	for _, display in ipairs(list) do
+		if display.output == nil or display.output == "" then
+			return true
+		end
+	end
+	return false
+end
+
 local displays, err = generated()
-if displays == nil then
-	displays = defaults
+displays = displays or {}
+if not states_fallback(displays) then
+	table.insert(displays, 1, FALLBACK)
 end
 
 for _, display in ipairs(displays) do
