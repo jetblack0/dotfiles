@@ -51,6 +51,7 @@ hl.bind(mainMod .. " + Home", hl.dsp.exec_cmd("noctalia msg volume-mute"), nogra
 
 -- Layout
 -----------------------------------------------
+hl.bind(mainMod .. " + Q", hl.dsp.window.close(), nograb)
 hl.bind(mainMod .. " + slash", hl.dsp.window.float(), nograb)
 hl.bind(mainMod .. " + J", hl.dsp.layout("cyclenext"), nograb)
 hl.bind(mainMod .. " + K", hl.dsp.layout("cycleprev"), nograb)
