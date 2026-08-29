@@ -2,7 +2,13 @@
 # Linux parallels vm
 # ---------------------------------------------
 #     ansible-playbook ansible/local.yml -e @ansible/hosts/mac-vm.yml
-#
+
+# Packages
+# ---------------------------------------------
+packages_exclude:
+  - ollama
+  - opencode
+
 
 # Displays
 # ---------------------------------------------
