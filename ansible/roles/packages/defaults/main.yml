@@ -26,6 +26,7 @@ packages:
   - { name: zoxide }
 
   # fonts
+  - { name: inter-font, cask: font-inter }
   - { name: noto-fonts-cjk, cask: font-noto-sans-cjk }
   - { name: otf-codenewroman-nerd, brew: false }
   - { name: ttf-jetbrains-mono-nerd, cask: font-jetbrains-mono-nerd-font }
