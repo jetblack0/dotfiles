@@ -109,6 +109,7 @@ packages:
   - { name: wireplumber, brew: false } # the session manager; pipewire is inert without one
   - { name: pipewire-pulse, brew: false } # pulse compat, what apps actually speak
   - { name: rtkit, brew: false } # realtime audio threads; without it audio can crackle under load
+  - { name: cava }
 
   # portals
   - { name: xdg-desktop-portal-hyprland, brew: false }
