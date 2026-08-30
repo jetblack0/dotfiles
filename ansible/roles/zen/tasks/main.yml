@@ -50,13 +50,15 @@
 
 - name: Install the zen settings
   ansible.builtin.copy:
-    src: "{{ zen_src }}/{{ item }}"
-    dest: "{{ zen_profile }}/{{ item }}"
+    src: "{{ zen_src }}/{{ item.src }}"
+    dest: "{{ zen_profile }}/{{ item.dest }}"
     mode: "0644"
     remote_src: true
   loop:
-    - user.js
-    - zen-keyboard-shortcuts.json
+    - { src: user.js, dest: user.js }
+    - { src: "{{ zen_shortcuts[zen_os] }}", dest: zen-keyboard-shortcuts.json }
+  loop_control:
+    label: "{{ item.src }}"
 
 - name: Ensure the distribution directory exists
   become: "{{ zen_os == 'archlinux' }}"

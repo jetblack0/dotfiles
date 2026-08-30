@@ -21,6 +21,11 @@ zen_resolver: >-
 # Throwaway target for the first-run launch, removed right after.
 zen_warmup_shot: /tmp/zen-warmup.png
 
+# Separate captures per platform.
+zen_shortcuts:
+  archlinux: zen-keyboard-shortcuts.linux.json
+  darwin: zen-keyboard-shortcuts.json
+
 # policies.json lives with the installation, not the profile.
 zen_policies_dir:
   archlinux: /opt/zen-browser-bin/distribution
