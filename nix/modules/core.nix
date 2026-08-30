@@ -5,157 +5,168 @@
   config,
   lib,
   pkgs,
-  username,
   ...
 }:
 
 let
   dotfiles = ../../config;
+  username = config.core.username;
 in
 {
-  # nix
+  # per-host knobs
   # ---------------------------------------------
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  options.core = {
+    username = lib.mkOption {
+      type = lib.types.str;
+      description = "The primary user (uid 1000), owner of the deployed dotfiles.";
+    };
+  };
 
-
-  # users
-  # ---------------------------------------------
-  users.users.${username} = {
-    isNormalUser = true;
-    uid = 1000;
-    extraGroups = [
-      "wheel"
-      "docker"
-      "video"
-      "input"
+  config = {
+    # nix
+    # ---------------------------------------------
+    nix.settings.experimental-features = [
+      "nix-command"
+      "flakes"
     ];
-    shell = pkgs.zsh;
-  };
 
 
-  # packages
-  # ---------------------------------------------
-  environment.systemPackages = with pkgs; [
-    # shell, terminal & files
-    bat
-    dua
-    eza
-    fd
-    fzf
-    jq
-    kitty.terminfo
-    ouch
-    ripgrep
-    tmux
-    yazi
-    zoxide
-
-    # system monitors & info
-    bottom
-    btop
-    fastfetch
-
-    # git & code
-    git
-    delta
-    lazygit
-    tokei
-
-    # editor
-    neovim
-    glow
-    tealdeer
-
-    # mail & feeds
-    aerc
-    newsboat
-
-    # secrets
-    pass
-
-    # basics other distros ship and nixos does not
-    curl
-    diffutils
-    man-pages
-    rsync
-    unzip
-
-    # nvim toolchain
-    jdk17
-    nodejs
-    python3
-    tree-sitter
-    gcc
-
-    # python tooling
-    uv
-
-    # cloud & devops
-    ansible
-    argocd
-    awscli2
-    docker-compose
-    kubernetes-helm
-    kubectl
-    opentofu
-
-    # ai
-    claude-code
-    ollama
-    opencode
-
-    # misc
-    xdg-ninja
-  ];
-
-  nixpkgs.config.allowUnfreePredicate =
-    pkg: builtins.elem (lib.getName pkg) [ "claude-code" ];
-
-  virtualisation.docker.enable = true;
-  programs.nix-ld.enable = true;
+    # users
+    # ---------------------------------------------
+    users.users.${username} = {
+      isNormalUser = true;
+      uid = 1000;
+      extraGroups = [
+        "wheel"
+        "docker"
+        "video"
+        "input"
+      ];
+      shell = pkgs.zsh;
+    };
 
 
-  # zsh
-  # ---------------------------------------------
-  programs.zsh = {
-    enable = true;
-    shellInit = builtins.readFile (dotfiles + "/etc/zsh/zshenv");
-    promptInit = "";
-    enableCompletion = false;
-  };
-  environment.binsh = "${pkgs.dash}/bin/dash";
+    # packages
+    # ---------------------------------------------
+    environment.systemPackages = with pkgs; [
+      # shell, terminal & files
+      bat
+      dua
+      eza
+      fd
+      fzf
+      jq
+      kitty.terminfo
+      ouch
+      ripgrep
+      tmux
+      yazi
+      zoxide
+
+      # system monitors & info
+      bottom
+      btop
+      fastfetch
+
+      # git & code
+      git
+      delta
+      lazygit
+      tokei
+
+      # editor
+      neovim
+      glow
+      tealdeer
+
+      # mail & feeds
+      aerc
+      newsboat
+
+      # secrets
+      pass
+
+      # basics other distros ship and nixos does not
+      curl
+      diffutils
+      man-pages
+      rsync
+      unzip
+
+      # nvim toolchain
+      jdk17
+      nodejs
+      python3
+      tree-sitter
+      gcc
+
+      # python tooling
+      uv
+
+      # cloud & devops
+      ansible
+      argocd
+      awscli2
+      docker-compose
+      kubernetes-helm
+      kubectl
+      opentofu
+
+      # ai
+      claude-code
+      ollama
+      opencode
+
+      # misc
+      xdg-ninja
+    ];
+
+    nixpkgs.config.allowUnfreePredicate =
+      pkg: builtins.elem (lib.getName pkg) [ "claude-code" ];
+
+    virtualisation.docker.enable = true;
+    programs.nix-ld.enable = true;
 
 
-  # home-manager
-  # ---------------------------------------------
-  home-manager.useGlobalPkgs = true;
-  home-manager.useUserPackages = true;
-  home-manager.backupFileExtension = "hm-backup";
-  home-manager.users.${username} = {
-    home.stateVersion = config.system.stateVersion;
+    # zsh
+    # ---------------------------------------------
+    programs.zsh = {
+      enable = true;
+      shellInit = builtins.readFile (dotfiles + "/etc/zsh/zshenv");
+      promptInit = "";
+      enableCompletion = false;
+    };
+    environment.binsh = "${pkgs.dash}/bin/dash";
 
-    xdg.configFile =
-      let
-        coreDirs = [
-          "aerc"
-          "bat"
-          "git"
-          "glow"
-          "lazygit"
-          "newsboat"
-          "nvim"
-          "opencode"
-          "shell"
-          "tmux"
-          "yazi"
-        ];
-      in
-      lib.genAttrs coreDirs (dir: {
-        source = dotfiles + "/config/${dir}";
-        recursive = true;
-      });
+
+    # home-manager
+    # ---------------------------------------------
+    home-manager.useGlobalPkgs = true;
+    home-manager.useUserPackages = true;
+    home-manager.backupFileExtension = "hm-backup";
+    home-manager.users.${username} = {
+      home.stateVersion = config.system.stateVersion;
+
+      xdg.configFile =
+        let
+          coreDirs = [
+            "aerc"
+            "bat"
+            "git"
+            "glow"
+            "lazygit"
+            "newsboat"
+            "nvim"
+            "opencode"
+            "shell"
+            "tmux"
+            "yazi"
+          ];
+        in
+        lib.genAttrs coreDirs (dir: {
+          source = dotfiles + "/config/${dir}";
+          recursive = true;
+        });
+    };
   };
 }

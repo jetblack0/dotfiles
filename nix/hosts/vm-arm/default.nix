@@ -1,17 +1,18 @@
 # ----------------------------------------------------------------------------
 # hosts/vm -- QEMU test machine.
 # ----------------------------------------------------------------------------
-{
-  lib,
-  username,
-  ...
-}:
+{ lib, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
     ../../modules/core.nix
   ];
+
+
+  # users
+  # ---------------------------------------------
+  core.username = "kaicheng.qi";
 
 
   # networking

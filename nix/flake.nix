@@ -9,11 +9,9 @@
 
   outputs = { nixpkgs, ... } @ inputs:
   let
-    username = "kaicheng.qi";
-
     mkHost = { system, hostDir, }: nixpkgs.lib.nixosSystem {
       inherit system;
-      specialArgs = { inherit inputs username; };
+      specialArgs = { inherit inputs; };
       modules = [
         inputs.home-manager.nixosModules.home-manager
         hostDir
