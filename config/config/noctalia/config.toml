@@ -752,6 +752,10 @@ min_length = 80.0
 title_scroll = "none"
 type = "active_window"
 
+[widget.control-center]
+glyph = "adjustments-horizontal"
+type = "control-center"
+
 [widget.cpu]
 stat = "cpu_usage"
 type = "sysmon"
