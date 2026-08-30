@@ -142,8 +142,6 @@ in
         coreDirs = [
           "aerc"
           "bat"
-          "bottom"
-          "btop"
           "git"
           "glow"
           "lazygit"
