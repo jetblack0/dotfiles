@@ -104,6 +104,16 @@ packages:
   - { name: capitaine-cursors, brew: false }
   - { name: tela-circle-icon-theme, aur: tela-circle-icon-theme-black-git, brew: false }
 
+  # audio. arch's user presets enable the sockets at install, no wiring needed
+  - { name: pipewire, brew: false }
+  - { name: wireplumber, brew: false } # the session manager; pipewire is inert without one
+  - { name: pipewire-pulse, brew: false } # pulse compat, what apps actually speak
+  - { name: rtkit, brew: false } # realtime audio threads; without it audio can crackle under load
+
+  # portals
+  - { name: xdg-desktop-portal-hyprland, brew: false }
+  - { name: xdg-desktop-portal-gtk, brew: false } # file chooser + settings backends
+
   # misc
   - { name: xdg-ninja, aur: xdg-ninja }
 
