@@ -100,6 +100,7 @@ packages:
   # desktop
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
   - { name: noctalia, brew: false }
+  - { name: libnotify, brew: false }
   - { name: capitaine-cursors, brew: false }
   - { name: tela-circle-icon-theme, aur: tela-circle-icon-theme-black-git, brew: false }
 
