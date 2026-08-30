@@ -1,14 +1,7 @@
 #!/usr/bin/env bash
 # Disposable macOS VMs for testing the darwin side of the playbooks, via
-# tart (Virtualization.framework, Apple Silicon only).
-#
-# Same rules as ./lab: the guest is a stock image plus ansible and an ssh
-# key (baked into a local template once by `build`), no host directory is
-# shared, and the repo is *copied* in over ssh.
-#
-# The base image download is ~25 GB (one-time, cached by tart), and
-# Apple's EULA/Virtualization.framework allows at most 2 macOS VMs
-# running per host.
+# tart (Virtualization.framework, Apple Silicon only). The base image 
+# download is around 25 GB.
 
 set -euo pipefail
 
@@ -16,9 +9,6 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/mac"
 
-# sequoia rather than tahoe: a guest newer than the host is the shaky
-# path under Virtualization.framework, and sequoia matches the macs this
-# playbook actually targets today
 IMAGE=ghcr.io/cirruslabs/macos-sequoia-base:latest
 TEMPLATE=dotfiles-lab-mac-template
 VM=dotfiles-lab-mac
@@ -38,8 +28,7 @@ commands:
   stop    stop and delete the vm (the template and image cache stay)
 
 The guest is the cirruslabs sequoia base image: user 'admin', brew
-preinstalled. Unlike linux, the primary macos user is uid 501 -- which is
-exactly what the playbook should meet on a real mac.
+preinstalled. The primary macos user is uid 501.
 EOF
 }
 
@@ -58,8 +47,6 @@ ssh_opts=(-i "$CACHE/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
 exists()  { tart list --quiet 2>/dev/null | grep -qx "$1"; }
 running() { tart list 2>/dev/null | awk -v vm="$1" '$0 ~ vm && /running/' | grep -q .; }
 
-# never fails: tart ip exits non-zero while the vm has no address yet,
-# which under set -e would kill the boot wait loop on its first poll
 vm_ip() { tart ip "$1" 2>/dev/null || true; }
 
 vm_ssh() {  # vm_ssh <vm> [-t] cmd...
@@ -70,8 +57,7 @@ vm_ssh() {  # vm_ssh <vm> [-t] cmd...
 }
 
 # guests reach the internet through this host-side relay: their raw nat
-# path skips the host's vpn (github resets), while host-originated
-# traffic rides it. bound to the bridge address, so only guests reach it.
+# path skips the host's vpn.
 relay_up() {  # relay_up <gateway-ip>
     [ -f "$CACHE/relay.pid" ] && kill -0 "$(cat "$CACHE/relay.pid")" 2>/dev/null && return 0
     python3 "$HERE/lib/relay.py" "$1" "$RELAY_PORT" >/dev/null 2>&1 &
@@ -91,8 +77,6 @@ boot() {  # boot <vm> [--headless] -- run detached, wait for ssh
     [ "${2:-}" = --headless ] && graphics=(--no-graphics)
     (tart run "$target" "${graphics[@]}" >/dev/null 2>&1 &)
     echo -n "waiting for ssh"
-    # a port probe, not an ssh login: during build the key is not planted
-    # yet, so authenticated ssh cannot be the readiness signal
     local i ip
     for i in $(seq 1 120); do
         ip="$(vm_ip "$target")"
@@ -113,8 +97,6 @@ build() {
     tart clone "$IMAGE" "$TEMPLATE"
     boot "$TEMPLATE" --headless
 
-    # the stock image only takes passwords; plant our key with expect
-    # (ships with macos), then everything else runs over key auth
     local ip; ip="$(vm_ip "$TEMPLATE")"
     /usr/bin/expect -f - "$ip" "$(cat "$CACHE/key.pub")" <<'EOF'
 set timeout 60
@@ -128,22 +110,13 @@ catch wait result
 exit [lindex $result 3]
 EOF
 
-    # fail loudly if the plant did not take: a silent failure here once
-    # shipped a template with no key and no provisioning at all
     vm_ssh "$TEMPLATE" true || die "key auth still failing after the plant"
 
     echo "provisioning the template"
-    # labs cannot answer sudo prompts, hence NOPASSWD (mirrors ./lab)
     vm_ssh "$TEMPLATE" "echo admin | sudo -S sh -c \
         'echo \"admin ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/admin && chmod 440 /etc/sudoers.d/admin'"
 
-    # public resolvers: the guest's NAT DNS forwarder breaks when the
-    # HOST resolves through 127.0.0.1 (local dns tools, vpns) -- queries
-    # time out while direct ones work fine
     vm_ssh "$TEMPLATE" "sudo networksetup -setdnsservers Ethernet 1.1.1.1 8.8.8.8"
-    # full paths: a non-interactive ssh command has no login-shell PATH.
-    # retried because first-boot downloads over a flaky network are
-    # exactly where one dns hiccup should not sink a 25 GB investment
     local gw try
     gw="$(gw_of "$TEMPLATE")"
     relay_up "$gw"
@@ -188,8 +161,6 @@ start() {
     # every login shell in the guest rides the host network from here on
     local gw; gw="$(gw_of "$VM")"
     relay_up "$gw"
-    # /etc/zprofile, not ~/.zprofile: the playbook's /etc/zshenv moves
-    # ZDOTDIR into ~/.config, after which ~/.zprofile is never read again
     vm_ssh "$VM" 'grep -q lab-relay /etc/zprofile 2>/dev/null || sudo tee -a /etc/zprofile >/dev/null' <<EOF
 # lab-relay: ride the host network (vpn included), not the raw nat
 export http_proxy=http://$gw:$RELAY_PORT https_proxy=http://$gw:$RELAY_PORT

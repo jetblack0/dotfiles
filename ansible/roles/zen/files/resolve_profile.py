@@ -2,10 +2,7 @@
 
 Zen picks its profile from the [Install<hash>] section of profiles.ini,
 not from the Default=1 flag, and the hash is derived from the install
-directory -- it can only be read back, never predicted. There is
-deliberately NO fallback to the first Path= entry: a registry without an
-install section means zen has not run yet, and guessing a profile there
-is what used to deploy into a directory zen never opens.
+directory, it can only be read back, never predicted.
 """
 import configparser
 import os

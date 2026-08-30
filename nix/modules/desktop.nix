@@ -93,6 +93,7 @@ in
       # terminal & viewers
       kitty
       zathura
+      cava
 
       # themes
       capitaine-cursors
