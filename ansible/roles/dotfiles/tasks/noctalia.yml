@@ -1,0 +1,13 @@
+---
+# Per-host noctalia values, rendered next to the synced config.
+#
+# Noctalia merges every ~/.config/noctalia/*.toml alphabetically and the
+# later file's scalars win, so a zz- prefixed overlay lands on top of
+# config.toml without touching the rest of its [wallpaper] table.
+
+- name: Render the noctalia host overlay
+  ansible.builtin.template:
+    src: zz-host.toml.j2
+    dest: "{{ dotfiles_dest }}/noctalia/zz-host.toml"
+    mode: "0644"
+  when: "'noctalia' not in (dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))"
