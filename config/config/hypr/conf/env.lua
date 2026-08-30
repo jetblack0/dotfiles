@@ -8,6 +8,10 @@ hl.env("GTK_IM_MODULE", "wayland")
 -- qt
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 
+-- cursor
+hl.env("XCURSOR_THEME", "capitaine-cursors")
+hl.env("XCURSOR_SIZE", "24")
+
 -- xdg and session
 hl.env("XDG_CURRENT_DESKTOP", "Hyprland")
 hl.env("XDG_SESSION_TYPE", "wayland")

@@ -27,3 +27,6 @@
 
 - name: Render the per-host hypr state
   ansible.builtin.import_tasks: hypr.yml
+
+- name: Mirror the gtk settings into gsettings
+  ansible.builtin.import_tasks: gtk.yml
