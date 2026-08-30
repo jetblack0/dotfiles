@@ -38,7 +38,6 @@ export LESSHISTFILE="$XDG_CACHE_HOME"/less/history
 export TERMINFO="$XDG_DATA_HOME"/terminfo
 export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:/usr/share/terminfo
 export GTK2_RC_FILES="$XDG_CONFIG_HOME"/gtk-2.0/gtkrc
-export XCURSOR_PATH="$XDG_DATA_HOME"/icons
 export PF_SOURCE="$XDG_CONFIG_HOME/pfetch/pfetch.sh"
 export FCEUX_HOME="$XDG_CONFIG_HOME"/fceux
 export W3M_DIR="$XDG_DATA_HOME"/w3m
