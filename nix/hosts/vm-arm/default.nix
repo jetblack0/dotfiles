@@ -7,12 +7,20 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/core.nix
+    ../../modules/desktop.nix
   ];
 
 
   # users
   # ---------------------------------------------
   core.username = "kaicheng.qi";
+
+
+  # desktop
+  # ---------------------------------------------
+  desktop.monitors = [
+    { output = "Virtual-1"; }
+  ];
 
 
   # networking
