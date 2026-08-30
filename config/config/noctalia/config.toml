@@ -84,7 +84,7 @@ order = [ "main" ]
     smart_auto_hide = false
     start = [ "launcher", "workspaces" ]
     thickness = 32
-    widget_spacing = 10
+    widget_spacing = 15
 
         [bar.main.dead_zone]
 
@@ -300,7 +300,7 @@ sunset = ""
 # ---------------------------------------------
 [lockscreen]
 allow_empty_password = false
-blur_intensity = 0.5
+blur_intensity = 0.099999994039535522
 blurred_desktop = false
 enabled = true
 fingerprint = true
@@ -312,40 +312,71 @@ wallpaper = ""
 
 # Lock screen widgets
 # ---------------------------------------------
+# what is drawn on the lock screen, and where. cx/cy are widget
+# CENTRES in the placement_width x placement_height space.
 [lockscreen_widgets]
 enabled = true
 schema_version = 2
-widget_order = [ "lockscreen-widget-0000000000000001", "lockscreen-widget-0000000000000002" ]
+widget_order = [ "lockscreen-login-box@Virtual-1", "lockscreen-widget-0000000000000001", "lockscreen-widget-0000000000000002" ]
 
     [lockscreen_widgets.grid]
     cell_size = 16
     major_interval = 4
     visible = true
-    [lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
-    box_height = 240.0
-    box_width = 720.0
+
+    [lockscreen_widgets.widget."lockscreen-login-box@Virtual-1"]
+    box_height = 70.0
+    box_width = 240.0
     cx = 800.0
-    cy = 330.0
+    cy = 913.0
+    enabled = true
+    output = "Virtual-1"
+    placement_height = 1000.0
+    placement_width = 1600.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@Virtual-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.0
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 0.59999999999999998
+        input_radius = 6.0
+        layout = "compact"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = false
+        show_media = true
+        show_session_buttons = true
+        show_unlock_hint = false
+        show_weather = true
+
+    [lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
+    box_height = 160.0
+    box_width = 560.0
+    cx = 800.0
+    cy = 196.0
     enabled = true
     output = ""
     placement_height = 1000.0
     placement_width = 1600.0
-    rotation = 0.0
+    rotation = -0.0
     type = "clock"
 
         [lockscreen_widgets.widget.lockscreen-widget-0000000000000001.settings]
         background = false
         center_text = true
         clock_style = "digital"
-        font_family = "Inter"
-        shadow = true
+        color = "on_surface"
+        font_family = "Inter Display Thin"
+        shadow = false
 
-          color = "on_surface"
     [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
-    box_height = 60.0
-    box_width = 520.0
+    box_height = 32.0
+    box_width = 400.0
     cx = 800.0
-    cy = 500.0
+    cy = 276.0
     enabled = true
     output = ""
     placement_height = 1000.0
@@ -355,15 +386,15 @@ widget_order = [ "lockscreen-widget-0000000000000001", "lockscreen-widget-000000
 
         [lockscreen_widgets.widget.lockscreen-widget-0000000000000002.settings]
         background = false
+        center_text = true
+        color = "on_surface_variant"
+        font_family = "Inter"
         format = "{:%A, %B %d}"
+        shadow = true
 
 
 # Night light
 # ---------------------------------------------
-          font_family = "Inter"
-          color = "on_surface_variant"
-          center_text = true
-          shadow = true
 [nightlight]
 enabled = false
 force = false
@@ -446,7 +477,7 @@ enabled = []
 # Shell
 # ---------------------------------------------
 [shell]
-app_icon_colorize = true
+app_icon_colorize = false
 avatar_path = ""
 button_borders = true
 card_borders = true
@@ -460,7 +491,7 @@ corner_radius_scale = 1.0
 date_format = "%A, %x"
 disable_mipmaps = false
 external_ip_enabled = false
-font_family = "CodeNewRoman Nerd Font Propo"
+font_family = "CodeNewRoman Nerd Font"
 input_borders = true
 launch_apps_as_systemd_services = false
 launch_apps_custom_command = ""
@@ -663,17 +694,18 @@ swap_pct_critical_threshold = 80.0
 
 # Theme
 # ---------------------------------------------
+# builtin Rosé Pine, to match hypr conf/themes/rose-pine.lua.
 [theme]
 builtin = "Rosé Pine"
 community_palette = "Oxocarbon"
 custom_palette = ""
 mode = "dark"
 pure_black_dark = false
-source = "builtin"
+source = "wallpaper"
 wallpaper_scheme = "m3-content"
 
     [theme.templates]
-    builtin_ids = [ "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
+    builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
     community_ids = []
     enable_builtin_templates = true
     enable_community_templates = true
@@ -682,7 +714,7 @@ wallpaper_scheme = "m3-content"
 # Wallpaper
 # ---------------------------------------------
 [wallpaper]
-directory = ""
+directory = "~/Media/pictures/wallpaper/landscape"
 directory_dark = ""
 directory_light = ""
 edge_smoothness = 0.30000001192092896
@@ -745,6 +777,7 @@ type = "lock_keys"
 
 [widget.media]
 art_size = 16.0
+hide_when_no_media = true
 max_length = 220.0
 min_length = 80.0
 title_scroll = "none"
