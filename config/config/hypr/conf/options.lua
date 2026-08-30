@@ -71,12 +71,6 @@ hl.config({
 	},
 })
 
--- Builtin thinkpad trackpad stays off.
-hl.device({
-	name    = "synaptics-tm3276-022",
-	enabled = false,
-})
-
 -- A theme that failed to load must not fail quietly: the fallback looks almost
 -- right, which is how you end up debugging the wrong thing. seterror puts it on
 -- screen until the next successful reload.

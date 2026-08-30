@@ -6,6 +6,8 @@
 hl.on("hyprland.start", function()
 	hl.exec_cmd("noctalia")
 
+	hl.exec_cmd("$HOME/.config/hypr/scripts/trackpad-toggle.sh init")
+
 	-- cursor theme
 	hl.exec_cmd("hyprctl setcursor capitaine-cursors 24")
 
