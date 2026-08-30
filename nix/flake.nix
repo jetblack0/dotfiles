@@ -29,6 +29,10 @@
         system = "aarch64-linux";
         hostDir = ./hosts/vm-arm;
       };
+      mac-vm = mkHost {
+        system = "aarch64-linux";
+        hostDir = ./hosts/mac-vm;
+      };
     };
   };
 }
