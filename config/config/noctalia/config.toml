@@ -59,6 +59,7 @@ order = [ "main" ]
         "volume",
         "brightness",
         "battery",
+        "trackpad",
         "control-center",
         "session"
     ]
@@ -459,7 +460,7 @@ scale = 1.0
 
 [plugins]
 auto_update = "all"
-enabled = []
+enabled = [ "jetblack0/trackpad" ]
 
     [[plugins.source]]
     enabled = true
@@ -806,6 +807,9 @@ type = "spacer"
 [widget.temp]
 stat = "cpu_temp"
 type = "sysmon"
+
+[widget.trackpad]
+type = "jetblack0/trackpad:indicator"
 
 [widget.workspaces]
 scale = 1.25
