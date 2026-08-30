@@ -1,7 +1,7 @@
 #!/bin/sh
 
 base_dir="$HOME/Resources/media/pictures/wallpaper/landscape"
-favorite="$HOME/.config/hypr/subconfig/paths/favorite-wall"
+favorite="$HOME/.config/hypr/paths/favorite-wall"
 options="
 --transition-type grow
 --transition-fps 60

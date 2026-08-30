@@ -25,8 +25,10 @@ packages:
   - { name: yazi }
   - { name: zoxide }
 
-  # fonts kitty asks for by name
+  # fonts
+  - { name: inter-font, cask: font-inter }
   - { name: noto-fonts-cjk, cask: font-noto-sans-cjk }
+  - { name: otf-codenewroman-nerd, brew: false }
   - { name: ttf-jetbrains-mono-nerd, cask: font-jetbrains-mono-nerd-font }
   - { name: ttf-udev-gothic, aur: ttf-udev-gothic, cask: font-udev-gothic-nf }
 
@@ -95,8 +97,12 @@ packages:
   - { name: ollama }
   - { name: opencode, tap: anomalyco/tap }
 
-  # browser
+  # desktop
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
+  - { name: noctalia, brew: false }
+  - { name: libnotify, brew: false }
+  - { name: capitaine-cursors, brew: false }
+  - { name: tela-circle-icon-theme, aur: tela-circle-icon-theme-black-git, brew: false }
 
   # misc
   - { name: xdg-ninja, aur: xdg-ninja }

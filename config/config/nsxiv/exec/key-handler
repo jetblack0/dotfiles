@@ -20,11 +20,11 @@ case "$1" in
 	;;
 # Set as favorite wallpaper.
 "W")
-	cp "${relative_path[$(( "$length" - 1))]}" ~/.config/hypr/subconfig/paths/favorite-wall
+	cp "${relative_path[$(( "$length" - 1))]}" ~/.config/hypr/paths/favorite-wall
 	;;
 # Set as hyprlock wallpaper.
 "e")
-	cp "${relative_path[$(( "$length" - 1))]}" ~/.config/hypr/subconfig/paths/hyprlock-wall
+	cp "${relative_path[$(( "$length" - 1))]}" ~/.config/hypr/paths/hyprlock-wall
 	;;
 "d")
 	# Works when file contain space.

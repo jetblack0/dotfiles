@@ -1,0 +1,19 @@
+---
+# Linux parallels vm
+# ---------------------------------------------
+#     ansible-playbook ansible/local.yml -e @ansible/hosts/mac-vm.yml
+
+# Packages
+# ---------------------------------------------
+packages_exclude:
+  - ollama
+  - opencode
+
+
+# Displays
+# ---------------------------------------------
+monitors:
+  - output: Virtual-1
+    mode: "2560x1600@60"
+    position: auto
+    scale: 1.6

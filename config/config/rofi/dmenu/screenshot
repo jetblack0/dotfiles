@@ -35,7 +35,7 @@ if [ -z "$option" ]; then
 	exit 0
 fi
 
-screenshot_location=$(cat ~/.config/hypr/subconfig/grimblast-path)
+screenshot_location=$(cat ~/.config/hypr/paths/grimblast-path)
 
 case "$option" in
 	"copy and save screen area")

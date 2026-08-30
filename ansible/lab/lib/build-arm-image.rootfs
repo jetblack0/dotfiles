@@ -1,0 +1,163 @@
+#!/usr/bin/env bash
+# Runs as root inside the debian builder, against its blank second disk.
+# Turns /tmp/alarm.tar.gz into a bootable arch linux arm system.
+
+set -euo pipefail
+
+DISK=/dev/vdb
+ROOT=/mnt/target
+PACKAGES="base linux-aarch64 openssh sudo cloud-init"
+
+[ -b "$DISK" ] || { echo "no $DISK in the builder" >&2; exit 1; }
+case "$(findmnt -no SOURCE /)" in
+    "$DISK"*) echo "refusing: $DISK is the builder's own root" >&2; exit 1 ;;
+esac
+
+cleanup() { umount -R "$ROOT" 2>/dev/null || true; }
+trap cleanup EXIT
+
+echo "--> partitioning $DISK"
+sgdisk --zap-all "$DISK" >/dev/null
+sgdisk -n1:0:+512M -t1:ef00 -c1:ESP \
+       -n2:0:0     -t2:8300 -c2:root "$DISK" >/dev/null
+
+# the debian cloud image carries no parted, so no partprobe; sgdisk has
+# already asked the kernel to re-read, this just waits for the nodes
+partx -u "$DISK" 2>/dev/null || blockdev --rereadpt "$DISK" 2>/dev/null || true
+udevadm settle 2>/dev/null || true
+for _ in $(seq 1 20); do
+    [ -b "${DISK}1" ] && [ -b "${DISK}2" ] && break
+    sleep 1
+done
+[ -b "${DISK}2" ] || { echo "partitions never appeared on $DISK" >&2; exit 1; }
+
+mkfs.vfat -F32 -n ESP "${DISK}1" >/dev/null
+mkfs.ext4 -q -F -L root "${DISK}2"
+
+mkdir -p "$ROOT"
+mount "${DISK}2" "$ROOT"
+
+echo "--> unpacking the rootfs"
+tar -xpf /tmp/alarm.tar.gz -C "$ROOT"
+
+# the esp doubles as /boot, which is where the kernel already lives
+mv "$ROOT/boot" "$ROOT/boot.tarball"
+mkdir -p "$ROOT/boot"
+mount "${DISK}1" "$ROOT/boot"
+cp -a "$ROOT/boot.tarball/." "$ROOT/boot/"
+rm -rf "$ROOT/boot.tarball"
+
+ESP_PARTUUID="$(blkid -s PARTUUID -o value "${DISK}1")"
+ROOT_PARTUUID="$(blkid -s PARTUUID -o value "${DISK}2")"
+
+echo "--> writing the system configuration"
+cat > "$ROOT/etc/fstab" <<EOF
+PARTUUID=$ROOT_PARTUUID  /      ext4  rw,relatime  0 1
+PARTUUID=$ESP_PARTUUID  /boot  vfat  rw,relatime,fmask=0137,dmask=0027  0 2
+EOF
+
+mkdir -p "$ROOT/etc/systemd/network" "$ROOT/etc/sudoers.d"
+cat > "$ROOT/etc/systemd/network/20-wired.network" <<'EOF'
+[Match]
+Name=en*
+
+[Network]
+DHCP=yes
+EOF
+
+echo lab-vm-archlinux-arm > "$ROOT/etc/hostname"
+ln -sf /usr/share/zoneinfo/UTC "$ROOT/etc/localtime"
+echo "en_US.UTF-8 UTF-8" >> "$ROOT/etc/locale.gen"
+echo "LANG=en_US.UTF-8" > "$ROOT/etc/locale.conf"
+
+# a stock cloud image leaves a passwordless-sudo user behind; cloud-init
+# adds this one's ssh key from the lab's seed on first boot
+cat > "$ROOT/etc/sudoers.d/dev" <<'EOF'
+dev ALL=(ALL) NOPASSWD:ALL
+EOF
+chmod 440 "$ROOT/etc/sudoers.d/dev"
+
+echo "--> entering the chroot"
+# plain bind mounts rather than arch-chroot, so the builder needs no
+# arch-specific tooling of its own
+mount --bind /dev "$ROOT/dev"
+mount --bind /dev/pts "$ROOT/dev/pts"
+mount -t proc proc "$ROOT/proc"
+mount -t sysfs sys "$ROOT/sys"
+mount -t tmpfs tmpfs "$ROOT/run"
+
+# debian's /etc/resolv.conf is a systemd-resolved stub pointing at
+# 127.0.0.53, which resolves nothing inside the chroot; prefer resolved's
+# real uplink list and fall back to qemu slirp's own dns
+rm -f "$ROOT/etc/resolv.conf"
+if [ -f /run/systemd/resolve/resolv.conf ]; then
+    cp /run/systemd/resolve/resolv.conf "$ROOT/etc/resolv.conf"
+else
+    cp /etc/resolv.conf "$ROOT/etc/resolv.conf"
+fi
+grep -qE '^nameserver +(127\.|::1)' "$ROOT/etc/resolv.conf" 2>/dev/null \
+    && printf 'nameserver 10.0.2.3\n' > "$ROOT/etc/resolv.conf"
+grep -q '^nameserver' "$ROOT/etc/resolv.conf" 2>/dev/null \
+    || printf 'nameserver 10.0.2.3\n' > "$ROOT/etc/resolv.conf"
+
+chroot "$ROOT" /bin/bash -euo pipefail <<CHROOT
+# the tarball ships an unpopulated keyring
+pacman-key --init
+pacman-key --populate archlinuxarm
+
+pacman -Syu --noconfirm --needed $PACKAGES
+
+locale-gen
+
+# arch linux arm's stock user is not the one the lab uses
+userdel -r alarm 2>/dev/null || true
+useradd -m -G wheel,video,input -s /bin/bash dev 2>/dev/null || true
+passwd -d root
+
+systemctl enable sshd systemd-networkd systemd-resolved
+
+# cloud-init reshuffled its units in 24.3 -- cloud-init.service became
+# cloud-init-network.service and cloud-init-main.service appeared -- so
+# enable whatever this version actually ships rather than a fixed list
+ci_enabled=0
+for u in cloud-init-main cloud-init-local cloud-init-network cloud-init \
+         cloud-config cloud-final; do
+    systemctl enable "\$u.service" >/dev/null 2>&1 && ci_enabled=1
+done
+systemctl enable cloud-init.target >/dev/null 2>&1 || true
+[ "\$ci_enabled" = 1 ] || { echo "no cloud-init units to enable" >&2; exit 1; }
+
+mkinitcpio -P
+
+SYSTEMD_RELAX_ESP_CHECKS=1 bootctl --esp-path=/boot install --no-variables \
+    || { mkdir -p /boot/EFI/BOOT
+         cp /usr/lib/systemd/boot/efi/systemd-bootaa64.efi /boot/EFI/BOOT/BOOTAA64.EFI; }
+
+mkdir -p /boot/loader/entries
+cat > /boot/loader/loader.conf <<'LOADER'
+default arch.conf
+timeout 0
+console-mode keep
+LOADER
+
+# arch linux arm's linux-aarch64 preset builds the default image only, so
+# there is usually no fallback to point at
+initrd=/initramfs-linux.img
+if [ -f /boot/initramfs-linux-fallback.img ]; then
+    initrd=/initramfs-linux-fallback.img
+fi
+[ -f "/boot\$initrd" ] || { echo "no initramfs in /boot" >&2; exit 1; }
+
+cat > /boot/loader/entries/arch.conf <<ENTRY
+title   Arch Linux ARM
+linux   /Image
+initrd  \$initrd
+options root=PARTUUID=$ROOT_PARTUUID rw rootwait console=ttyAMA0 console=tty0
+ENTRY
+CHROOT
+
+# hand dns back to the guest's own resolved instead of leaving the
+# builder's servers baked into the image
+ln -sf ../run/systemd/resolve/stub-resolv.conf "$ROOT/etc/resolv.conf"
+
+echo "--> done"

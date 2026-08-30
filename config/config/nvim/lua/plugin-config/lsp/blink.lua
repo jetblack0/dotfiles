@@ -20,8 +20,6 @@ blink.setup {
     --   end
     -- },
     ['<C-space>'] = { 'show', 'show_documentation', 'hide_documentation' },
-    ["<a-l>"] = { "snippet_forward", "fallback" },
-    ["<a-h>"] = { "snippet_backward", "fallback" },
     -- ["<Tab>"] = { "snippet_forward" },
   },
 

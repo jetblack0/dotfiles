@@ -1,0 +1,8 @@
+---
+# Runtime directories the shell config writes into.
+# ---------------------------------------------
+home_dirs:
+  - .cache/less
+  - .cache/zsh
+  - .local/share/redis
+  - .local/share/zsh
