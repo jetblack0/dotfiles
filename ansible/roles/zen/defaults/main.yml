@@ -14,6 +14,13 @@ zen_bin:
   archlinux: /usr/bin/zen-browser
   darwin: /Applications/Zen.app/Contents/MacOS/zen
 
+zen_resolver: >-
+  {{ [ansible_facts['python']['executable'],
+      role_path ~ '/files/resolve_profile.py'] + zen_roots[zen_os] }}
+
+# Throwaway target for the first-run launch, removed right after.
+zen_warmup_shot: /tmp/zen-warmup.png
+
 # policies.json lives with the installation, not the profile.
 zen_policies_dir:
   archlinux: /opt/zen-browser-bin/distribution

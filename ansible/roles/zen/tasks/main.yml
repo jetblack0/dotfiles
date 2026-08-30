@@ -10,51 +10,43 @@
   ansible.builtin.set_fact:
     zen_os: "{{ ansible_facts['os_family'] | lower }}"
 
-# The profile directory has a random name; the registry knows it. Zen is
-# only told a profile NAME to create, so it alone decides where things
-# live, and the registry is re-read afterwards.
-- name: Look for zen's profile registry
-  ansible.builtin.stat:
-    path: "{{ item }}/profiles.ini"
-  loop: "{{ zen_roots[zen_os] }}"
-  register: zen_ini
+- name: Check whether zen has a profile
+  ansible.builtin.command:
+    argv: "{{ zen_resolver }}"
+  register: zen_probe
+  changed_when: false
+  check_mode: false
+  failed_when: false
 
-- name: Create a profile when zen has none
+- name: Let zen create its profile
   ansible.builtin.command:
     argv:
       - "{{ zen_bin[zen_os] }}"
-      - -CreateProfile
-      - dotfiles
+      - --headless
+      - --screenshot
+      - "{{ zen_warmup_shot }}"
+      - about:blank
   environment:
     MOZ_HEADLESS: "1"
-  when: zen_ini.results | selectattr('stat.exists') | length == 0
+  when: zen_probe.rc != 0
 
-- name: Look again after creating
-  ansible.builtin.stat:
-    path: "{{ item }}/profiles.ini"
-  loop: "{{ zen_roots[zen_os] }}"
-  register: zen_ini
+- name: Remove the warm-up screenshot
+  ansible.builtin.file:
+    path: "{{ zen_warmup_shot }}"
+    state: absent
+  when: zen_probe.rc != 0
 
-- name: Read the registry
+- name: Resolve the profile zen uses
+  ansible.builtin.command:
+    argv: "{{ zen_resolver }}"
+  register: zen_resolved
+  changed_when: false
+  check_mode: false
+  failed_when: zen_resolved.rc != 0
+
+- name: Remember the profile directory
   ansible.builtin.set_fact:
-    zen_root: "{{ (zen_ini.results | selectattr('stat.exists') | map(attribute='item') | first) }}"
-
-- name: Parse the registry
-  ansible.builtin.slurp:
-    src: "{{ zen_root }}/profiles.ini"
-  register: zen_ini_raw
-
-# Prefer the installation's default profile; a registry fresh from
-# -CreateProfile has no install section yet, so fall back to the first
-# (and only) profile entry.
-- name: Resolve the profile directory
-  ansible.builtin.set_fact:
-    zen_profile: >-
-      {{ zen_root ~ '/' ~
-         ((zen_ini_raw.content | b64decode
-           | regex_search('\[Install[^\]]*\]\r?\nDefault=(.+)', '\1'))
-          or (zen_ini_raw.content | b64decode
-              | regex_search('(?m)^Path=(.+)$', '\1'))) | first }}
+    zen_profile: "{{ zen_resolved.stdout }}"
 
 - name: Install the zen settings
   ansible.builtin.copy:
