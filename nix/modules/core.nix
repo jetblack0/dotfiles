@@ -139,6 +139,14 @@ in
     };
     environment.binsh = "${pkgs.dash}/bin/dash";
 
+    # dirs the shell config writes into
+    systemd.user.tmpfiles.users.${username}.rules = [
+      "d %h/.cache/less"
+      "d %h/.cache/zsh"
+      "d %h/.local/share/redis"
+      "d %h/.local/share/zsh"
+    ];
+
 
     # home-manager
     # ---------------------------------------------
