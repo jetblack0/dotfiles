@@ -111,6 +111,7 @@ in
       kubernetes-helm
       kubectl
       opentofu
+      steampipe
 
       # ai
       claude-code
