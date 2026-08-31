@@ -41,6 +41,7 @@
         DHCP = "ipv4";
         IPv6AcceptRA = true;
       };
+      dhcpV4Config.ClientIdentifier = "mac";
       linkConfig.RequiredForOnline = "routable";
     };
   };
