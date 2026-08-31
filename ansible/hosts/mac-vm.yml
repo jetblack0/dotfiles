@@ -8,6 +8,7 @@
 packages_exclude:
   - ollama
   - opencode
+  - steampipe
 
 
 # Displays

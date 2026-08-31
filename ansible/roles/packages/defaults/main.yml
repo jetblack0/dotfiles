@@ -91,6 +91,7 @@ packages:
   - { name: helm }
   - { name: kubectl }
   - { name: opentofu }
+  - { name: steampipe, aur: steampipe-bin }
 
   # ai
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }
