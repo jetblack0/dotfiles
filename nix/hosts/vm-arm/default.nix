@@ -8,6 +8,7 @@
     ./hardware-configuration.nix
     ../../modules/core.nix
     ../../modules/desktop.nix
+    ../../modules/zen.nix
   ];
 
 
