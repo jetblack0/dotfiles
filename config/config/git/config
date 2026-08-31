@@ -1,6 +1,9 @@
 [includeIf "gitdir:~/Development/work/"]
 	path = ~/.config/git/config.work
 
+[init]
+	defaultBranch = main
+
 [user]
 	name = Henry Chi
 	email = me@unazoomer.com
