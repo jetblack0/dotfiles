@@ -99,6 +99,7 @@ in
       python3
       tree-sitter
       gcc
+      gnumake
 
       # python tooling
       uv
