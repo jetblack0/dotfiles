@@ -128,6 +128,12 @@ require("lazy").setup({
 			require("plugin-config.smart-split")
 		end,
 	},
+  {
+    "nvimtools/hydra.nvim",
+    config = function()
+      require("plugin-config.hydra")
+    end,
+  },
 	{
 		"folke/which-key.nvim",
     event = 'VimEnter',
