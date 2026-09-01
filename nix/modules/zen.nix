@@ -38,7 +38,7 @@ in
       };
 
       xdg.configFile."zen/default/zen-keyboard-shortcuts.json".source =
-        dotfiles + "/zen/zen-keyboard-shortcuts.json";
+        dotfiles + "/zen/zen-keyboard-shortcuts.linux.json";
 
       # A real file, not a store symlink: noctalia's zen template hook edits
       # user.js in place and aborts on a read-only one.
