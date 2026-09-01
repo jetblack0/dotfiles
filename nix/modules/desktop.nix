@@ -74,6 +74,12 @@ in
     xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     programs.dconf.enable = true;
 
+    # nixpkgs keeps schemas in a layout the plain gsettings CLI never
+    # searches; without this every `gsettings set` fails
+    environment.sessionVariables.XDG_DATA_DIRS = [
+      "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
+    ];
+
     # audio
     # ---------------------------------------------
     security.rtkit.enable = true;
