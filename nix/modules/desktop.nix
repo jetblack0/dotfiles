@@ -80,6 +80,12 @@ in
       "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
     ];
 
+    # qt reads the qt5ct/qt6ct color schemes the noctalia template writes
+    qt = {
+      enable = true;
+      platformTheme = "qt5ct";
+    };
+
     # audio
     # ---------------------------------------------
     security.rtkit.enable = true;
