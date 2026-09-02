@@ -132,6 +132,7 @@ require("lazy").setup({
     "nvimtools/hydra.nvim",
     config = function()
       require("plugin-config.hydra")
+      require("plugin-config.git.hunks")
     end,
   },
 	{
