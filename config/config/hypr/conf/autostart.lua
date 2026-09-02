@@ -11,6 +11,11 @@ hl.on("hyprland.start", function()
 	-- cursor theme
 	hl.exec_cmd("hyprctl setcursor capitaine-cursors 24")
 
+	-- xwayland font dpi and rendering: rendered per host next to
+	-- monitors.lua; absent when the host file sets no xwayland_dpi.
+	-- The xrdb connection also wakes the lazy xwayland server up.
+	hl.exec_cmd('f="${XDG_STATE_HOME:-$HOME/.local/state}/hypr/xresources"; [ -f "$f" ] && xrdb -merge "$f"')
+
 	-- gtk settings
 	hl.exec_cmd("gsettings set org.gnome.desktop.interface icon-theme 'Tela-circle-black-dark'")
 	hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme 'capitaine-cursors'")

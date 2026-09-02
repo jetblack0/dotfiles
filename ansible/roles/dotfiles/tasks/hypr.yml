@@ -18,3 +18,20 @@
         src: monitors.lua.j2
         dest: "{{ dotfiles_state }}/hypr/monitors.lua"
         mode: "0644"
+
+- name: Render the host's xresources
+  when:
+    - xwayland_dpi is defined
+    - "'hypr' not in (dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))"
+  block:
+    - name: Ensure the hypr state directory exists
+      ansible.builtin.file:
+        path: "{{ dotfiles_state }}/hypr"
+        state: directory
+        mode: "0755"
+
+    - name: Write the xresources
+      ansible.builtin.template:
+        src: xresources.j2
+        dest: "{{ dotfiles_state }}/hypr/xresources"
+        mode: "0644"

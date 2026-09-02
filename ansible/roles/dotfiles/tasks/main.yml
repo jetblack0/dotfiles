@@ -13,6 +13,29 @@
     path: "{{ dotfiles_dest }}"
     state: directory
 
+- name: Check the managed directories for foreign-owned files
+  ansible.builtin.find:
+    paths: >-
+      {{ dotfiles_found.files | map(attribute='path') | map('basename')
+       | difference(dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))
+       | map('regex_replace', '^(.*)$', dotfiles_dest ~ '/\1') | list }}
+    file_type: any
+    recurse: true
+  register: dotfiles_owned
+  when: dotfiles_assert_ownership | bool
+
+- name: Assert the playbook user owns the managed files
+  ansible.builtin.assert:
+    that:
+      - dotfiles_owned.files | rejectattr('uid', 'equalto', ansible_facts['user_uid'] | int) | length == 0
+    fail_msg: >-
+      Files not owned by {{ ansible_facts['user_id'] }}
+      (fix with chown, or set dotfiles_assert_ownership: false):
+      {{ dotfiles_owned.files | rejectattr('uid', 'equalto', ansible_facts['user_uid'] | int)
+       | map(attribute='path') | list | join(', ') }}
+    quiet: true
+  when: dotfiles_assert_ownership | bool
+
 - name: Sync each managed directory
   ansible.builtin.include_tasks: sync.yml
   loop: >-

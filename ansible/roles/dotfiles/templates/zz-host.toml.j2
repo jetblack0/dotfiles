@@ -4,3 +4,7 @@
 
 [wallpaper]
 directory = "{{ wallpaper_directory }}"
+
+# Empty resolves to the XDG Pictures directory (ScreenshotConfig).
+[shell.screenshot]
+directory = "{{ screenshot_directory }}"
