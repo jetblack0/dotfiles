@@ -133,6 +133,7 @@ require("lazy").setup({
     config = function()
       require("plugin-config.hydra")
       require("plugin-config.git.hunks")
+      require("plugin-config.lsp.diagnostics")
     end,
   },
 	{
