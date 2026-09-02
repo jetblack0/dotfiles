@@ -81,6 +81,12 @@ in
       description = "Directory noctalia picks wallpapers from.";
     };
 
+    screenshotDirectory = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "Noctalia screenshot directory; empty means XDG Pictures.";
+    };
+
     xwaylandDpi = lib.mkOption {
       type = lib.types.nullOr lib.types.int;
       default = null;
@@ -172,6 +178,9 @@ in
 
             [wallpaper]
             directory = "${cfg.wallpaperDirectory}"
+
+            [shell.screenshot]
+            directory = "${cfg.screenshotDirectory}"
           '';
         };
 
