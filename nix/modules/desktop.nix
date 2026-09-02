@@ -141,6 +141,13 @@ in
       glib
       gsettings-desktop-schemas
 
+      # screen pickers & clipboard (binds.lua)
+      grim
+      slurp
+      hyprpicker
+      wl-clipboard
+      (tesseract.override { enableLanguages = [ "eng" ]; })
+
       # xwayland dpi (autostart.lua xrdb-merges the state xresources)
       xorg.xrdb
     ];
