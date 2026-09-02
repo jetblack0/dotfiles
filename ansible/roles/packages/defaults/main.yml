@@ -119,6 +119,7 @@ packages:
   # gtk theming. the theme noctalia's gtk template targets (noctalia apply.sh sets
   # adw-gtk3-dark only when installed)
   - { name: adw-gtk-theme, brew: false }
+  - { name: xorg-xrdb, brew: false }
 
   - { name: hyprpicker, brew: false }
   - { name: grim, brew: false }
