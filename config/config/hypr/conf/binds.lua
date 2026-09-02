@@ -26,9 +26,11 @@ hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("noctalia msg notification-clear-acti
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("noctalia msg notification-invoke-latest"), nograb)
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), nograb)
 
--- screenshots
 hl.bind("Print", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"), nograb)
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"), nograb)
+hl.bind(mainMod .. " + SHIFT + S",
+	hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy && notify-send Screenshot \"Copied to clipboard\""),
+	nograb)
 
 -- wallpapers
 hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd("noctalia msg wallpaper-random"), nograb)
