@@ -34,6 +34,16 @@ hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"), no
 hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd("noctalia msg wallpaper-random"), nograb)
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("noctalia msg panel-toggle wallpaper"), nograb)
 
+-- pass: the launcher's /pass dmenu entry lists the store, selection copies
+hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("noctalia msg panel-open launcher \"/pass \""), nograb)
+
+-- screen pickers, both end up in the clipboard. X for "extract text";
+-- O belongs to window.pin below
+hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker -a"), nograb)
+hl.bind(mainMod .. " + X",
+	hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tesseract stdin stdout | wl-copy && notify-send OCR \"Copied to clipboard\""),
+	nograb)
+
 -- night light toggle
 hl.bind(mainMod .. " + SHIFT + Prior", hl.dsp.exec_cmd("noctalia msg nightlight-toggle"), nograb)
 

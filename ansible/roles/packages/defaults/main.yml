@@ -116,6 +116,14 @@ packages:
   - { name: xdg-desktop-portal-hyprland, brew: false }
   - { name: xdg-desktop-portal-gtk, brew: false } # file chooser + settings backends
 
+  - { name: hyprpicker, brew: false }
+  - { name: grim, brew: false }
+  - { name: slurp, brew: false }
+  - { name: tesseract, brew: false }
+  - { name: tesseract-data-eng, brew: false }
+  - { name: wl-clipboard, brew: false } # wl-copy
+  - { name: libnotify, brew: false } # notify-send
+
   # misc
   - { name: xdg-ninja, aur: xdg-ninja }
 
