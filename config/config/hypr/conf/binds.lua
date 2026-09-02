@@ -124,3 +124,4 @@ hl.bind(mainMod .. " + SHIFT + O", hl.dsp.window.move({ monitor = "+1", follow =
 -- Programs
 -----------------------------------------------
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd("kitty"))
+hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd("zen-browser"), nograb)
