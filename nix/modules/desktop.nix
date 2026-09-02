@@ -135,6 +135,7 @@ in
       cava
 
       # themes
+      adw-gtk3
       capitaine-cursors
       (tela-circle-icon-theme.override { colorVariants = [ "black" ]; })
       glib
