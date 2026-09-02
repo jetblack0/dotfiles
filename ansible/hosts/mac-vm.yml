@@ -18,3 +18,6 @@ monitors:
     mode: "2560x1600@60"
     position: auto
     scale: 1.6
+
+# Xft.dpi for xwayland apps: 96 * scale.
+xwayland_dpi: 154

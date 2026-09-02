@@ -116,6 +116,19 @@ packages:
   - { name: xdg-desktop-portal-hyprland, brew: false }
   - { name: xdg-desktop-portal-gtk, brew: false } # file chooser + settings backends
 
+  # gtk theming. the theme noctalia's gtk template targets (noctalia apply.sh sets
+  # adw-gtk3-dark only when installed)
+  - { name: adw-gtk-theme, brew: false }
+  - { name: xorg-xrdb, brew: false }
+
+  - { name: hyprpicker, brew: false }
+  - { name: grim, brew: false }
+  - { name: slurp, brew: false }
+  - { name: tesseract, brew: false }
+  - { name: tesseract-data-eng, brew: false }
+  - { name: wl-clipboard, brew: false } # wl-copy
+  - { name: libnotify, brew: false } # notify-send
+
   # misc
   - { name: xdg-ninja, aur: xdg-ninja }
 
