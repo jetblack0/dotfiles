@@ -45,6 +45,13 @@ hl.config({
 		new_status = "slave",
 	},
 
+	-- XWayland surfaces render at 1x and get upscaled into blur on a
+	-- fractionally scaled monitor (e.g., gpg pinentry). Zero-scaling 
+  -- keeps them sharp; they draw small instead (fixed by Xft.dpi).
+	xwayland = {
+		force_zero_scaling = true,
+	},
+
 	-- All four group states, not just the active one: a slot left unfilled
 	-- falls back to Hyprland's default colours, not to the theme.
 	group = {

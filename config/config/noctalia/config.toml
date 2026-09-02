@@ -535,6 +535,12 @@ time_format = "{:%H:%M}"
 
         [shell.launcher.dmenu]
 
+            [shell.launcher.dmenu.entry.pass]
+            command = "find ${PASSWORD_STORE_DIR:-$HOME/.password-store} -name '*.gpg' -printf '%P\\n' | sed 's/\\.gpg$//' | sort"
+            exec = "pass show -c \"{selection}\""
+            glyph = "key"
+            prefix = "pass"
+
     [shell.mpris]
     blacklist = []
 
