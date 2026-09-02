@@ -14,6 +14,12 @@ dotfiles_state: "{{ ansible_facts['user_dir'] }}/.local/state"
 dotfiles_backup_root: "{{ ansible_facts['user_dir'] }}/.local/state/dotfiles/backup"
 dotfiles_backup: "{{ dotfiles_backup_root }}/{{ ansible_facts['date_time']['iso8601_basic_short'] }}"
 
+# Refuse to sync while a managed file is owned by someone else. The sync
+# self-heals content and mode drift but cannot see or chown foreign
+# ownership without root, so it fails loudly instead of certifying a
+# deployment where the shell may not be able to write its own config.
+dotfiles_assert_ownership: true
+
 # Directories masked from a given platform.
 dotfiles_mask:
   archlinux:
