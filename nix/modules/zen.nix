@@ -37,6 +37,10 @@ in
         profiles.default = { };
       };
 
+      home.packages = [
+        (pkgs.writeShellScriptBin "zen-browser" ''exec zen-beta "$@"'')
+      ];
+
       xdg.configFile."zen/default/zen-keyboard-shortcuts.json".source =
         dotfiles + "/zen/zen-keyboard-shortcuts.linux.json";
 
