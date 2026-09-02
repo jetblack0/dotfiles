@@ -3,7 +3,8 @@
 
 -- gtk
 hl.env("GDK_BACKEND", "wayland,x11")
-hl.env("GTK_IM_MODULE", "wayland")
+-- breaks pinentry
+-- hl.env("GTK_IM_MODULE", "wayland")
 
 -- qt
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
