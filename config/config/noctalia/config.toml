@@ -651,6 +651,9 @@ time_format = "{:%H:%M}"
     alpha = 0.55000001192092896
     direction = "down"
 
+    [shell.window_switcher]
+    mru = true
+
 
 # Storage
 # ---------------------------------------------
