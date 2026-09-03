@@ -277,13 +277,13 @@ pre_action_fade_seconds = 2.0
 cancel = [ "Escape" ]
 copy = [ "Ctrl+c" ]
 delete = [ "Delete" ]
-down = [ "Down" ]
-left = [ "Left" ]
-right = [ "Right" ]
+down = [ "Down", "Alt+j" ]
+left = [ "Left", "Alt+h" ]
+right = [ "Right", "Alt+l" ]
 save = [ "Ctrl+s" ]
 tab_next = [ "Tab" ]
 tab_previous = [ "Shift+ISO_Left_Tab" ]
-up = [ "Up" ]
+up = [ "Up", "Alt+k" ]
 validate = [ "Return", "KP_Enter", "space" ]
 
 
