@@ -1,3 +1,6 @@
 ---
 # The repo's etc/ tree.
 system_src: "{{ playbook_dir | dirname }}/config/etc"
+
+# The repo's var/ tree.
+system_var_src: "{{ playbook_dir | dirname }}/config/var"

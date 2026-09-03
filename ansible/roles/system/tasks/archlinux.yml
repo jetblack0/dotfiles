@@ -131,3 +131,15 @@
   ansible.builtin.systemd_service:
     name: greetd.service
     enabled: true
+
+# The dir and its greeter owner come from the noctalia-greeter package
+# hook (packages runs before this role).
+- name: Install the greeter config
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_var_src }}/lib/noctalia-greeter/greeter.toml"
+    dest: /var/lib/noctalia-greeter/greeter.toml
+    owner: greeter
+    group: greeter
+    mode: "0644"
+    remote_src: true
