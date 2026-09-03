@@ -26,7 +26,6 @@ dotfiles_mask:
     - Kvantum
     - X11
     - dunst
-    - fontconfig
     - gtk-2.0
     - qt5ct
     - waybar

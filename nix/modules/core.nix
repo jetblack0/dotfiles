@@ -124,7 +124,11 @@ in
     ];
 
     nixpkgs.config.allowUnfreePredicate =
-      pkg: builtins.elem (lib.getName pkg) [ "claude-code" ];
+      pkg:
+      builtins.elem (lib.getName pkg) [
+        "claude-code"
+        "apple-color-emoji"
+      ];
 
     virtualisation.docker.enable = true;
     programs.nix-ld.enable = true;
