@@ -1,0 +1,4024 @@
+	archlinux
+	tux
+	debian
+	freebsd
+	gentoo
+	linuxmint
+	linuxmint inverse
+	alpine
+	aosc
+	centos
+	coreos
+	devuan
+	docker
+	elementary
+	fedora
+	fedora inverse
+	mageia
+	mandriva
+	manjaro
+	nixos
+	opensuse
+	raspberry pi
+	redhat
+	sabayon
+	slackware
+	slackware inverse
+	ubuntu
+	ubuntu inverse
+	almalinux
+	archlabs
+	artix
+	budgie
+	deepin
+	endeavour
+	ferris
+	flathub
+	gnu guix
+	illumos
+	kali linux
+	openbsd
+	parrot
+	pop os
+	rocky linux
+	snappy
+	solus
+	void
+	zorin
+	apple
+	add
+	lightbulb
+	repo
+	repo forked
+	git pull request
+	record keys
+	tag
+	person
+	source control
+	mirror
+	star empty
+	comment
+	warning
+	search
+	sign out
+	sign in
+	eye
+	circle filled
+	primitive square
+	edit
+	info
+	lock
+	close
+	sync
+	desktop download
+	beaker
+	vm
+	file
+	ellipsis
+	reply
+	organization
+	new file
+	new folder
+	trash
+	history
+	folder
+	github
+	terminal
+	symbol event
+	error
+	symbol variable
+	symbol array
+	symbol namespace
+	symbol method
+	symbol boolean
+	symbol numeric
+	symbol structure
+	symbol parameter
+	symbol key
+	go to file
+	symbol enum
+	symbol ruler
+	activate breakpoints
+	archive
+	arrow both
+	arrow down
+	arrow left
+	arrow right
+	arrow small down
+	arrow small left
+	arrow small right
+	arrow small up
+	arrow up
+	bell
+	bold
+	book
+	bookmark
+	debug breakpoint conditional unverified
+	debug breakpoint conditional
+	debug breakpoint data unverified
+	debug breakpoint data
+	debug breakpoint log unverified
+	debug breakpoint log
+	briefcase
+	broadcast
+	browser
+	bug
+	calendar
+	case sensitive
+	check
+	checklist
+	chevron down
+	chevron left
+	chevron right
+	chevron up
+	chrome close
+	chrome maximize
+	chrome minimize
+	chrome restore
+	circle
+	circle slash
+	circuit board
+	clear all
+	clippy
+	close all
+	cloud download
+	cloud upload
+	code
+	collapse all
+	color mode
+	comment discussion
+	credit card
+	dash
+	dashboard
+	database
+	debug continue
+	debug disconnect
+	debug pause
+	debug restart
+	debug start
+	debug step into
+	debug step out
+	debug step over
+	debug stop
+	debug
+	device camera video
+	device camera
+	device mobile
+	diff added
+	diff ignored
+	diff modified
+	diff removed
+	diff renamed
+	diff
+	discard
+	editor layout
+	empty window
+	exclude
+	extensions
+	eye closed
+	file binary
+	file code
+	file media
+	file pdf
+	file submodule
+	file symlink directory
+	file symlink file
+	file zip
+	files
+	filter
+	flame
+	fold down
+	fold up
+	fold
+	folder active
+	folder opened
+	gear
+	gift
+	gist secret
+	git commit
+	git compare
+	git merge
+	github action
+	github alt
+	globe
+	grabber
+	graph
+	gripper
+	heart
+	home
+	horizontal rule
+	hubot
+	inbox
+	issue reopened
+	issues
+	italic
+	jersey
+	json
+	kebab vertical
+	key
+	law
+	lightbulb autofix
+	link external
+	link
+	list ordered
+	list unordered
+	live share
+	loading
+	location
+	mail read
+	mail
+	markdown
+	megaphone
+	mention
+	milestone
+	mortar board
+	move
+	multiwindows
+	mute
+	no newline
+	note
+	octoface
+	open preview
+	package
+	paintcan
+	pin
+	play
+	plug
+	preserve case
+	preview
+	project
+	pulse
+	question
+	quote
+	radio tower
+	reactions
+	references
+	refresh
+	regex
+	remote explorer
+	remote
+	remove
+	replace all
+	replace
+	repo clone
+	repo force push
+	repo pull
+	repo push
+	report
+	request changes
+	rocket
+	root folder opened
+	root folder
+	rss
+	ruby
+	save all
+	save as
+	save
+	screen full
+	screen normal
+	search stop
+	server
+	settings gear
+	settings
+	shield
+	smiley
+	sort precedence
+	split horizontal
+	split vertical
+	squirrel
+	star full
+	star half
+	symbol class
+	symbol color
+	symbol constant
+	symbol enum member
+	symbol field
+	symbol file
+	symbol interface
+	symbol keyword
+	symbol misc
+	symbol operator
+	symbol property
+	symbol snippet
+	tasklist
+	telescope
+	text size
+	three bars
+	thumbsdown
+	thumbsup
+	tools
+	triangle down
+	triangle left
+	triangle right
+	triangle up
+	twitter
+	unfold
+	unlock
+	unmute
+	unverified
+	verified
+	versions
+	vm active
+	vm outline
+	vm running
+	watch
+	whitespace
+	whole word
+	window
+	word wrap
+	zoom in
+	zoom out
+	list filter
+	list flat
+	list selection
+	list tree
+	debug breakpoint function unverified
+	debug breakpoint function
+	debug stackframe active
+	circle small filled
+	debug stackframe
+	debug breakpoint unsupported
+	symbol string
+	debug reverse continue
+	debug step back
+	debug restart frame
+	debug alt
+	call incoming
+	call outgoing
+	menu
+	expand all
+	feedback
+	group by ref type
+	ungroup by ref type
+	account
+	bell dot
+	debug console
+	library
+	output
+	run all
+	sync ignored
+	pinned
+	github inverted
+	server process
+	server environment
+	pass
+	stop circle
+	play circle
+	record
+	debug alt small
+	vm connect
+	cloud
+	merge
+	export
+	graph left
+	magnet
+	notebook
+	redo
+	check all
+	pinned dirty
+	pass filled
+	circle large filled
+	circle large
+	combine
+	table
+	variable group
+	type hierarchy
+	type hierarchy sub
+	type hierarchy super
+	git pull request create
+	run above
+	run below
+	notebook template
+	debug rerun
+	workspace trusted
+	workspace untrusted
+	workspace unknown
+	terminal cmd
+	terminal debian
+	terminal linux
+	terminal powershell
+	terminal tmux
+	terminal ubuntu
+	terminal bash
+	arrow swap
+	copy
+	person add
+	filter filled
+	wand
+	debug line by line
+	inspect
+	layers
+	layers dot
+	layers active
+	compass
+	compass dot
+	compass active
+	azure
+	issue draft
+	git pull request closed
+	git pull request draft
+	debug all
+	debug coverage
+	run errors
+	folder library
+	debug continue small
+	beaker stop
+	graph line
+	graph scatter
+	pie chart
+	bracket dot
+	bracket error
+	lock small
+	azure devops
+	verified filled
+	newline
+	layout
+	bing small
+	css tricks
+	git
+	bitbucket
+	mysql
+	streamline
+	database
+	dropbox
+	github alt
+	github badge
+	github
+	wordpress
+	visualstudio
+	jekyll small
+	android
+	windows
+	stackoverflow
+	apple
+	linux
+	appstore
+	ghost small
+	yahoo
+	codepen
+	github full
+	nodejs small
+	nodejs
+	hackernews
+	ember
+	dojo
+	django
+	npm
+	ghost
+	modernizr
+	unity small
+	rasberry pi
+	blackberry
+	go
+	git branch
+	git pull request
+	git merge
+	git compare
+	git commit
+	cssdeck
+	yahoo small
+	techcrunch
+	smashing magazine
+	netmagazine
+	codrops
+	phonegap
+	google drive
+	html5 multimedia
+	html5 device access
+	html5 connectivity
+	html5 3d effects
+	html5
+	scala
+	java
+	ruby
+	ubuntu
+	ruby on rails
+	python
+	php
+	markdown
+	laravel
+	magento
+	joomla
+	drupal
+	chrome
+	ie
+	firefox
+	opera
+	bootstrap
+	safari
+	css3
+	css3 full
+	sass
+	grunt
+	bower
+	javascript
+	javascript shield
+	jquery
+	coffeescript
+	backbone
+	angular
+	jquery ui
+	swift
+	symfony
+	symfony badge
+	less
+	stylus
+	trello
+	atlassian
+	jira
+	envato
+	snap svg
+	raphael
+	chart
+	compass
+	onedrive
+	gulp
+	atom
+	cisco
+	nancy
+	jenkins
+	clojure
+	perl
+	clojure alt
+	celluloid
+	w3c
+	redis
+	postgresql
+	webplatform
+	requirejs
+	opensource
+	typo3
+	uikit
+	doctrine
+	groovy
+	nginx
+	haskell
+	zend
+	gnu
+	yeoman
+	heroku
+	msql server
+	debian
+	travis
+	dotnet
+	codeigniter
+	javascript badge
+	yii
+	composer
+	krakenjs badge
+	krakenjs
+	mozilla
+	firebase
+	sizzlejs
+	creativecommons
+	creativecommons badge
+	mitlicence
+	senchatouch
+	bugsense
+	extjs
+	mootools badge
+	mootools
+	ruby rough
+	komodo
+	coda
+	bintray
+	terminal
+	code
+	responsive
+	dart
+	aptana
+	mailchimp
+	netbeans
+	dreamweaver
+	brackets
+	eclipse
+	cloud9
+	scrum
+	prolog
+	terminal badge
+	code badge
+	mongodb
+	meteor
+	meteorfull
+	fsharp
+	rust
+	ionic
+	sublime
+	appcelerator
+	asterisk
+	aws
+	digital ocean
+	dlang
+	docker
+	erlang
+	google cloud platform
+	grails
+	illustrator
+	intellij
+	materializecss
+	openshift
+	photoshop
+	rackspace
+	react
+	redhat
+	scriptcs
+	sqllite
+	vim
+	glass
+	music
+	search
+	envelope outline
+	heart
+	star
+	star outline
+	user
+	film
+	th large
+	th
+	th list
+	check
+	times
+	search plus
+	search minus
+	power off
+	signal
+	cog
+	trash outline
+	home
+	file outline
+	clock outline
+	road
+	download
+	arrow circle down
+	arrow circle up
+	inbox
+	play circle outline
+	repeat
+	refresh
+	list alt
+	lock
+	flag
+	headphones
+	volume off
+	volume down
+	volume up
+	qrcode
+	barcode
+	tag
+	tags
+	book
+	bookmark
+	print
+	camera
+	font
+	bold
+	italic
+	text height
+	text width
+	align left
+	align center
+	align right
+	align justify
+	list
+	outdent
+	indent
+	video camera
+	picture outline
+	pencil
+	map marker
+	adjust
+	tint
+	pencil square outline
+	share square outline
+	check square outline
+	arrows
+	step backward
+	fast backward
+	backward
+	play
+	pause
+	stop
+	forward
+	fast forward
+	step forward
+	eject
+	chevron left
+	chevron right
+	plus circle
+	minus circle
+	times circle
+	check circle
+	question circle
+	info circle
+	crosshairs
+	times circle outline
+	check circle outline
+	ban
+	arrow left
+	arrow right
+	arrow up
+	arrow down
+	share
+	expand
+	compress
+	plus
+	minus
+	asterisk
+	exclamation circle
+	gift
+	leaf
+	fire
+	eye
+	eye slash
+	exclamation triangle
+	plane
+	calendar
+	random
+	comment
+	magnet
+	chevron up
+	chevron down
+	retweet
+	shopping cart
+	folder
+	folder open
+	arrows v
+	arrows h
+	bar chart
+	twitter square
+	facebook square
+	camera retro
+	key
+	cogs
+	comments
+	thumbs up
+	thumbs down
+	star half
+	heart outline
+	sign out
+	linkedin square
+	thumb tack
+	external link
+	sign in
+	trophy
+	github square
+	upload
+	lemon outline
+	phone
+	square outline
+	bookmark outline
+	phone square
+	twitter
+	facebook
+	github
+	unlock
+	credit card
+	rss
+	hdd
+	bullhorn
+	bell
+	certificate
+	hand right
+	hand left
+	hand up
+	hand down
+	arrow circle left
+	arrow circle right
+	arrow circle up
+	arrow circle down
+	globe
+	wrench
+	tasks
+	filter
+	briefcase
+	arrows alt
+	users
+	link
+	cloud
+	flask
+	scissors
+	files
+	paperclip
+	floppy
+	square
+	bars
+	list ul
+	list ol
+	strikethrough
+	underline
+	table
+	magic
+	truck
+	pinterest
+	pinterest square
+	google plus square
+	google plus
+	money
+	caret down
+	caret up
+	caret left
+	caret right
+	columns
+	sort
+	sort desc
+	sort asc
+	envelope
+	linkedin
+	undo
+	gavel
+	tachometer
+	comment
+	comments
+	bolt
+	sitemap
+	umbrella
+	clipboard
+	lightbulb
+	exchange
+	cloud download
+	cloud upload
+	user md
+	stethoscope
+	suitcase
+	bell
+	coffee
+	cutlery
+	file text
+	building
+	hospital
+	ambulance
+	medkit
+	fighter jet
+	beer
+	h square
+	plus square
+	angle double left
+	angle double right
+	angle double up
+	angle double down
+	angle left
+	angle right
+	angle up
+	angle down
+	desktop
+	laptop
+	tablet
+	mobile
+	circle
+	quote left
+	quote right
+	spinner
+	circle
+	reply
+	github alt
+	folder
+	folder open
+	smile
+	frown
+	meh
+	gamepad
+	keyboard
+	flag
+	flag checkered
+	terminal
+	code
+	reply all
+	star half
+	location arrow
+	crop
+	code fork
+	chain broken
+	question
+	info
+	exclamation
+	superscript
+	subscript
+	eraser
+	puzzle piece
+	microphone
+	microphone slash
+	shield
+	calendar
+	fire extinguisher
+	rocket
+	maxcdn
+	chevron circle left
+	chevron circle right
+	chevron circle up
+	chevron circle down
+	html5
+	css3
+	anchor
+	unlock alt
+	bullseye
+	ellipsis h
+	ellipsis v
+	rss square
+	play circle
+	ticket
+	minus square
+	minus square
+	level up
+	level down
+	check square
+	pencil square
+	external link square
+	share square
+	compass
+	caret square down
+	caret square up
+	caret square right
+	eur
+	gbp
+	usd
+	inr
+	jpy
+	rub
+	krw
+	btc
+	file
+	file text
+	sort alpha asc
+	sort alpha desc
+	sort amount asc
+	sort amount desc
+	sort numeric asc
+	sort numeric desc
+	thumbs up
+	thumbs down
+	youtube square
+	youtube
+	xing
+	xing square
+	youtube play
+	dropbox
+	stack overflow
+	instagram
+	flickr
+	adn
+	bitbucket
+	bitbucket square
+	tumblr
+	tumblr square
+	long arrow down
+	long arrow up
+	long arrow left
+	long arrow right
+	apple
+	windows
+	android
+	linux
+	dribbble
+	skype
+	foursquare
+	trello
+	female
+	male
+	gratipay
+	sun
+	moon
+	archive
+	bug
+	vk
+	weibo
+	renren
+	pagelines
+	stack exchange
+	arrow circle right
+	arrow circle left
+	caret square left
+	dot circle
+	wheelchair
+	vimeo square
+	try
+	plus square
+	space shuttle
+	slack
+	envelope square
+	wordpress
+	openid
+	university
+	graduation cap
+	yahoo
+	google
+	reddit
+	reddit square
+	stumbleupon circle
+	stumbleupon
+	delicious
+	digg
+	pied piper pp
+	pied piper alt
+	drupal
+	joomla
+	language
+	fax
+	building
+	child
+	paw
+	spoon
+	cube
+	cubes
+	behance
+	behance square
+	steam
+	steam square
+	recycle
+	car
+	taxi
+	tree
+	spotify
+	deviantart
+	soundcloud
+	database
+	file pdf
+	file word
+	file excel
+	file powerpoint
+	file image
+	file archive
+	file audio
+	file video
+	file code
+	vine
+	codepen
+	jsfiddle
+	life ring
+	circle notch
+	rebel
+	empire
+	git square
+	git
+	hacker news
+	tencent weibo
+	qq
+	weixin
+	paper plane
+	paper plane
+	history
+	circle thin
+	header
+	paragraph
+	sliders
+	share alt
+	share alt square
+	bomb
+	futbol
+	tty
+	binoculars
+	plug
+	slideshare
+	twitch
+	yelp
+	newspaper
+	wifi
+	calculator
+	paypal
+	google wallet
+	cc visa
+	cc mastercard
+	cc discover
+	cc amex
+	cc paypal
+	cc stripe
+	bell slash
+	bell slash outline
+	trash
+	copyright
+	at
+	eyedropper
+	paint brush
+	birthday cake
+	area chart
+	pie chart
+	line chart
+	lastfm
+	lastfm square
+	toggle off
+	toggle on
+	bicycle
+	bus
+	ioxhost
+	angellist
+	cc
+	ils
+	meanpath
+	buysellads
+	connectdevelop
+	dashcube
+	forumbee
+	leanpub
+	sellsy
+	shirtsinbulk
+	simplybuilt
+	skyatlas
+	cart plus
+	cart arrow down
+	diamond
+	ship
+	user secret
+	motorcycle
+	street view
+	heartbeat
+	venus
+	mars
+	mercury
+	transgender
+	transgender alt
+	venus double
+	mars double
+	venus mars
+	mars stroke
+	mars stroke v
+	mars stroke h
+	neuter
+	genderless
+	facebook official
+	pinterest p
+	whatsapp
+	server
+	user plus
+	user times
+	bed
+	viacoin
+	train
+	subway
+	medium
+	y combinator
+	optin monster
+	opencart
+	expeditedssl
+	battery full
+	battery three quarters
+	battery half
+	battery quarter
+	battery empty
+	mouse pointer
+	i cursor
+	object group
+	object ungroup
+	sticky note
+	sticky note outline
+	cc jcb
+	cc diners club
+	clone
+	balance scale
+	hourglass outline
+	hourglass start
+	hourglass half
+	hourglass end
+	hourglass
+	hand rock outline
+	hand paper outline
+	hand scissors outline
+	hand lizard outline
+	hand spock outline
+	hand pointer outline
+	hand peace outline
+	trademark
+	registered
+	creative commons
+	gg
+	gg circle
+	tripadvisor
+	odnoklassniki
+	odnoklassniki square
+	get pocket
+	wikipedia w
+	safari
+	chrome
+	firefox
+	opera
+	internet explorer
+	television
+	contao
+	500px
+	amazon
+	calendar plus outline
+	calendar minus outline
+	calendar times outline
+	calendar check outline
+	industry
+	map pin
+	map signs
+	map outline
+	map
+	commenting
+	commenting outline
+	houzz
+	vimeo
+	black tie
+	fonticons
+	reddit alien
+	edge
+	credit card alt
+	codiepie
+	modx
+	fort awesome
+	usb
+	product hunt
+	mixcloud
+	scribd
+	pause circle
+	pause circle outline
+	stop circle
+	stop circle outline
+	shopping bag
+	shopping basket
+	hashtag
+	bluetooth
+	bluetooth b
+	percent
+	gitlab
+	wpbeginner
+	wpforms
+	envira
+	universal access
+	wheelchair alt
+	question circle outline
+	blind
+	audio description
+	volume control phone
+	braille
+	assistive listening systems
+	american sign language interpreting
+	deaf
+	glide
+	glide g
+	sign language
+	low vision
+	viadeo
+	viadeo square
+	snapchat
+	snapchat ghost
+	snapchat square
+	pied piper
+	first order
+	yoast
+	themeisle
+	google plus official
+	font awesome
+	handshake outline
+	envelope open
+	envelope open outline
+	linode
+	address book
+	address book outline
+	address card
+	address card outline
+	user circle
+	user circle outline
+	user outline
+	id badge
+	id card
+	id card outline
+	quora
+	free code camp
+	telegram
+	thermometer full
+	thermometer three quarters
+	thermometer half
+	thermometer quarter
+	thermometer empty
+	shower
+	bath
+	podcast
+	window maximize
+	window minimize
+	window restore
+	window close
+	window close outline
+	bandcamp
+	grav
+	etsy
+	imdb
+	ravelry
+	eercast
+	microchip
+	snowflake outline
+	superpowers
+	wpexplorer
+	meetup
+	smaller
+	snowing
+	soda
+	sofa
+	soup
+	spermatozoon
+	spin double
+	stomach
+	storm
+	telescope
+	thermometer
+	thermometer high
+	thermometer low
+	thin close
+	toilet
+	tools
+	tooth
+	uterus
+	w3c
+	walking
+	virus
+	telegram circle
+	slash
+	telegram
+	shirt
+	tacos
+	sushi
+	triangle ruler
+	tree
+	sun cloud
+	ruby outline
+	ruler
+	umbrella
+	medicine
+	microscope
+	milk bottle
+	minimize
+	molecule
+	moon cloud
+	mushroom
+	mustache
+	mysql
+	nintendo
+	palette color
+	pi
+	pizza
+	planet
+	plant
+	playstation
+	poison
+	popcorn
+	popsicle
+	pulse
+	python
+	quora circle
+	quora square
+	radioactive
+	raining
+	real heart
+	refrigerator
+	restore
+	ring
+	ruby
+	fingerprint
+	floppy
+	footprint
+	freecodecamp
+	galaxy
+	galery
+	glass
+	google drive
+	google play
+	gps
+	grav
+	guitar
+	gut
+	halter
+	hamburger
+	hat
+	hexagon
+	high heel
+	hotdog
+	ice cream
+	id card
+	imdb
+	infinity
+	java
+	layers
+	lips
+	lipstick
+	liver
+	lung
+	makeup brushes
+	maximize
+	wallet
+	chess horse
+	chess king
+	chess pawn
+	chess queen
+	chess tower
+	cheese
+	chilli
+	chip
+	cicling
+	cloud
+	cockroach
+	coffe beans
+	coins
+	comb
+	comet
+	crown
+	cup coffe
+	dice
+	disco
+	dna
+	donut
+	dress
+	drop
+	ello
+	envelope open
+	envelope open outline
+	equal
+	equal bigger
+	feedly
+	file export
+	file import
+	wind
+	atom
+	bacteria
+	banana
+	bath
+	bed
+	benzene
+	bigger
+	biohazard
+	blogger circle
+	blogger square
+	bones
+	book open
+	book open outline
+	brain
+	bread
+	butterfly
+	carot
+	cc by
+	cc cc
+	cc nc
+	cc nc eu
+	cc nc jp
+	cc nd
+	cc remix
+	cc sa
+	cc share
+	cc zero
+	checklist outline
+	cherry
+	chess bishop
+	xbox
+	apfruit
+	chicken thigh
+	gift card
+	injection
+	isle
+	lollipop
+	loyalty card
+	meat
+	mountains
+	orange
+	peach
+	pear
+⏻	power
+⏼	toggle power
+⏽	power on
+⏾	sleep mode
+⭘	power off
+	vector square
+	access point
+	access point network
+	account
+	account alert
+	account box
+	account box outline
+	account check
+	account circle
+	account convert
+	account key
+	account location
+	account minus
+	account multiple
+	account multioutline
+	account multiplus
+	account network
+	account off
+	account outline
+	account plus
+	account remove
+	account search
+	account star
+	orbit
+	account switch
+	adjust
+	air conditioner
+	airballoon
+	airplane
+	airplane off
+	airplay
+	alarm
+	alarm check
+	alarm multiple
+	alarm off
+	alarm plus
+	album
+	alert
+	alert box
+	alert circle
+	alert octagon
+	alert outline
+	alpha
+	alphabetical
+	amazon
+	amazon clouddrive
+	ambulance
+	amplifier
+	anchor
+	android
+	android debug bridge
+	android studio
+	apple
+	apfinder
+	apios
+	apmobileme
+	apsafari
+	font awesome
+	apps
+	archive
+	arrange bring forward
+	arrange bring to front
+	arrange send backward
+	arrange send to back
+	arrow all
+	arrow bottom left
+	arrow bottom right
+	arrow collapse all
+	arrow down
+	arrow down thick
+	arrow down bold circle
+	arrow down bold circle outline
+	arrow down bold hexagon outline
+	arrow down drop circle
+	arrow down drop circle outline
+	arrow expand all
+	arrow left
+	arrow left thick
+	arrow left bold circle
+	arrow left bold circle outline
+	arrow left bold hexagon outline
+	arrow left drop circle
+	arrow left drop circle outline
+	arrow right
+	arrow right thick
+	arrow right bold circle
+	arrow right bold circle outline
+	arrow right bold hexagon outline
+	arrow right drop circle
+	arrow right drop circle outline
+	arrow top left
+	arrow top right
+	arrow up
+	arrow up thick
+	arrow up bold circle
+	arrow up bold circle outline
+	arrow up bold hexagon outline
+	arrow up drop circle
+	arrow up drop circle outline
+	assistant
+	at
+	attachment
+	audiobook
+	auto fix
+	auto upload
+	autorenew
+	av timer
+	baby
+	backburger
+	backspace
+	backup restore
+	bank
+	barcode
+	barcode scan
+	barley
+	barrel
+	basecamp
+	basket
+	basket fill
+	basket unfill
+	battery
+	battery 10
+	battery 20
+	battery 30
+	battery 40
+	battery 50
+	battery 60
+	battery 70
+	battery 80
+	battery 90
+	battery alert
+	battery charging
+	battery charging 100
+	battery charging 20
+	battery charging 30
+	battery charging 40
+	battery charging 60
+	battery charging 80
+	battery charging 90
+	battery minus
+	battery negative
+	battery outline
+	battery plus
+	battery positive
+	battery unknown
+	beach
+	flask
+	flask empty
+	flask empty outline
+	flask outline
+	beats
+	beer
+	behance
+	bell
+	bell off
+	bell outline
+	bell plus
+	bell ring
+	bell ring outline
+	bell sleep
+	beta
+	bible
+	bike
+	bing
+	binoculars
+	bio
+	biohazard
+	bitbucket
+	black mesa
+	blackberry
+	blender
+	blinds
+	block helper
+	blogger
+	bluetooth
+	bluetooth audio
+	bluetooth connect
+	bluetooth off
+	bluetooth settings
+	bluetooth transfer
+	blur
+	blur linear
+	blur off
+	blur radial
+	bone
+	book
+	book multiple
+	book multivariant
+	book open
+	book open variant
+	book variant
+	bookmark
+	bookmark check
+	bookmark music
+	bookmark outline
+	bookmark plus outline
+	bookmark plus
+	bookmark remove
+	border all
+	border bottom
+	border color
+	border horizontal
+	border inside
+	border left
+	border none
+	border outside
+	border right
+	border style
+	border top
+	border vertical
+	bowling
+	box
+	box cutter
+	briefcase
+	briefcase check
+	briefcase download
+	briefcase upload
+	brightness 1
+	brightness 2
+	brightness 3
+	brightness 4
+	brightness 5
+	brightness 6
+	brightness 7
+	brightness auto
+	broom
+	brush
+	bug
+	bulletin board
+	bullhorn
+	bus
+	cached
+	cake
+	cake layered
+	cake variant
+	calculator
+	calendar
+	calendar blank
+	calendar check
+	calendar clock
+	calendar multiple
+	calendar multicheck
+	calendar plus
+	calendar remove
+	calendar text
+	calendar today
+	call made
+	call merge
+	call missed
+	call received
+	call split
+	camcorder
+	camcorder box
+	camcorder box off
+	camcorder off
+	camera
+	camera enhance
+	camera front
+	camera front variant
+	camera iris
+	camera party mode
+	camera rear
+	camera rear variant
+	camera switch
+	camera timer
+	candycane
+	car
+	car battery
+	car connected
+	car wash
+	carrot
+	cart
+	cart outline
+	cart plus
+	case sensitive alt
+	cash
+	cash 100
+	cash multiple
+	cash usd
+	cast
+	cast connected
+	castle
+	cat
+	cellphone
+	cellphone android
+	cellphone basic
+	cellphone dock
+	cellphone iphone
+	cellphone link
+	cellphone link off
+	cellphone settings
+	certificate
+	chair school
+	chart arc
+	chart areaspline
+	chart bar
+	chart histogram
+	chart line
+	chart pie
+	check
+	check all
+	checkbox blank
+	checkbox blank circle
+	checkbox blank circle outline
+	checkbox blank outline
+	checkbox marked
+	checkbox marked circle
+	checkbox marked circle outline
+	checkbox marked outline
+	checkbox multiblank
+	checkbox multiblank outline
+	checkbox multimarked
+	checkbox multimarked outline
+	checkerboard
+	chemical weapon
+	chevron double down
+	chevron double left
+	chevron double right
+	chevron double up
+	chevron down
+	chevron left
+	chevron right
+	chevron up
+	church
+	cisco webex
+	city
+	clipboard
+	clipboard account
+	clipboard alert
+	clipboard arrow down
+	clipboard arrow left
+	clipboard check
+	clipboard outline
+	clipboard text
+	clippy
+	clock
+	clock end
+	clock fast
+	clock in
+	clock out
+	clock start
+	close
+	close box
+	close box outline
+	close circle
+	close circle outline
+	close network
+	close octagon
+	close octagon outline
+	closed caption
+	cloud
+	cloud check
+	cloud circle
+	cloud download
+	cloud outline
+	cloud off outline
+	cloud print
+	cloud print outline
+	cloud upload
+	code array
+	code braces
+	code brackets
+	code equal
+	code greater than
+	code greater than or equal
+	code less than
+	code less than or equal
+	code not equal
+	code not equal variant
+	code parentheses
+	code string
+	code tags
+	codepen
+	coffee
+	coffee to go
+	coin
+	color helper
+	comment
+	comment account
+	comment account outline
+	comment alert
+	comment alert outline
+	comment check
+	comment check outline
+	comment multioutline
+	comment outline
+	comment plus outline
+	comment processing
+	comment processing outline
+	comment question outline
+	comment remove outline
+	comment text
+	comment text outline
+	compare
+	compass
+	compass outline
+	console
+	contact mail
+	content copy
+	content cut
+	content duplicate
+	content paste
+	content save
+	content save all
+	contrast
+	contrast box
+	contrast circle
+	cookie
+	counter
+	cow
+	credit card
+	credit card multiple
+	credit card scan
+	crop
+	crop free
+	crop landscape
+	crop portrait
+	crop square
+	crosshairs
+	crosshairs gps
+	crown
+	cube
+	cube outline
+	cube send
+	cube unfolded
+	cup
+	cup water
+	currency btc
+	currency eur
+	currency gbp
+	currency inr
+	currency ngn
+	currency rub
+	currency try
+	currency usd
+	cursor default
+	cursor default outline
+	cursor move
+	cursor pointer
+	database
+	database minus
+	database plus
+	debug step into
+	debug step out
+	debug step over
+	decimal decrease
+	decimal increase
+	delete
+	delete variant
+	delta
+	deskphone
+	desktop mac
+	desktop tower
+	details
+	deviantart
+	diamond
+	creation
+	dice 1
+	dice 2
+	dice 3
+	dice 4
+	dice 5
+	dice 6
+	directions
+	disk alert
+	disqus
+	disqus outline
+	division
+	division box
+	dns
+	domain
+	dots horizontal
+	dots vertical
+	download
+	drag
+	drag horizontal
+	drag vertical
+	drawing
+	drawing box
+	dribbble
+	dribbble box
+	drone
+	dropbox
+	drupal
+	duck
+	dumbbell
+	earth
+	earth off
+	edge
+	eject
+	elevation decline
+	elevation rise
+	elevator
+	email
+	email open
+	email outline
+	email secure
+	emoticon
+	emoticon cool
+	emoticon devil
+	emoticon happy
+	emoticon neutral
+	emoticon poop
+	emoticon sad
+	emoticon tongue
+	engine
+	engine outline
+	equal
+	equal box
+	eraser
+	escalator
+	ethernet
+	ethernet cable
+	ethernet cable off
+	etsy
+	evernote
+	exclamation
+	exit to app
+	export
+	eye
+	eye off
+	eyedropper
+	eyedropper variant
+	facebook
+	facebook box
+	facebook messenger
+	factory
+	fan
+	fast forward
+	fax
+	ferry
+	file
+	file chart
+	file check
+	file cloud
+	file delimited
+	file document
+	file document box
+	file excel
+	file excel box
+	file export
+	file find
+	file image
+	file import
+	file lock
+	file multiple
+	file music
+	file outline
+	file pdf
+	file pdf box
+	file powerpoint
+	file powerpoint box
+	file presentation box
+	file send
+	file video
+	file word
+	file word box
+	file xml
+	film
+	filmstrip
+	filmstrip off
+	filter
+	filter outline
+	filter remove
+	filter remove outline
+	filter variant
+	fingerprint
+	fire
+	firefox
+	fish
+	flag
+	flag checkered
+	flag outline
+	flag variant outline
+	flag triangle
+	flag variant
+	flash
+	flash auto
+	flash off
+	flashlight
+	flashlight off
+	flattr
+	flip to back
+	flip to front
+	floppy
+	flower
+	folder
+	folder account
+	folder download
+	folder google drive
+	folder image
+	folder lock
+	folder lock open
+	folder move
+	folder multiple
+	folder multiimage
+	folder multioutline
+	folder outline
+	folder plus
+	folder remove
+	folder upload
+	food
+	food apple
+	food variant
+	football
+	football australian
+	football helmet
+	format align center
+	format align justify
+	format align left
+	format align right
+	format bold
+	format clear
+	format color fill
+	format float center
+	format float left
+	format float none
+	format float right
+	format header 1
+	format header 2
+	format header 3
+	format header 4
+	format header 5
+	format header 6
+	format header decrease
+	format header equal
+	format header increase
+	format header pound
+	format indent decrease
+	format indent increase
+	format italic
+	format line spacing
+	format list bulleted
+	format list bulleted type
+	format list numbers
+	format paint
+	format paragraph
+	format quote close
+	format size
+	format strikethrough
+	format strikethrough variant
+	format subscript
+	format superscript
+	format text
+	format textdirection l to r
+	format textdirection r to l
+	format underline
+	format wrap inline
+	format wrap square
+	format wrap tight
+	format wrap top bottom
+	forum
+	forward
+	foursquare
+	fridge
+	fridge filled
+	fridge filled bottom
+	fridge filled top
+	fullscreen
+	fullscreen exit
+	function
+	gamepad
+	gamepad variant
+	gas station
+	gate
+	gauge
+	gavel
+	gender female
+	gender male
+	gender male female
+	gender transgender
+	ghost
+	gift
+	git
+	github box
+	github circle
+	glass flute
+	glass mug
+	glass stange
+	glass tulip
+	glassdoor
+	glasses
+	gmail
+	gnome
+	google
+	google cardboard
+	google chrome
+	google circles
+	google circles communities
+	google circles extended
+	google circles group
+	google controller
+	google controller off
+	google drive
+	google earth
+	google glass
+	google nearby
+	google pages
+	google physical web
+	google play
+	google plus
+	google plus box
+	google translate
+	google wallet
+	grid
+	grid off
+	group
+	guitar electric
+	guitar pick
+	guitar pick outline
+	hand pointing right
+	hanger
+	hangouts
+	harddisk
+	headphones
+	headphones box
+	headphones settings
+	headset
+	headset dock
+	headset off
+	heart
+	heart box
+	heart box outline
+	heart broken
+	heart outline
+	help
+	help circle
+	hexagon
+	hexagon outline
+	history
+	hololens
+	home
+	home modern
+	home variant
+	hops
+	hospital
+	hospital building
+	hospital marker
+	hotel
+	houzz
+	houzz box
+	human
+	human child
+	human male female
+	image
+	image album
+	image area
+	image area close
+	image broken
+	image broken variant
+	image filter
+	image filter black white
+	image filter center focus
+	image filter center focus weak
+	image filter drama
+	image filter frames
+	image filter hdr
+	image filter none
+	image filter tilt shift
+	image filter vintage
+	image multiple
+	import
+	inbox arrow down
+	information
+	information outline
+	instagram
+	instapaper
+	internet explorer
+	invert colors
+	jeepney
+	jira
+	jsfiddle
+	keg
+	key
+	key change
+	key minus
+	key plus
+	key remove
+	key variant
+	keyboard
+	keyboard backspace
+	keyboard caps
+	keyboard close
+	keyboard off
+	keyboard return
+	keyboard tab
+	keyboard variant
+	kodi
+	label
+	label outline
+	lan
+	lan connect
+	lan disconnect
+	lan pending
+	language csharp
+	language css3
+	language html5
+	language javascript
+	language php
+	language python
+	language python text
+	laptop
+	laptop chromebook
+	laptop mac
+	laptop windows
+	lastfm
+	launch
+	layers
+	layers off
+	leaf
+	led off
+	led on
+	led outline
+	led variant off
+	led variant on
+	led variant outline
+	library
+	library books
+	library music
+	library plus
+	lightbulb
+	lightbulb outline
+	link
+	link off
+	link variant
+	link variant off
+	linkedin
+	linkedin box
+	linux
+	lock
+	lock open
+	lock open outline
+	lock outline
+	login
+	logout
+	looks
+	loupe
+	lumx
+	magnet
+	magnet on
+	magnify
+	magnify minus
+	magnify plus
+	mail ru
+	map
+	map marker
+	map marker circle
+	map marker multiple
+	map marker off
+	map marker radius
+	margin
+	markdown
+	marker check
+	martini
+	material ui
+	math compass
+	maxcdn
+	medium
+	memory
+	menu
+	menu down
+	menu left
+	menu right
+	menu up
+	message
+	message alert
+	message draw
+	message image
+	message outline
+	message processing
+	message reply
+	message reply text
+	message text
+	message text outline
+	message video
+	microphone
+	microphone off
+	microphone outline
+	microphone settings
+	microphone variant
+	microphone variant off
+	microsoft
+	minecraft
+	minus
+	minus box
+	minus circle
+	minus circle outline
+	minus network
+	monitor
+	monitor multiple
+	more
+	motorbike
+	mouse
+	mouse off
+	mouse variant
+	mouse variant off
+	movie
+	multiplication
+	multiplication box
+	music box
+	music box outline
+	music circle
+	music note
+	music note eighth
+	music note half
+	music note off
+	music note quarter
+	music note sixteenth
+	music note whole
+	nature
+	nature people
+	navigation
+	needle
+	nest protect
+	nest thermostat
+	new box
+	newspaper
+	nfc
+	nfc tap
+	nfc variant
+	nodejs
+	note
+	note outline
+	note plus
+	note plus outline
+	note text
+	notification clear all
+	numeric
+	numeric 0 box
+	numeric 0 box multioutline
+	numeric 0 box outline
+	numeric 1 box
+	numeric 1 box multioutline
+	numeric 1 box outline
+	numeric 2 box
+	numeric 2 box multioutline
+	numeric 2 box outline
+	numeric 3 box
+	numeric 3 box multioutline
+	numeric 3 box outline
+	numeric 4 box
+	numeric 4 box multioutline
+	numeric 4 box outline
+	numeric 5 box
+	numeric 5 box multioutline
+	numeric 5 box outline
+	numeric 6 box
+	numeric 6 box multioutline
+	numeric 6 box outline
+	numeric 7 box
+	numeric 7 box multioutline
+	numeric 7 box outline
+	numeric 8 box
+	numeric 8 box multioutline
+	numeric 8 box outline
+	numeric 9 box
+	numeric 9 box multioutline
+	numeric 9 box outline
+	numeric 9 plus box
+	numeric 9 plus box multioutline
+	numeric 9 plus box outline
+	nutrition
+	octagon
+	octagon outline
+	odnoklassniki
+	office
+	oil
+	oil temperature
+	omega
+	onedrive
+	open in app
+	open in new
+	openid
+	opera
+	ornament
+	ornament variant
+	inbox arrow up
+	owl
+	package
+	package down
+	package up
+	package variant
+	package variant closed
+	palette
+	palette advanced
+	panda
+	pandora
+	panorama
+	panorama fisheye
+	panorama horizontal
+	panorama vertical
+	panorama wide angle
+	paper cut vertical
+	paperclip
+	parking
+	pause
+	pause circle
+	pause circle outline
+	pause octagon
+	pause octagon outline
+	paw
+	pen
+	pencil
+	pencil box
+	pencil box outline
+	pencil lock
+	pencil off
+	percent
+	pharmacy
+	phone
+	phone bluetooth
+	phone forward
+	phone hangup
+	phone in talk
+	phone incoming
+	phone locked
+	phone log
+	phone missed
+	phone outgoing
+	phone paused
+	phone settings
+	phone voip
+	pi
+	pi box
+豈	pig
+更	pill
+車	pin
+賈	pin off
+滑	pine tree
+串	pine tree box
+句	pinterest
+龜	pinterest box
+龜	pizza
+契	play
+金	play box outline
+喇	play circle
+奈	play circle outline
+懶	play pause
+癩	play protected content
+羅	playlist minus
+蘿	playlist play
+螺	playlist plus
+裸	playlist remove
+邏	playstation
+樂	plus
+洛	plus box
+烙	plus circle
+珞	plus circle multioutline
+落	plus circle outline
+酪	plus network
+駱	plus one
+亂	pocket
+卵	pokeball
+欄	polaroid
+爛	poll
+蘭	poll box
+鸞	polymer
+嵐	popcorn
+濫	pound
+藍	pound box
+襤	power
+拉	power settings
+臘	power socket
+蠟	presentation
+廊	presentation play
+朗	printer
+浪	printer 3d
+狼	printer alert
+郎	professional hexagon
+來	projector
+冷	projector screen
+勞	pulse
+擄	puzzle
+櫓	qrcode
+爐	qrcode scan
+盧	quadcopter
+老	quality high
+蘆	quicktime
+虜	radar
+路	radiator
+露	radio
+魯	radio handheld
+鷺	radio tower
+碌	radioactive
+祿	radiobox blank
+綠	radiobox marked
+菉	raspberrypi
+錄	ray end
+鹿	ray end arrow
+論	ray start
+壟	ray start arrow
+弄	ray start end
+籠	ray vertex
+聾	lastpass
+牢	read
+磊	youtube tv
+賂	receipt
+雷	record
+壘	record rec
+屢	recycle
+樓	reddit
+淚	redo
+漏	redo variant
+累	refresh
+縷	regex
+陋	relative scale
+勒	reload
+肋	remote
+凜	rename box
+凌	repeat
+稜	repeat off
+綾	repeat once
+菱	replay
+陵	reply
+讀	reply all
+拏	reproduction
+樂	resize bottom right
+諾	responsive
+丹	rewind
+寧	ribbon
+怒	road
+率	road variant
+異	rocket
+北	rotate 3d
+磻	rotate left
+便	rotate left variant
+復	rotate right
+不	rotate right variant
+泌	router wireless
+數	routes
+索	rss
+參	rss box
+塞	ruler
+省	run fast
+葉	sale
+說	satellite
+殺	satellite variant
+辰	scale
+沈	scale bathroom
+拾	school
+若	screen rotation
+掠	screen rotation lock
+略	screwdriver
+亮	script
+兩	sd
+凉	seal
+梁	seat flat
+糧	seat flat angled
+良	seat individual suite
+諒	seat legroom extra
+量	seat legroom normal
+勵	seat legroom reduced
+呂	seat recline extra
+女	seat recline normal
+廬	security
+旅	security network
+濾	select
+礪	select all
+閭	select inverse
+驪	select off
+麗	selection
+黎	send
+力	server
+曆	server minus
+歷	server network
+轢	server network off
+年	server off
+憐	server plus
+戀	server remove
+撚	server security
+漣	settings
+煉	settings box
+璉	shape plus
+秊	share
+練	share variant
+聯	shield
+輦	shield outline
+蓮	shopping
+連	shopping music
+鍊	shredder
+列	shuffle
+劣	shuffle disabled
+咽	shuffle variant
+烈	sigma
+裂	sign caution
+說	signal
+廉	silverware
+念	silverware fork
+捻	silverware spoon
+殮	silverware variant
+簾	sim
+獵	sim alert
+令	sim off
+囹	sitemap
+寧	skip backward
+嶺	skip forward
+怜	skip next
+玲	skip previous
+瑩	skype
+羚	skype business
+聆	slack
+鈴	sleep
+零	sleep off
+靈	smoking
+領	smoking off
+例	snapchat
+禮	snowman
+醴	soccer
+隸	sofa
+惡	sort
+了	sort alphabetical
+僚	sort ascending
+寮	sort descending
+尿	sort numeric
+料	sort variant
+樂	soundcloud
+燎	source fork
+療	source pull
+蓼	speaker
+遼	speaker off
+龍	speedometer
+暈	spellcheck
+阮	spotify
+劉	spotlight
+杻	spotlight beam
+柳	square inc
+流	square inc cash
+溜	stack overflow
+琉	stairs
+留	star
+硫	star circle
+紐	star half
+類	star off
+六	star outline
+戮	steam
+陸	steering
+倫	step backward
+崙	step backward 2
+淪	step forward
+輪	step forward 2
+律	stethoscope
+慄	stocking
+栗	stop
+率	store
+隆	store 24 hour
+利	stove
+吏	subway variant
+履	sunglasses
+易	swap horizontal
+李	swap vertical
+梨	swim
+泥	switch
+理	sword
+痢	sync
+罹	sync alert
+裏	sync off
+裡	tab
+里	tab unselected
+離	table
+匿	table column plus after
+溺	table column plus before
+吝	table column remove
+燐	table column width
+璘	table edit
+藺	table large
+隣	table row height
+鱗	table row plus after
+麟	table row plus before
+林	table row remove
+淋	tablet
+臨	tablet android
+立	tablet ipad
+笠	tag
+粒	tag faces
+狀	tag multiple
+炙	tag outline
+識	tag text outline
+什	target
+茶	taxi
+刺	teamviewer
+切	telegram
+度	television
+拓	television guide
+糖	temperature celsius
+宅	temperature fahrenheit
+洞	temperature kelvin
+暴	tennis
+輻	tent
+行	terrain
+降	text to speech
+見	text to speech off
+廓	texture
+兀	theater
+嗀	theme light dark
+﨎	thermometer
+﨏	thermometer lines
+塚	thumb down
+﨑	thumb down outline
+晴	thumb up
+﨓	thumb up outline
+﨔	thumbs up down
+凞	ticket
+猪	ticket account
+益	ticket confirmation
+礼	tie
+神	timelapse
+祥	timer
+福	timer 10
+靖	timer 3
+精	timer off
+羽	timer sand
+﨟	timetable
+蘒	toggle switch
+﨡	toggle switch off
+諸	tooltip
+﨣	tooltip edit
+﨤	tooltip image
+逸	tooltip outline
+都	tooltip outline plus
+﨧	tooltip text
+﨨	tooth
+﨩	tor
+飯	traffic light
+飼	train
+館	tram
+鶴	transcribe
+郞	transcribe close
+隷	transfer
+侮	tree
+僧	trello
+免	trending down
+勉	trending neutral
+勤	trending up
+卑	triangle
+喝	triangle outline
+嘆	trophy
+器	trophy award
+塀	trophy outline
+墨	trophy variant
+層	trophy variant outline
+屮	truck
+悔	truck delivery
+慨	tshirt crew
+憎	tshirt v
+懲	tumblr
+敏	tumblr reblog
+既	twitch
+暑	twitter
+梅	twitter box
+海	twitter circle
+渚	twitter retweet
+漢	ubuntu
+煮	umbraco
+爫	umbrella
+琢	umbrella outline
+碑	undo
+社	undo variant
+祉	unfold less horizontal
+祈	unfold more horizontal
+祐	ungroup
+祖	untappd
+祝	upload
+禍	usb
+禎	vector arrange above
+穀	vector arrange below
+突	vector circle
+節	vector circle variant
+練	vector combine
+縉	vector curve
+繁	vector difference
+署	vector difference ab
+者	vector difference ba
+臭	vector intersection
+艹	vector line
+艹	vector point
+著	vector polygon
+褐	vector polyline
+視	vector selection
+謁	vector triangle
+謹	vector union
+賓	verified
+贈	vibrate
+辶	video
+逸	video off
+難	video switch
+響	view agenda
+頻	view array
+恵	view carousel
+𤋮	view column
+舘	view dashboard
+並	view headline
+况	view list
+全	view module
+侀	view quilt
+充	view stream
+冀	view week
+勇	vimeo
+勺	venmo
+喝	vk
+啕	vk box
+喙	vk circle
+嗢	vlc
+塚	voicemail
+墳	volume high
+奄	volume low
+奔	volume medium
+婢	volume off
+嬨	vpn
+廒	walk
+廙	wallet
+彩	wallet giftcard
+徭	wallet membership
+惘	wallet travel
+慎	wan
+愈	watch
+憎	watch export
+慠	watch import
+懲	water
+戴	water off
+揄	water percent
+搜	water pump
+摒	cloudy
+敖	fog
+晴	hail
+朗	lightning
+望	night
+杖	partlycloudy
+歹	pouring
+殺	rainy
+流	snowy
+滛	sunny
+滋	sunset
+漢	sunset down
+瀞	sunset up
+煮	windy
+瞧	windy variant
+爵	web
+犯	webcam
+猪	weight
+瑱	weight kilogram
+甆	whatsapp
+画	wheelchair accessibility
+瘝	white balance auto
+瘟	white balance incandescent
+益	white balance iridescent
+盛	white balance sunny
+直	wifi
+睊	wifi off
+着	wii
+磌	wikipedia
+窱	window close
+節	window closed
+类	window maximize
+絛	window minimize
+練	window open
+缾	window restore
+者	windows
+荒	wordpress
+華	worker
+蝹	wrap
+襁	wrench
+覆	wunderlist
+視	xbox
+調	xbox controller
+諸	xbox controller off
+請	xda
+謁	xing
+諾	xing box
+諭	xing circle
+謹	xml
+變	yeast
+贈	yelp
+輸	youtube play
+遲	zip box
+醙	surround sound
+鉶	vector rectangle
+陼	playlist check
+難	format line style
+靖	format line weight
+韛	translate
+響	voice
+頋	opacity
+頻	near me
+鬒	clock alert
+龜	human pregnant
+𢡊	sticker
+𢡄	scale balance
+𣏕	account card details
+㮝	account multiminus
+䀘	airplane landing
+䀹	airplane takeoff
+𥉉	alert circle outline
+𥳐	altimeter
+𧻓	animation
+齃	book minus
+龎	book open page variant
+ﬀ	page last
+ﬁ	phone classic
+ﬂ	priority high
+ﬃ	priority low
+ﬄ	qqchat
+ﬅ	pool
+ﬆ	rounded corner
+ﬓ	application
+ﬔ	arrow collapse
+ﬕ	arrow expand
+ﬖ	bowl
+ﬗ	bridge
+יִ	format horizontal align center
+ײַ	format horizontal align right
+ﬠ	format vertical align bottom
+ﬡ	format vertical align center
+ﬢ	format vertical align top
+ﬣ	hackernews
+ﬤ	help circle outline
+ﬥ	json
+ﬦ	lambda
+ﬧ	matrix
+ﬨ	meteor
+﬩	mixcloud
+שׁ	sigma lower
+שׂ	source branch
+שּׁ	source merge
+שּׂ	tune
+אַ	webhook
+אָ	account settings
+אּ	account settings variant
+בּ	apkeyboard caps
+גּ	apkeyboard command
+דּ	apkeyboard control
+הּ	apkeyboard option
+וּ	apkeyboard shift
+זּ	box shadow
+טּ	cards outline
+יּ	cards playing outline
+ךּ	checkbox multiblank circle
+כּ	checkbox multiblank circle outline
+לּ	checkbox multimarked circle
+מּ	cloud sync
+נּ	directions fork
+סּ	eraser variant
+ףּ	face profile
+פּ	file tree
+צּ	gas cylinder
+קּ	grease pencil
+רּ	human female
+שּ	human greeting
+תּ	human handsdown
+וֹ	human handsup
+בֿ	human male
+כֿ	information variant
+פֿ	lead pencil
+ﭏ	map marker minus
+ﭐ	map marker plus
+ﭑ	marker
+ﭒ	message plus
+ﭓ	microscope
+ﭔ	move resize
+ﭕ	move resize variant
+ﭖ	paw off
+ﭗ	phone minus
+ﭘ	phone plus
+ﭙ	pot
+ﭚ	pot mix
+ﭛ	serial port
+ﭜ	shape circle plus
+ﭝ	shape polygon plus
+ﭞ	shape rectangle plus
+ﭟ	shape square plus
+ﭠ	skip next circle
+ﭡ	skip next circle outline
+ﭢ	skip previous circle
+ﭣ	skip previous circle outline
+ﭤ	spray
+ﭥ	stop circle
+ﭦ	stop circle outline
+ﭧ	test tube
+ﭨ	text shadow
+ﭩ	tune vertical
+ﭪ	cart off
+ﭫ	chart gantt
+ﭬ	chart scatterplot hexbin
+ﭭ	chart timeline
+ﭮ	discord
+ﭯ	file restore
+ﭰ	language c
+ﭱ	language cpp
+ﭲ	xaml
+ﭳ	bandcamp
+ﭴ	credit card plus
+ﭵ	itunes
+ﭶ	bow tie
+ﭷ	calendar range
+ﭸ	currency usd off
+ﭹ	flash red eye
+ﭺ	oar
+ﭻ	piano
+ﭼ	lightning rainy
+ﭽ	snowy rainy
+ﭾ	yin yang
+ﭿ	tower beach
+ﮀ	tower fire
+ﮁ	delete circle
+ﮂ	dna
+ﮃ	hamburger
+ﮄ	gondola
+ﮅ	inbox
+ﮆ	reorder horizontal
+ﮇ	reorder vertical
+ﮈ	security home
+ﮉ	tag heart
+ﮊ	skull
+ﮋ	solid
+ﮌ	alarm snooze
+ﮍ	baby buggy
+ﮎ	beaker
+ﮏ	bomb
+ﮐ	calendar question
+ﮑ	camera burst
+ﮒ	code tags check
+ﮓ	coins
+ﮔ	crop rotate
+ﮕ	developer board
+ﮖ	do not disturb
+ﮗ	do not disturb off
+ﮘ	douban
+ﮙ	emoticon dead
+ﮚ	emoticon excited
+ﮛ	folder star
+ﮜ	format color text
+ﮝ	format section
+ﮞ	gradient
+ﮟ	home outline
+ﮠ	message bulleted
+ﮡ	message bulleted off
+ﮢ	nuke
+ﮣ	power plug
+ﮤ	power plug off
+ﮥ	publish
+ﮦ	restore
+ﮧ	robot
+ﮨ	format rotate 90
+ﮩ	scanner
+ﮪ	subway
+ﮫ	timer sand empty
+ﮬ	transit transfer
+ﮭ	unity
+ﮮ	update
+ﮯ	watch vibrate
+ﮰ	angular
+ﮱ	dolby
+﮲	emby
+﮳	lamp
+﮴	menu down outline
+﮵	menu up outline
+﮶	note multiple
+﮷	note multioutline
+﮸	plex
+﮹	plane shield
+﮺	account edit
+﮻	alert decagram
+﮼	all inclusive
+﮽	angularjs
+﮾	arrow down box
+﮿	arrow left box
+﯀	arrow right box
+﯁	arrow up box
+﯂	asterisk
+ﯓ	flash outline
+ﯔ	format font
+ﯕ	format page break
+ﯖ	format pilcrow
+ﯗ	garage
+ﯘ	garage open
+ﯚ	google keep
+ﯛ	google photos
+ﯜ	heart half full
+ﯝ	heart half
+ﯞ	heart half outline
+ﯟ	hexagon multiple
+ﯠ	hook
+ﯡ	hook off
+ﯢ	infinity
+ﯣ	language swift
+ﯤ	language typescript
+ﯥ	laptop off
+ﯦ	lightbulb on
+ﯧ	lightbulb on outline
+ﯨ	lock pattern
+ﯩ	loop
+ﯪ	magnify minus outline
+ﯫ	magnify plus outline
+ﯬ	mailbox
+ﯭ	medical bag
+ﯮ	message settings
+ﯯ	message settings variant
+ﯰ	minus box outline
+ﯱ	network
+ﯲ	download network
+ﯳ	help network
+ﯴ	upload network
+ﯵ	npm
+ﯶ	nut
+ﯷ	octagram
+ﯸ	page layout body
+ﯹ	page layout footer
+ﯺ	page layout header
+ﯻ	page layout sidebar left
+ﯼ	page layout sidebar right
+ﯽ	pencil circle
+ﯾ	pentagon
+ﯿ	pentagon outline
+ﰀ	pillar
+ﰁ	pistol
+ﰂ	plus box outline
+ﰃ	plus outline
+ﰄ	prescription
+ﰅ	printer settings
+ﰆ	react
+ﰇ	restart
+ﰈ	rewind outline
+ﰉ	rhombus
+ﰊ	rhombus outline
+ﰋ	roomba
+ﰌ	run
+ﰍ	search web
+ﰎ	shovel
+ﰏ	shovel off
+ﰐ	signal 2g
+ﰑ	signal 3g
+ﰒ	signal 4g
+ﰓ	signal hspa
+ﰔ	signal hspa plus
+ﰕ	snowflake
+ﰖ	source commit
+ﰗ	source commit end
+ﰘ	source commit end local
+ﰙ	source commit local
+ﰚ	source commit next local
+ﰛ	source commit start
+ﰜ	source commit start next local
+ﰝ	speaker wireless
+ﰞ	stadium
+ﰟ	svg
+ﰠ	tag plus
+ﰡ	tag remove
+ﰢ	ticket percent
+ﰣ	tilde
+ﰤ	treasure chest
+ﰥ	truck trailer
+ﰦ	view parallel
+ﰧ	view sequential
+ﰨ	washing machine
+ﰩ	webpack
+ﰪ	widgets
+ﰫ	wiiu
+ﰬ	arrow down bold
+ﰭ	arrow down bold box
+ﰮ	arrow down bold box outline
+ﰯ	arrow left bold
+ﰰ	arrow left bold box
+ﰱ	arrow left bold box outline
+ﰲ	arrow right bold
+ﰳ	arrow right bold box
+ﰴ	arrow right bold box outline
+ﰵ	arrow up bold
+ﰶ	arrow up bold box
+ﰷ	arrow up bold box outline
+ﰸ	cancel
+ﰹ	file account
+ﰺ	gesture double tap
+ﰻ	gesture swipe down
+ﰼ	gesture swipe left
+ﰽ	gesture swipe right
+ﰾ	gesture swipe up
+ﰿ	gesture tap
+ﱀ	gesture two double tap
+ﱁ	gesture two tap
+ﱂ	humble bundle
+ﱃ	kickstarter
+ﱄ	netflix
+ﱅ	onenote
+ﱆ	periscope
+ﱇ	uber
+ﱈ	vector radius
+ﱉ	xbox controller battery alert
+ﱊ	xbox controller battery empty
+ﱋ	xbox controller battery full
+ﱌ	xbox controller battery low
+ﱍ	xbox controller battery medium
+ﱎ	xbox controller battery unknown
+ﱏ	clipboard plus
+ﱐ	file plus
+ﱑ	format align bottom
+ﱒ	format align middle
+ﱓ	format align top
+ﱔ	format list checks
+ﱕ	format quote open
+ﱖ	grid large
+ﱗ	heart off
+ﱘ	music
+ﱙ	music off
+ﱚ	tab plus
+ﱛ	volume plus
+ﱜ	volume minus
+ﱝ	volume mute
+ﱞ	unfold less vertical
+ﱟ	unfold more vertical
+ﱠ	taco
+ﱡ	square outline
+ﱢ	square
+ﱣ	circle
+ﱤ	circle outline
+ﱥ	alert octagram
+ﱦ	atom
+ﱧ	ceiling light
+ﱨ	chart bar stacked
+ﱩ	chart line stacked
+ﱪ	decagram
+ﱫ	decagram outline
+ﱬ	dice multiple
+ﱭ	dice d10
+ﱮ	folder open
+ﱯ	guitar acoustic
+ﱰ	loading
+ﱱ	lock reset
+ﱲ	ninja
+ﱳ	octagram outline
+ﱴ	pencil circle outline
+ﱵ	selection off
+ﱶ	set all
+ﱷ	set center
+ﱸ	set center right
+ﱹ	set left
+ﱺ	set left center
+ﱻ	set left right
+ﱼ	set none
+ﱽ	set right
+ﱾ	shield half full
+ﱿ	sign direction
+ﲀ	sign text
+ﲁ	signal off
+ﲂ	square root
+ﲃ	sticker emoji
+ﲄ	summit
+ﲅ	sword cross
+ﲆ	truck fast
+ﲇ	yammer
+ﲈ	cast off
+ﲉ	help box
+ﲊ	timer sand full
+ﲋ	waves
+ﲌ	alarm bell
+ﲍ	alarm light
+ﲎ	android head
+ﲏ	approval
+ﲐ	arrow collapse down
+ﲑ	arrow collapse left
+ﲒ	arrow collapse right
+ﲓ	arrow collapse up
+ﲔ	arrow expand down
+ﲕ	arrow expand left
+ﲖ	arrow expand right
+ﲗ	arrow expand up
+ﲘ	book secure
+ﲙ	book unsecure
+ﲚ	bus articulated end
+ﲛ	bus articulated front
+ﲜ	bus double decker
+ﲝ	bus school
+ﲞ	bus side
+ﲟ	camera gopro
+ﲠ	camera metering center
+ﲡ	camera metering matrix
+ﲢ	camera metering partial
+ﲣ	camera metering spot
+ﲤ	cannabis
+ﲥ	car convertible
+ﲦ	car estate
+ﲧ	car hatchback
+ﲨ	car pickup
+ﲩ	car side
+ﲪ	car sports
+ﲫ	caravan
+ﲬ	cctv
+ﲭ	chart donut
+ﲮ	chart donut variant
+ﲯ	chart line variant
+ﲰ	chili hot
+ﲱ	chili medium
+ﲲ	chili mild
+ﲳ	cloud braces
+ﲴ	cloud tags
+ﲵ	console line
+ﲶ	corn
+ﲷ	currency chf
+ﲸ	currency cny
+ﲹ	currency eth
+ﲺ	currency jpy
+ﲻ	currency krw
+ﲼ	currency sign
+ﲽ	currency twd
+ﲾ	desktop classic
+ﲿ	dip switch
+ﳀ	donkey
+ﳁ	dots horizontal circle
+ﳂ	dots vertical circle
+ﳃ	ear hearing
+ﳄ	elephant
+ﳅ	eventbrite
+ﳆ	food croissant
+ﳇ	forklift
+ﳈ	fuel
+ﳉ	gesture
+ﳊ	google analytics
+ﳋ	google assistant
+ﳌ	headphones off
+ﳍ	high definition
+ﳎ	home assistant
+ﳏ	home automation
+ﳐ	home circle
+ﳑ	language go
+ﳒ	language r
+ﳓ	lava lamp
+ﳔ	led strip
+ﳕ	locker
+ﳖ	locker multiple
+ﳗ	map marker outline
+ﳘ	metronome
+ﳙ	metronome tick
+ﳚ	micro sd
+ﳛ	mixer
+ﳜ	movie roll
+ﳝ	mushroom
+ﳞ	mushroom outline
+ﳟ	nintendo switch
+ﳠ	null
+ﳡ	passport
+ﳢ	periodic table co2
+ﳣ	pipe
+ﳤ	pipe disconnected
+ﳥ	power socket eu
+ﳦ	power socket uk
+ﳧ	power socket us
+ﳨ	rice
+ﳩ	ring
+ﳪ	sass
+ﳫ	send secure
+ﳬ	soy sauce
+ﳭ	standard definition
+ﳮ	surround sound 2 0
+ﳯ	surround sound 3 1
+ﳰ	surround sound 5 1
+ﳱ	surround sound 7 1
+ﳲ	television classic
+ﳳ	textbox password
+ﳴ	thought bubble
+ﳵ	thought bubble outline
+ﳶ	trackpad
+ﳷ	ultra high definition
+ﳸ	van passenger
+ﳹ	van utility
+ﳺ	vanish
+ﳻ	video 3d
+ﳼ	wall
+ﳽ	xmpp
+ﳾ	account multiplus outline
+ﳿ	account plus outline
+ﴀ	allo
+ﴁ	artist
+ﴂ	atlassian
+ﴃ	azure
+ﴄ	basketball
+ﴅ	battery charging wireless
+ﴆ	battery charging wireless 10
+ﴇ	battery charging wireless 20
+ﴈ	battery charging wireless 30
+ﴉ	battery charging wireless 40
+ﴊ	battery charging wireless 50
+ﴋ	battery charging wireless 60
+ﴌ	battery charging wireless 70
+ﴍ	battery charging wireless 80
+ﴎ	battery charging wireless 90
+ﴏ	battery charging wireless alert
+ﴐ	battery charging wireless outline
+ﴑ	bitcoin
+ﴒ	briefcase outline
+ﴓ	cellphone wireless
+ﴔ	clover
+ﴕ	comment question
+ﴖ	content save outline
+ﴗ	delete restore
+ﴘ	door
+ﴙ	door closed
+ﴚ	door open
+ﴛ	fan off
+ﴜ	file percent
+ﴝ	finance
+ﴞ	flash circle
+ﴟ	floor plan
+ﴠ	forum outline
+ﴡ	golf
+ﴢ	google home
+ﴣ	guy fawkes mask
+ﴤ	home account
+ﴥ	home heart
+ﴦ	hot tub
+ﴧ	hulu
+ﴨ	ice cream
+ﴩ	image off
+ﴪ	karate
+ﴫ	ladybug
+ﴬ	notebook
+ﴭ	phone return
+ﴮ	poker chip
+ﴯ	shape
+ﴰ	shape outline
+ﴱ	ship wheel
+ﴲ	soccer field
+ﴳ	table column
+ﴴ	table of contents
+ﴵ	table row
+ﴶ	table settings
+ﴷ	television box
+ﴸ	television classic off
+ﴹ	television off
+ﴺ	towing
+ﴻ	upload multiple
+ﴼ	video 4k box
+ﴽ	video input antenna
+﴾	video input component
+﴿	video input hdmi
+﵀	video input svideo
+﵁	view dashboard variant
+﵂	vuejs
+﵃	xamarin
+﵄	xamarin outline
+﵅	youtube creator studio
+﵆	youtube gaming
+♥	heart
+⚡	zap
+	light bulb
+	repo
+	repo forked
+	repo push
+	repo pull
+	book
+	octoface
+	git pull request
+ﯙ	github face
+	mark github
+	cloud download
+	cloud upload
+	keyboard
+	gist
+	file code
+	file text
+	file media
+	file zip
+	file pdf
+	tag
+	file directory
+	file submodule
+	person
+	jersey
+	git commit
+	git branch
+	git merge
+	mirror
+	issue opened
+	issue reopened
+	issue closed
+	star
+	comment
+	question
+	alert
+	search
+	gear
+	radio tower
+	tools
+	sign out
+	rocket
+	rss
+	clippy
+	sign in
+	organization
+	device mobile
+	unfold
+	check
+	mail
+	mail read
+	arrow up
+	arrow right
+	arrow down
+	arrow left
+	pin
+	gift
+	graph
+	triangle left
+	credit card
+	clock
+	ruby
+	broadcast
+	key
+	repo force push
+	repo clone
+	diff
+	eye
+	comment discussion
+	mail reply
+	primitive dot
+	primitive square
+	device camera
+	device camera video
+	pencil
+	info
+	triangle right
+	triangle down
+	link
+	plus
+	three bars
+	code
+	location
+	list unordered
+	list ordered
+	quote
+	versions
+	calendar
+	lock
+	diff added
+	diff removed
+	diff modified
+	diff renamed
+	horizontal rule
+	arrow small right
+	milestone
+	checklist
+	megaphone
+	chevron right
+	bookmark
+	settings
+	dashboard
+	history
+	link external
+	mute
+	x
+	circle slash
+	pulse
+	sync
+	telescope
+	gist secret
+	home
+	stop
+	bug
+	logo github
+	file binary
+	database
+	server
+	diff ignored
+	ellipsis
+	no newline
+	hubot
+	arrow small up
+	arrow small down
+	arrow small left
+	chevron up
+	chevron down
+	chevron left
+	triangle up
+	git compare
+	logo gist
+	file symlink file
+	file symlink directory
+	squirrel
+	globe
+	unmute
+	mention
+	package
+	browser
+	terminal
+	markdown
+	dash
+	fold
+	inbox
+	trashcan
+	paintcan
+	flame
+	briefcase
+	plug
+	circuit board
+	mortar board
+	law
+	thumbsup
+	thumbsdown
+	desktop download
+	beaker
+	bell
+	watch
+	shield
+	bold
+	text size
+	italic
+	tasklist
+	verified
+	smiley
+	unverified
+	ellipses
+	file
+	grabber
+	plus small
+	reply
+	device desktop
+	branch
+	line number
+	hostname
+	column number
+	left hard divider
+	left soft divider
+	right hard divider
+	right soft divider
+	right half circle thick
+	right half circle thin
+	left half circle thick
+	left half circle thin
+	lower left triangle
+	backslash separator
+	lower right triangle
+	forwardslash separator
+	upper left triangle
+	forwardslash separator redundant
+	upper right triangle
+	backslash separator redundant
+	flame thick
+	flame thin
+	flame thick mirrored
+	flame thin mirrored
+	pixelated squares small
+	pixelated squares small mirrored
+	pixelated squares big
+	pixelated squares big mirrored
+	ice waveform
+	ice waveform mirrored
+	honeycomb
+	honeycomb outline
+	lego separator
+	lego separator thin
+	lego block facing
+	lego block sideways
+	trapezoid top bottom
+	trapezoid top bottom mirrored
+	clean code
+	pomodoro done
+	pomodoro estimated
+	pomodoro ticking
+	pomodoro squashed
+	short pause
+	long pause
+	away
+	pair programming
+	internal interruption
+	external interruption
+	folder npm
+	folder git
+	folder config
+	folder github
+	folder open
+	folder
+	stylus
+	project
+	play arrow
+	sass
+	rails
+	ruby
+	python
+	heroku
+	php
+	markdown
+	license
+	json
+	javascript
+	image
+	html
+	mustache
+	gulp
+	grunt
+	default
+	folder
+	css
+	config
+	npm
+	home
+	ejs
+	xml
+	bower
+	coffee
+	twig
+	cpp
+	c
+	haskell
+	lua
+	indent line
+	karma
+	favicon
+	julia
+	react
+	go
+	go
+	typescript
+	msdos
+	windows
+	vim
+	elm
+	elixir
+	electron
+	crystal
+	purescript
+	puppet
+	emacs
+	orgmode
+	kotlin
+	day cloudy gusts
+	day cloudy windy
+	day cloudy
+	day fog
+	day hail
+	day lightning
+	day rain mix
+	day rain wind
+	day rain
+	day showers
+	day snow
+	day sprinkle
+	day sunny overcast
+	day sunny
+	day storm showers
+	day thunderstorm
+	cloudy gusts
+	cloudy windy
+	cloudy
+	fog
+	hail
+	lightning
+	rain mix
+	rain wind
+	rain
+	showers
+	snow
+	sprinkle
+	storm showers
+	thunderstorm
+	windy
+	night alt cloudy gusts
+	night alt cloudy windy
+	night alt hail
+	night alt lightning
+	night alt rain mix
+	night alt rain wind
+	night alt rain
+	night alt rain mix
+	night alt snow
+	night alt sprinkle
+	night alt storm showers
+	night alt thunderstorm
+	night clear
+	night cloudy gusts
+	night cloudy windy
+	night cloudy
+	night hail
+	night lightning
+	night rain mix
+	night rain wind
+	night rain
+	night showers
+	night snow
+	night sprinkle
+	night storm showers
+	night thunderstorm
+	celsius
+	cloud down
+	cloud refresh
+	cloud up
+	cloud
+	degrees
+	direction down left
+	direction down
+	fahrenheit
+	horizon alt
+	horizon
+	direction left
+	aliens
+	night fog
+	refresh alt
+	refresh
+	direction right
+	raindrops
+	strong wind
+	sunrise
+	sunset
+	thermometer exterior
+	thermometer internal
+	thermometer
+	tornado
+	direction up right
+	direction up
+	wind west
+	wind south west
+	wind south east
+	wind south
+	wind north west
+	wind north east
+	wind north
+	wind east
+	smoke
+	dust
+	snow wind
+	day snow wind
+	night snow wind
+	night alt snow wind
+	day sleet storm
+	night sleet storm
+	night alt sleet storm
+	day snow thunderstorm
+	night snow thunderstorm
+	night alt snow thunderstorm
+	solar eclipse
+	lunar eclipse
+	meteor
+	hot
+	hurricane
+	smog
+	alien
+	snowflake cold
+	stars
+	raindrop
+	barometer
+	humidity
+	na
+	flood
+	day cloudy high
+	night alt cloudy high
+	night cloudy high
+	night alt partly cloudy
+	sandstorm
+	night partly cloudy
+	umbrella
+	day windy
+	night alt cloudy
+	direction up left
+	direction down right
+	time 12
+	time 1
+	time 2
+	time 3
+	time 4
+	time 5
+	time 6
+	time 7
+	time 8
+	time 9
+	time 10
+	time 11
+	moon new
+	moon waxing crescent 1
+	moon waxing crescent 2
+	moon waxing crescent 3
+	moon waxing crescent 4
+	moon waxing crescent 5
+	moon waxing crescent 6
+	moon first quarter
+	moon waxing gibbous 1
+	moon waxing gibbous 2
+	moon waxing gibbous 3
+	moon waxing gibbous 4
+	moon waxing gibbous 5
+	moon waxing gibbous 6
+	moon full
+	moon waning gibbous 1
+	moon waning gibbous 2
+	moon waning gibbous 3
+	moon waning gibbous 4
+	moon waning gibbous 5
+	moon waning gibbous 6
+	moon third quarter
+	moon waning crescent 1
+	moon waning crescent 2
+	moon waning crescent 3
+	moon waning crescent 4
+	moon waning crescent 5
+	moon waning crescent 6
+	wind direction
+	day sleet
+	night sleet
+	night alt sleet
+	sleet
+	day haze
+	wind beaufort 0
+	wind beaufort 1
+	wind beaufort 2
+	wind beaufort 3
+	wind beaufort 4
+	wind beaufort 5
+	wind beaufort 6
+	wind beaufort 7
+	wind beaufort 8
+	wind beaufort 9
+	wind beaufort 10
+	wind beaufort 11
+	wind beaufort 12
+	day light wind
+	tsunami
+	earthquake
+	fire
+	volcano
+	moonrise
+	moonset
+	train
+	small craft advisory
+	gale warning
+	storm warning
+	hurricane warning
+	moon alt waxing crescent 1
+	moon alt waxing crescent 2
+	moon alt waxing crescent 3
+	moon alt waxing crescent 4
+	moon alt waxing crescent 5
+	moon alt waxing crescent 6
+	moon alt first quarter
+	moon alt waxing gibbous 1
+	moon alt waxing gibbous 2
+	moon alt waxing gibbous 3
+	moon alt waxing gibbous 4
+	moon alt waxing gibbous 5
+	moon alt waxing gibbous 6
+	moon alt full
+	moon alt waning gibbous 1
+	moon alt waning gibbous 2
+	moon alt waning gibbous 3
+	moon alt waning gibbous 4
+	moon alt waning gibbous 5
+	moon alt waning gibbous 6
+	moon alt third quarter
+	moon alt waning crescent 1
+	moon alt waning crescent 2
+	moon alt waning crescent 3
+	moon alt waning crescent 4
+	moon alt waning crescent 5
+	moon alt waning crescent 6
+	moon alt new

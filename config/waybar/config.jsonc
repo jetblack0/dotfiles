@@ -1,0 +1,252 @@
+// Inspired by: 
+// - elifouts' dotfile: https://github.com/elifouts/Dotfiles
+// - Hyprdot project: https://github.com/prasanthrangan/hyprdots
+{
+	"layer": "top",
+	"position": "top",
+    // "height": 10,
+	"reload_style_on_change": true,
+	"modules-left": [
+		"clock",
+		"tray",
+		"custom/endpoint",
+		"hyprland/window"
+	],
+	"modules-right": [
+		"group/expand",
+		"custom/pacman",
+		"temperature",
+		"memory",
+		"cpu",
+		"custom/endpoint",
+		"custom/notifications",
+		"pulseaudio",
+		"bluetooth",
+		"network",
+		"battery#bat2",
+		"battery",
+		"custom/powermenu",
+	],
+	"modules-center": [
+		"hyprland/workspaces"
+	],
+
+	// Module left
+	//------------
+	"clock": {
+		"format": "{:%I:%M:%S %p} ",
+		"interval": 1,   
+		"tooltip-format": "<tt>{calendar}</tt>",
+        "calendar": {
+            "mode": "month",
+            "mode-mon-col": 3,
+			// "weeks-pos" : "right",
+            "on-scroll": 1,
+            "on-click-right": "mode",
+            "format": {
+                "months": "<span color='#ffead3'><b>{}</b></span>",
+                "weekdays": "<span color='#E5B395'><b>{}</b></span>",
+				"weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+                "today": "<span color='#D19097'><b>{}</b></span>"
+            }
+        },
+        "actions": {
+            "on-click-right": "mode",
+            "on-click-forward": "tz_up",
+            "on-click-backward": "tz_down",
+            "on-scroll-up": "shift_up",
+            "on-scroll-down": "shift_down"
+        }
+	},
+	"tray": {
+		"icon-size": 14,
+		"spacing": 10
+	},
+	"custom/endpoint":{
+		"format": "|",
+		"tooltip": false
+	},
+
+	// Module center
+	//--------------
+	"hyprland/workspaces": {
+		"format": "{icon}",
+		"format-icons": {
+			"active": "",
+			"default": "",
+			"empty": ""
+		},
+		"all-outputs": false
+	},
+
+	// Module right
+	//-------------
+	"custom/wallpaper": {
+		"tooltip": true,
+		"tooltip-format": "Select a wallpaper",
+		"format": "",
+		"on-click": "~/Development/script/gui/swww/utility.sh random",
+        "on-click-right": "~/Development/script/gui/swww/utility.sh favorite",
+		"escape": true
+	},
+	// NOTE: I don't know if it works
+	// https://github.com/Alexays/Waybar/issues/3268
+	"idle_inhibitor": {
+        "format": "{icon}",
+        "rotate": 0,
+        "format-icons": {
+			"activated": "",
+			"deactivated": ""
+        }
+	},
+	"group/expand": {
+		"orientation": "horizontal",
+		"drawer": {
+			"transition-duration": 600,
+			"transition-to-left": true,
+			"click-to-reveal": true
+		},
+		"modules": [
+			"custom/expand",
+			"custom/wallpaper",
+			"idle_inhibitor",
+			"custom/endpoint",
+		]
+	},
+	"custom/expand": {
+		"format": "",
+		"tooltip": false
+	},
+    "custom/notifications": {
+        "format": "{} {icon}",
+        "rotate": 0,
+        "format-icons": {
+            "email-notification": "<sup></sup>",
+            "chat-notification": "󱋊<sup></sup>",
+            "warning-notification": "󱨪<sup></sup>",
+            "error-notification": "󱨪<sup></sup>",
+            "network-notification": "󱂇<sup></sup>",
+            "battery-notification": "󰁺<sup></sup>",
+            "update-notification": "󰚰<sup></sup>",
+            "music-notification": "󰝚<sup></sup>",
+            "volume-notification": "󰕿<sup></sup>",
+            "notification": "<sup></sup>",
+            "dnd": "",
+            "none": ""
+        },
+        "return-type": "json",
+        "exec-if": "test -x ~/Development/script/gui/waybar/notifications.py",
+        "exec": "~/Development/script/gui/waybar/notifications.py",
+        "on-scroll-down": "sleep 0.1 && dunstctl history-pop",
+        "on-click": "dunstctl set-paused toggle",
+        "on-click-middle": "dunstctl history-clear",
+        "on-click-right": "dunstctl close-all",
+        "interval": 1,
+        "tooltip": true,
+        "escape": true
+    },
+	"custom/pacman": {
+		"format": "󰅢 {}",
+		"interval": 600,   
+		"exec": "checkupdates | wc -l",
+		"exec-if": "which checkupdates",
+		// "on-click": "kitty sh -c 'yay -Syu; echo Done - Press enter to exit; read'; pkill -SIGRTMIN+8 waybar",
+		"signal": 8,
+		// TODO: make a tooltip that shows a list of packages.
+		"tooltip": false
+	},
+	"temperature": {
+		"critical-threshold": 80,
+		"format": " {temperatureC}°C"
+	},
+	"memory": {
+		"format": " {percentage}%"
+	},
+	"cpu": {
+		"format": " {usage}%",
+		"tooltip": true
+	},
+	"pulseaudio": {
+		"format": "{icon} {volume}%",
+		"format-muted": "",
+		"format-icons": {
+			"headphone": "",
+			"hands-free": "",
+			"headset": "",
+			"phone": "",
+			"phone-muted": "",
+			"portable": "",
+			"car": "",
+			"default": ["", ""]
+		},
+	},
+	"bluetooth": {
+		"format-on": "󰂯",
+		"format-off": "BT-off",
+		"format-disabled": "󰂲",
+		"format-connected-battery": "{device_battery_percentage}% 󰂯",
+		"format-alt": "{device_alias} 󰂯",
+		"tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+		"tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
+		"tooltip-format-enumerate-connected": "{device_alias}\n{device_address}",
+		"tooltip-format-enumerate-connected-battery": "{device_alias}\n{device_address}\n{device_battery_percentage}%",
+		"on-click-right": "blueman-manager"
+	}, 
+	"network": {
+		"format-wifi": " {essid}",
+		"format-ethernet":" {essid}",
+		"format-disconnected": " {essid}",
+		"tooltip-format-disconnected": "No network",
+		"tooltip-format-wifi": "{essid} ({signalStrength}%) ",
+		"tooltip-format-ethernet": "{ifname} 🖧 "
+	},
+	"battery": {
+		"bat": "BAT0",
+		"interval": 30,
+		"states": {
+			"good": 95,
+			"warning": 30,
+			"critical": 20
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "󰂄 {capacity}%",
+		"format-plugged": "󰂄  {capacity}%",
+		"format-alt": "{time} {icon}",
+		"format-icons": [
+			"󰁻",
+			"󰁼",
+			"󰁾",
+			"󰂀",
+			"󰂂",
+			"󰁹"
+		]
+	},
+	"battery#bat2": {
+		"bat": "BAT1",
+		"interval": 30,
+		"states": {
+			"good": 95,
+			"warning": 30,
+			"critical": 20
+		},
+		"format": "{icon} {capacity}%",
+		"format-charging": "󰂄 {capacity}%",
+		"format-plugged": "󰂄  {capacity}%",
+		"format-alt": "{time} {icon}",
+		"format-icons": [
+			"󰁻",
+			"󰁼",
+			"󰁾",
+			"󰂀",
+			"󰂂",
+			"󰁹"
+		]
+	},
+	"custom/powermenu": {
+		"tooltip": true,
+		"tooltip-format": "Open powermenu",
+		"format": "",
+		"on-click": "~/Development/projects/dotfiles/config/rofi/powermenu.sh gruvbox",
+		"escape": true
+	},
+} 
