@@ -154,11 +154,30 @@ in
 
     fonts.packages = with pkgs; [
       inter
+      libertinus
       noto-fonts-cjk-sans
+      noto-fonts-cjk-serif
       nerd-fonts.code-new-roman
       nerd-fonts.jetbrains-mono
       udev-gothic-nf
+      (callPackage ../packages/apple-color-emoji.nix { })
     ];
+
+    fonts.fontconfig.defaultFonts = {
+      serif = [
+        "Libertinus Serif"
+        "Noto Serif CJK SC"
+      ];
+      sansSerif = [
+        "Inter"
+        "Noto Sans CJK SC"
+      ];
+      monospace = [
+        "JetBrainsMono Nerd Font"
+        "Noto Sans Mono CJK SC"
+      ];
+      emoji = [ "Apple Color Emoji" ];
+    };
 
 
     # home-manager
