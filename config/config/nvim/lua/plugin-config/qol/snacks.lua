@@ -34,6 +34,20 @@ local function worktree_icon(item, picker)
     "SnacksPickerGitStatus" .. name:sub(1, 1):upper() .. name:sub(2)
 end
 
+local git_source = require("snacks.picker.source.git")
+if not git_source.merge_status_unranked then
+  git_source.merge_status_unranked = git_source.merge_status
+  git_source.merge_status = function(a, b)
+    local merged = git_source.merge_status_unranked(a, b)
+    if merged ~= " M" or a == " M" or b == " M" then
+      return merged
+    end
+    local as, bs = git_source.git_status(a), git_source.git_status(b)
+    return as.priority >= bs.priority and a or b
+  end
+end
+
+
 -- Remember cursor, scroll, expanded dirs and toggles, restore on the next open.
 local last_explorer = nil
 

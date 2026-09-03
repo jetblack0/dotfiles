@@ -17,6 +17,10 @@ hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-ce
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard"), nograb)
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("noctalia msg bar-toggle"), { description = "toggle the bar" })
 
+-- window switcher: opens on the held SUPER, Tab advances (Shift+Tab back),
+-- releasing SUPER commits.
+hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("noctalia msg window-switcher"), nograb)
+
 -- session. lock is the only one bound directly; the rest live in the session
 -- panel above
 hl.bind(mainMod .. " + escape", hl.dsp.exec_cmd("noctalia msg session lock"))
@@ -79,8 +83,9 @@ hl.bind(mainMod .. " + SHIFT + J", hl.dsp.layout("swapnext"), nograb)
 hl.bind(mainMod .. " + SHIFT + K", hl.dsp.layout("swapprev"), nograb)
 
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.group.toggle(), nograb)
-hl.bind(mainMod .. " + Tab", hl.dsp.group.next())
-hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.group.prev())
+-- group cycling gave its keys to the window switcher; parked, not deleted
+-- hl.bind(mainMod .. " + Tab", hl.dsp.group.next())
+-- hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.group.prev())
 
 -- resize
 hl.bind(mainMod .. " + A", hl.dsp.submap("resize"))
