@@ -4,3 +4,7 @@ require("conf.options")
 require("conf.animation")
 require("conf.binds")
 require("conf.autostart")
+
+pcall(function()
+	require("noctalia").apply_theme()
+end)

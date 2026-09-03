@@ -24,6 +24,21 @@ let
       + "position = ${builtins.toJSON m.position}, scale = ${builtins.toJSON m.scale} },\n"
     ) cfg.monitors
     + "}\n";
+
+  xresources = ''
+    ! Rendered by nix (modules/desktop.nix). Rebuilds replace it.
+
+    Xft.dpi: ${toString cfg.xwaylandDpi}
+    Xft.antialias: true
+    Xft.hinting: true
+    Xft.rgba: rgb
+    Xft.autohint: true
+    Xft.hintstyle: hintfull
+    Xft.lcdfilter: lcddefault
+
+    Xcursor.theme: capitaine-cursors
+    Xcursor.size: 24
+  '';
 in
 {
   # per-host knobs
@@ -65,6 +80,18 @@ in
       default = "~/Resources/media/pictures/wallpaper/landscape";
       description = "Directory noctalia picks wallpapers from.";
     };
+
+    screenshotDirectory = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "Noctalia screenshot directory; empty means XDG Pictures.";
+    };
+
+    xwaylandDpi = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
+      default = null;
+      description = "Xft.dpi for xwayland apps, typically 96 * scale.";
+    };
   };
 
   config = {
@@ -73,6 +100,18 @@ in
     programs.hyprland.enable = true;
     xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     programs.dconf.enable = true;
+
+    # nixpkgs keeps schemas in a layout the plain gsettings CLI never
+    # searches; without this every `gsettings set` fails
+    environment.sessionVariables.XDG_DATA_DIRS = [
+      "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
+    ];
+
+    # qt reads the qt5ct/qt6ct color schemes the noctalia template writes
+    qt = {
+      enable = true;
+      platformTheme = "qt5ct";
+    };
 
     # audio
     # ---------------------------------------------
@@ -96,10 +135,21 @@ in
       cava
 
       # themes
+      adw-gtk3
       capitaine-cursors
       (tela-circle-icon-theme.override { colorVariants = [ "black" ]; })
       glib
       gsettings-desktop-schemas
+
+      # screen pickers & clipboard (binds.lua)
+      grim
+      slurp
+      hyprpicker
+      wl-clipboard
+      (tesseract.override { enableLanguages = [ "eng" ]; })
+
+      # xwayland dpi (autostart.lua xrdb-merges the state xresources)
+      xorg.xrdb
     ];
 
     fonts.packages = with pkgs; [
@@ -136,6 +186,9 @@ in
 
             [wallpaper]
             directory = "${cfg.wallpaperDirectory}"
+
+            [shell.screenshot]
+            directory = "${cfg.screenshotDirectory}"
           '';
         };
 
@@ -145,10 +198,14 @@ in
         recursive = true;
       };
 
-      # per-host display rules for conf/monitors.lua
-      xdg.stateFile = lib.mkIf (cfg.monitors != [ ]) {
-        "hypr/monitors.lua".text = monitorsLua;
-      };
+      # per-host display rules for conf/monitors.lua, xresources for xwayland
+      xdg.stateFile =
+        lib.optionalAttrs (cfg.monitors != [ ]) {
+          "hypr/monitors.lua".text = monitorsLua;
+        }
+        // lib.optionalAttrs (cfg.xwaylandDpi != null) {
+          "hypr/xresources".text = xresources;
+        };
     };
   };
 }

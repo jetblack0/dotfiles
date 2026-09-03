@@ -8,6 +8,7 @@
     ./hardware-configuration.nix
     ../../modules/core.nix
     ../../modules/desktop.nix
+    ../../modules/zen.nix
   ];
 
 
@@ -26,6 +27,9 @@
     }
   ];
 
+  # 96 * scale
+  desktop.xwaylandDpi = 154;
+
 
   # networking
   # ---------------------------------------------
@@ -40,6 +44,7 @@
         DHCP = "ipv4";
         IPv6AcceptRA = true;
       };
+      dhcpV4Config.ClientIdentifier = "mac";
       linkConfig.RequiredForOnline = "routable";
     };
   };
