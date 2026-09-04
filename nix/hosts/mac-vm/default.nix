@@ -30,6 +30,14 @@
   # 96 * scale
   desktop.xwaylandDpi = 154;
 
+  # the parallels virtual display advertises a bogus preferred mode
+  # (1448x906, no EDID size); pin the greeter to the real panel
+  programs.noctalia-greeter.settings.output = {
+    width = 2560;
+    height = 1600;
+    scale = 1.6;
+  };
+
 
   # networking
   # ---------------------------------------------

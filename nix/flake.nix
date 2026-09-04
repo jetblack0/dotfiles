@@ -10,6 +10,11 @@
       url = "github:noctalia-dev/noctalia-shell";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # the login greeter matching the shell; not in nixpkgs either
+    noctalia-greeter = {
+      url = "github:noctalia-dev/noctalia-greeter";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # zen is not in nixpkgs at all
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
