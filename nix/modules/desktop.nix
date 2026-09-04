@@ -102,6 +102,7 @@ in
     # hyprland
     # ---------------------------------------------
     programs.hyprland.enable = true;
+    programs.hyprland.withUWSM = true;
     xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     programs.dconf.enable = true;
 
