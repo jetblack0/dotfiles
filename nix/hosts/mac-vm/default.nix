@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------
 # hosts/mac-vm -- Parallels test machine on the mac.
 # ----------------------------------------------------------------------------
-{ ... }:
+{ lib, config, ... }:
 
 {
   imports = [
@@ -37,6 +37,10 @@
     height = 1600;
     scale = 1.6;
   };
+
+  # VM-only: real gpus do scan-out correctly
+  services.greetd.settings.default_session.command = lib.mkForce
+    "env WLR_SCENE_DISABLE_DIRECT_SCANOUT=1 ${config.programs.noctalia-greeter.package}/bin/noctalia-greeter-session";
 
 
   # networking
