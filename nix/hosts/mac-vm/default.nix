@@ -1,7 +1,7 @@
 # ----------------------------------------------------------------------------
 # hosts/mac-vm -- Parallels test machine on the mac.
 # ----------------------------------------------------------------------------
-{ ... }:
+{ lib, config, ... }:
 
 {
   imports = [
@@ -29,6 +29,18 @@
 
   # 96 * scale
   desktop.xwaylandDpi = 154;
+
+  # the parallels virtual display advertises a bogus preferred mode
+  # (1448x906, no EDID size); pin the greeter to the real panel
+  programs.noctalia-greeter.settings.output = {
+    width = 2560;
+    height = 1600;
+    scale = 1.6;
+  };
+
+  # VM-only: real gpus do scan-out correctly
+  services.greetd.settings.default_session.command = lib.mkForce
+    "env WLR_SCENE_DISABLE_DIRECT_SCANOUT=1 ${config.programs.noctalia-greeter.package}/bin/noctalia-greeter-session";
 
 
   # networking

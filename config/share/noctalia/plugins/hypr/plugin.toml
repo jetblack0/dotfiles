@@ -1,0 +1,24 @@
+# Hyprland toggles
+# ---------------------------------------------
+
+id = "jetblack0/hypr"
+name = "Hyprland"
+version = "1.0.0"
+plugin_api = 23
+description = "Dropdown of Hyprland toggles (animation, trackpad, ...)"
+icon = "toggle-left"
+
+[[widget]]
+id = "indicator"
+entry = "widget.luau"
+
+    [widget.actions]
+    left = "panel-toggle jetblack0/hypr:menu"
+
+[[panel]]
+id = "menu"
+entry = "panel.luau"
+width = 250
+height = 210
+placement = "attached"
+open_near_click = true

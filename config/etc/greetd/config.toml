@@ -1,0 +1,13 @@
+# Greetd
+# ---------------------------------------------
+# noctalia-greeter draws the login screen with its own bundled wlroots
+# compositor; `noctalia msg greeter-sync` themes it to match the shell.
+# If the greeter ever breaks, swap the command for "agreety --cmd /bin/sh"
+# (ships with greetd) to get a plain text login.
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "env XCURSOR_THEME=capitaine-cursors XCURSOR_SIZE=24 /usr/bin/noctalia-greeter-session"
+user = "greeter"

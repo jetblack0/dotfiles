@@ -3,10 +3,10 @@
 -- Adapted from theblackdon's animations-def.nix / animations-moving.nix.
 
 local curves = {
-	wind   = { { -1.05, 0.9 }, { 0.1, 1.05 } },
-	winIn  = { { -1.1, 1.1 },  { 0.1, 1.1 } },
-	winOut = { { -1.3, -0.3 }, { 0, 1 } },
-	liner  = { { 0, 1 },       { 1, 1 } },
+	wind   = { { -1.0, 0.9 }, { 0.1, 1.05 } },
+	winIn  = { { -1.0, 1.1 }, { 0.1, 1.1 } },
+	winOut = { { -1.0, -0.3 }, { 0, 1 } },
+	liner  = { { 0, 1 },      { 1, 1 } },
 }
 
 return {

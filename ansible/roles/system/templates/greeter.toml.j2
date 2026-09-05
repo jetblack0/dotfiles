@@ -1,0 +1,20 @@
+# Noctalia greeter
+# ---------------------------------------------
+# The greeter's admin config: sync never writes it and its keys win over
+# sync.toml, so deliberate deviations live here. Rendered by the system
+# role from the greeter_* host vars.
+
+[appearance]
+hide_logo = true
+{% if greeter_output is defined and greeter_output %}
+
+# Pin the greeter to a fixed mode. Only for hosts whose display
+# advertises a bogus preferred mode (the parallels virtio-gpu renders
+# tiny and blurry otherwise); real panels report EDID and set nothing.
+[output]
+width = {{ greeter_output.width }}
+height = {{ greeter_output.height }}
+{% if greeter_output.scale is defined %}
+scale = {{ greeter_output.scale }}
+{% endif %}
+{% endif %}

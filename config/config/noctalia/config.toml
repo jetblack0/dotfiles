@@ -59,7 +59,7 @@ order = [ "main" ]
         "volume",
         "brightness",
         "battery",
-        "trackpad",
+        "hypr",
         "control-center",
         "session"
     ]
@@ -277,13 +277,13 @@ pre_action_fade_seconds = 2.0
 cancel = [ "Escape" ]
 copy = [ "Ctrl+c" ]
 delete = [ "Delete" ]
-down = [ "Down" ]
-left = [ "Left" ]
-right = [ "Right" ]
+down = [ "Down", "Alt+j" ]
+left = [ "Left", "Alt+h" ]
+right = [ "Right", "Alt+l" ]
 save = [ "Ctrl+s" ]
 tab_next = [ "Tab" ]
 tab_previous = [ "Shift+ISO_Left_Tab" ]
-up = [ "Up" ]
+up = [ "Up", "Alt+k" ]
 validate = [ "Return", "KP_Enter", "space" ]
 
 
@@ -460,7 +460,7 @@ scale = 1.0
 
 [plugins]
 auto_update = "all"
-enabled = [ "jetblack0/trackpad" ]
+enabled = [ "jetblack0/hypr" ]
 
     [[plugins.source]]
     enabled = true
@@ -773,6 +773,9 @@ type = "sysmon"
 format = "{:%a %d %b}"
 type = "clock"
 
+[widget.hypr]
+type = "jetblack0/hypr:indicator"
+
 [widget.input_volume]
 device = "input"
 type = "volume"
@@ -820,9 +823,6 @@ type = "spacer"
 [widget.temp]
 stat = "cpu_temp"
 type = "sysmon"
-
-[widget.trackpad]
-type = "jetblack0/trackpad:indicator"
 
 [widget.workspaces]
 scale = 1.25

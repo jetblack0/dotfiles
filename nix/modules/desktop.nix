@@ -41,6 +41,10 @@ let
   '';
 in
 {
+  # upstream nixos module: wires greetd to the greeter and manages the
+  # declarative /var/lib/noctalia-greeter/greeter.toml from `settings`
+  imports = [ inputs.noctalia-greeter.nixosModules.default ];
+
   # per-host knobs
   # ---------------------------------------------
   options.desktop = {
@@ -98,6 +102,7 @@ in
     # hyprland
     # ---------------------------------------------
     programs.hyprland.enable = true;
+    programs.hyprland.withUWSM = true;
     xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
     programs.dconf.enable = true;
 
@@ -111,6 +116,24 @@ in
     qt = {
       enable = true;
       platformTheme = "qt5ct";
+    };
+
+    # display manager
+    # ---------------------------------------------
+    # settings is the whole declarative greeter.toml; appearance otherwise
+    # follows the shell via `noctalia msg greeter-sync` (sync.toml stays
+    # mutable). Cursor rides here because store paths make XCURSOR_* env
+    # on the greetd command line (the arch route) meaningless.
+    programs.noctalia-greeter = {
+      enable = true;
+      settings = {
+        appearance.hide_logo = true;
+        cursor = {
+          theme = "capitaine-cursors";
+          size = 24;
+          path = "${pkgs.capitaine-cursors}/share/icons";
+        };
+      };
     };
 
     # audio

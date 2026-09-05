@@ -116,3 +116,29 @@
       SystemMaxUse=500M
     dest: /etc/systemd/journald.conf.d/size.conf
     mode: "0644"
+
+# Boot into noctalia-greeter via greetd.
+- name: Install the greetd config
+  become: true
+  ansible.builtin.copy:
+    src: "{{ system_src }}/greetd/config.toml"
+    dest: /etc/greetd/config.toml
+    mode: "0644"
+    remote_src: true
+
+- name: Boot into the greeter
+  become: true
+  ansible.builtin.systemd_service:
+    name: greetd.service
+    enabled: true
+
+# The dir and its greeter owner come from the noctalia-greeter package
+# hook (packages runs before this role).
+- name: Install the greeter config
+  become: true
+  ansible.builtin.template:
+    src: greeter.toml.j2
+    dest: /var/lib/noctalia-greeter/greeter.toml
+    owner: greeter
+    group: greeter
+    mode: "0644"

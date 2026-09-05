@@ -1,15 +1,8 @@
 #!/bin/sh
 # Swap one of the config's swappable sets.
 #
-# Usage: ./hypr-switch.sh <kind> [--list | --current | --next | <name>]
-#        kind = theme | animation
-#
-# Both kinds work the same way: options are the *.lua files in a conf/
-# directory, the choice is a name in $XDG_STATE_HOME/hypr/<kind>, and the Lua
-# side reads that name on the next config load.
-#
-# theme-switcher.sh and animation-switcher.sh are one-line wrappers over this;
-# the two kinds differ only in the three values resolved below.
+# Usage: ./hypr-switch.sh <kind> [--notify] [--list | --current | --next | <name>]
+#        kind = theme | animation | layout
 
 set -eu
 
@@ -17,14 +10,22 @@ here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 kind=${1:-}
 case "$kind" in
-	theme)     dir="$here/../conf/themes";     default="rose-pine" ;;
-	animation) dir="$here/../conf/animations"; default="macos" ;;
+	theme)     dir="$here/../conf/themes";     default="rose-pine"; title="Theme" ;;
+	animation) dir="$here/../conf/animations"; default="macos";     title="Animation" ;;
+	layout)    dir="$here/../conf/layouts";    default="master";    title="Layout" ;;
 	*)
-		printf 'usage: %s <theme|animation> [--list | --current | --next | <name>]\n' "${0##*/}" >&2
+		printf 'usage: %s <theme|animation|layout> [--notify] [--list | --current | --next | <name>]\n' "${0##*/}" >&2
 		exit 2
 		;;
 esac
 shift
+
+# Optional, must come before the action. Only the keybinds pass it.
+notify=0
+if [ "${1:-}" = "--notify" ]; then
+	notify=1
+	shift
+fi
 
 dir=$(CDPATH= cd -- "$dir" && pwd)
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/hypr"
@@ -62,6 +63,12 @@ next() {
 		}'
 }
 
+# notify-tag keeps one replaceable notification per tag, so repeated cycling
+# updates a single toast in place instead of stacking one per press.
+notify_switch() {
+	"$here/notify-tag.sh" switch show -t 1500 "$title" "$1" || true
+}
+
 set_to() {
 	# Refuse an unknown name before touching anything.
 	if ! list | grep -qxF "$1"; then
@@ -84,6 +91,10 @@ set_to() {
 		hyprctl -q reload
 	fi
 
+	if [ "$notify" = 1 ]; then
+		notify_switch "$1"
+	fi
+
 	printf '%s\n' "$1"
 }
 
@@ -92,7 +103,7 @@ case "${1:---current}" in
 	--current) current ;;
 	--next)    set_to "$(next)" ;;
 	-*)
-		printf 'usage: %s %s [--list | --current | --next | <name>]\n' "${0##*/}" "$kind" >&2
+		printf 'usage: %s %s [--notify] [--list | --current | --next | <name>]\n' "${0##*/}" "$kind" >&2
 		exit 2
 		;;
 	*) set_to "$1" ;;

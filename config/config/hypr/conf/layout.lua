@@ -1,0 +1,72 @@
+-- Active layout
+-----------------------------------------------
+-- Mirrors conf/theme.lua: the chosen name lives in
+-- $XDG_STATE_HOME/hypr/layout, so switching is a state write plus a
+-- reload rather than a config edit. scripts/layout-switcher.sh writes it.
+-- Pure: returns { name, options, binds? }; options.lua applies the options,
+-- binds.lua calls binds() exactly once (this resolver never calls it --
+-- require is not cached and this file loads twice per config pass).
+
+local DEFAULT = "master"
+
+local function state_path()
+	local dir = os.getenv("XDG_STATE_HOME")
+	if dir == nil or dir == "" then
+		local home = os.getenv("HOME")
+		if home == nil or home == "" then
+			return nil
+		end
+		dir = home .. "/.local/state"
+	end
+	return dir .. "/hypr/layout"
+end
+
+local function read_name()
+	local path = state_path()
+	if path == nil then
+		return nil
+	end
+	local fh = io.open(path, "r")
+	if fh == nil then
+		return nil
+	end
+	local line = fh:read("*l")
+	fh:close()
+	if line == nil then
+		return nil
+	end
+	local name = line:match("^%s*(.-)%s*$")
+	if name == "" then
+		return nil
+	end
+	return name
+end
+
+local function load(name)
+	if type(name) ~= "string" or name:match("^[%w._-]+$") == nil then
+		return nil, string.format("invalid layout name %q", tostring(name))
+	end
+	local ok, layout = pcall(require, "conf.layouts." .. name)
+	if not ok then
+		return nil, string.format("layout %q failed to load: %s", name, tostring(layout):match("^[^\n]*"))
+	end
+	if type(layout) ~= "table" or type(layout.name) ~= "string" or type(layout.options) ~= "table" then
+		return nil, string.format("layout %q is malformed", name)
+	end
+	if layout.binds ~= nil and type(layout.binds) ~= "function" then
+		return nil, string.format("layout %q: binds must be a function", name)
+	end
+	return layout
+end
+
+local layout, err = load(read_name() or DEFAULT)
+if layout ~= nil then
+	return layout
+end
+
+local fallback, fallback_err = load(DEFAULT)
+if fallback == nil then
+	error(string.format("no usable layout: %s (default also failed: %s)", err, fallback_err))
+end
+fallback._error = err
+return fallback

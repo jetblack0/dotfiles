@@ -5,6 +5,9 @@ local workspaces = require("conf.workspaces")
 local mainMod    = "SUPER"
 local nograb = { dont_inhibit = true }
 
+-- Layout-specific keys live in the active layout's conf/layouts/<name>.lua
+local layout = require("conf.layout")
+
 
 -- System
 -----------------------------------------------
@@ -28,7 +31,9 @@ hl.bind(mainMod .. " + escape", hl.dsp.exec_cmd("noctalia msg session lock"))
 -- notifications
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("noctalia msg notification-clear-active"), nograb)
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("noctalia msg notification-invoke-latest"), nograb)
+-- do-not-disturb toggle. W mirrors his mac (option+w); SHIFT+N does the same
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), nograb)
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), nograb)
 
 hl.bind("Print", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"), nograb)
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"), nograb)
@@ -49,6 +54,10 @@ hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker -a"), nograb)
 hl.bind(mainMod .. " + X",
 	hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tesseract stdin stdout | wl-copy && notify-send OCR \"Copied to clipboard\""),
 	nograb)
+
+-- cycle the hyprland animation set / layout
+hl.bind(mainMod .. " + SHIFT + A", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/animation-switcher.sh --notify --next"), nograb)
+hl.bind(mainMod .. " + SHIFT + SPACE", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/layout-switcher.sh --notify --next"), nograb)
 
 -- night light toggle
 hl.bind(mainMod .. " + SHIFT + Prior", hl.dsp.exec_cmd("noctalia msg nightlight-toggle"), nograb)
@@ -73,28 +82,48 @@ hl.bind(mainMod .. " + Home", hl.dsp.exec_cmd("noctalia msg volume-mute"), nogra
 -----------------------------------------------
 hl.bind(mainMod .. " + Q", hl.dsp.window.close(), nograb)
 hl.bind(mainMod .. " + slash", hl.dsp.window.float(), nograb)
-hl.bind(mainMod .. " + J", hl.dsp.layout("cyclenext"), nograb)
-hl.bind(mainMod .. " + K", hl.dsp.layout("cycleprev"), nograb)
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen(), nograb)
-hl.bind(mainMod .. " + H", hl.dsp.focus({ direction = "l" }), nograb)
-hl.bind(mainMod .. " + L", hl.dsp.focus({ direction = "r" }), nograb)
 hl.bind(mainMod .. " + O", hl.dsp.window.pin(), nograb)
-hl.bind(mainMod .. " + SHIFT + J", hl.dsp.layout("swapnext"), nograb)
-hl.bind(mainMod .. " + SHIFT + K", hl.dsp.layout("swapprev"), nograb)
+
+if layout.binds then
+	layout.binds({ mod = mainMod, nograb = nograb })
+end
 
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.group.toggle(), nograb)
 -- group cycling gave its keys to the window switcher; parked, not deleted
 -- hl.bind(mainMod .. " + Tab", hl.dsp.group.next())
 -- hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.group.prev())
 
--- resize
-hl.bind(mainMod .. " + A", hl.dsp.submap("resize"))
+local notify_tag = "$HOME/.config/hypr/scripts/notify-tag.sh"
+local function submode(name, hint)
+	return function()
+		hl.dispatch(hl.dsp.submap(name))
+		hl.exec_cmd(string.format("%s submode show -t 0 '%s submode' '%s'", notify_tag, name, hint))
+	end
+end
+local function submode_leave()
+	hl.dispatch(hl.dsp.submap("reset"))
+	hl.exec_cmd(notify_tag .. " submode close")
+end
+
+-- resize submode
+hl.bind(mainMod .. " + R", submode("resize", "hjkl resizes, esc leaves"))
 hl.define_submap("resize", function()
 	hl.bind("l", hl.dsp.window.resize({ x = 20, y = 0, relative = true }), { repeating = true })
 	hl.bind("h", hl.dsp.window.resize({ x = -20, y = 0, relative = true }), { repeating = true })
 	hl.bind("k", hl.dsp.window.resize({ x = 0, y = 20, relative = true }), { repeating = true })
 	hl.bind("j", hl.dsp.window.resize({ x = 0, y = -20, relative = true }), { repeating = true })
-	hl.bind("escape", hl.dsp.submap("reset"))
+	hl.bind("escape", submode_leave)
+end)
+
+-- directional-swap submode
+hl.bind(mainMod .. " + A", submode("swap", "hjkl throws the window, esc leaves"))
+hl.define_submap("swap", function()
+	hl.bind("h", hl.dsp.window.swap({ direction = "l" }))
+	hl.bind("j", hl.dsp.window.swap({ direction = "d" }))
+	hl.bind("k", hl.dsp.window.swap({ direction = "u" }))
+	hl.bind("l", hl.dsp.window.swap({ direction = "r" }))
+	hl.bind("escape", submode_leave)
 end)
 
 
