@@ -3,17 +3,6 @@
 #
 # Usage: ./hypr-switch.sh <kind> [--notify] [--list | --current | --next | <name>]
 #        kind = theme | animation | layout
-#
-# Both kinds work the same way: options are the *.lua files in a conf/
-# directory, the choice is a name in $XDG_STATE_HOME/hypr/<kind>, and the Lua
-# side reads that name on the next config load.
-#
-# theme-switcher.sh and animation-switcher.sh are one-line wrappers over this;
-# the kinds differ only in the values resolved below.
-#
-# --notify pops a toast naming the set we switched into. The keybinds pass it;
-# the noctalia menu does NOT -- its dropdown re-renders the row itself, so a
-# toast there would just be redundant.
 
 set -eu
 
@@ -74,26 +63,10 @@ next() {
 		}'
 }
 
-# Toast naming the set we switched into. Reuses one notification id (stored
-# in the state dir) via notify-send -r, so repeated cycling updates the toast
-# in place instead of stacking a new one each press -- noctalia honours
-# replaces_id but has no synchronous/tag hint, so we track the id ourselves.
-# An id that no longer exists (expired/dismissed) is simply not found and a
-# fresh toast is made; ids are monotonic so we never clobber someone else's.
+# notify-tag keeps one replaceable notification per tag, so repeated cycling
+# updates a single toast in place instead of stacking one per press.
 notify_switch() {
-	command -v notify-send >/dev/null 2>&1 || return 0
-	_name=$1
-	_id_file="$state_dir/switch-notif-id"
-	_old=""
-	if [ -r "$_id_file" ]; then
-		read -r _old < "$_id_file" || true
-	fi
-	if [ -n "$_old" ]; then
-		_new=$(notify-send -a Hyprland -t 1500 -p -r "$_old" "$title" "$_name") || return 0
-	else
-		_new=$(notify-send -a Hyprland -t 1500 -p "$title" "$_name") || return 0
-	fi
-	printf '%s\n' "$_new" > "$_id_file" 2>/dev/null || true
+	"$here/notify-tag.sh" switch show -t 1500 "$title" "$1" || true
 }
 
 set_to() {

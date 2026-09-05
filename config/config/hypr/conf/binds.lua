@@ -94,24 +94,36 @@ hl.bind(mainMod .. " + SHIFT + E", hl.dsp.group.toggle(), nograb)
 -- hl.bind(mainMod .. " + Tab", hl.dsp.group.next())
 -- hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.group.prev())
 
+local notify_tag = "$HOME/.config/hypr/scripts/notify-tag.sh"
+local function submode(name, hint)
+	return function()
+		hl.dispatch(hl.dsp.submap(name))
+		hl.exec_cmd(string.format("%s submode show -t 0 '%s submode' '%s'", notify_tag, name, hint))
+	end
+end
+local function submode_leave()
+	hl.dispatch(hl.dsp.submap("reset"))
+	hl.exec_cmd(notify_tag .. " submode close")
+end
+
 -- resize submode
-hl.bind(mainMod .. " + R", hl.dsp.submap("resize"))
+hl.bind(mainMod .. " + R", submode("resize", "hjkl resizes, esc leaves"))
 hl.define_submap("resize", function()
 	hl.bind("l", hl.dsp.window.resize({ x = 20, y = 0, relative = true }), { repeating = true })
 	hl.bind("h", hl.dsp.window.resize({ x = -20, y = 0, relative = true }), { repeating = true })
 	hl.bind("k", hl.dsp.window.resize({ x = 0, y = 20, relative = true }), { repeating = true })
 	hl.bind("j", hl.dsp.window.resize({ x = 0, y = -20, relative = true }), { repeating = true })
-	hl.bind("escape", hl.dsp.submap("reset"))
+	hl.bind("escape", submode_leave)
 end)
 
 -- directional-swap submode
-hl.bind(mainMod .. " + A", hl.dsp.submap("swap"))
+hl.bind(mainMod .. " + A", submode("swap", "hjkl throws the window, esc leaves"))
 hl.define_submap("swap", function()
 	hl.bind("h", hl.dsp.window.swap({ direction = "l" }))
 	hl.bind("j", hl.dsp.window.swap({ direction = "d" }))
 	hl.bind("k", hl.dsp.window.swap({ direction = "u" }))
 	hl.bind("l", hl.dsp.window.swap({ direction = "r" }))
-	hl.bind("escape", hl.dsp.submap("reset"))
+	hl.bind("escape", submode_leave)
 end)
 
 

@@ -1,12 +1,15 @@
 -- Scrolling layout
 -----------------------------------------------
+
+local widths = { 0.5, 0.667, 1.0 }
+
 return {
 	name = "scrolling",
 	options = {
 		scrolling = {
 			column_width = 1.0,
 			fullscreen_on_one_column = true,
-			explicit_column_widths = "0.5, 0.667, 1.0",
+			explicit_column_widths = table.concat(widths, ", "),
 		},
 	},
 
@@ -27,6 +30,28 @@ return {
 		hl.bind(ctx.mod .. " + SHIFT + comma",  hl.dsp.layout("consume_or_expel prev"), ctx.nograb)
 		hl.bind(ctx.mod .. " + SHIFT + period", hl.dsp.layout("consume_or_expel next"), ctx.nograb)
 
-		hl.bind(ctx.mod .. " + SHIFT + R", hl.dsp.layout("colresize +conf"), ctx.nograb)
+		hl.bind(ctx.mod .. " + SHIFT + R", function()
+			hl.dispatch(hl.dsp.layout("colresize +conf"))
+
+			local win = hl.get_active_window()
+			local mon = hl.get_active_monitor()
+			if win == nil or mon == nil or not mon.scale or mon.scale == 0 then
+				return
+			end
+
+			local frac = win.size.x / (mon.width / mon.scale)
+			local best, dist = widths[1], math.huge
+			for _, w in ipairs(widths) do
+				local d = math.abs(w - frac)
+				if d < dist then
+					best, dist = w, d
+				end
+			end
+
+			hl.exec_cmd(string.format(
+				"$HOME/.config/hypr/scripts/notify-tag.sh width show -t 1200 Width %d%%",
+				math.floor(best * 100 + 0.5)
+			))
+		end, ctx.nograb)
 	end,
 }
