@@ -535,6 +535,12 @@ time_format = "{:%H:%M}"
 
         [shell.launcher.dmenu]
 
+            [shell.launcher.dmenu.entry.nf]
+            command = "cat $HOME/.local/share/nerd-glyphs/glyphs.tsv"
+            exec = "printf '%s\\n' \"{selection}\" | cut -f1 | tr -d '\\n' | wl-copy"
+            glyph = "typography"
+            prefix = "nf"
+
             [shell.launcher.dmenu.entry.pass]
             command = "find ${PASSWORD_STORE_DIR:-$HOME/.password-store} -name '*.gpg' -printf '%P\\n' | sed 's/\\.gpg$//' | sort"
             exec = "pass show -c \"{selection}\""

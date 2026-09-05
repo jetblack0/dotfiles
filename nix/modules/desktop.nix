@@ -240,6 +240,11 @@ in
         recursive = true;
       };
 
+      xdg.dataFile."nerd-glyphs" = {
+        source = dotfiles + "/share/nerd-glyphs";
+        recursive = true;
+      };
+
       # per-host display rules for conf/monitors.lua, xresources for xwayland
       xdg.stateFile =
         lib.optionalAttrs (cfg.monitors != [ ]) {
