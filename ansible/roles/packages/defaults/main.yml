@@ -110,6 +110,7 @@ packages:
   # display manager
   - { name: greetd, brew: false }
   - { name: noctalia-greeter, aur: noctalia-greeter, brew: false }
+  - { name: uwsm, brew: false }
 
   # audio. arch's user presets enable the sockets at install, no wiring needed
   - { name: pipewire, brew: false }
