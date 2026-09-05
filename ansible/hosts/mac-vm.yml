@@ -21,3 +21,11 @@ monitors:
 
 # Xft.dpi for xwayland apps: 96 * scale.
 xwayland_dpi: 154
+
+# the parallels virtio-gpu advertises a bogus preferred mode, so the
+# greeter renders tiny and blurry unless pinned to the real panel. Real
+# hardware reads EDID and needs none of this.
+greeter_output:
+  width: 2560
+  height: 1600
+  scale: 1.6
