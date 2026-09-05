@@ -1,4 +1,5 @@
 local theme = require("conf.theme")
+local layout = require("conf.layout")
 
 hl.config({
 	general = {
@@ -9,7 +10,7 @@ hl.config({
 			active_border   = theme.ui.border_active,
 			inactive_border = theme.ui.border_inactive,
 		},
-		layout = "master",
+		layout = layout.name,
 	},
 
 	decoration = {
@@ -39,14 +40,9 @@ hl.config({
 		disable_autoreload = false,
 		mouse_move_enables_dpms = true,
 		key_press_enables_dpms  = true,
-		-- What shows through before a window paints; unset it and the
-		-- compositor's own blue-grey is the one colour no theme controls.
 		background_color = theme.ui.background,
 	},
 
-	master = {
-		new_status = "slave",
-	},
 
 	-- XWayland surfaces render at 1x and get upscaled into blur on a
 	-- fractionally scaled monitor (e.g., gpg pinentry). Zero-scaling 
@@ -55,8 +51,6 @@ hl.config({
 		force_zero_scaling = true,
 	},
 
-	-- All four group states, not just the active one: a slot left unfilled
-	-- falls back to Hyprland's default colours, not to the theme.
 	group = {
 		col = {
 			border_active          = theme.ui.group_border_active,
@@ -81,13 +75,11 @@ hl.config({
 	},
 })
 
--- A theme that failed to load must not fail quietly: the fallback looks almost
--- right, which is how you end up debugging the wrong thing. seterror puts it on
--- screen until the next successful reload.
---
--- The banner colour is the one literal in the config that is deliberately not
--- from the theme. Reporting that the theme system broke, in a colour taken from
--- the theme system, is circular -- so this stays a plain value.
+-- layout-specific options
+if next(layout.options) ~= nil then
+	hl.config(layout.options)
+end
+
 if theme._error ~= nil then
 	hl.on("hyprland.start", function()
 		hl.exec_cmd(string.format(
