@@ -1,15 +1,19 @@
 #!/bin/sh
 # Swap one of the config's swappable sets.
 #
-# Usage: ./hypr-switch.sh <kind> [--list | --current | --next | <name>]
-#        kind = theme | animation
+# Usage: ./hypr-switch.sh <kind> [--notify] [--list | --current | --next | <name>]
+#        kind = theme | animation | layout
 #
 # Both kinds work the same way: options are the *.lua files in a conf/
 # directory, the choice is a name in $XDG_STATE_HOME/hypr/<kind>, and the Lua
 # side reads that name on the next config load.
 #
 # theme-switcher.sh and animation-switcher.sh are one-line wrappers over this;
-# the two kinds differ only in the three values resolved below.
+# the kinds differ only in the values resolved below.
+#
+# --notify pops a toast naming the set we switched into. The keybinds pass it;
+# the noctalia menu does NOT -- its dropdown re-renders the row itself, so a
+# toast there would just be redundant.
 
 set -eu
 
@@ -17,14 +21,22 @@ here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 kind=${1:-}
 case "$kind" in
-	theme)     dir="$here/../conf/themes";     default="rose-pine" ;;
-	animation) dir="$here/../conf/animations"; default="macos" ;;
+	theme)     dir="$here/../conf/themes";     default="rose-pine"; title="Theme" ;;
+	animation) dir="$here/../conf/animations"; default="macos";     title="Animation" ;;
+	layout)    dir="$here/../conf/layouts";    default="master";    title="Layout" ;;
 	*)
-		printf 'usage: %s <theme|animation> [--list | --current | --next | <name>]\n' "${0##*/}" >&2
+		printf 'usage: %s <theme|animation|layout> [--notify] [--list | --current | --next | <name>]\n' "${0##*/}" >&2
 		exit 2
 		;;
 esac
 shift
+
+# Optional, must come before the action. Only the keybinds pass it.
+notify=0
+if [ "${1:-}" = "--notify" ]; then
+	notify=1
+	shift
+fi
 
 dir=$(CDPATH= cd -- "$dir" && pwd)
 state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/hypr"
@@ -62,6 +74,28 @@ next() {
 		}'
 }
 
+# Toast naming the set we switched into. Reuses one notification id (stored
+# in the state dir) via notify-send -r, so repeated cycling updates the toast
+# in place instead of stacking a new one each press -- noctalia honours
+# replaces_id but has no synchronous/tag hint, so we track the id ourselves.
+# An id that no longer exists (expired/dismissed) is simply not found and a
+# fresh toast is made; ids are monotonic so we never clobber someone else's.
+notify_switch() {
+	command -v notify-send >/dev/null 2>&1 || return 0
+	_name=$1
+	_id_file="$state_dir/switch-notif-id"
+	_old=""
+	if [ -r "$_id_file" ]; then
+		read -r _old < "$_id_file" || true
+	fi
+	if [ -n "$_old" ]; then
+		_new=$(notify-send -a Hyprland -t 1500 -p -r "$_old" "$title" "$_name") || return 0
+	else
+		_new=$(notify-send -a Hyprland -t 1500 -p "$title" "$_name") || return 0
+	fi
+	printf '%s\n' "$_new" > "$_id_file" 2>/dev/null || true
+}
+
 set_to() {
 	# Refuse an unknown name before touching anything.
 	if ! list | grep -qxF "$1"; then
@@ -84,6 +118,10 @@ set_to() {
 		hyprctl -q reload
 	fi
 
+	if [ "$notify" = 1 ]; then
+		notify_switch "$1"
+	fi
+
 	printf '%s\n' "$1"
 }
 
@@ -92,7 +130,7 @@ case "${1:---current}" in
 	--current) current ;;
 	--next)    set_to "$(next)" ;;
 	-*)
-		printf 'usage: %s %s [--list | --current | --next | <name>]\n' "${0##*/}" "$kind" >&2
+		printf 'usage: %s %s [--notify] [--list | --current | --next | <name>]\n' "${0##*/}" "$kind" >&2
 		exit 2
 		;;
 	*) set_to "$1" ;;
