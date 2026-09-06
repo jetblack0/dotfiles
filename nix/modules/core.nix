@@ -108,6 +108,7 @@ in
       curl
       diffutils
       file
+      gawk
       man-pages
       rsync
       unzip

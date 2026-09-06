@@ -302,6 +302,11 @@ in
         f="''${XDG_STATE_HOME:-$HOME/.local/state}/hypr/screenshot-dir"
         [ -e "$f" ] || run install -Dm644 ${screenshotDirState} "$f"
       '';
+
+      home.extraActivationPath = [ pkgs.gawk ];
+      home.activation.noctaliaPruneState = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        run sh ${../../lib/deploy/noctalia-prune-state}
+      '';
     };
   };
 }
