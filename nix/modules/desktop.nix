@@ -205,6 +205,18 @@ in
       emoji = [ "Apple Color Emoji" ];
     };
 
+    fonts.fontconfig.localConf = ''
+      <?xml version="1.0"?>
+      <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+      <fontconfig>
+        <match target="pattern">
+          <test name="family"><string>SF Pro Display Clock</string></test>
+          <edit name="family" mode="assign" binding="strong"><string>SF Pro Display</string></edit>
+          <edit name="weight" mode="assign" binding="strong"><const>semibold</const></edit>
+        </match>
+      </fontconfig>
+    '';
+
 
     # home-manager
     # ---------------------------------------------
