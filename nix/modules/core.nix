@@ -129,6 +129,7 @@ in
       builtins.elem (lib.getName pkg) [
         "claude-code"
         "apple-color-emoji"
+        "apple-fonts-sf-pro"
       ];
 
     virtualisation.docker.enable = true;

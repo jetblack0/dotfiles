@@ -187,6 +187,7 @@ in
       nerd-fonts.jetbrains-mono
       udev-gothic-nf
       (callPackage ../packages/apple-color-emoji.nix { })
+      (callPackage ../packages/apple-fonts.nix { })
     ];
 
     fonts.fontconfig.defaultFonts = {

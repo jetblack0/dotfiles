@@ -26,6 +26,7 @@ packages:
   - { name: zoxide }
 
   # fonts
+  - { name: apple-fonts, aur: apple-fonts, brew: false } # SF Pro/Rounded; macos ships these natively
   - { name: inter-font, cask: font-inter }
   - { name: noto-fonts-cjk, cask: font-noto-sans-cjk }
   - { name: otf-libertinus, cask: font-libertinus }
