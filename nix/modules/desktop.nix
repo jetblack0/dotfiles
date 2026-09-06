@@ -204,6 +204,7 @@ in
         "Noto Serif CJK SC"
       ];
       sansSerif = [
+        "SF Pro Text"
         "Inter"
         "Noto Sans CJK SC"
       ];
