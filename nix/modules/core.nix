@@ -89,6 +89,7 @@ in
       # basics other distros ship and nixos does not
       curl
       diffutils
+      file
       man-pages
       rsync
       unzip
