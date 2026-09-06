@@ -516,7 +516,8 @@ time_format = "{:%H:%M}"
     speed = 1.0
 
     [shell.greeter_sync]
-    auto_sync = false
+    auto_sync = true
+    privilege_command = "pkexec"
 
     [shell.keyboard_layout]
 
