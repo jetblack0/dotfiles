@@ -48,10 +48,10 @@ hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("noctalia msg notification-in
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), d("do not disturb", nograb))
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), d("do not disturb", nograb))
 
-hl.bind("Print", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"), d("screenshot the screen", nograb))
-hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("noctalia msg screenshot-region"), d("screenshot a region", nograb))
+hl.bind("Print", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/screenshot.sh full"), d("screenshot the screen", nograb))
+hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/screenshot.sh region"), d("screenshot a region", nograb))
 hl.bind(mainMod .. " + SHIFT + S",
-	hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | wl-copy && notify-send Screenshot \"Copied to clipboard\""),
+	hl.dsp.exec_cmd("set -o pipefail; region=$(slurp) && grim -g \"$region\" - | wl-copy && notify-send Screenshot \"Copied to clipboard\""),
 	d("copy a region screenshot", nograb))
 
 -- wallpapers
@@ -65,7 +65,7 @@ hl.bind(mainMod .. " + SHIFT + P", hl.dsp.exec_cmd("noctalia msg panel-open laun
 -- O belongs to window.pin below
 hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("hyprpicker -a"), d("color picker", nograb))
 hl.bind(mainMod .. " + X",
-	hl.dsp.exec_cmd("grim -g \"$(slurp)\" - | tesseract stdin stdout | wl-copy && notify-send OCR \"Copied to clipboard\""),
+	hl.dsp.exec_cmd("set -o pipefail; region=$(slurp) && grim -g \"$region\" - | tesseract stdin stdout | wl-copy && notify-send OCR \"Copied to clipboard\""),
 	d("ocr a region to the clipboard", nograb))
 
 -- cycle the hyprland animation set / layout
