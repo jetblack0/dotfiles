@@ -1,0 +1,32 @@
+#!/bin/sh
+# Drop the settings noctalia's GUI wrote into its state file, so the repo's
+# config.toml wins. Deploys run this on every pass.
+
+set -eu
+
+# Sections that survive; everything else is dropped. To preserve another
+# section:
+#
+#     keep='wallpaper|plugins'
+#
+# Candidates: theme, dock, desktop_widgets, lockscreen_widgets.
+keep='wallpaper'
+
+f=${1:-${XDG_STATE_HOME:-$HOME/.local/state}/noctalia/settings.toml}
+[ -f "$f" ] || exit 0
+
+tmp=$f.pruned.$$
+trap 'rm -f "$tmp"' EXIT
+
+awk -v keep="$keep" '
+  /^[[:space:]]*\[/ {
+    seen = 1
+    head = $0
+    sub(/^[[:space:]]*\[\[?/, "", head)  # drop the leading [ or [[
+    sub(/[].].*$/, "", head)             # first path segment only
+    wanted = (head ~ ("^(" keep ")$"))
+  }
+  (!seen || wanted) { print }
+' "$f" >"$tmp"
+
+cmp -s "$tmp" "$f" || { mv "$tmp" "$f"; echo "pruned $f"; }
