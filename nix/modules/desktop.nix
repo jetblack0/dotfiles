@@ -14,8 +14,10 @@ let
   cfg = config.desktop;
   username = config.core.username;
 
-  # swayimg 5.x from unstable -- stable is still 4.7 with the old INI config
-  # (see flake.nix). Only this package comes from here.
+  # Seed for the screenshot-dir state file (home.activation)
+  screenshotDirState = pkgs.writeText "screenshot-dir" (cfg.screenshotDirectory + "\n");
+
+  # stable is still 4.7 with the old INI config.
   pkgs-unstable = import inputs.nixpkgs-unstable { inherit (pkgs) system; };
 
   # conf/monitors.lua
@@ -124,10 +126,6 @@ in
 
     # display manager
     # ---------------------------------------------
-    # settings is the whole declarative greeter.toml; appearance otherwise
-    # follows the shell via `noctalia msg greeter-sync` (sync.toml stays
-    # mutable). Cursor rides here because store paths make XCURSOR_* env
-    # on the greetd command line (the arch route) meaningless.
     programs.noctalia-greeter = {
       enable = true;
       settings = {
@@ -160,7 +158,7 @@ in
       kitty
       zathura
       cava
-      pkgs-unstable.swayimg # 5.x for the shared Lua config (config/config/swayimg)
+      pkgs-unstable.swayimg
 
       # themes
       adw-gtk3
@@ -210,7 +208,9 @@ in
 
     # home-manager
     # ---------------------------------------------
-    home-manager.users.${username} = {
+    home-manager.users.${username} =
+      { lib, ... }:
+      {
       xdg.configFile =
         let
           desktopDirs = [
@@ -274,6 +274,12 @@ in
         // lib.optionalAttrs (cfg.xwaylandDpi != null) {
           "hypr/xresources".text = xresources;
         };
+
+      # Seeded from screenshotDirectory but a plain writable file, created once
+      home.activation.screenshotDir = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        f="''${XDG_STATE_HOME:-$HOME/.local/state}/hypr/screenshot-dir"
+        [ -e "$f" ] || run install -Dm644 ${screenshotDirState} "$f"
+      '';
     };
   };
 }
