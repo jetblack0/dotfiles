@@ -370,7 +370,7 @@ widget_order = [ "lockscreen-login-box@Virtual-1", "lockscreen-widget-0000000000
         center_text = true
         clock_style = "digital"
         color = "on_surface"
-        font_family = "Inter Display Thin"
+        font_family = "SF Pro Display Clock"
         shadow = false
 
     [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
