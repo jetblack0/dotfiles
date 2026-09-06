@@ -146,7 +146,7 @@ bindkey -s '^f' '^uyy\n'
 bindkey -s '^v' '^unvim .\n'
 bindkey -s '^o' '^uzicd\n'
 bindkey -s '^e' '^ufzfed\n'
-# bindkey -s '^n' '^uimages &\n'
+bindkey -s '^n' '^uimages &\n'
 
 
 # Aliases
@@ -312,7 +312,7 @@ fzfed() {
 	nvim "$file"
 }
 
-# Open every image in the current directory in nsxiv, newest first.
+# Open every image under the current directory in swayimg, newest first.
 images() {
-	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=time | nsxiv -i
+	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=time | swayimg -f /dev/stdin -e 'swayimg.imagelist.order = "none"'
 }

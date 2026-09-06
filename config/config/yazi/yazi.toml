@@ -22,8 +22,8 @@ edit = [
 	{ run = 'nvim %s', block = true, for = "unix" },
 ]
 image = [
-	{ run = 'nsxiv %s', orphan = true, for = "linux" },
-	{ run = 'open %s',  orphan = true, for = "macos" },
+	{ run = 'swayimg %s', orphan = true, for = "linux" },
+	{ run = 'open %s',    orphan = true, for = "macos" },
 ]
 video = [
 	{ run = 'mpv %s', orphan = true, for = "unix" },
