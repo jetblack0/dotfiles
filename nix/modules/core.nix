@@ -11,6 +11,24 @@
 let
   dotfiles = ../../config;
   username = config.core.username;
+
+  # yazi plugins. The list comes from config/yazi/package.toml
+  yaziPluginFiles =
+    let
+      deps =
+        (builtins.fromTOML (builtins.readFile (dotfiles + "/config/yazi/package.toml"))).plugin.deps
+          or [ ];
+      names = map (d: lib.last (lib.splitString ":" (lib.last (lib.splitString "/" d.use)))) deps;
+      missing = builtins.filter (n: !(pkgs.yaziPlugins ? ${n})) names;
+    in
+    lib.throwIf (missing != [ ])
+      "yazi plugins in package.toml but absent from nixpkgs yaziPlugins: ${lib.concatStringsSep ", " missing}"
+      (builtins.listToAttrs (
+        map (n: {
+          name = "yazi/plugins/${n}.yazi";
+          value.source = pkgs.yaziPlugins.${n};
+        }) names
+      ));
 in
 {
   # per-host knobs
@@ -182,7 +200,10 @@ in
         lib.genAttrs coreDirs (dir: {
           source = dotfiles + "/config/${dir}";
           recursive = true;
-        });
+        })
+        # yazi's plugins/ is untracked (ya pkg owns it on arch), so the flake
+        # never copies it -- deploy them from nixpkgs instead
+        // yaziPluginFiles;
     };
   };
 }
