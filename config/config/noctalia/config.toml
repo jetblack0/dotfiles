@@ -389,7 +389,7 @@ widget_order = [ "lockscreen-login-box@Virtual-1", "lockscreen-widget-0000000000
         background = false
         center_text = true
         color = "on_surface_variant"
-        font_family = "Inter"
+        font_family = "SF Pro Display"
         format = "{:%A, %B %d}"
         shadow = true
 
