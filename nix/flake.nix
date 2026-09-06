@@ -1,9 +1,6 @@
 {
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
-    # swayimg only: stable is 4.7 (INI config), arch ships 5.x (Lua config),
-    # and the two formats are incompatible. Unstable has 5.x, so the shared
-    # config/config/swayimg/init.lua works on both. Pulled for this one package.
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
