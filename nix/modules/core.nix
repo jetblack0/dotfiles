@@ -49,6 +49,18 @@ in
     ];
 
 
+    # console
+    # ---------------------------------------------
+    console = {
+      font = "ter-d24b";
+      keyMap = pkgs.runCommand "us-capslock-escape.map" { } ''
+        gunzip -c ${pkgs.kbd}/share/keymaps/i386/qwerty/us.map.gz > $out
+        echo 'keycode 58 = Escape' >> $out
+      '';
+      packages = [ pkgs.terminus_font ];
+    };
+
+
     # users
     # ---------------------------------------------
     users.users.${username} = {

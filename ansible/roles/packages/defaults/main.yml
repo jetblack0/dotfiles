@@ -34,6 +34,7 @@ packages:
   - { name: ttf-apple-emoji, aur: ttf-apple-emoji, brew: false }
   - { name: ttf-jetbrains-mono-nerd, cask: font-jetbrains-mono-nerd-font }
   - { name: ttf-udev-gothic, aur: ttf-udev-gothic, cask: font-udev-gothic-nf }
+  - { name: terminus-font, brew: false }
 
   # system monitors & info
   - { name: bottom }

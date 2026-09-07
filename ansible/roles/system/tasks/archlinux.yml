@@ -149,3 +149,62 @@
     src: noctalia-greeter.rules
     dest: /etc/polkit-1/rules.d/49-noctalia-greeter.rules
     mode: "0644"
+
+# Console
+# ---------------------------------------------
+- name: Ensure the console keymap directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/kbd
+    state: directory
+    mode: "0755"
+
+- name: Render the console keymap with capslock as escape
+  ansible.builtin.shell:
+    cmd: |
+      set -eu
+      gunzip -c /usr/share/kbd/keymaps/i386/qwerty/us.map.gz
+      echo 'keycode 58 = Escape'
+    executable: /bin/sh
+  register: system_console_keymap_src
+  changed_when: false
+  check_mode: false
+
+- name: Install the console keymap
+  become: true
+  ansible.builtin.copy:
+    content: "{{ system_console_keymap_src.stdout }}\n"
+    dest: /etc/kbd/us.map
+    mode: "0644"
+  register: system_console_keymap
+
+- name: Set the console font
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/vconsole.conf
+    regexp: '^#?\s*FONT='
+    line: FONT=ter-d24b
+    create: true
+    mode: "0644"
+  register: system_console_font
+
+- name: Point the console keymap at the repo's
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/vconsole.conf
+    regexp: '^#?\s*KEYMAP='
+    line: KEYMAP=/etc/kbd/us.map
+    create: true
+    mode: "0644"
+  register: system_console_map
+
+- name: Apply the console font and keymap now
+  become: true
+  ansible.builtin.systemd_service:
+    name: systemd-vconsole-setup.service
+    state: restarted
+  when: >
+    (system_console_keymap is changed
+    or system_console_font is changed
+    or system_console_map is changed)
+    and ansible_facts['service_mgr'] == 'systemd'
