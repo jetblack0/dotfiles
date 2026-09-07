@@ -1,7 +1,7 @@
 ---
 # Linux parallels vm
 # ---------------------------------------------
-#     ansible-playbook ansible/local.yml -e @ansible/hosts/mac-vm.yml
+#     ansible-playbook ansible/base.yml -e @ansible/hosts/mac-vm.yml
 
 # Packages
 # ---------------------------------------------
