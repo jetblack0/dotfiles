@@ -60,6 +60,9 @@ in
       packages = [ pkgs.terminus_font ];
     };
 
+    # the pc speaker beeps on every boot and on every console bell
+    boot.blacklistedKernelModules = [ "pcspkr" ];
+
 
     # users
     # ---------------------------------------------

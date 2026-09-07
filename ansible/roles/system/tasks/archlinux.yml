@@ -208,3 +208,11 @@
     or system_console_font is changed
     or system_console_map is changed)
     and ansible_facts['service_mgr'] == 'systemd'
+
+- name: Silence the pc speaker
+  become: true
+  ansible.builtin.copy:
+    content: |
+      blacklist pcspkr
+    dest: /etc/modprobe.d/nobeep.conf
+    mode: "0644"
