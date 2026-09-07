@@ -1,0 +1,15 @@
+---
+data_home: "{{ ansible_facts['user_dir'] }}/assets"
+data_require_mount: true
+
+# Directories in $HOME replaced by symlinks into the second home.
+data_links:
+  .local/share/zsh: state/zsh
+
+# xdg user dirs routed into the second home.
+#     xdg key (lowercase): path under data_home
+data_userdirs:
+  documents: docs
+  download: downs
+  videos: media/vids
+  pictures: media/pics

@@ -34,6 +34,7 @@ packages:
   - { name: ttf-apple-emoji, aur: ttf-apple-emoji, brew: false }
   - { name: ttf-jetbrains-mono-nerd, cask: font-jetbrains-mono-nerd-font }
   - { name: ttf-udev-gothic, aur: ttf-udev-gothic, cask: font-udev-gothic-nf }
+  - { name: terminus-font, brew: false }
 
   # system monitors & info
   - { name: bottom }
@@ -109,6 +110,17 @@ packages:
   - { name: capitaine-cursors, brew: false }
   - { name: tela-circle-icon-theme, aur: tela-circle-icon-theme-black-git, brew: false }
 
+  # networking. noctalia's bar widget speaks NetworkManager over dbus
+  - { name: networkmanager, brew: false }
+
+  # bluetooth
+  - { name: bluez, brew: false }
+  - { name: bluez-utils, brew: false } # bluetoothctl
+  - { name: upower, brew: false }
+  - { name: power-profiles-daemon, brew: false }
+  - { name: fprintd, brew: false }
+  - { name: accountsservice, brew: false }
+
   # display manager
   - { name: greetd, brew: false }
   - { name: noctalia-greeter, aur: noctalia-greeter, brew: false }
@@ -139,6 +151,7 @@ packages:
   - { name: libnotify, brew: false } # notify-send
 
   # misc
+  - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
   - { name: xdg-ninja, aur: xdg-ninja }
 
 # Entries to skip by canonical name, e.g. on a distro that lacks them.

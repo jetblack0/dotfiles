@@ -49,6 +49,21 @@ in
     ];
 
 
+    # console
+    # ---------------------------------------------
+    console = {
+      font = "ter-d24b";
+      keyMap = pkgs.runCommand "us-capslock-escape.map" { } ''
+        gunzip -c ${pkgs.kbd}/share/keymaps/i386/qwerty/us.map.gz > $out
+        echo 'keycode 58 = Escape' >> $out
+      '';
+      packages = [ pkgs.terminus_font ];
+    };
+
+    # the pc speaker beeps on every boot and on every console bell
+    boot.blacklistedKernelModules = [ "pcspkr" ];
+
+
     # users
     # ---------------------------------------------
     users.users.${username} = {
@@ -140,6 +155,7 @@ in
       opencode
 
       # misc
+      ventoy
       xdg-ninja
     ];
 
@@ -149,7 +165,11 @@ in
         "claude-code"
         "apple-color-emoji"
         "apple-fonts-sf-pro"
+        "ventoy"
       ];
+
+    # ventoy bundles prebuilt blobs nixpkgs will not vouch for (nixpkgs#404663).
+    nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "ventoy";
 
     virtualisation.docker.enable = true;
     programs.nix-ld.enable = true;

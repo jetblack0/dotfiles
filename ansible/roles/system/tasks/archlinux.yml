@@ -117,6 +117,37 @@
     dest: /etc/systemd/journald.conf.d/size.conf
     mode: "0644"
 
+- name: Turn on bluetooth at boot
+  become: true
+  ansible.builtin.systemd_service:
+    name: bluetooth.service
+    enabled: true
+
+- name: Boot into NetworkManager
+  become: true
+  ansible.builtin.systemd_service:
+    name: NetworkManager.service
+    enabled: true
+
+# Masked
+- name: Retire systemd-networkd
+  become: true
+  ansible.builtin.systemd_service:
+    name: systemd-networkd.service
+    enabled: false
+    masked: true
+
+- name: Retire the systemd-networkd trigger sockets
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: false
+  loop:
+    - systemd-networkd.socket
+    - systemd-networkd-varlink.socket
+    - systemd-networkd-varlink-metrics.socket
+    - systemd-networkd-resolve-hook.socket
+
 # Boot into noctalia-greeter via greetd.
 - name: Install the greetd config
   become: true
@@ -148,4 +179,71 @@
   ansible.builtin.copy:
     src: noctalia-greeter.rules
     dest: /etc/polkit-1/rules.d/49-noctalia-greeter.rules
+    mode: "0644"
+
+# Console
+# ---------------------------------------------
+- name: Ensure the console keymap directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/kbd
+    state: directory
+    mode: "0755"
+
+- name: Render the console keymap with capslock as escape
+  ansible.builtin.shell:
+    cmd: |
+      set -eu
+      gunzip -c /usr/share/kbd/keymaps/i386/qwerty/us.map.gz
+      echo 'keycode 58 = Escape'
+    executable: /bin/sh
+  register: system_console_keymap_src
+  changed_when: false
+  check_mode: false
+
+- name: Install the console keymap
+  become: true
+  ansible.builtin.copy:
+    content: "{{ system_console_keymap_src.stdout }}\n"
+    dest: /etc/kbd/us.map
+    mode: "0644"
+  register: system_console_keymap
+
+- name: Set the console font
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/vconsole.conf
+    regexp: '^#?\s*FONT='
+    line: FONT=ter-d24b
+    create: true
+    mode: "0644"
+  register: system_console_font
+
+- name: Point the console keymap at the repo's
+  become: true
+  ansible.builtin.lineinfile:
+    path: /etc/vconsole.conf
+    regexp: '^#?\s*KEYMAP='
+    line: KEYMAP=/etc/kbd/us.map
+    create: true
+    mode: "0644"
+  register: system_console_map
+
+- name: Apply the console font and keymap now
+  become: true
+  ansible.builtin.systemd_service:
+    name: systemd-vconsole-setup.service
+    state: restarted
+  when: >
+    (system_console_keymap is changed
+    or system_console_font is changed
+    or system_console_map is changed)
+    and ansible_facts['service_mgr'] == 'systemd'
+
+- name: Silence the pc speaker
+  become: true
+  ansible.builtin.copy:
+    content: |
+      blacklist pcspkr
+    dest: /etc/modprobe.d/nobeep.conf
     mode: "0644"

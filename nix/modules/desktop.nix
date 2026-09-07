@@ -146,6 +146,17 @@ in
       });
     '';
 
+    # networking
+    # ---------------------------------------------
+    networking.networkmanager.enable = true;
+    networking.networkmanager.connectionConfig."ipv4.dhcp-client-id" = "mac";
+
+    hardware.bluetooth.enable = true;
+    services.upower.enable = true;
+    services.power-profiles-daemon.enable = true;
+    services.fprintd.enable = true;
+    services.accounts-daemon.enable = true;
+
     # audio
     # ---------------------------------------------
     security.rtkit.enable = true;

@@ -27,19 +27,7 @@
   # networking
   # ---------------------------------------------
   networking.hostName = "vm-arm64";
-
   networking.useDHCP = false;
-  systemd.network = {
-    enable = true;
-    networks."20-lan" = {
-      matchConfig.Name = "en*";
-      networkConfig = {
-        DHCP = "ipv4";
-        IPv6AcceptRA = true;
-      };
-      linkConfig.RequiredForOnline = "routable";
-    };
-  };
 
 
   # services
