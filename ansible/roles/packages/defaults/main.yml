@@ -140,6 +140,7 @@ packages:
   - { name: libnotify, brew: false } # notify-send
 
   # misc
+  - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
   - { name: xdg-ninja, aur: xdg-ninja }
 
 # Entries to skip by canonical name, e.g. on a distro that lacks them.

@@ -155,6 +155,7 @@ in
       opencode
 
       # misc
+      ventoy
       xdg-ninja
     ];
 
@@ -164,7 +165,11 @@ in
         "claude-code"
         "apple-color-emoji"
         "apple-fonts-sf-pro"
+        "ventoy"
       ];
+
+    # ventoy bundles prebuilt blobs nixpkgs will not vouch for (nixpkgs#404663).
+    nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "ventoy";
 
     virtualisation.docker.enable = true;
     programs.nix-ld.enable = true;
