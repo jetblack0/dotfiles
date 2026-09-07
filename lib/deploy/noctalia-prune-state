@@ -1,0 +1,37 @@
+#!/bin/sh
+# Drop the settings noctalia's GUI wrote into its state file, so the repo's
+# config.toml wins. Deploys run this on every pass.
+
+set -eu
+
+# Sections that survive; everything else is dropped, bare keys above the first
+# table included. config_version is one of those: noctalia rewrites it on its
+# next save, and a state file carrying a version newer than the local noctalia
+# understands is a fatal config error -- easy to hit when two hosts run
+# different versions. Absent, it reads as 0 and the migrations re-run over a
+# file that has nothing to migrate.
+#
+# To preserve another section:
+#
+#     keep='wallpaper|plugins'
+#
+# Candidates: theme, dock, desktop_widgets, lockscreen_widgets.
+keep='wallpaper'
+
+f=${1:-${XDG_STATE_HOME:-$HOME/.local/state}/noctalia/settings.toml}
+[ -f "$f" ] || exit 0
+
+tmp=$f.pruned.$$
+trap 'rm -f "$tmp"' EXIT
+
+awk -v keep="$keep" '
+  /^[[:space:]]*\[/ {
+    head = $0
+    sub(/^[[:space:]]*\[\[?/, "", head)  # drop the leading [ or [[
+    sub(/[].].*$/, "", head)             # first path segment only
+    wanted = (head ~ ("^(" keep ")$"))
+  }
+  wanted { print }
+' "$f" >"$tmp"
+
+cmp -s "$tmp" "$f" || { mv "$tmp" "$f"; echo "pruned $f"; }

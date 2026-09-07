@@ -44,9 +44,9 @@ hl.bind(mainMod .. " + escape", hl.dsp.exec_cmd("noctalia msg session lock"), d(
 -- notifications
 hl.bind(mainMod .. " + C", hl.dsp.exec_cmd("noctalia msg notification-clear-active"), d("dismiss notifications", nograb))
 hl.bind(mainMod .. " + SHIFT + C", hl.dsp.exec_cmd("noctalia msg notification-invoke-latest"), d("act on the latest notification", nograb))
--- do-not-disturb toggle. W mirrors his mac (option+w); SHIFT+N does the same
+-- do-not-disturb toggle
 hl.bind(mainMod .. " + SHIFT + N", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), d("do not disturb", nograb))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("noctalia msg notification-dnd-toggle"), d("do not disturb", nograb))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("noctalia msg panel-toggle control-center notifications"), d("notification history", nograb))
 
 hl.bind("Print", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/screenshot.sh full"), d("screenshot the screen", nograb))
 hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/screenshot.sh region"), d("screenshot a region", nograb))

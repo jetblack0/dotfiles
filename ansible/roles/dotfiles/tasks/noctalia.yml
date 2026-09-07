@@ -36,3 +36,10 @@
     mode: preserve
     remote_src: true
   when: "'noctalia' not in (dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))"
+
+- name: Drop the noctalia settings the gui overrode
+  ansible.builtin.command:
+    cmd: "{{ playbook_dir }}/../lib/deploy/noctalia-prune-state"
+  register: dotfiles_noctalia_prune
+  changed_when: dotfiles_noctalia_prune.stdout != ""
+  when: "'noctalia' not in (dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))"

@@ -142,3 +142,10 @@
     owner: greeter
     group: greeter
     mode: "0644"
+
+- name: Sync the greeter appearance without a password prompt
+  become: true
+  ansible.builtin.copy:
+    src: noctalia-greeter.rules
+    dest: /etc/polkit-1/rules.d/49-noctalia-greeter.rules
+    mode: "0644"
