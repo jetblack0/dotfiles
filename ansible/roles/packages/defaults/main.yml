@@ -110,6 +110,9 @@ packages:
   - { name: capitaine-cursors, brew: false }
   - { name: tela-circle-icon-theme, aur: tela-circle-icon-theme-black-git, brew: false }
 
+  # networking. noctalia's bar widget speaks NetworkManager over dbus
+  - { name: networkmanager, brew: false }
+
   # display manager
   - { name: greetd, brew: false }
   - { name: noctalia-greeter, aur: noctalia-greeter, brew: false }

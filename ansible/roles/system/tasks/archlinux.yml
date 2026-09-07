@@ -117,6 +117,31 @@
     dest: /etc/systemd/journald.conf.d/size.conf
     mode: "0644"
 
+- name: Boot into NetworkManager
+  become: true
+  ansible.builtin.systemd_service:
+    name: NetworkManager.service
+    enabled: true
+
+# Masked
+- name: Retire systemd-networkd
+  become: true
+  ansible.builtin.systemd_service:
+    name: systemd-networkd.service
+    enabled: false
+    masked: true
+
+- name: Retire the systemd-networkd trigger sockets
+  become: true
+  ansible.builtin.systemd_service:
+    name: "{{ item }}"
+    enabled: false
+  loop:
+    - systemd-networkd.socket
+    - systemd-networkd-varlink.socket
+    - systemd-networkd-varlink-metrics.socket
+    - systemd-networkd-resolve-hook.socket
+
 # Boot into noctalia-greeter via greetd.
 - name: Install the greetd config
   become: true
