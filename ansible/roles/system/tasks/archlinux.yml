@@ -117,6 +117,12 @@
     dest: /etc/systemd/journald.conf.d/size.conf
     mode: "0644"
 
+- name: Turn on bluetooth at boot
+  become: true
+  ansible.builtin.systemd_service:
+    name: bluetooth.service
+    enabled: true
+
 - name: Boot into NetworkManager
   become: true
   ansible.builtin.systemd_service:

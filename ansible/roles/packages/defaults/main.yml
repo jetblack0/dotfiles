@@ -113,6 +113,14 @@ packages:
   # networking. noctalia's bar widget speaks NetworkManager over dbus
   - { name: networkmanager, brew: false }
 
+  # bluetooth
+  - { name: bluez, brew: false }
+  - { name: bluez-utils, brew: false } # bluetoothctl
+  - { name: upower, brew: false }
+  - { name: power-profiles-daemon, brew: false }
+  - { name: fprintd, brew: false }
+  - { name: accountsservice, brew: false }
+
   # display manager
   - { name: greetd, brew: false }
   - { name: noctalia-greeter, aur: noctalia-greeter, brew: false }
