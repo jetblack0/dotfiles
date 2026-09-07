@@ -146,6 +146,11 @@ in
       });
     '';
 
+    # networking
+    # ---------------------------------------------
+    networking.networkmanager.enable = true;
+    networking.networkmanager.connectionConfig."ipv4.dhcp-client-id" = "mac";
+
     # audio
     # ---------------------------------------------
     security.rtkit.enable = true;

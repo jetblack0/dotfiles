@@ -46,20 +46,7 @@
   # networking
   # ---------------------------------------------
   networking.hostName = "mac-vm";
-
   networking.useDHCP = false;
-  systemd.network = {
-    enable = true;
-    networks."20-lan" = {
-      matchConfig.Name = "en*";
-      networkConfig = {
-        DHCP = "ipv4";
-        IPv6AcceptRA = true;
-      };
-      dhcpV4Config.ClientIdentifier = "mac";
-      linkConfig.RequiredForOnline = "routable";
-    };
-  };
 
 
   # time
