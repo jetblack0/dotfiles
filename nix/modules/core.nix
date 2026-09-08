@@ -38,6 +38,12 @@ in
       type = lib.types.str;
       description = "The primary user (uid 1000), owner of the deployed dotfiles.";
     };
+
+    sshAutostart = lib.mkOption {
+      type = lib.types.bool;
+      default = false;
+      description = "Start sshd at boot. Off by default.";
+    };
   };
 
   config = {
@@ -174,6 +180,26 @@ in
 
     virtualisation.docker.enable = true;
     programs.nix-ld.enable = true;
+
+
+    # ssh
+    # ---------------------------------------------
+    # Provisioned, not running: sshd_config and the host keys exist so a
+    # `systemctl start sshd` is all it takes to reach a desktop from another
+    # machine. Hosts that want it at boot set core.sshAutostart.
+    services.openssh = {
+      enable = true;
+      settings = {
+        PasswordAuthentication = true; # the primary user logs in by password
+        PermitRootLogin = "no";
+      };
+    };
+
+    # the openssh module wires sshd into multi-user.target; drop that unless
+    # the host opts in
+    systemd.services.sshd.wantedBy = lib.mkForce (
+      lib.optional config.core.sshAutostart "multi-user.target"
+    );
 
 
     # zsh

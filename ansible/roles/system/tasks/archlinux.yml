@@ -13,6 +13,19 @@
     name: "{{ ansible_facts['user_id'] }}"
     shell: /usr/bin/zsh
 
+# sshd_config includes this directory from its second line and takes the
+# first value it sees, so 10- outranks the stock drop-ins. The service is
+# deliberately left disabled: start it with `systemctl start sshd` when a
+# machine needs to be reachable.
+- name: Allow the playbook user to log in over ssh with a password
+  become: true
+  ansible.builtin.copy:
+    content: |
+      PasswordAuthentication yes
+      PermitRootLogin no
+    dest: /etc/ssh/sshd_config.d/10-password-login.conf
+    mode: "0644"
+
 - name: Point sh at dash
   become: true
   ansible.builtin.file:
