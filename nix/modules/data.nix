@@ -96,6 +96,7 @@ in
       type = lib.types.attrsOf lib.types.str;
       default = {
         ".local/share/zsh" = "state/zsh";
+        ".claude" = "state/claude";
       };
       description = ''
         Directories in $HOME replaced by symlinks into the data home.
