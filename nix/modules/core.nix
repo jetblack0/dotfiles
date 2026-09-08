@@ -74,6 +74,7 @@ in
       fd
       fzf
       jq
+      yq-go
       kitty.terminfo
       ouch
       ripgrep
@@ -138,6 +139,9 @@ in
       claude-code
       ollama
       opencode
+
+      # proxy
+      sing-box
 
       # misc
       xdg-ninja
