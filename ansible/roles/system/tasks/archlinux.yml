@@ -149,3 +149,6 @@
     src: noctalia-greeter.rules
     dest: /etc/polkit-1/rules.d/49-noctalia-greeter.rules
     mode: "0644"
+
+- name: Wire up sing-box
+  ansible.builtin.include_tasks: sing-box.yml

@@ -1,3 +1,6 @@
 ---
 # The repo's etc/ tree.
 system_src: "{{ playbook_dir | dirname }}/config/etc"
+
+# Where sing-box reads its profiles.
+singbox_profile_dir: "{{ ansible_facts['user_dir'] }}/.config/sing-box"

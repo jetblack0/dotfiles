@@ -1,0 +1,15 @@
+[Unit]
+RequiresMountsFor={{ ansible_facts['user_dir'] }}
+
+[Service]
+RuntimeDirectory=sing-box-%i
+RuntimeDirectoryMode=0700
+
+ExecStartPre=/bin/sh -c 'umask 077; exec /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yaml > %t/sing-box-%i/config.json'
+
+ExecStart=
+ExecStart=/usr/bin/sing-box -D /var/lib/sing-box-%i -c %t/sing-box-%i/config.json run
+
+ExecReload=
+ExecReload=/bin/sh -c 'umask 077; exec /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yaml > %t/sing-box-%i/config.json'
+ExecReload=/bin/kill -HUP $MAINPID
