@@ -57,13 +57,7 @@
 
   # services
   # ---------------------------------------------
-  services.openssh = {
-    enable = true;
-    settings = {
-      PermitRootLogin = "yes";
-      PasswordAuthentication = true;
-    };
-  };
+  core.sshAutostart = true;
 
   system.stateVersion = "26.05";
 }

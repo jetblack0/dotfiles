@@ -34,10 +34,7 @@
   # ---------------------------------------------
   services.qemuGuest.enable = true;
 
-  services.openssh = {
-    enable = true;
-    settings.PasswordAuthentication = lib.mkForce true;
-  };
+  core.sshAutostart = true;
 
   system.stateVersion = "26.05";
 }
