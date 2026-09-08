@@ -195,6 +195,7 @@ in
 
       # xwayland dpi (autostart.lua xrdb-merges the state xresources)
       xorg.xrdb
+      xauth
     ];
 
     fonts.packages = with pkgs; [

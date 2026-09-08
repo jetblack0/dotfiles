@@ -89,6 +89,7 @@ packages:
   - { name: ansible }
   - { name: argocd }
   - { name: aws-cli, brew: awscli }
+  - { name: cloudflared }
   - { name: colima, pacman: false } # backs the docker cli on macos
   - { name: docker } # engine on arch, plain cli on macos
   - { name: docker-compose }
@@ -141,6 +142,7 @@ packages:
   # adw-gtk3-dark only when installed)
   - { name: adw-gtk-theme, brew: false }
   - { name: xorg-xrdb, brew: false }
+  - { name: xorg-xauth, brew: false } # x11 cookie for guis run as another user
 
   - { name: hyprpicker, brew: false }
   - { name: grim, brew: false }
