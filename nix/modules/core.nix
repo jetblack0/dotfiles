@@ -143,6 +143,7 @@ in
       ansible
       argocd
       awscli2
+      cloudflared
       docker-compose
       kubernetes-helm
       kubectl

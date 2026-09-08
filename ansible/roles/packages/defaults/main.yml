@@ -89,6 +89,7 @@ packages:
   - { name: ansible }
   - { name: argocd }
   - { name: aws-cli, brew: awscli }
+  - { name: cloudflared }
   - { name: colima, pacman: false } # backs the docker cli on macos
   - { name: docker } # engine on arch, plain cli on macos
   - { name: docker-compose }
