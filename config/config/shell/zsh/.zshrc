@@ -152,7 +152,7 @@ bindkey -s '^n' '^uimages &\n'
 # Aliases
 # ---------------------------------------------
 alias vim="nvim"
-alias neofetch="fastfetch -c ani"
+alias neofetch="fastfetch"
 alias ip="ip -c=always"
 # The trailing space makes zsh expand the *next* word as an alias too, so
 # things like `sudo ll` keep working.
