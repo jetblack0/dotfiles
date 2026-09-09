@@ -2,6 +2,8 @@
 RequiresMountsFor={{ ansible_facts['user_dir'] }}
 
 [Service]
+TimeoutStartSec=300
+
 RuntimeDirectory=sing-box-%i
 RuntimeDirectoryMode=0700
 

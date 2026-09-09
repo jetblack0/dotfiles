@@ -50,11 +50,13 @@ in
             "network-online.target"
           ];
           requires = [ "network-online.target" ];
+          path = [ pkgs.tor ];
           unitConfig.RequiresMountsFor = home;
           serviceConfig = {
             User = "sing-box";
             Group = "sing-box";
             StateDirectory = "sing-box-%i";
+            TimeoutStartSec = "300";
             RuntimeDirectory = "sing-box-%i";
             RuntimeDirectoryMode = "0700";
             AmbientCapabilities = capabilities;
