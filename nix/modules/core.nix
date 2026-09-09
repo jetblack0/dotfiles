@@ -234,6 +234,7 @@ in
           coreDirs = [
             "aerc"
             "bat"
+            "fastfetch"
             "git"
             "glow"
             "lazygit"
