@@ -104,6 +104,7 @@ packages:
 
   # proxy
   - { name: sing-box, brew: false }
+  - { name: tor, brew: false }
 
   # desktop
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }

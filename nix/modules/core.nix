@@ -142,6 +142,9 @@ in
 
       # proxy
       sing-box
+      # the profile's `type: tor` outbound execs this at startup; without it
+      # sing-box refuses to start at all, not just .onion
+      tor
 
       # misc
       xdg-ninja
