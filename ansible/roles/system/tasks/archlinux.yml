@@ -130,6 +130,41 @@
     dest: /etc/systemd/journald.conf.d/size.conf
     mode: "0644"
 
+# The battery-threshold Noctalia plugin writes charge_control_end_threshold
+# directly without sudo.  
+- name: Create the battery_ctl group
+  become: true
+  ansible.builtin.group:
+    name: battery_ctl
+    system: true
+
+- name: Put the user in battery_ctl
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    groups: battery_ctl
+    append: true
+
+- name: Grant battery_ctl write access to the charge threshold
+  become: true
+  ansible.builtin.copy:
+    dest: /etc/udev/rules.d/99-battery-threshold.rules
+    mode: "0644"
+    content: |
+      # Managed by ansible. Lets the noctalia battery-threshold plugin write
+      # the charge limit as the desktop user.
+      SUBSYSTEM=="power_supply", KERNEL=="BAT*", \
+          RUN+="/usr/bin/chgrp battery_ctl /sys$devpath/charge_control_end_threshold", \
+          RUN+="/usr/bin/chmod g+w /sys$devpath/charge_control_end_threshold"
+  register: system_battery_udev
+
+- name: Reload the udev rules
+  become: true
+  ansible.builtin.command:
+    cmd: udevadm control --reload-rules
+  changed_when: true
+  when: system_battery_udev is changed
+
 - name: Turn on bluetooth at boot
   become: true
   ansible.builtin.systemd_service:
