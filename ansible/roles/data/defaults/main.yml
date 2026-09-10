@@ -6,6 +6,11 @@ data_require_mount: true
 data_links:
   .local/share/zsh: state/zsh
   .claude: state/claude
+  .config/sing-box: config/sing-box
+  .config/aws: config/aws
+  .local/share/pass: state/pass
+  .local/share/gnupg: state/gnupg
+  .local/share/google: state/google
 
 # xdg user dirs routed into the second home.
 #     xdg key (lowercase): path under data_home

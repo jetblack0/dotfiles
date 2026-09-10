@@ -87,7 +87,7 @@ in
 
     wallpaperDirectory = lib.mkOption {
       type = lib.types.str;
-      default = "~/Resources/media/pictures/wallpaper/landscape";
+      default = "~/assets/media/pics/wallpaper/landscape";
       description = "Directory noctalia picks wallpapers from.";
     };
 
@@ -156,6 +156,15 @@ in
     services.power-profiles-daemon.enable = true;
     services.fprintd.enable = true;
     services.accounts-daemon.enable = true;
+
+    # noctalia battery-threshold plugin
+    users.groups.battery_ctl = { };
+    users.users.${username}.extraGroups = [ "battery_ctl" ];
+    services.udev.extraRules = ''
+      SUBSYSTEM=="power_supply", KERNEL=="BAT*", \
+          RUN+="${pkgs.coreutils}/bin/chgrp battery_ctl /sys$devpath/charge_control_end_threshold", \
+          RUN+="${pkgs.coreutils}/bin/chmod g+w /sys$devpath/charge_control_end_threshold"
+    '';
 
     # audio
     # ---------------------------------------------
