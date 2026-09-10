@@ -152,7 +152,7 @@ bindkey -s '^n' '^uimages &\n'
 # Aliases
 # ---------------------------------------------
 alias vim="nvim"
-alias neofetch="fastfetch -c ani"
+alias neofetch="fastfetch"
 alias ip="ip -c=always"
 # The trailing space makes zsh expand the *next* word as an alias too, so
 # things like `sudo ll` keep working.
@@ -292,8 +292,8 @@ fzfed() {
 		"$XDG_CONFIG_HOME/hypr/subconfig/keybinding.conf"
 
 		"$HOME/.ssh/config"
-		"$HOME/Documents/quick-note.md"
-		"$HOME/Documents/learning/note.md"
+		"$XDG_DOCUMENTS_DIR/quick-note.md"
+		"$XDG_DOCUMENTS_DIR/learning/note.md"
 	)
 
 	file=$(printf "%s\n" "${files[@]}" | fzf \
