@@ -12,6 +12,22 @@ let
   dotfiles = ../../config;
   username = config.core.username;
 
+  # Executables from config/bin[/<subdir>] as ~/.local/bin entries
+  binScripts =
+    subdir:
+    let
+      root = dotfiles + "/bin${subdir}";
+    in
+    lib.optionalAttrs (builtins.pathExists root) (
+      lib.mapAttrs' (
+        name: _:
+        lib.nameValuePair ".local/bin/${name}" {
+          source = root + "/${name}";
+          executable = true;
+        }
+      ) (lib.filterAttrs (_: type: type == "regular") (builtins.readDir root))
+    );
+
   # yazi plugins. The list comes from config/yazi/package.toml
   yaziPluginFiles =
     let
@@ -253,6 +269,8 @@ in
         # yazi's plugins/ is untracked (ya pkg owns it on arch), so the flake
         # never copies it -- deploy them from nixpkgs instead
         // yaziPluginFiles;
+
+      home.file = binScripts "" // binScripts "/linux";
     };
   };
 }
