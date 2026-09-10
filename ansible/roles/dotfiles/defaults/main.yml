@@ -47,6 +47,6 @@ dotfiles_mask:
     - X11
 
 # Per-host preferences, rendered into the noctalia overlay.
-wallpaper_directory: "~/Resources/media/pictures/wallpaper/landscape"
+wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"
 # Empty means noctalia's default, the XDG Pictures directory.
 screenshot_directory: ""

@@ -87,7 +87,7 @@ in
 
     wallpaperDirectory = lib.mkOption {
       type = lib.types.str;
-      default = "~/Resources/media/pictures/wallpaper/landscape";
+      default = "~/assets/media/pics/wallpaper/landscape";
       description = "Directory noctalia picks wallpapers from.";
     };
 
