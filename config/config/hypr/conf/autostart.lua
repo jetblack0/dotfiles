@@ -16,6 +16,8 @@ hl.on("hyprland.start", function()
 	-- The xrdb connection also wakes the lazy xwayland server up.
 	hl.exec_cmd('f="${XDG_STATE_HOME:-$HOME/.local/state}/hypr/xresources"; [ -f "$f" ] && xrdb -merge "$f"')
 
+	hl.exec_cmd('mkdir -p "${XAUTHORITY%/*}" && xauth -q generate "$DISPLAY" . trusted')
+
 	-- gtk settings
 	hl.exec_cmd("gsettings set org.gnome.desktop.interface icon-theme 'Tela-circle-black-dark'")
 	hl.exec_cmd("gsettings set org.gnome.desktop.interface cursor-theme 'capitaine-cursors'")

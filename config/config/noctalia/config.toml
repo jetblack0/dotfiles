@@ -22,6 +22,7 @@ order = [ "main" ]
         "volume",
         "brightness",
         "battery",
+        "battery-threshold",
         "hypr",
         "control-center",
         "session"
@@ -155,7 +156,7 @@ widget_order = [ "lockscreen-login-box@Virtual-1", "lockscreen-widget-0000000000
         shadow = true
 
 [plugins]
-enabled = [ "jetblack0/hypr" ]
+enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr" ]
 
 
 # Shell
@@ -198,6 +199,9 @@ source = "wallpaper"
     [theme.templates]
     builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
     community_ids = [ "zen-browser" ]
+
+[widget.battery-threshold]
+type = "damian-ds7/battery-threshold:battery-threshold"
 
 [widget.control-center]
 glyph = "adjustments-horizontal"

@@ -1,0 +1,28 @@
+---
+- name: Ensure the script directory exists
+  ansible.builtin.file:
+    path: "{{ bin_dest }}"
+    state: directory
+    mode: "0755"
+
+- name: Look for scripts specific to this platform
+  ansible.builtin.stat:
+    path: "{{ bin_platform_dir }}"
+  register: bin_platform_stat
+
+- name: Find the scripts this platform gets
+  ansible.builtin.find:
+    paths: "{{ [bin_src] + ([bin_platform_dir] if bin_platform_stat.stat.isdir | default(false) else []) }}"
+    file_type: file
+    recurse: false
+  register: bin_found
+
+- name: Install the scripts
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ bin_dest }}/{{ item | basename }}"
+    mode: "0755"
+    remote_src: true
+  loop: "{{ bin_found.files | map(attribute='path') | sort }}"
+  loop_control:
+    label: "{{ item | basename }}"

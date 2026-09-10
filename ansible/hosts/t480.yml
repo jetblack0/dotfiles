@@ -1,0 +1,8 @@
+# Thinkpad T480
+# ---------------------------------------------
+#     ansible-playbook ansible/base.yml -e @ansible/hosts/t480.yml
+
+
+# Noctalia
+# ---------------------------------------------
+wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"

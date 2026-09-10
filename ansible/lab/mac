@@ -170,7 +170,7 @@ EOF
 
     copy_repo
     echo "fresh macos vm, repo copied to ~/dotfiles -- try:"
-    echo "    ansible-playbook ansible/local.yml"
+    echo "    ansible-playbook ansible/base.yml"
     shell
 }
 
