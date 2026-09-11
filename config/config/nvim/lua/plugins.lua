@@ -70,6 +70,12 @@ require("lazy").setup({
        require("plugin-config.qol.hlslens")
      end,
   },
+  {
+    "m4xshen/smartcolumn.nvim",
+    config = function()
+      require("plugin-config.qol.smartcolumn")
+    end,
+  },
 
 
   -- Base
