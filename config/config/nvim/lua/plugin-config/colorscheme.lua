@@ -26,6 +26,18 @@ local statusbar_colors = {
 }
 
 
+local function hlslens_highlights()
+  local cur = vim.api.nvim_get_hl(0, { name = "CurSearch", link = false })
+  vim.api.nvim_set_hl(0, "HlSearchLens", { link = "Comment" })
+  vim.api.nvim_set_hl(0, "HlSearchLensNear", { fg = cur.bg or cur.fg, bold = true })
+end
+
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("hlslens_highlights", { clear = true }),
+  callback = hlslens_highlights,
+  desc = "Keep the hlslens counters in step with the theme",
+})
+
 M.colorscheme_conf = {
   gruvbox_shokry = function()
     local gruvbox_shokry = helpers.safe_require("gruvbox")
