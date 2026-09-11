@@ -11,6 +11,13 @@ vim.keymap.set("n", "*", [[*<Cmd>lua require('hlslens').start()<CR>]],
 vim.keymap.set("n", "#", [[#<Cmd>lua require('hlslens').start()<CR>]],
   vim.tbl_extend("force", star_opts, { desc = "Search word under cursor backward" }))
 
+vim.keymap.set("n", "n",
+  [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
+  vim.tbl_extend("force", star_opts, { desc = "Next search match" }))
+vim.keymap.set("n", "N",
+  [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
+  vim.tbl_extend("force", star_opts, { desc = "Previous search match" }))
+
 local function search_selection(motion)
   local anchor, cursor = vim.fn.getpos("v"), vim.fn.getpos(".")
   local lines = vim.fn.getregion(anchor, cursor, { type = vim.fn.mode() })
