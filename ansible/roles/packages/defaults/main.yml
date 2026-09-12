@@ -104,6 +104,7 @@ packages:
   - { name: opencode, tap: anomalyco/tap }
 
   # desktop
+  - { name: hyprland, brew: false }
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
   - { name: noctalia, brew: false }
   - { name: swayimg, brew: false }
