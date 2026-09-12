@@ -14,15 +14,13 @@ order = [ "main" ]
     background_opacity = 0.91999995708465576
     end = [
         "media",
-        "tray",
-        "notifications",
-        "clipboard",
-        "network",
-        "bluetooth",
         "volume",
         "brightness",
         "battery",
-        "battery-threshold",
+        "network",
+        "bluetooth",
+        "clipboard",
+        "notifications",
         "hypr",
         "control-center",
         "session"
@@ -34,7 +32,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "launcher", "workspaces" ]
+    start = [ "workspaces", "tray" ]
     thickness = 32
     widget_spacing = 15
 
@@ -181,8 +179,16 @@ type = "control-center"
 [widget.hypr]
 type = "jetblack0/hypr:indicator"
 
+[widget.launcher]
+enabled = false
+type = "launcher"
+
 [widget.media]
 hide_when_no_media = true
+
+[widget.network]
+show_label = false
+type = "network"
 
 [widget.workspaces]
 scale = 1.25
