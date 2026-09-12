@@ -31,6 +31,7 @@ dotfiles_mask:
     - waybar
   darwin:
     - dunst
+    - environment.d
     - fontconfig
     - foot
     - gtk-2.0
