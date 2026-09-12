@@ -85,35 +85,6 @@ blur_intensity = 0.099999994039535522
 # CENTRES in the placement_width x placement_height space.
 [lockscreen_widgets]
 enabled = true
-widget_order = [ "lockscreen-login-box@Virtual-1", "lockscreen-widget-0000000000000001", "lockscreen-widget-0000000000000002" ]
-
-    [lockscreen_widgets.widget."lockscreen-login-box@Virtual-1"]
-    box_height = 70.0
-    box_width = 240.0
-    cx = 800.0
-    cy = 913.0
-    enabled = true
-    output = "Virtual-1"
-    placement_height = 1000.0
-    placement_width = 1600.0
-    rotation = 0.0
-    type = "login_box"
-
-        [lockscreen_widgets.widget."lockscreen-login-box@Virtual-1".settings]
-        background_color = "surface_variant"
-        background_opacity = 0.0
-        background_radius = 12.0
-        center_password_text = false
-        input_opacity = 0.59999999999999998
-        input_radius = 6.0
-        layout = "compact"
-        show_caps_lock = true
-        show_keyboard_layout = true
-        show_login_button = false
-        show_media = true
-        show_session_buttons = true
-        show_unlock_hint = false
-        show_weather = true
 
     [lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
     box_height = 160.0
