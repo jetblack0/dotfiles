@@ -26,13 +26,11 @@ M.enabled_servers = {
 }
 
 
-local linters = {
-}
+M.ensured_installed = helpers.extract(M.enabled_servers, "mason")
 
-M.ensured_installed = vim.tbl_extend(
-  "force",
-  helpers.extract(M.enabled_servers, "mason"),
-  linters
-)
+M.tools = {
+  "npm-groovy-lint",
+  "statix",
+}
 
 return M

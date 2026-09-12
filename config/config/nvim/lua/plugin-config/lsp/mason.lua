@@ -1,6 +1,7 @@
 local helpers = require("utils.helpers")
 local mason = helpers.safe_require("mason")
 local mason_lspconfig = helpers.safe_require("mason-lspconfig")
+local mason_tool_installer = helpers.safe_require("mason-tool-installer")
 local lsputils = helpers.safe_require('utils.lsp')
 
 if not mason then return end
@@ -31,6 +32,10 @@ mason_lspconfig.setup({
 	ensure_installed = lsputils.ensured_installed,
 	automatic_installation = true,
 })
+
+if mason_tool_installer then
+  mason_tool_installer.setup({ ensure_installed = lsputils.tools })
+end
 
 vim.api.nvim_set_keymap("n", "<leader>3", ":Mason<CR>", {
   desc = 'Open up Mason',
