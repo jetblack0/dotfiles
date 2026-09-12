@@ -31,6 +31,7 @@
 
   # 96 * scale
   desktop.xwaylandDpi = 154;
+  desktop.lockscreenHeight = 1000;
 
   # the parallels virtual display advertises a bogus preferred mode
   # (1448x906, no EDID size); pin the greeter to the real panel

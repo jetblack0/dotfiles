@@ -69,6 +69,15 @@ let
     ''
   ) (lib.filter (m: m.output != "") cfg.monitors);
 
+  lockClockToml = lib.optionalString (cfg.lockscreenHeight != null) ''
+
+    [lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
+    box_height = ${builtins.toJSON (cfg.lockscreenHeight * 0.161)}
+
+    [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
+    box_height = ${builtins.toJSON (cfg.lockscreenHeight * 0.038)}
+  '';
+
   xresources = ''
     ! Rendered by nix (modules/desktop.nix). Rebuilds replace it.
 
@@ -139,6 +148,12 @@ in
       type = lib.types.nullOr lib.types.int;
       default = null;
       description = "Xft.dpi for xwayland apps, typically 96 * scale.";
+    };
+
+    lockscreenHeight = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
+      default = null;
+      description = "Logical height of the lock screen's output (mode height / scale); scales the lock clock.";
     };
   };
 
@@ -320,7 +335,7 @@ in
 
             [shell.screenshot]
             directory = "${cfg.screenshotDirectory}"
-          '' + loginBoxToml;
+          '' + loginBoxToml + lockClockToml;
         };
 
       # swayimg is the default image viewer (arch sets this via mimeapps.list;
