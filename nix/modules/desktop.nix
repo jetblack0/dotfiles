@@ -140,7 +140,9 @@ in
 
     security.polkit.extraConfig = ''
       polkit.addRule(function(action, subject) {
-          if (action.id == "org.noctalia.greeter.apply-appearance" && subject.active && subject.local) {
+          if ((action.id == "org.noctalia.greeter.sync-appearance" ||
+               action.id == "org.noctalia.greeter.apply-appearance") &&
+              subject.active && subject.local) {
               return polkit.Result.YES;
           }
       });
