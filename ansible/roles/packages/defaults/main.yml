@@ -88,6 +88,7 @@ packages:
 
   # cloud & devops
   - { name: ansible }
+  - { name: ansible-lint }
   - { name: argocd }
   - { name: aws-cli, brew: awscli }
   - { name: cloudflared }
