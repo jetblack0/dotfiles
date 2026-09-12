@@ -20,7 +20,7 @@ M.enabled_servers = {
   terraformls =                     { cmd = "terraform-ls", mason = "terraformls" },
   -- nil_ls =                          { cmd = "nil" },
   dockerls =                        { cmd = "docker-langserver", mason = "dockerls" },
-  groovyls =                        { cmd = "java", mason = "groovyls" },
+  -- groovyls =                     { cmd = "java", mason = "groovyls" },
   -- nginx_language_server =           { cmd = "nginx-language-server", mason = "nginx_language_server" },
   docker_compose_language_service = { cmd = "docker-compose-langserver", mason = "docker_compose_language_service" },
 }
