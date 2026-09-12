@@ -8,3 +8,36 @@ directory = "{{ wallpaper_directory }}"
 # Empty resolves to the XDG Pictures directory (ScreenshotConfig).
 [shell.screenshot]
 directory = "{{ screenshot_directory }}"
+
+# Lock screen login box
+# ---------------------------------------------
+{% for monitor in monitors | default([]) if monitor.output | default('') %}
+
+[lockscreen_widgets.widget."lockscreen-login-box@{{ monitor.output }}"]
+box_height = 70.0
+box_width = 240.0
+cx = 800.0
+cy = 913.0
+enabled = true
+output = "{{ monitor.output }}"
+placement_height = 1000.0
+placement_width = 1600.0
+rotation = 0.0
+type = "login_box"
+
+    [lockscreen_widgets.widget."lockscreen-login-box@{{ monitor.output }}".settings]
+    background_color = "surface_variant"
+    background_opacity = 0.0
+    background_radius = 12.0
+    center_password_text = false
+    input_opacity = 0.59999999999999998
+    input_radius = 6.0
+    layout = "compact"
+    show_caps_lock = true
+    show_keyboard_layout = true
+    show_login_button = false
+    show_media = true
+    show_session_buttons = true
+    show_unlock_hint = false
+    show_weather = true
+{% endfor %}
