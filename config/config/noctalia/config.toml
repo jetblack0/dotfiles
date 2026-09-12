@@ -85,7 +85,7 @@ blur_intensity = 0.099999994039535522
 enabled = true
 
     [lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
-    box_height = 160.0
+    box_height = 161.0
     box_width = 560.0
     cx = 800.0
     cy = 196.0
@@ -100,15 +100,15 @@ enabled = true
         background = false
         center_text = true
         clock_style = "digital"
-        color = "on_surface"
+        color = "#cfcfcfe6"
         font_family = "SF Pro Display Clock"
         shadow = false
 
     [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
-    box_height = 32.0
-    box_width = 400.0
+    box_height = 38.0
+    box_width = 480.0
     cx = 800.0
-    cy = 276.0
+    cy = 112.0
     enabled = true
     output = ""
     placement_height = 1000.0
@@ -119,10 +119,10 @@ enabled = true
         [lockscreen_widgets.widget.lockscreen-widget-0000000000000002.settings]
         background = false
         center_text = true
-        color = "on_surface_variant"
-        font_family = "SF Pro Display"
-        format = "{:%A, %B %d}"
-        shadow = true
+        color = "#bdbdbdd9"
+        font_family = "SF Pro Display Clock"
+        format = "{:%A, %B %-d}"
+        shadow = false
 
 [plugins]
 enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr" ]
