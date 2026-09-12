@@ -41,3 +41,14 @@ type = "login_box"
     show_unlock_hint = false
     show_weather = true
 {% endfor %}
+
+# Lock screen clock size
+# ---------------------------------------------
+{% if lockscreen_height is defined %}
+
+[lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
+box_height = {{ (lockscreen_height * 0.161) | round(1) }}
+
+[lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
+box_height = {{ (lockscreen_height * 0.038) | round(1) }}
+{% endif %}
