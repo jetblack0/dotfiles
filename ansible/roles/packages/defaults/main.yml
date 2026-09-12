@@ -17,6 +17,7 @@ packages:
   - { name: fd }
   - { name: fzf }
   - { name: jq }
+  - { name: yq, pacman: go-yq }
   - { name: kitty, cask: kitty }
   - { name: kitty-terminfo, brew: false }
   - { name: ouch }
@@ -87,6 +88,7 @@ packages:
 
   # cloud & devops
   - { name: ansible }
+  - { name: ansible-lint }
   - { name: argocd }
   - { name: aws-cli, brew: awscli }
   - { name: cloudflared }
@@ -102,6 +104,10 @@ packages:
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }
   - { name: ollama }
   - { name: opencode, tap: anomalyco/tap }
+
+  # proxy
+  - { name: sing-box, brew: false }
+  - { name: tor, brew: false }
 
   # desktop
   - { name: hyprland, brew: false }
@@ -160,3 +166,10 @@ packages:
 # Entries to skip by canonical name, e.g. on a distro that lacks them.
 # ---------------------------------------------
 packages_exclude: []
+
+# Proxy carried into the AUR tasks, which run as the build user.
+# ---------------------------------------------
+packages_proxy_env:
+  http_proxy: "{{ lookup('env', 'http_proxy') }}"
+  https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  no_proxy: "{{ lookup('env', 'no_proxy') }}"

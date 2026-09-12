@@ -295,3 +295,6 @@
       blacklist pcspkr
     dest: /etc/modprobe.d/nobeep.conf
     mode: "0644"
+
+- name: Wire up sing-box
+  ansible.builtin.include_tasks: sing-box.yml

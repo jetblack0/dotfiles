@@ -45,6 +45,7 @@ dotfiles_mask:
     - systemd
     - waybar
     - X11
+    - swayimg
 
 # Per-host preferences, rendered into the noctalia overlay.
 wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"

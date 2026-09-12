@@ -23,7 +23,7 @@ bindkey -v
 typeset -U PATH path fpath
 
 # Prepended, so these shadow the system copies.
-export PATH="$CARGO_HOME/bin:$PATH"
+export PATH="$HOME/.local/bin:$CARGO_HOME/bin:$PATH"
 
 # Appended: only reached when nothing earlier provides the command.
 export PATH="$PATH:$NPM_PACKAGES/bin:${KREW_ROOT:-$HOME/.krew}/bin"

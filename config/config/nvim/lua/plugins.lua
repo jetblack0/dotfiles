@@ -64,6 +64,18 @@ require("lazy").setup({
 			"nvim-tree/nvim-web-devicons",
 		},
 	},
+  {
+    'kevinhwang91/nvim-hlslens',
+     config = function()
+       require("plugin-config.qol.hlslens")
+     end,
+  },
+  -- {
+  --   "m4xshen/smartcolumn.nvim",
+  --   config = function()
+  --     require("plugin-config.qol.smartcolumn")
+  --   end,
+  -- },
 
 
   -- Base

@@ -1,0 +1,10 @@
+---
+bin_src: "{{ playbook_dir | dirname }}/config/bin"
+
+bin_dest: "{{ ansible_facts['user_dir'] }}/.local/bin"
+
+bin_platform:
+  archlinux: linux
+  darwin: macos
+
+bin_platform_dir: "{{ bin_src }}/{{ bin_platform[ansible_facts['os_family'] | lower] }}"

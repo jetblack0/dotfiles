@@ -9,6 +9,7 @@
     ../../modules/core.nix
     ../../modules/desktop.nix
     ../../modules/zen.nix
+    ../../modules/sing-box.nix
   ];
 
 

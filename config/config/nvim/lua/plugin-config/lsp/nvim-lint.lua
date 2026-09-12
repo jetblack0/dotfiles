@@ -6,8 +6,7 @@ if not nvim_lint then return end
 nvim_lint.linters_by_ft = {
   nix = { "statix" },
   -- lua = { "luacheck" },
-  -- NOTE: Could not ignroe non-zero exit code
-  -- groovy = { "npm-groovy-lint" },
+  groovy = { "npm-groovy-lint" },
   -- sh = { "shellcheck" },
   -- yaml = { "yamllint" },
 }
