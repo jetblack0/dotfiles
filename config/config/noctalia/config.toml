@@ -149,7 +149,7 @@ polkit_agent = true
             prefix = "nf"
 
             [shell.launcher.dmenu.entry.pass]
-            command = "find ${PASSWORD_STORE_DIR:-$HOME/.password-store} -name '*.gpg' -printf '%P\\n' | sed 's/\\.gpg$//' | sort"
+            command = "find ${PASSWORD_STORE_DIR:-$HOME/.password-store}/ -name '*.gpg' -printf '%P\\n' | sed 's/\\.gpg$//' | sort"
             exec = "pass show -c \"{selection}\""
             glyph = "key"
             prefix = "pass"
