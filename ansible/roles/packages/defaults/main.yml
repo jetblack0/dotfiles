@@ -164,3 +164,10 @@ packages:
 # Entries to skip by canonical name, e.g. on a distro that lacks them.
 # ---------------------------------------------
 packages_exclude: []
+
+# Proxy carried into the AUR tasks, which run as the build user.
+# ---------------------------------------------
+packages_proxy_env:
+  http_proxy: "{{ lookup('env', 'http_proxy') }}"
+  https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  no_proxy: "{{ lookup('env', 'no_proxy') }}"
