@@ -31,6 +31,44 @@ let
     ) cfg.monitors
     + "}\n";
 
+  # Lock screen login box, one per declared monitor (noctalia/zz-host.toml).
+  loginBoxToml = lib.concatMapStrings (
+    m:
+    let
+      id = builtins.toJSON "lockscreen-login-box@${m.output}";
+    in
+    ''
+
+      [lockscreen_widgets.widget.${id}]
+      box_height = 70.0
+      box_width = 240.0
+      cx = 800.0
+      cy = 913.0
+      enabled = true
+      output = ${builtins.toJSON m.output}
+      placement_height = 1000.0
+      placement_width = 1600.0
+      rotation = 0.0
+      type = "login_box"
+
+          [lockscreen_widgets.widget.${id}.settings]
+          background_color = "surface_variant"
+          background_opacity = 0.0
+          background_radius = 12.0
+          center_password_text = false
+          input_opacity = 0.59999999999999998
+          input_radius = 6.0
+          layout = "compact"
+          show_caps_lock = true
+          show_keyboard_layout = true
+          show_login_button = false
+          show_media = true
+          show_session_buttons = true
+          show_unlock_hint = false
+          show_weather = true
+    ''
+  ) (lib.filter (m: m.output != "") cfg.monitors);
+
   xresources = ''
     ! Rendered by nix (modules/desktop.nix). Rebuilds replace it.
 
@@ -282,7 +320,7 @@ in
 
             [shell.screenshot]
             directory = "${cfg.screenshotDirectory}"
-          '';
+          '' + loginBoxToml;
         };
 
       # swayimg is the default image viewer (arch sets this via mimeapps.list;
