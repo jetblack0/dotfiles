@@ -170,8 +170,16 @@ in
       docker-compose
       kubernetes-helm
       kubectl
+      linode-cli
       opentofu
+      sops
       steampipe
+
+      # networking
+      dig
+      mtr
+      tcpdump
+      traceroute
 
       # ai
       claude-code
