@@ -302,6 +302,7 @@ require("lazy").setup({
     config = function()
       require("plugin-config.qol.snacks")
       require("plugin-config.qol.cheatsheet")
+      require("plugin-config.qol.table-align")
     end,
   },
   {
