@@ -97,8 +97,16 @@ packages:
   - { name: docker-compose }
   - { name: helm }
   - { name: kubectl }
+  - { name: linode-cli, aur: linode-cli }
   - { name: opentofu }
+  - { name: sops }
   - { name: steampipe, aur: steampipe-bin }
+
+  # networking
+  - { name: bind, brew: false }
+  - { name: mtr }
+  - { name: tcpdump, brew: false }
+  - { name: traceroute, brew: false }
 
   # ai
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }
