@@ -1,5 +1,5 @@
 #!/bin/sh
-# Suspend but only on battery.
+# Suspend but only on battery, and never in a vm.
 #
 # Usage: ./suspend-on-battery.sh          suspend if on battery
 #        ./suspend-on-battery.sh --check  print mains|battery|unknown, exit 0
@@ -25,6 +25,9 @@ if [ "${1:-}" = --check ]; then
 	echo "$state"
 	exit 0
 fi
+
+virt=$(systemd-detect-virt 2>/dev/null) || true # exits 1 when it finds none
+[ "${virt:-none}" = none ] || exit 0
 
 [ "$state" = battery ] || exit 0
 exec systemctl suspend
