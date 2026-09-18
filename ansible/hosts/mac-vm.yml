@@ -9,6 +9,7 @@ packages_exclude:
   - ollama
   - opencode
   - steampipe
+  - edk2-ovmf
 
 
 # Displays
@@ -29,3 +30,8 @@ greeter_output:
   width: 2560
   height: 1600
   scale: 1.6
+
+
+# Virt
+# ---------------------------------------------
+system_docker_group: true

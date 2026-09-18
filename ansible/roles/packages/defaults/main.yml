@@ -95,6 +95,13 @@ packages:
   - { name: opentofu }
   - { name: steampipe, aur: steampipe-bin }
 
+  # virtualization
+  - { name: qemu-desktop, brew: false }
+  - { name: libvirt, brew: false }
+  - { name: virt-manager, brew: false }
+  - { name: dnsmasq, brew: false }
+  - { name: edk2-ovmf, brew: false }
+
   # ai
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }
   - { name: ollama }
