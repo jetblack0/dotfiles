@@ -101,6 +101,7 @@ packages:
   - { name: virt-manager, brew: false }
   - { name: dnsmasq, brew: false }
   - { name: edk2-ovmf, brew: false }
+  - { name: vagrant, aur: vagrant, cask: vagrant }
 
   # ai
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }

@@ -10,6 +10,7 @@ packages_exclude:
   - opencode
   - steampipe
   - edk2-ovmf
+  - vagrant
 
 
 # Displays
