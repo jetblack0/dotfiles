@@ -11,7 +11,15 @@ let
   profileDir = "${home}/.config/sing-box";
 
   renderConfig = pkgs.writeShellScript "sing-box-render-config" ''
+    set -e   # abort at the failing step; a bad render must not reach merge
     umask 077
+    # yq treats its path argument as an EXPRESSION when it cannot stat the
+    # file, so a missing profile surfaces as "lexer: invalid input text"
+    # rather than "no such file". Say what is actually wrong.
+    if [ ! -r "${profileDir}/$1.yaml" ]; then
+      echo "cannot read ${profileDir}/$1.yaml" >&2
+      exit 1
+    fi
     ${lib.getExe pkgs.yq-go} -o=json "${profileDir}/$1.yaml" > "$RUNTIME_DIRECTORY/policy.json"
     if [ -f "${profileDir}/providers.json" ]; then
       ${lib.getExe pkgs.sing-box} merge "$RUNTIME_DIRECTORY/config.json" \
