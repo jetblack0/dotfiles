@@ -316,3 +316,9 @@ fzfed() {
 images() {
 	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=time | swayimg -f /dev/stdin -e 'swayimg.imagelist.order = "none"'
 }
+
+
+for f in "$HOME"/assets/config/zsh/*.zsh(N); do
+	source "$f"
+done
+unset f
