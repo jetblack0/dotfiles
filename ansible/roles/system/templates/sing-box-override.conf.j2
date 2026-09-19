@@ -7,11 +7,11 @@ TimeoutStartSec=300
 RuntimeDirectory=sing-box-%i
 RuntimeDirectoryMode=0700
 
-ExecStartPre=/bin/sh -ec 'umask 077; test -r {{ singbox_profile_dir }}/%i.yaml || { echo "cannot read {{ singbox_profile_dir }}/%i.yaml" >&2; exit 1; }; /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yaml > %t/sing-box-%i/policy.json; if [ -f {{ singbox_profile_dir }}/providers.json ]; then /usr/bin/sing-box merge %t/sing-box-%i/config.json -c %t/sing-box-%i/policy.json -c {{ singbox_profile_dir }}/providers.json >/dev/null; else mv %t/sing-box-%i/policy.json %t/sing-box-%i/config.json; fi'
+ExecStartPre=/bin/sh -ec 'umask 077; if [ -r {{ singbox_profile_dir }}/%i.yaml ]; then /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yaml > %t/sing-box-%i/policy.json; elif [ -r {{ singbox_profile_dir }}/%i.yml ]; then /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yml > %t/sing-box-%i/policy.json; else echo "no readable profile {{ singbox_profile_dir }}/%i.yaml or %i.yml" >&2; exit 1; fi; if [ -f {{ singbox_profile_dir }}/providers.json ]; then /usr/bin/sing-box merge %t/sing-box-%i/config.json -c %t/sing-box-%i/policy.json -c {{ singbox_profile_dir }}/providers.json >/dev/null; else mv %t/sing-box-%i/policy.json %t/sing-box-%i/config.json; fi'
 
 ExecStart=
 ExecStart=/usr/bin/sing-box -D /var/lib/sing-box-%i -c %t/sing-box-%i/config.json run
 
 ExecReload=
-ExecReload=/bin/sh -ec 'umask 077; test -r {{ singbox_profile_dir }}/%i.yaml || { echo "cannot read {{ singbox_profile_dir }}/%i.yaml" >&2; exit 1; }; /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yaml > %t/sing-box-%i/policy.json; if [ -f {{ singbox_profile_dir }}/providers.json ]; then /usr/bin/sing-box merge %t/sing-box-%i/config.json -c %t/sing-box-%i/policy.json -c {{ singbox_profile_dir }}/providers.json >/dev/null; else mv %t/sing-box-%i/policy.json %t/sing-box-%i/config.json; fi'
+ExecReload=/bin/sh -ec 'umask 077; if [ -r {{ singbox_profile_dir }}/%i.yaml ]; then /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yaml > %t/sing-box-%i/policy.json; elif [ -r {{ singbox_profile_dir }}/%i.yml ]; then /usr/bin/yq -o=json {{ singbox_profile_dir }}/%i.yml > %t/sing-box-%i/policy.json; else echo "no readable profile {{ singbox_profile_dir }}/%i.yaml or %i.yml" >&2; exit 1; fi; if [ -f {{ singbox_profile_dir }}/providers.json ]; then /usr/bin/sing-box merge %t/sing-box-%i/config.json -c %t/sing-box-%i/policy.json -c {{ singbox_profile_dir }}/providers.json >/dev/null; else mv %t/sing-box-%i/policy.json %t/sing-box-%i/config.json; fi'
 ExecReload=/bin/kill -HUP $MAINPID
