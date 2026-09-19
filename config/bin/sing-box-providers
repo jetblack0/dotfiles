@@ -46,7 +46,7 @@ require_tools() {
   [ -f "$SPEC" ] || die "no spec at $SPEC"
 }
 
-abspath() { printf '%s/%s\n' "$(cd "$(dirname "$1")" && pwd)" "$(basename "$1")"; }
+abspath() { printf '%s/%s\n' "$(cd "$(dirname "$1")" && pwd -P)" "$(basename "$1")"; }
 
 resolve_policy() {
   local profiles=() spec_abs f
@@ -56,7 +56,7 @@ resolve_policy() {
       [ "$(abspath "$f")" = "$spec_abs" ] && continue
       yq -e '.providers' "$f" >/dev/null 2>&1 && continue
       profiles+=("$f")
-    done < <(find "$CONF_DIR" -maxdepth 1 \( -name '*.yaml' -o -name '*.yml' \) 2>/dev/null | sort)
+    done < <(find -L "$CONF_DIR" -maxdepth 1 \( -name '*.yaml' -o -name '*.yml' \) 2>/dev/null | sort)
 
     [ "${#profiles[@]}" -eq 1 ] \
       || die "cannot pick a policy profile automatically (${#profiles[@]} found in $CONF_DIR${profiles[*]:+: ${profiles[*]}}); pass --policy"
