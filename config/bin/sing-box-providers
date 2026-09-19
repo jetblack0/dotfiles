@@ -166,10 +166,15 @@ build_groups() {
       | ( (if (.include_auto // false) then [ $a[].tag ] else [] end)
           + $static
           + [ $n[] | select(.tag | test($filter)) | .tag ] ) as $members
+      | (.default // "") as $default
       | if ($members | length) == 0
         then error("group \"\($tag)\" matched nothing -- check its filter")
+        elif $default != "" and ($members | index($default)) == null
+        # sing-box rejects this at RUN time ("default outbound not found") but
+        # `check` passes it, so catch it here or the service dies at boot.
+        then error("group \"\($tag)\" defaults to \"\($default)\", which is not one of its members -- add it to the static: list for that group")
         else { type: (.type // "selector"), tag: $tag, outbounds: $members }
-             + (if (.default // "") != "" then { default: .default } else {} end)
+             + (if $default != "" then { default: $default } else {} end)
         end
     ]' > "$TMP/spec_groups.json"
 }
@@ -186,7 +191,7 @@ validate() {
   yq -o=json "$POLICY" > "$TMP/policy.json" || die "policy profile $POLICY is not parseable yaml"
   # merge prints the output path on stderr; keep it quiet unless it fails
   sing-box merge "$TMP/probe.json" -c "$TMP/policy.json" -c "$TMP/providers.json" >/dev/null 2>"$TMP/merge.err" \
-    || { cat "$TMP/merge.err" >&2; die "merge rejected the result (duplicate tags between policy and providers?)"; }
+    || { cat "$TMP/merge.err" >&2; die "merge rejected the result"; }
   sing-box check -c "$TMP/probe.json" \
     || die "merged config failed validation -- $OUT left untouched"
   note "merged config validates"

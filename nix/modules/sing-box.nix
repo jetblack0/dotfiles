@@ -11,8 +11,24 @@ let
   profileDir = "${home}/.config/sing-box";
 
   renderConfig = pkgs.writeShellScript "sing-box-render-config" ''
+    set -e   # abort at the failing step; a bad render must not reach merge
     umask 077
-    ${lib.getExe pkgs.yq-go} -o=json "${profileDir}/$1.yaml" > "$RUNTIME_DIRECTORY/policy.json"
+    # Either extension: profiles get written both ways and the unit should
+    # not care. yq treats its path argument as an EXPRESSION when it cannot
+    # stat the file, so a missing profile would otherwise surface as
+    # "lexer: invalid input text" rather than "no such file".
+    profile=
+    for ext in yaml yml; do
+      if [ -r "${profileDir}/$1.$ext" ]; then
+        profile="${profileDir}/$1.$ext"
+        break
+      fi
+    done
+    if [ -z "$profile" ]; then
+      echo "no readable profile ${profileDir}/$1.yaml or $1.yml" >&2
+      exit 1
+    fi
+    ${lib.getExe pkgs.yq-go} -o=json "$profile" > "$RUNTIME_DIRECTORY/policy.json"
     if [ -f "${profileDir}/providers.json" ]; then
       ${lib.getExe pkgs.sing-box} merge "$RUNTIME_DIRECTORY/config.json" \
         -c "$RUNTIME_DIRECTORY/policy.json" \
