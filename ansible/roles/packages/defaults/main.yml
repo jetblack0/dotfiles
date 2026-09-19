@@ -154,6 +154,7 @@ packages:
   - { name: pipewire, brew: false }
   - { name: wireplumber, brew: false } # the session manager; pipewire is inert without one
   - { name: pipewire-pulse, brew: false } # pulse compat, what apps actually speak
+  - { name: pipewire-jack, brew: false }
   - { name: rtkit, brew: false } # realtime audio threads; without it audio can crackle under load
   - { name: cava }
 
