@@ -60,6 +60,12 @@
           "URLTemplate": "https://hub.docker.com/search?q={searchTerms}"
         },
         {
+          "Name": "Google Search",
+          "Alias": "g",
+          "Method": "GET",
+          "URLTemplate": "https://www.google.com/search?q={searchTerms}"
+        },
+        {
           "Name": "Linux manual",
           "Alias": "man",
           "Method": "GET",
