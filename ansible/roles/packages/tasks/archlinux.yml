@@ -1,4 +1,24 @@
 ---
+# Repos
+# ---------------------------------------------
+- name: Enable the multilib repository
+  become: true
+  ansible.builtin.replace:
+    path: /etc/pacman.conf
+    regexp: '^#\[multilib\]\n#Include = (.*)$'
+    replace: '[multilib]\nInclude = \1'
+  when: ansible_facts['architecture'] == 'x86_64'
+
+# Packages
+# ---------------------------------------------
+- name: Check that gpu_vendor names a known driver set
+  ansible.builtin.assert:
+    that: gpu_vendor in packages_gpu_drivers
+    fail_msg: >-
+      Unknown gpu_vendor '{{ gpu_vendor }}': pick one of
+      {{ packages_gpu_drivers.keys() | list | join(', ') }}.
+  when: gpu_vendor | length > 0
+
 - name: Install packages with pacman
   become: true
   community.general.pacman:

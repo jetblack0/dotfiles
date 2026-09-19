@@ -167,6 +167,10 @@ packages:
   - { name: wl-clipboard, brew: false } # wl-copy
   - { name: libnotify, brew: false } # notify-send
 
+  - { name: steam, brew: false }
+  - { name: ntsync-autoload, brew: false }
+  - { name: vulkan-tools, brew: false }
+
   # misc
   - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
   - { name: xdg-ninja, aur: xdg-ninja }
@@ -174,6 +178,10 @@ packages:
 # Entries to skip by canonical name, e.g. on a distro that lacks them.
 # ---------------------------------------------
 packages_exclude: []
+
+# The GPU in this box, set per host.
+# ---------------------------------------------
+gpu_vendor: ""
 
 # Proxy carried into the AUR tasks, which run as the build user.
 # ---------------------------------------------

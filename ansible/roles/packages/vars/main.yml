@@ -12,7 +12,18 @@ packages_pacman: >-
                        | map(attribute='pacman') | list)
    + (packages_enabled | rejectattr('aur', 'defined')
                        | rejectattr('pacman', 'defined')
-                       | map(attribute='name') | list) }}
+                       | map(attribute='name') | list)
+   + packages_gpu }}
+
+# The 64-bit halves need no entry: lib32-vulkan-intel depends on vulkan-intel,
+# lib32-vulkan-radeon on vulkan-radeon, so on and so forth.
+packages_gpu_drivers:
+  amd: [lib32-mesa, lib32-vulkan-radeon]
+  intel: [lib32-mesa, lib32-vulkan-intel]
+  nvidia: [lib32-nvidia-utils]
+
+# Unknown names resolve to nothing here.
+packages_gpu: "{{ packages_gpu_drivers[gpu_vendor] | default([]) }}"
 
 packages_aur: "{{ packages_enabled | selectattr('aur', 'defined') | map(attribute='aur') | list }}"
 

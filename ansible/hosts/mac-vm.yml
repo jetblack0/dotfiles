@@ -9,6 +9,8 @@ packages_exclude:
   - ollama
   - opencode
   - steampipe
+  - steam
+  - ntsync-autoload
 
 
 # Displays
