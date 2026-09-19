@@ -1,0 +1,28 @@
+#!/bin/sh
+# Regenerate config/share/nerd-glyphs/glyphs.tsv from nerd-fonts' canonical
+# name list.
+
+set -eu
+
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+out="$here/../config/share/nerd-glyphs/glyphs.tsv"
+url="https://raw.githubusercontent.com/ryanoasis/nerd-fonts/master/glyphnames.json"
+
+curl -fsSL "$url" | python3 -c '
+import json, sys
+
+d = json.load(sys.stdin)
+d.pop("METADATA", None)
+
+lines = []
+for name, v in d.items():
+    lines.append("%s\t%s\n" % (chr(int(v["code"], 16)), name.removeprefix("nf-")))
+lines.sort(key=lambda l: l.split("\t", 1)[1])
+
+out = "".join(lines)
+if len(out.encode()) >= 256 * 1024:
+    sys.exit("refusing: %d bytes would hit the 256 KiB launcher cap" % len(out.encode()))
+
+sys.stdout.write(out)
+print("%d glyphs, %d KiB" % (len(lines), len(out.encode()) // 1024), file=sys.stderr)
+' > "$out"

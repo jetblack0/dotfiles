@@ -15,20 +15,20 @@ return {
 
 	binds = function(ctx)
 		-- H/L walk the columns; J/K walk a column's vertical stack
-		hl.bind(ctx.mod .. " + H", hl.dsp.focus({ direction = "l" }), ctx.nograb)
-		hl.bind(ctx.mod .. " + L", hl.dsp.focus({ direction = "r" }), ctx.nograb)
-		hl.bind(ctx.mod .. " + J", hl.dsp.focus({ direction = "d" }), ctx.nograb)
-		hl.bind(ctx.mod .. " + K", hl.dsp.focus({ direction = "u" }), ctx.nograb)
-		hl.bind(ctx.mod .. " + SHIFT + J", hl.dsp.window.swap({ direction = "d" }), ctx.nograb)
-		hl.bind(ctx.mod .. " + SHIFT + K", hl.dsp.window.swap({ direction = "u" }), ctx.nograb)
+		hl.bind(ctx.mod .. " + H", hl.dsp.focus({ direction = "l" }), ctx.d("focus the column left", ctx.nograb))
+		hl.bind(ctx.mod .. " + L", hl.dsp.focus({ direction = "r" }), ctx.d("focus the column right", ctx.nograb))
+		hl.bind(ctx.mod .. " + J", hl.dsp.focus({ direction = "d" }), ctx.d("focus down the stack", ctx.nograb))
+		hl.bind(ctx.mod .. " + K", hl.dsp.focus({ direction = "u" }), ctx.d("focus up the stack", ctx.nograb))
+		hl.bind(ctx.mod .. " + SHIFT + J", hl.dsp.window.swap({ direction = "d" }), ctx.d("swap down the stack", ctx.nograb))
+		hl.bind(ctx.mod .. " + SHIFT + K", hl.dsp.window.swap({ direction = "u" }), ctx.d("swap up the stack", ctx.nograb))
 
 		-- reorder the focused column left/right in the tape
-		hl.bind(ctx.mod .. " + comma",  hl.dsp.layout("swapcol l"), ctx.nograb)
-		hl.bind(ctx.mod .. " + period", hl.dsp.layout("swapcol r"), ctx.nograb)
+		hl.bind(ctx.mod .. " + comma",  hl.dsp.layout("swapcol l"), ctx.d("move the column left", ctx.nograb))
+		hl.bind(ctx.mod .. " + period", hl.dsp.layout("swapcol r"), ctx.d("move the column right", ctx.nograb))
 
 		-- niri consume/expel
-		hl.bind(ctx.mod .. " + SHIFT + comma",  hl.dsp.layout("consume_or_expel prev"), ctx.nograb)
-		hl.bind(ctx.mod .. " + SHIFT + period", hl.dsp.layout("consume_or_expel next"), ctx.nograb)
+		hl.bind(ctx.mod .. " + SHIFT + comma",  hl.dsp.layout("consume_or_expel prev"), ctx.d("stack into or eject from the left column", ctx.nograb))
+		hl.bind(ctx.mod .. " + SHIFT + period", hl.dsp.layout("consume_or_expel next"), ctx.d("stack into or eject from the right column", ctx.nograb))
 
 		hl.bind(ctx.mod .. " + SHIFT + R", function()
 			hl.dispatch(hl.dsp.layout("colresize +conf"))
@@ -52,6 +52,6 @@ return {
 				"$HOME/.config/hypr/scripts/notify-tag.sh width show -t 1200 Width %d%%",
 				math.floor(best * 100 + 0.5)
 			))
-		end, ctx.nograb)
+		end, ctx.d("cycle the column width", ctx.nograb))
 	end,
 }

@@ -1,0 +1,12 @@
+---
+- name: Set up a unix box
+  hosts: localhost
+  connection: local
+
+  roles:
+    - { role: packages, tags: packages }
+    - { role: system, tags: system }
+    - { role: home, tags: home }
+    - { role: bin, tags: bin }
+    - { role: dotfiles, tags: dotfiles }
+    - { role: zen, tags: zen }

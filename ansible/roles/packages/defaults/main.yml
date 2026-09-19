@@ -17,6 +17,7 @@ packages:
   - { name: fd }
   - { name: fzf }
   - { name: jq }
+  - { name: yq, pacman: go-yq }
   - { name: kitty, cask: kitty }
   - { name: kitty-terminfo, brew: false }
   - { name: ouch }
@@ -26,6 +27,7 @@ packages:
   - { name: zoxide }
 
   # fonts
+  - { name: apple-fonts, aur: apple-fonts, brew: false } # SF Pro/Rounded; macos ships these natively
   - { name: inter-font, cask: font-inter }
   - { name: noto-fonts-cjk, cask: font-noto-sans-cjk }
   - { name: otf-libertinus, cask: font-libertinus }
@@ -33,6 +35,7 @@ packages:
   - { name: ttf-apple-emoji, aur: ttf-apple-emoji, brew: false }
   - { name: ttf-jetbrains-mono-nerd, cask: font-jetbrains-mono-nerd-font }
   - { name: ttf-udev-gothic, aur: ttf-udev-gothic, cask: font-udev-gothic-nf }
+  - { name: terminus-font, brew: false }
 
   # system monitors & info
   - { name: bottom }
@@ -85,14 +88,18 @@ packages:
 
   # cloud & devops
   - { name: ansible }
+  - { name: ansible-lint }
   - { name: argocd }
   - { name: aws-cli, brew: awscli }
+  - { name: cloudflared }
   - { name: colima, pacman: false } # backs the docker cli on macos
   - { name: docker } # engine on arch, plain cli on macos
   - { name: docker-compose }
   - { name: helm }
   - { name: kubectl }
+  - { name: linode-cli, aur: linode-cli }
   - { name: opentofu }
+  - { name: sops }
   - { name: steampipe, aur: steampipe-bin }
 
   # virtualization
@@ -103,21 +110,45 @@ packages:
   - { name: edk2-ovmf, brew: false }
   - { name: vagrant, aur: vagrant, cask: vagrant }
 
+  # networking
+  - { name: bind, brew: false }
+  - { name: mtr }
+  - { name: tcpdump, brew: false }
+  - { name: traceroute, brew: false }
+
   # ai
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }
   - { name: ollama }
   - { name: opencode, tap: anomalyco/tap }
 
+  # proxy
+  - { name: sing-box, brew: false }
+  - { name: tor, brew: false }
+
   # desktop
+  - { name: hyprland, brew: false }
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
   - { name: noctalia, brew: false }
+  - { name: swayimg, brew: false }
   - { name: libnotify, brew: false }
   - { name: capitaine-cursors, brew: false }
   - { name: tela-circle-icon-theme, aur: tela-circle-icon-theme-black-git, brew: false }
 
+  # networking. noctalia's bar widget speaks NetworkManager over dbus
+  - { name: networkmanager, brew: false }
+
+  # bluetooth
+  - { name: bluez, brew: false }
+  - { name: bluez-utils, brew: false } # bluetoothctl
+  - { name: upower, brew: false }
+  - { name: power-profiles-daemon, brew: false }
+  - { name: fprintd, brew: false }
+  - { name: accountsservice, brew: false }
+
   # display manager
   - { name: greetd, brew: false }
   - { name: noctalia-greeter, aur: noctalia-greeter, brew: false }
+  - { name: uwsm, brew: false }
 
   # audio. arch's user presets enable the sockets at install, no wiring needed
   - { name: pipewire, brew: false }
@@ -134,6 +165,7 @@ packages:
   # adw-gtk3-dark only when installed)
   - { name: adw-gtk-theme, brew: false }
   - { name: xorg-xrdb, brew: false }
+  - { name: xorg-xauth, brew: false } # x11 cookie for guis run as another user
 
   - { name: hyprpicker, brew: false }
   - { name: grim, brew: false }
@@ -144,8 +176,16 @@ packages:
   - { name: libnotify, brew: false } # notify-send
 
   # misc
+  - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
   - { name: xdg-ninja, aur: xdg-ninja }
 
 # Entries to skip by canonical name, e.g. on a distro that lacks them.
 # ---------------------------------------------
 packages_exclude: []
+
+# Proxy carried into the AUR tasks, which run as the build user.
+# ---------------------------------------------
+packages_proxy_env:
+  http_proxy: "{{ lookup('env', 'http_proxy') }}"
+  https_proxy: "{{ lookup('env', 'https_proxy') }}"
+  no_proxy: "{{ lookup('env', 'no_proxy') }}"

@@ -1,11 +1,5 @@
 -- Active layout
 -----------------------------------------------
--- Mirrors conf/theme.lua: the chosen name lives in
--- $XDG_STATE_HOME/hypr/layout, so switching is a state write plus a
--- reload rather than a config edit. scripts/layout-switcher.sh writes it.
--- Pure: returns { name, options, binds? }; options.lua applies the options,
--- binds.lua calls binds() exactly once (this resolver never calls it --
--- require is not cached and this file loads twice per config pass).
 
 local DEFAULT = "master"
 

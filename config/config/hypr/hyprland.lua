@@ -3,6 +3,7 @@ require("conf.monitors")
 require("conf.options")
 require("conf.gestures")
 require("conf.animation")
+require("conf.rules")
 require("conf.binds")
 require("conf.autostart")
 

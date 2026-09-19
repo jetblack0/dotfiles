@@ -1,0 +1,8 @@
+# Managed by ansible (roles/data).
+{% for key in ['DESKTOP', 'DOCUMENTS', 'DOWNLOAD', 'MUSIC', 'PICTURES', 'PUBLICSHARE', 'TEMPLATES', 'VIDEOS'] %}
+{% if key | lower in data_userdirs %}
+XDG_{{ key }}_DIR="{{ data_home }}/{{ data_userdirs[key | lower] }}"
+{% else %}
+XDG_{{ key }}_DIR="$HOME/"
+{% endif %}
+{% endfor %}

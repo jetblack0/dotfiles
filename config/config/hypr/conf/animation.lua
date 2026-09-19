@@ -1,16 +1,5 @@
 -- Active animation set
 -----------------------------------------------
--- Mirrors conf/theme.lua: the chosen name lives in
--- $XDG_STATE_HOME/hypr/animation, so switching is a state write plus a reload
--- rather than a config edit. scripts/animation-switcher.sh writes it.
---
--- Unlike theme.lua this module is NOT pure -- it applies the set. That is fine
--- because hyprland.lua requires it exactly once, but it does mean this file
--- must never be required from anywhere else: hyprland's require() is not
--- cached, so a second require would apply every curve and leaf a second time.
---
--- A set that fails to load falls back to the default and returns _error for a
--- caller to surface, same contract as the theme.
 
 local animations = require("conf.animations")
 

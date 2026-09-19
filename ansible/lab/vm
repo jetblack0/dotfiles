@@ -215,7 +215,7 @@ start() {
 
     copy_repo
     echo "fresh $distro vm, repo copied to ~/dotfiles -- try:"
-    echo "    ansible-playbook ansible/local.yml"
+    echo "    ansible-playbook ansible/base.yml"
     shell
 }
 

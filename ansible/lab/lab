@@ -78,9 +78,9 @@ start() {
     echo "fresh $distro box, repo copied to ~/dotfiles -- try:"
     # Arch Linux ARM trails mainline: skip the packages it does not carry.
     if [ "$distro" = archlinux ] && [ "$(docker version --format '{{.Server.Arch}}')" = arm64 ]; then
-        echo "    ansible-playbook ansible/local.yml -e '{\"packages_exclude\": [\"ollama\", \"opencode\", \"steampipe\"]}'"
+        echo "    ansible-playbook ansible/base.yml -e '{\"packages_exclude\": [\"ollama\", \"opencode\", \"steampipe\"]}'"
     else
-        echo "    ansible-playbook ansible/local.yml"
+        echo "    ansible-playbook ansible/base.yml"
     fi
     shell
 }

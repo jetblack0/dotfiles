@@ -1,0 +1,32 @@
+#!/bin/sh
+# prlip [vm-name] -- resolve a Parallels VM's IP from the host's DHCP lease file.
+# Matches on the MAC in the VM's config, so it still works when the guest's
+# graphical session or Parallels Tools has died.
+LEASES=/Library/Preferences/Parallels/parallels_dhcp_leases
+
+lookup() {
+	mac=$(prlctl list -i "$1" 2>/dev/null | grep -oE 'mac=[0-9A-Fa-f]{12}' | head -1 | cut -d= -f2)
+	[ -n "$mac" ] || { echo "no such vm"; return 1; }
+	# lease line: IP="expiry,duration,mac,client_id" -- newest expiry wins
+	set -- $(awk -v mac="$(echo "$mac" | tr 'A-Z' 'a-z')" -F'"' '
+		/^[0-9]/ {
+			ip = $1; sub(/=$/, "", ip)
+			split($2, f, ",")
+			if (f[3] == mac && f[1] > best) { best = f[1]; bip = ip }
+		}
+		END { if (bip != "") print bip, best }' "$LEASES")
+	[ -n "$1" ] || { echo "no lease"; return 1; }
+	if [ "$2" -gt "$(date +%s)" ]; then
+		echo "$1  (active)"
+	else
+		echo "$1  (stale, expired $(date -r "$2" '+%Y-%m-%d %H:%M'))"
+	fi
+}
+
+if [ $# -gt 0 ]; then
+	lookup "$1"
+else
+	prlctl list -a -o name --no-header | while read -r vm; do
+		printf '%-18s %s\n' "$vm" "$(lookup "$vm")"
+	done
+fi

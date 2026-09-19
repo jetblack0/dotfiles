@@ -1,0 +1,146 @@
+---
+# Check then act. Everything up to the assert only gathers facts; a failing
+# precondition aborts before any change, reporting every violation at once
+# with its fix. Everything below the assert may write.
+
+# Preconditions
+# ---------------------------------------------
+- name: Gather the state of the second home
+  ansible.builtin.stat:
+    path: "{{ data_home }}"
+  register: data_home_stat
+
+- name: Check whether the second home is a mountpoint
+  ansible.builtin.command:
+    argv: [mountpoint, -q, "{{ data_home }}"]
+  register: data_home_mount
+  changed_when: false
+  failed_when: false
+
+- name: Gather the state of the link targets
+  ansible.builtin.stat:
+    path: "{{ data_home }}/{{ item.value }}"
+  loop: "{{ data_links | dict2items }}"
+  loop_control:
+    label: "{{ item.value }}"
+  register: data_link_targets
+
+- name: Gather the state of the user-dir targets
+  ansible.builtin.stat:
+    path: "{{ data_home }}/{{ item.value }}"
+  loop: "{{ data_userdirs | dict2items }}"
+  loop_control:
+    label: "{{ item.value }}"
+  register: data_userdir_targets
+
+- name: Gather the state of the link sources
+  ansible.builtin.stat:
+    path: "{{ ansible_facts['user_dir'] }}/{{ item.key }}"
+  loop: "{{ data_links | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+  register: data_link_sources
+
+- name: Inspect directories standing where links belong
+  ansible.builtin.find:
+    paths: "{{ item.stat.path }}"
+    file_type: any
+    hidden: true
+  loop: >-
+    {{ data_link_sources.results
+     | selectattr('stat.exists') | rejectattr('stat.islnk')
+     | selectattr('stat.isdir') | list }}
+  loop_control:
+    label: "{{ item.item.key }}"
+  register: data_source_dirs
+
+- name: Collect every precondition violation
+  ansible.builtin.set_fact:
+    data_problems: "{{ p_home + p_mount + p_owner + p_targets + p_sources }}"
+  vars:
+    user_home: "{{ ansible_facts['user_dir'] }}"
+    p_home: >-
+      {{ [] if (data_home_stat.stat.exists and data_home_stat.stat.isdir)
+         else [data_home ~ ' does not exist or is not a directory — mount the data drive first'] }}
+    p_mount: >-
+      {{ [] if (not (data_require_mount | bool) or data_home_mount.rc == 0)
+         else [data_home ~ ' is not a mountpoint — the data drive is not mounted (a plain directory needs data_require_mount: false)'] }}
+    p_owner: >-
+      {{ [] if (not data_home_stat.stat.exists
+                or data_home_stat.stat.uid == (ansible_facts['user_uid'] | int))
+         else [data_home ~ ' is owned by uid ' ~ data_home_stat.stat.uid
+               ~ ' — fix with: sudo chown ' ~ ansible_facts['user_id'] ~ ': ' ~ data_home] }}
+    p_targets: >-
+      {%- set msgs = [] -%}
+      {%- for r in (data_link_targets.results | default([])) + (data_userdir_targets.results | default([])) -%}
+      {%-   if not r.stat.exists -%}
+      {%-     set _ = msgs.append(data_home ~ '/' ~ r.item.value
+                ~ ' is missing — this playbook never writes into the second home; put the data there yourself (mkdir -p it, or mv the existing state in)') -%}
+      {%-   elif not r.stat.isdir -%}
+      {%-     set _ = msgs.append(data_home ~ '/' ~ r.item.value ~ ' is not a directory') -%}
+      {%-   endif -%}
+      {%- endfor -%}
+      {{ msgs }}
+    p_sources: >-
+      {%- set msgs = [] -%}
+      {%- set contents = {} -%}
+      {%- for r in (data_source_dirs.results | default([])) -%}
+      {%-   set _ = contents.update({r.item.item.key: r.matched}) -%}
+      {%- endfor -%}
+      {%- for s in (data_link_sources.results | default([])) -%}
+      {%-   set src = user_home ~ '/' ~ s.item.key -%}
+      {%-   set dst = data_home ~ '/' ~ s.item.value -%}
+      {%-   if s.stat.exists and s.stat.islnk -%}
+      {%-     if (s.stat.lnk_source | default(s.stat.lnk_target, true)) != dst -%}
+      {%-       set _ = msgs.append(src ~ ' is a symlink to ' ~ s.stat.lnk_target ~ ', not ' ~ dst
+                  ~ ' — remove it if stale: rm ' ~ src) -%}
+      {%-     endif -%}
+      {%-   elif s.stat.exists and s.stat.isdir and contents.get(s.item.key, 0) > 0 -%}
+      {%-     set _ = msgs.append(src ~ ' is a non-empty directory — merge it into the second home yourself: mv '
+                ~ src ~ ' ' ~ dst ~ ' (or move its contents, minding dotfiles) and rerun') -%}
+      {%-   elif s.stat.exists and not s.stat.isdir -%}
+      {%-     set _ = msgs.append(src ~ ' is a regular file — move it into the second home yourself: mv '
+                ~ src ~ ' ' ~ dst ~ '/') -%}
+      {%-   endif -%}
+      {%- endfor -%}
+      {{ msgs }}
+
+- name: Assert the second home is ready
+  ansible.builtin.assert:
+    that: data_problems | length == 0
+    fail_msg: "{{ data_problems }}"
+    quiet: true
+
+# Actions
+# ---------------------------------------------
+- name: Remove empty directories standing where links belong
+  ansible.builtin.command:
+    argv: [rmdir, "{{ ansible_facts['user_dir'] }}/{{ item.item.item.key }}"]
+  loop: "{{ data_source_dirs.results | default([]) | selectattr('matched', 'equalto', 0) | list }}"
+  loop_control:
+    label: "{{ item.item.item.key }}"
+  changed_when: true
+
+- name: Ensure the link parents exist
+  ansible.builtin.file:
+    path: "{{ (ansible_facts['user_dir'] ~ '/' ~ item.key) | dirname }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ data_links | dict2items }}"
+  loop_control:
+    label: "{{ item.key }}"
+
+- name: Link the state directories into the second home
+  ansible.builtin.file:
+    src: "{{ data_home }}/{{ item.value }}"
+    dest: "{{ ansible_facts['user_dir'] }}/{{ item.key }}"
+    state: link
+  loop: "{{ data_links | dict2items }}"
+  loop_control:
+    label: "{{ item.key }} -> {{ item.value }}"
+
+- name: Point the xdg user dirs into the second home
+  ansible.builtin.template:
+    src: user-dirs.dirs.j2
+    dest: "{{ ansible_facts['user_dir'] }}/.config/user-dirs.dirs"
+    mode: "0644"

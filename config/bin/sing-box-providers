@@ -1,0 +1,236 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# turn clash subscriptions into a sing-box outbound file. Fetches every
+# subscription in the spec, converts the clash `proxies:` list into sing-box
+# outbounds, and writes one generated file.
+#
+# Usage:
+#   sing-box-providers [--spec FILE] [--out FILE] [--policy FILE]
+#                      [--no-reload] [--dry-run]
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/sing-box"
+SPEC="$CONF_DIR/providers.yml"
+OUT="$CONF_DIR/providers.json"
+POLICY=""
+RELOAD=1
+DRY_RUN=0
+TMP=""
+
+die() { printf '%s: %s\n' "${0##*/}" "$*" >&2; exit 1; }
+note() { printf '  %s\n' "$*" >&2; }
+
+# Prints the comment block under the shebang.
+usage() { awk 'NR>1 && /^#/ { sub(/^# ?/,""); print; next } NR>1 { exit }' "$0"; }
+
+parse_args() {
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --spec)      SPEC=$2; shift 2 ;;
+      --out)       OUT=$2; shift 2 ;;
+      --policy)    POLICY=$2; shift 2 ;;
+      --no-reload) RELOAD=0; shift ;;
+      --dry-run)   DRY_RUN=1; RELOAD=0; shift ;;
+      -h|--help)   usage; exit 0 ;;
+      *)           die "unknown option: $1" ;;
+    esac
+  done
+}
+
+require_tools() {
+  command -v yq   >/dev/null || die "yq not found (mikefarah's; arch: go-yq)"
+  command -v jq   >/dev/null || die "jq not found"
+  command -v curl >/dev/null || die "curl not found"
+  command -v sing-box >/dev/null || die "sing-box not found"
+  [ -f "$SPEC" ] || die "no spec at $SPEC"
+}
+
+abspath() { printf '%s/%s\n' "$(cd "$(dirname "$1")" && pwd)" "$(basename "$1")"; }
+
+resolve_policy() {
+  local profiles=() spec_abs f
+  if [ -z "$POLICY" ]; then
+    spec_abs=$(abspath "$SPEC")
+    while IFS= read -r f; do
+      [ "$(abspath "$f")" = "$spec_abs" ] && continue
+      yq -e '.providers' "$f" >/dev/null 2>&1 && continue
+      profiles+=("$f")
+    done < <(find "$CONF_DIR" -maxdepth 1 \( -name '*.yaml' -o -name '*.yml' \) 2>/dev/null | sort)
+
+    [ "${#profiles[@]}" -eq 1 ] \
+      || die "cannot pick a policy profile automatically (${#profiles[@]} found in $CONF_DIR${profiles[*]:+: ${profiles[*]}}); pass --policy"
+    POLICY="${profiles[0]}"
+  fi
+  [ -f "$POLICY" ] || die "no policy profile at $POLICY"
+}
+
+init_workspace() {
+  umask 077   # everything below carries subscription credentials
+  TMP=$(mktemp -d)
+  trap 'rm -rf "$TMP"' EXIT
+  echo '[]' > "$TMP/all_nodes.json"
+  echo '[]' > "$TMP/auto_groups.json"
+}
+
+# Fetch one subscription and translate its `proxies:` into sing-box outbounds.
+convert_provider() {
+  local name=$1 url=$2 count
+
+  note "fetching $name"
+  # --fail so an HTML error page never gets parsed as a subscription
+  curl -sS --fail --location --max-time 120 --retry 2 --retry-all-errors \
+       -o "$TMP/$name.raw" "$url" || die "fetch failed for provider '$name'"
+
+  yq -o=json "$TMP/$name.raw" > "$TMP/$name.json" 2>/dev/null \
+    || die "provider '$name' did not return parseable yaml"
+  jq -e '.proxies | type == "array"' "$TMP/$name.json" >/dev/null \
+    || die "provider '$name' returned no 'proxies' list"
+
+  jq --arg p "$name" '
+    def known_trojan: ["name","type","server","port","password","sni","skip-cert-verify","udp"];
+    def known_ss:     ["name","type","server","port","cipher","password","udp"];
+
+    [ .proxies[]
+      | . as $n
+      | (if   .type == "trojan"      then known_trojan
+         elif .type == "ss"          then known_ss
+         else error("unsupported proxy type \"\(.type)\" for node \"\(.name)\" from provider \"\($p)\" -- add a mapping to sing-box-providers")
+         end) as $known
+      | (($n | keys) - $known) as $extra
+      | (if ($extra | length) > 0
+            then error("node \"\($n.name)\" (\($p)) carries unmapped field(s): \($extra | join(", ")) -- refusing to emit a half-translated outbound")
+            else . end)
+      | if .type == "trojan" then {
+          type: "trojan",
+          tag: "\($p)-\(.name)",
+          server: .server,
+          server_port: (.port | tonumber),
+          password: (.password | tostring),
+          tls: {
+            enabled: true,
+            server_name: (.sni // .server),
+            insecure: ((."skip-cert-verify") // false)
+          }
+        }
+        else {
+          type: "shadowsocks",
+          tag: "\($p)-\(.name)",
+          server: .server,
+          server_port: (.port | tonumber),
+          method: .cipher,
+          password: (.password | tostring)
+        }
+        end
+    ]' "$TMP/$name.json" > "$TMP/$name.nodes.json" \
+    || die "conversion failed for provider '$name' (see the error above)"
+
+  count=$(jq 'length' "$TMP/$name.nodes.json")
+  [ "$count" -gt 0 ] || die "provider '$name' produced no usable nodes"
+  note "  $count nodes"
+
+  jq -s '.[0] + .[1]' "$TMP/all_nodes.json" "$TMP/$name.nodes.json" > "$TMP/merged.json"
+  mv "$TMP/merged.json" "$TMP/all_nodes.json"
+
+  # one auto group per provider, so a dead node fails over without a human
+  jq -n --arg tag "$name-auto" --slurpfile nodes "$TMP/$name.nodes.json" \
+    '{ type: "urltest", tag: $tag, outbounds: [ $nodes[0][].tag ] }' > "$TMP/$name.auto.json"
+  jq -s '.[0] + [.[1]]' "$TMP/auto_groups.json" "$TMP/$name.auto.json" > "$TMP/merged.json"
+  mv "$TMP/merged.json" "$TMP/auto_groups.json"
+}
+
+fetch_providers() {
+  local total i name url
+  total=$(yq '.providers | length' "$SPEC")
+  [ "$total" -gt 0 ] || die "spec lists no providers"
+
+  for i in $(seq 0 $((total - 1))); do
+    name=$(yq -r ".providers[$i].name" "$SPEC")
+    url=$(yq -r ".providers[$i].url" "$SPEC")
+    [ -n "$name" ] && [ "$name" != "null" ] || die "provider[$i] has no name"
+    [ -n "$url" ] && [ "$url" != "null" ]   || die "provider '$name' has no url"
+    convert_provider "$name" "$url"
+  done
+}
+
+build_groups() {
+  jq -n \
+    --slurpfile nodes "$TMP/all_nodes.json" \
+    --slurpfile autos "$TMP/auto_groups.json" \
+    --argjson spec "$(yq -o=json '.groups // []' "$SPEC")" '
+    ($nodes[0]) as $n | ($autos[0]) as $a |
+    [ $spec[]
+      | .tag as $tag
+      | (.filter // ".") as $filter
+      | (.static // []) as $static
+      | ( (if (.include_auto // false) then [ $a[].tag ] else [] end)
+          + $static
+          + [ $n[] | select(.tag | test($filter)) | .tag ] ) as $members
+      | if ($members | length) == 0
+        then error("group \"\($tag)\" matched nothing -- check its filter")
+        else { type: (.type // "selector"), tag: $tag, outbounds: $members }
+             + (if (.default // "") != "" then { default: .default } else {} end)
+        end
+    ]' > "$TMP/spec_groups.json"
+}
+
+assemble() {
+  jq -s '{ outbounds: (.[0] + .[1] + .[2]) }' \
+    "$TMP/all_nodes.json" "$TMP/auto_groups.json" "$TMP/spec_groups.json" > "$TMP/providers.json"
+
+  note "generated $(jq '.outbounds | length' "$TMP/providers.json") outbounds ($(jq '[.outbounds[]|select(.type=="urltest" or .type=="selector")]|length' "$TMP/providers.json") groups)"
+}
+
+# The MERGED config must be valid before anything is replaced.
+validate() {
+  yq -o=json "$POLICY" > "$TMP/policy.json" || die "policy profile $POLICY is not parseable yaml"
+  # merge prints the output path on stderr; keep it quiet unless it fails
+  sing-box merge "$TMP/probe.json" -c "$TMP/policy.json" -c "$TMP/providers.json" >/dev/null 2>"$TMP/merge.err" \
+    || { cat "$TMP/merge.err" >&2; die "merge rejected the result (duplicate tags between policy and providers?)"; }
+  sing-box check -c "$TMP/probe.json" \
+    || die "merged config failed validation -- $OUT left untouched"
+  note "merged config validates"
+}
+
+report_dry_run() {
+  note "dry run: not writing $OUT"
+  jq -r '.outbounds[] | select(.type=="selector" or .type=="urltest") | "  \(.tag) <- \(.outbounds|length) members"' "$TMP/providers.json" >&2
+}
+
+install_output() {
+  install -m 0600 "$TMP/providers.json" "$OUT"
+  note "wrote $OUT"
+}
+
+reload_units() {
+  local unit
+  [ "$RELOAD" = 1 ] || return 0
+  command -v systemctl >/dev/null || return 0
+  while read -r unit; do
+    [ -n "$unit" ] || continue
+    note "reloading $unit"
+    systemctl reload "$unit" 2>/dev/null || sudo systemctl reload "$unit" || note "  reload failed for $unit"
+  done < <(systemctl list-units 'sing-box@*' --state=active --no-legend 2>/dev/null | awk '{print $1}')
+}
+
+main() {
+  parse_args "$@"
+  require_tools
+  resolve_policy
+  init_workspace
+
+  fetch_providers
+  build_groups
+  assemble
+  validate
+
+  if [ "$DRY_RUN" = 1 ]; then
+    report_dry_run
+    return 0
+  fi
+
+  install_output
+  reload_units
+}
+
+main "$@"

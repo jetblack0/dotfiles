@@ -1,7 +1,7 @@
 ---
 # Linux parallels vm
 # ---------------------------------------------
-#     ansible-playbook ansible/local.yml -e @ansible/hosts/mac-vm.yml
+#     ansible-playbook ansible/base.yml -e @ansible/hosts/mac-vm.yml
 
 # Packages
 # ---------------------------------------------
@@ -23,6 +23,8 @@ monitors:
 
 # Xft.dpi for xwayland apps: 96 * scale.
 xwayland_dpi: 154
+
+lockscreen_height: 1000
 
 # the parallels virtio-gpu advertises a bogus preferred mode, so the
 # greeter renders tiny and blurry unless pinned to the real panel. Real

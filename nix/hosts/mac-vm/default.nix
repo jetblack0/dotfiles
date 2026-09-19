@@ -9,6 +9,8 @@
     ../../modules/core.nix
     ../../modules/desktop.nix
     ../../modules/zen.nix
+    ../../modules/sing-box.nix
+    # ../../modules/data.nix
   ];
 
 
@@ -29,6 +31,7 @@
 
   # 96 * scale
   desktop.xwaylandDpi = 154;
+  desktop.lockscreenHeight = 1000;
 
   # the parallels virtual display advertises a bogus preferred mode
   # (1448x906, no EDID size); pin the greeter to the real panel
@@ -46,20 +49,7 @@
   # networking
   # ---------------------------------------------
   networking.hostName = "mac-vm";
-
   networking.useDHCP = false;
-  systemd.network = {
-    enable = true;
-    networks."20-lan" = {
-      matchConfig.Name = "en*";
-      networkConfig = {
-        DHCP = "ipv4";
-        IPv6AcceptRA = true;
-      };
-      dhcpV4Config.ClientIdentifier = "mac";
-      linkConfig.RequiredForOnline = "routable";
-    };
-  };
 
 
   # time
@@ -69,13 +59,7 @@
 
   # services
   # ---------------------------------------------
-  services.openssh = {
-    enable = true;
-    settings = {
-      PermitRootLogin = "yes";
-      PasswordAuthentication = true;
-    };
-  };
+  core.sshAutostart = true;
 
   system.stateVersion = "26.05";
 }

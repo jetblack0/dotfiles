@@ -105,6 +105,9 @@ export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
 export AWS_CONFIG_FILE="$XDG_CONFIG_HOME"/aws/config
 export AWS_PAGER=""
 
+# linode
+export LINODE_CLI_CONFIG="$HOME/.config/linode"
+
 # loki
 export LOKI_ADDR="https://loki.ops.unazoomer.com"
 export LOKI_ORG_ID="ops"

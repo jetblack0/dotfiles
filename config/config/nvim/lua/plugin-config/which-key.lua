@@ -8,5 +8,9 @@ wk.setup({
     mappings = false,
   },
   preset = 'helix',
+
+  triggers = {
+    { "<auto>", mode = "nxs" },
+  },
 })
 

@@ -1,0 +1,13 @@
+---
+# Wires the self-managed data drive  into the user session.
+#
+# Run it by hand, after base.yml, only on machines that have the second home:
+#
+#     ansible-playbook data.yml
+
+- name: Wire the second home into the user session
+  hosts: localhost
+  connection: local
+
+  roles:
+    - { role: data, tags: data }

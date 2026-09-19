@@ -53,3 +53,21 @@
 
 - name: Render the per-host noctalia overlay
   ansible.builtin.import_tasks: noctalia.yml
+
+# swayimg as the default image viewer. The nix side owns mimeapps.list via
+# home-manager's xdg.mimeApps; here we own the same file. Linux only -- macos
+# has its own launch services.
+- name: Set swayimg as the default image viewer
+  ansible.builtin.copy:
+    dest: "{{ ansible_facts['user_dir'] }}/.config/mimeapps.list"
+    mode: "0644"
+    content: |
+      [Default Applications]
+      image/png=swayimg.desktop
+      image/jpeg=swayimg.desktop
+      image/gif=swayimg.desktop
+      image/webp=swayimg.desktop
+      image/bmp=swayimg.desktop
+      image/tiff=swayimg.desktop
+      image/avif=swayimg.desktop
+  when: ansible_facts['os_family'] != 'Darwin'

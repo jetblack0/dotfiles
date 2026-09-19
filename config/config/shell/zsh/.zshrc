@@ -23,7 +23,7 @@ bindkey -v
 typeset -U PATH path fpath
 
 # Prepended, so these shadow the system copies.
-export PATH="$CARGO_HOME/bin:$PATH"
+export PATH="$HOME/.local/bin:$CARGO_HOME/bin:$PATH"
 
 # Appended: only reached when nothing earlier provides the command.
 export PATH="$PATH:$NPM_PACKAGES/bin:${KREW_ROOT:-$HOME/.krew}/bin"
@@ -146,13 +146,13 @@ bindkey -s '^f' '^uyy\n'
 bindkey -s '^v' '^unvim .\n'
 bindkey -s '^o' '^uzicd\n'
 bindkey -s '^e' '^ufzfed\n'
-# bindkey -s '^n' '^uimages &\n'
+bindkey -s '^n' '^uimages &\n'
 
 
 # Aliases
 # ---------------------------------------------
 alias vim="nvim"
-alias neofetch="fastfetch -c ani"
+alias neofetch="fastfetch"
 alias ip="ip -c=always"
 # The trailing space makes zsh expand the *next* word as an alias too, so
 # things like `sudo ll` keep working.
@@ -292,8 +292,8 @@ fzfed() {
 		"$XDG_CONFIG_HOME/hypr/subconfig/keybinding.conf"
 
 		"$HOME/.ssh/config"
-		"$HOME/Documents/quick-note.md"
-		"$HOME/Documents/learning/note.md"
+		"$XDG_DOCUMENTS_DIR/quick-note.md"
+		"$XDG_DOCUMENTS_DIR/learning/note.md"
 	)
 
 	file=$(printf "%s\n" "${files[@]}" | fzf \
@@ -312,7 +312,7 @@ fzfed() {
 	nvim "$file"
 }
 
-# Open every image in the current directory in nsxiv, newest first.
+# Open every image under the current directory in swayimg, newest first.
 images() {
-	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=time | nsxiv -i
+	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=time | swayimg -f /dev/stdin -e 'swayimg.imagelist.order = "none"'
 }

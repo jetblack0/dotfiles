@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh sing-box outbounds from the clash subscriptions
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User={{ ansible_facts['user_id'] }}
+ExecStart={{ ansible_facts['user_dir'] }}/.local/bin/sing-box-providers --no-reload
+ExecStartPost=+/usr/bin/systemctl reload sing-box@*

@@ -31,6 +31,7 @@ dotfiles_mask:
     - waybar
   darwin:
     - dunst
+    - environment.d
     - fontconfig
     - foot
     - gtk-2.0
@@ -45,8 +46,9 @@ dotfiles_mask:
     - systemd
     - waybar
     - X11
+    - swayimg
 
 # Per-host preferences, rendered into the noctalia overlay.
-wallpaper_directory: "~/Resources/media/pictures/wallpaper/landscape"
+wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"
 # Empty means noctalia's default, the XDG Pictures directory.
 screenshot_directory: ""

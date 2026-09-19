@@ -44,6 +44,7 @@
 - name: Build and install paru
   become: true
   become_user: aur_builder
+  environment: "{{ packages_proxy_env }}"
   ansible.builtin.shell:
     cmd: |
       set -e
@@ -70,6 +71,7 @@
 - name: Install packages from the AUR
   become: true
   become_user: aur_builder
+  environment: "{{ packages_proxy_env }}"
   ansible.builtin.command:
     argv: "{{ ['paru', '-S', '--needed', '--noconfirm'] + packages_aur_missing }}"
   vars:
