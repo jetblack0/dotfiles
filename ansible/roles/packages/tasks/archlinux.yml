@@ -5,6 +5,10 @@
     name: "{{ packages_pacman }}"
     state: present
     update_cache: true
+  register: packages_pacman_install
+  until: packages_pacman_install is succeeded
+  retries: 3
+  delay: 10
 
 # AUR
 # ---------------------------------------------
@@ -77,3 +81,7 @@
   vars:
     packages_aur_missing: "{{ packages_aur | difference(packages_aur_query.stdout_lines | default([])) }}"
   when: packages_aur | length > 0 and packages_aur_missing | length > 0
+  register: packages_aur_install
+  until: packages_aur_install is succeeded
+  retries: 3
+  delay: 10
