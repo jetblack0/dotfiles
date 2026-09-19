@@ -11,7 +11,7 @@
 
 [credential]
 	helper = 
-	helper = store --file ~/.config/git/credentials
+	helper = store --file ~/.config/git/conf.d/credentials
 
 [credential "https://github.com/jetblack0/"]
     username = jetblack0
@@ -23,4 +23,4 @@
 	cmd = nvim \"$MERGED\" -c \"CodeDiff merge \\\"$MERGED\\\"\"
 
 [includeIf "gitdir:~/Development/work/"]
-	path = ~/.config/git/config.work
+	path = ~/.config/git/conf.d/config.work
