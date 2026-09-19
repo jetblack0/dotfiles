@@ -33,6 +33,21 @@ in
 {
   # per-host knobs
   # ---------------------------------------------
+  options.singBox.providersTimer = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Refresh the subscription outbounds on a timer. Off by default: it
+      reaches the network and rewrites providers.json.
+    '';
+  };
+
+  options.singBox.providersSchedule = lib.mkOption {
+    type = lib.types.str;
+    default = "daily";
+    description = "OnCalendar expression for the refresh timer.";
+  };
+
   options.singBox.autostartProfiles = lib.mkOption {
     type = lib.types.listOf lib.types.str;
     default = [ ];
@@ -80,10 +95,41 @@ in
           };
         };
       }
+      # Refresh service.
+      // lib.optionalAttrs config.singBox.providersTimer {
+        sing-box-providers = {
+          description = "Refresh sing-box outbounds from the clash subscriptions";
+          after = [ "network-online.target" ];
+          wants = [ "network-online.target" ];
+          path = [
+            pkgs.yq-go
+            pkgs.jq
+            pkgs.curl
+            pkgs.sing-box
+          ];
+          serviceConfig = {
+            Type = "oneshot";
+            User = username;
+            ExecStart = "${home}/.local/bin/sing-box-providers --no-reload";
+            ExecStartPost = "+${pkgs.systemd}/bin/systemctl reload sing-box@*";
+          };
+        };
+      }
       // lib.genAttrs (map (p: "sing-box@${p}") config.singBox.autostartProfiles) (_: {
         overrideStrategy = "asDropin";
         wantedBy = [ "multi-user.target" ];
       });
+
+
+    systemd.timers.sing-box-providers = lib.mkIf config.singBox.providersTimer {
+      description = "Refresh sing-box outbounds from the clash subscriptions";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = config.singBox.providersSchedule;
+        Persistent = true;
+        RandomizedDelaySec = "1h";
+      };
+    };
 
 
     # the daemon's own user

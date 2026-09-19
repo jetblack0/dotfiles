@@ -26,3 +26,28 @@
   ansible.builtin.systemd_service:
     daemon_reload: true
   when: singbox_override is changed
+
+- name: Install the subscription refresh units
+  become: true
+  ansible.builtin.template:
+    src: "{{ item }}"
+    dest: /etc/systemd/system/{{ item | replace('.j2', '') }}
+    mode: "0644"
+  loop:
+    - sing-box-providers.service.j2
+    - sing-box-providers.timer.j2
+  register: singbox_providers_units
+
+- name: Reload systemd so the refresh units take effect
+  become: true
+  ansible.builtin.systemd_service:
+    daemon_reload: true
+  when: singbox_providers_units is changed
+
+- name: Set the subscription refresh timer
+  become: true
+  ansible.builtin.systemd_service:
+    name: sing-box-providers.timer
+    enabled: "{{ singbox_providers_timer | bool }}"
+    state: "{{ 'started' if singbox_providers_timer | bool else 'stopped' }}"
+  when: ansible_facts['service_mgr'] == 'systemd'

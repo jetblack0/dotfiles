@@ -1,0 +1,10 @@
+[Unit]
+Description=Refresh sing-box outbounds from the clash subscriptions
+
+[Timer]
+OnCalendar={{ singbox_providers_schedule }}
+Persistent=true
+RandomizedDelaySec=1h
+
+[Install]
+WantedBy=timers.target
