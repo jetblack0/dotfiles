@@ -13,6 +13,95 @@
         "installation_mode": "normal_installed",
         "install_url": "https://addons.mozilla.org/firefox/downloads/latest/return-youtube-dislikes/latest.xpi"
       }
+    },
+    "SearchEngines": {
+      "Default": "DuckDuckGo",
+      "Add": [
+        {
+          "Name": "AUR",
+          "Alias": "aur",
+          "Method": "GET",
+          "URLTemplate": "https://aur.archlinux.org/packages?O=0&K={searchTerms}"
+        },
+        {
+          "Name": "Amazon books",
+          "Alias": "amab",
+          "Method": "GET",
+          "URLTemplate": "https://www.amazon.com/s/ref=nb_sb_noss?url=search-alias%3Dstripbooks-intl-ship&crid=2DSKEXXWYQL7Q&sprefix=%2Cstripbooks-intl-ship%2C355&field-keywords={searchTerms}"
+        },
+        {
+          "Name": "Annas Archive",
+          "Alias": "anna",
+          "Method": "GET",
+          "URLTemplate": "https://annas-archive.li/search?q={searchTerms}"
+        },
+        {
+          "Name": "Arch wiki",
+          "Alias": "archwiki",
+          "Method": "GET",
+          "URLTemplate": "https://wiki.archlinux.org/index.php?title=Special%3ASearch&search={searchTerms}"
+        },
+        {
+          "Name": "Breave search",
+          "Alias": "br",
+          "Method": "GET",
+          "URLTemplate": "https://search.brave.com/search?source=web&q={searchTerms}"
+        },
+        {
+          "Name": "Debian packages",
+          "Alias": "deb",
+          "Method": "GET",
+          "URLTemplate": "https://packages.debian.org/search?searchon=names&suite=bookworm&section=all&keywords={searchTerms}"
+        },
+        {
+          "Name": "Docker hub",
+          "Alias": "dock",
+          "Method": "GET",
+          "URLTemplate": "https://hub.docker.com/search?q={searchTerms}"
+        },
+        {
+          "Name": "Google Search",
+          "Alias": "g",
+          "Method": "GET",
+          "URLTemplate": "https://www.google.com/search?q={searchTerms}"
+        },
+        {
+          "Name": "Linux manual",
+          "Alias": "man",
+          "Method": "GET",
+          "URLTemplate": "https://manned.org/browse/search?q={searchTerms}"
+        },
+        {
+          "Name": "NPM Packages",
+          "Alias": "npm",
+          "Method": "GET",
+          "URLTemplate": "https://www.npmjs.com/search?q={searchTerms}"
+        },
+        {
+          "Name": "NixOS package search",
+          "Alias": "nixpkg",
+          "Method": "GET",
+          "URLTemplate": "https://search.nixos.org/packages?channel=26.05&query={searchTerms}"
+        },
+        {
+          "Name": "Piratebay",
+          "Alias": "pir",
+          "Method": "GET",
+          "URLTemplate": "https://thepiratebay.org/search.php?all=on&page=0&orderby=&q={searchTerms}"
+        },
+        {
+          "Name": "Superuser",
+          "Alias": "sup",
+          "Method": "GET",
+          "URLTemplate": "https://superuser.com/search?q={searchTerms}"
+        },
+        {
+          "Name": "Youtube",
+          "Alias": "ytb",
+          "Method": "GET",
+          "URLTemplate": "https://www.youtube.com/results?search_query={searchTerms}"
+        }
+      ]
     }
   }
 }

@@ -11,6 +11,8 @@ hl.config({
 			inactive_border = theme.ui.border_inactive,
 		},
 		layout = layout.name,
+
+		allow_tearing = true,
 	},
 
 	decoration = {
@@ -36,11 +38,15 @@ hl.config({
 
 	misc = {
 		disable_hyprland_logo = true,
-		vrr = 2,
+		vrr = 3,
 		disable_autoreload = false,
 		mouse_move_enables_dpms = true,
 		key_press_enables_dpms  = true,
 		background_color = theme.ui.background,
+	},
+
+	render = {
+		direct_scanout = 2,
 	},
 
 

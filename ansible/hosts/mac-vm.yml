@@ -11,6 +11,8 @@ packages_exclude:
   - steampipe
   - edk2-ovmf
   - vagrant
+  - steam
+  - ntsync-autoload
 
 
 # Displays
