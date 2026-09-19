@@ -12,7 +12,14 @@ let
 
   renderConfig = pkgs.writeShellScript "sing-box-render-config" ''
     umask 077
-    exec ${lib.getExe pkgs.yq-go} -o=json "${profileDir}/$1.yaml" > "$RUNTIME_DIRECTORY/config.json"
+    ${lib.getExe pkgs.yq-go} -o=json "${profileDir}/$1.yaml" > "$RUNTIME_DIRECTORY/policy.json"
+    if [ -f "${profileDir}/providers.json" ]; then
+      ${lib.getExe pkgs.sing-box} merge "$RUNTIME_DIRECTORY/config.json" \
+        -c "$RUNTIME_DIRECTORY/policy.json" \
+        -c "${profileDir}/providers.json" > /dev/null
+    else
+      mv "$RUNTIME_DIRECTORY/policy.json" "$RUNTIME_DIRECTORY/config.json"
+    fi
   '';
 
   capabilities = [
