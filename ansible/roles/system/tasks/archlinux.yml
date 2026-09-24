@@ -76,37 +76,6 @@
     create: true
     mode: "0644"
 
-- name: Turn on the pacman qol options
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/pacman.conf
-    regexp: '^#?\s*{{ item }}'
-    line: "{{ item }}"
-    insertafter: '^\[options\]'
-  loop:
-    - Color
-    - CheckSpace
-    - VerbosePkgLists
-    - ILoveCandy
-
-- name: Download packages in parallel
-  become: true
-  ansible.builtin.lineinfile:
-    path: /etc/pacman.conf
-    regexp: '^#?\s*ParallelDownloads'
-    line: ParallelDownloads = 5
-    insertafter: '^\[options\]'
-
-# makepkg sources /etc/makepkg.conf.d/*.conf on its own; $(nproc) is
-# evaluated at build time.
-- name: Let makepkg build on all cores
-  become: true
-  ansible.builtin.copy:
-    content: |
-      MAKEFLAGS="-j$(nproc)"
-    dest: /etc/makepkg.conf.d/makeflags.conf
-    mode: "0644"
-
 - name: Trim the ssd weekly
   become: true
   ansible.builtin.systemd_service:
