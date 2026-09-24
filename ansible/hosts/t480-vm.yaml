@@ -1,14 +1,13 @@
 ---
-# generic x86 qemu vm
+# qemu lab vm on the t480
 # ---------------------------------------------
-#     ansible-playbook ansible/base.yml -e @ansible/hosts/vm.yml
+#     ansible-playbook ansible/base.yml -e @ansible/hosts/t480-vm.yaml
 
 
 # Displays
 # ---------------------------------------------
 monitors:
-  - output: eDP-1
-    mode: preferred
+  - mode: preferred
     position: auto
     scale: 1.2
 
