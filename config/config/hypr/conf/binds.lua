@@ -26,6 +26,19 @@ end
 -----------------------------------------------
 local media = { locked = true, repeating = true, dont_inhibit = true }
 
+-- lid: the laptop panel goes dark while closed. Internal panels (eDP-*) only.
+local function lid(action)
+	return function()
+		for _, m in ipairs(hl.get_monitors()) do
+			if m.name:match("^eDP") then
+				hl.dispatch(hl.dsp.dpms({ action = action, monitor = m.name }))
+			end
+		end
+	end
+end
+hl.bind("switch:on:Lid Switch", lid("off"), { locked = true })
+hl.bind("switch:off:Lid Switch", lid("on"), { locked = true })
+
 -- shell surfaces
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), d("launcher", nograb))
 hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("noctalia msg panel-toggle session"), d("session menu", nograb))
