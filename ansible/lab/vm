@@ -32,6 +32,10 @@ distros:
 The vm runs accelerated when host and guest architectures match (kvm on
 linux, hvf on macos) and falls back to slow emulation otherwise. State
 lives under $CACHE.
+
+environment:
+  LAB_VM_CPUS  vcpus for the vm (default: half the host's cpus)
+  LAB_VM_MEM   memory for the vm in MiB (default: half the host's memory)
 EOF
 }
 
@@ -96,6 +100,24 @@ accel_args() {
     fi
 }
 
+host_cpus() { getconf _NPROCESSORS_ONLN; }
+
+host_mem_mib() {
+    case "$(uname -s)" in
+        Darwin) echo $(( $(sysctl -n hw.memsize) / 1048576 )) ;;
+        Linux)  awk '/^MemTotal:/ { print int($2 / 1024) }' /proc/meminfo ;;
+    esac
+}
+
+# Half the host by default, so a build in the guest cannot starve it.
+vm_size() {
+    local half_cpus=$(( $(host_cpus) / 2 )) half_mem=$(( $(host_mem_mib) / 2 ))
+    cpus="${LAB_VM_CPUS:-$(( half_cpus > 0 ? half_cpus : 1 ))}"
+    mem="${LAB_VM_MEM:-$half_mem}"
+    [[ "$cpus" =~ ^[1-9][0-9]*$ ]] || die "LAB_VM_CPUS must be a positive integer, got '$cpus'"
+    [[ "$mem" =~ ^[1-9][0-9]*$ ]] || die "LAB_VM_MEM must be a positive integer (MiB), got '$mem'"
+}
+
 make_seed() {
     ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
     mkdir -p "$vm/seed"
@@ -154,6 +176,9 @@ shell() {
 start() {
     command -v "$qemu" >/dev/null \
         || die "$qemu not found (install qemu: brew install qemu / pacman -S qemu-desktop)"
+    local cpus mem
+    vm_size
+    echo "sizing the vm at $cpus vcpus, $mem MiB"
     running && stop
     rm -rf "$vm"
     mkdir -p "$vm" "$CACHE/base"
@@ -187,7 +212,7 @@ start() {
     [ "$arg" = --headless ] && display=(-display none)
     # shellcheck disable=SC2046
     "$qemu" \
-        -name "lab-vm-$distro" -m 4096 -smp 4 \
+        -name "lab-vm-$distro" -m "$mem" -smp "$cpus" \
         "${platform[@]}" \
         $(accel_args) \
         -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
