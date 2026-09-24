@@ -1,0 +1,20 @@
+# Server mode
+# ---------------------------------------------
+# Keeps the laptop running with the lid closed. The mode itself is
+# hypr/scripts/server-mode.sh; this plugin is its bar icon (shown only while
+# on) and its control-center tile.
+
+id = "jetblack0/server"
+name = "Server mode"
+version = "1.0.0"
+plugin_api = 23
+description = "Keep the laptop running with the lid closed"
+icon = "server"
+
+[[widget]]
+id = "indicator"
+entry = "widget.luau"
+
+[[shortcut]]
+id = "toggle"
+entry = "shortcut.luau"
