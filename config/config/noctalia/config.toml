@@ -179,6 +179,27 @@ polkit_agent = true
             glyph = "key"
             prefix = "pass"
 
+    [[shell.session.actions]]
+    action = "lock"
+    shortcut = "1"
+
+    [[shell.session.actions]]
+    action = "logout"
+    shortcut = "2"
+
+    [[shell.session.actions]]
+    action = "lock_and_suspend"
+    shortcut = "3"
+
+    [[shell.session.actions]]
+    action = "reboot"
+    shortcut = "4"
+
+    [[shell.session.actions]]
+    action = "shutdown"
+    shortcut = "5"
+    variant = "default"
+
     [shell.window_switcher]
     mru = true
 
