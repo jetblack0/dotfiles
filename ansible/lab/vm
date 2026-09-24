@@ -36,6 +36,7 @@ lives under $CACHE.
 environment:
   LAB_VM_CPUS  vcpus for the vm (default: half the host's cpus)
   LAB_VM_MEM   memory for the vm in MiB (default: half the host's memory)
+  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 1920x1080)
 EOF
 }
 
@@ -118,6 +119,14 @@ vm_size() {
     [[ "$mem" =~ ^[1-9][0-9]*$ ]] || die "LAB_VM_MEM must be a positive integer (MiB), got '$mem'"
 }
 
+# The preferred mode virtio-gpu advertises over edid; qemu's own is 1280x800.
+vm_resolution() {
+    local res="${LAB_VM_RES:-1920x1080}"
+    [[ "$res" =~ ^([1-9][0-9]*)x([1-9][0-9]*)$ ]] \
+        || die "LAB_VM_RES must look like 1920x1080, got '$res'"
+    xres="${BASH_REMATCH[1]}" yres="${BASH_REMATCH[2]}"
+}
+
 make_seed() {
     ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
     mkdir -p "$vm/seed"
@@ -176,9 +185,10 @@ shell() {
 start() {
     command -v "$qemu" >/dev/null \
         || die "$qemu not found (install qemu: brew install qemu / pacman -S qemu-desktop)"
-    local cpus mem
+    local cpus mem xres yres
     vm_size
-    echo "sizing the vm at $cpus vcpus, $mem MiB"
+    vm_resolution
+    echo "sizing the vm at $cpus vcpus, $mem MiB, ${xres}x${yres}"
     running && stop
     rm -rf "$vm"
     mkdir -p "$vm" "$CACHE/base"
@@ -216,7 +226,7 @@ start() {
         "${platform[@]}" \
         $(accel_args) \
         -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
-        -device virtio-gpu-pci -device virtio-rng-pci \
+        -device virtio-gpu-pci,xres="$xres",yres="$yres" -device virtio-rng-pci \
         -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" \
         -qmp "unix:$vm/qmp.sock,server,nowait" \
         -serial "file:$vm/serial.log" \
