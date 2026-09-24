@@ -27,7 +27,6 @@ packages:
   - { name: zoxide }
 
   # fonts
-  - { name: apple-fonts, aur: apple-fonts, brew: false } # SF Pro/Rounded; macos ships these natively
   - { name: inter-font, cask: font-inter }
   - { name: noto-fonts-cjk, cask: font-noto-sans-cjk }
   - { name: otf-libertinus, cask: font-libertinus }
@@ -191,6 +190,16 @@ packages_exclude: []
 # The GPU in this box, set per host.
 # ---------------------------------------------
 gpu_vendor: ""
+
+# SF Pro on arch
+# ---------------------------------------------
+# Apple republishes at the same url, so the checksum pins one release and
+# the wayback snapshot keeps it reachable after Apple moves on. Bump all
+# three together, and nix/packages/apple-fonts.nix with them.
+packages_sf_pro:
+  sha256: 968ab3b8b1f92c2d8af61eb0680f5c2224c4e78d59b986bf004502a7fc012918
+  url: https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg
+  mirror: https://web.archive.org/web/20260916202226id_/https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg
 
 # Proxy carried into the AUR tasks, which run as the build user.
 # ---------------------------------------------

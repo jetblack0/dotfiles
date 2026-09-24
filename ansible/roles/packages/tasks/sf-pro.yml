@@ -1,0 +1,79 @@
+---
+- name: Check whether this SF Pro release is installed
+  ansible.builtin.stat:
+    path: "{{ packages_sf_pro_dir }}/.release-{{ packages_sf_pro.sha256 }}"
+  register: packages_sf_pro_stamp
+
+- name: Install this SF Pro release
+  when: not packages_sf_pro_stamp.stat.exists
+  become: true
+  block:
+    - name: Install the tools that unpack SF Pro
+      community.general.pacman:
+        name: [7zip, cpio]
+        state: present
+
+    - name: Create a scratch directory for SF Pro
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: -sf-pro
+      register: packages_sf_pro_tmp
+
+    - name: Download SF Pro
+      environment: "{{ packages_proxy_env }}"
+      block:
+        - name: Download SF Pro from Apple
+          ansible.builtin.get_url:
+            url: "{{ packages_sf_pro.url }}"
+            dest: "{{ packages_sf_pro_tmp.path }}/SF-Pro.dmg"
+            checksum: "sha256:{{ packages_sf_pro.sha256 }}"
+            mode: "0644"
+      rescue:
+        - name: Download SF Pro from the wayback snapshot
+          ansible.builtin.get_url:
+            url: "{{ packages_sf_pro.mirror }}"
+            dest: "{{ packages_sf_pro_tmp.path }}/SF-Pro.dmg"
+            checksum: "sha256:{{ packages_sf_pro.sha256 }}"
+            force: true
+            mode: "0644"
+
+    - name: Unpack SF Pro
+      ansible.builtin.shell:
+        cmd: |
+          set -eu
+          7z x -bso0 -bsp0 SF-Pro.dmg
+          7z x -bso0 -bsp0 SFProFonts.pkg SFProFontsPackage.pkg/Payload
+          7z x -bso0 -bsp0 SFProFontsPackage.pkg/Payload
+          cpio -idm --quiet < 'Payload~'
+        chdir: "{{ packages_sf_pro_tmp.path }}"
+      changed_when: true
+
+    - name: Remove the previous SF Pro release
+      ansible.builtin.file:
+        path: "{{ packages_sf_pro_dir }}"
+        state: absent
+
+    - name: Install the SF Pro fonts
+      ansible.builtin.copy:
+        src: "{{ packages_sf_pro_tmp.path }}/Library/Fonts/"
+        dest: "{{ packages_sf_pro_dir }}/"
+        remote_src: true
+        directory_mode: "0755"
+        mode: "0644"
+
+    - name: Record the installed SF Pro release
+      ansible.builtin.copy:
+        content: ""
+        dest: "{{ packages_sf_pro_dir }}/.release-{{ packages_sf_pro.sha256 }}"
+        mode: "0644"
+
+    - name: Rebuild the font cache
+      ansible.builtin.command: fc-cache -f
+      changed_when: true
+
+  always:
+    - name: Remove the SF Pro scratch directory
+      ansible.builtin.file:
+        path: "{{ packages_sf_pro_tmp.path }}"
+        state: absent
+      when: packages_sf_pro_tmp.path is defined

@@ -39,3 +39,5 @@ packages_brew: >-
 packages_casks: "{{ packages_enabled | selectattr('cask', 'defined') | map(attribute='cask') | list }}"
 
 packages_taps: "{{ packages_enabled | selectattr('tap', 'defined') | map(attribute='tap') | unique | list }}"
+
+packages_sf_pro_dir: /usr/local/share/fonts/apple-sf-pro
