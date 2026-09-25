@@ -33,10 +33,15 @@ The vm runs accelerated when host and guest architectures match (kvm on
 linux, hvf on macos) and falls back to slow emulation otherwise. State
 lives under $CACHE.
 
+On a linux host the window opens fullscreen with 3d graphics and takes
+the keyboard. Ctrl+Alt+F leaves fullscreen and gives the keyboard back.
+The guest screen then follows the window size.
+
 environment:
   LAB_VM_CPUS  vcpus for the vm (default: half the host's cpus)
   LAB_VM_MEM   memory for the vm in MiB (default: half the host's memory)
-  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 1920x1080)
+  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 1920x1080);
+               the fullscreen linux window overrides it with the screen size
 EOF
 }
 
@@ -222,7 +227,17 @@ start() {
     local input=(-device qemu-xhci -device usb-kbd -device usb-tablet)
 
     local display=()
-    [ "$arg" = --headless ] && display=(-display none)
+    if [ "$arg" = --headless ]; then
+        display=(-display none)
+    elif [ "$(uname -s)" = Linux ]; then
+        case "$gpu" in
+            virtio-vga)     gpu=virtio-vga-gl ;;
+            virtio-gpu-pci) gpu=virtio-gpu-gl-pci ;;
+        esac
+        display=(-display sdl,gl=on -full-screen)
+        export SDL_VIDEO_WAYLAND_SCALE_TO_DISPLAY=1
+    fi
+
     # shellcheck disable=SC2046
     "$qemu" \
         -name "lab-vm-$distro" -m "$mem" -smp "$cpus" \
