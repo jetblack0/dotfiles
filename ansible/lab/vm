@@ -206,8 +206,8 @@ start() {
     qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
     make_seed
 
-    # the virt machine has neither q35's ide to hang the seed off nor a
-    # ps/2 controller, so the seed rides on virtio and input over usb
+    # the virt machine has no ide to hang the seed off, so there the seed
+    # rides on virtio
     local platform=(-machine q35 -vga none -cdrom "$vm/seed.iso")
     local gpu=virtio-vga
     if [ "$guest_arch" = aarch64 ]; then
@@ -216,9 +216,10 @@ start() {
         platform=(-machine virt
                   -drive if=pflash,format=raw,readonly=on,file="$(firmware)"
                   -drive if=pflash,format=raw,file="$vm/vars.fd"
-                  -drive if=virtio,file="$vm/seed.iso",format=raw,readonly=on
-                  -device qemu-xhci -device usb-kbd -device usb-tablet)
+                  -drive if=virtio,file="$vm/seed.iso",format=raw,readonly=on)
     fi
+
+    local input=(-device qemu-xhci -device usb-kbd -device usb-tablet)
 
     local display=()
     [ "$arg" = --headless ] && display=(-display none)
@@ -229,6 +230,7 @@ start() {
         $(accel_args) \
         -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
         -device "$gpu",xres="$xres",yres="$yres" -device virtio-rng-pci \
+        "${input[@]}" \
         -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" \
         -qmp "unix:$vm/qmp.sock,server,nowait" \
         -serial "file:$vm/serial.log" \
