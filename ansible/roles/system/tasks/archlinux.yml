@@ -169,11 +169,10 @@
 # Boot into noctalia-greeter via greetd.
 - name: Install the greetd config
   become: true
-  ansible.builtin.copy:
+  ansible.builtin.template:
     src: "{{ system_src }}/greetd/config.toml"
     dest: /etc/greetd/config.toml
     mode: "0644"
-    remote_src: true
 
 - name: Boot into the greeter
   become: true
