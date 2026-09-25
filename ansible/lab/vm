@@ -19,7 +19,9 @@ commands:
               cloud-init, copy the repo to ~/dotfiles and open a shell
               (pass --headless as the third argument to skip the window)
   shell       open another shell in the running vm
-  screenshot  dump the virtual monitor to a png ([arg] = output file)
+  screenshot  dump the virtual monitor to a png ([arg] = output file);
+              needs the 2d display (--headless or macos), qemu can't dump
+              the 3d one
   stop        power the vm off and remove its state
 
 distros:
@@ -300,7 +302,9 @@ def cmd(c):
 cmd({"execute": "qmp_capabilities"})
 r = cmd({"execute": "screendump",
          "arguments": {"filename": sys.argv[2], "format": "png"}})
-sys.exit(0 if "return" in r else 1)
+# a gl display has no surface to dump; say so instead of failing silently
+if "error" in r:
+    sys.exit("screendump failed: " + r["error"]["desc"])
 EOF
     echo "$out"
 }
