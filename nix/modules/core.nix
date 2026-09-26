@@ -93,7 +93,6 @@ in
       uid = 1000;
       extraGroups = [
         "wheel"
-        "docker"
         "video"
         "input"
       ];
@@ -167,7 +166,6 @@ in
       argocd
       awscli2
       cloudflared
-      docker-compose
       kubernetes-helm
       kubectl
       linode-cli
@@ -206,7 +204,6 @@ in
     # ventoy bundles prebuilt blobs nixpkgs will not vouch for (nixpkgs#404663).
     nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "ventoy";
 
-    virtualisation.docker.enable = true;
     programs.nix-ld.enable = true;
 
 
