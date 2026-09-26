@@ -34,13 +34,21 @@ in
 
     # libvirt
     # ---------------------------------------------
-    virtualisation.libvirtd.enable = true;
+    virtualisation.libvirtd = {
+      enable = true;
+      qemu.runAsRoot = false;
+    };
     programs.virt-manager.enable = true;
 
     # the module hardwires libvirtd into multi-user.target; libvirtd.socket
     # stays, so the first virsh or virt-manager call starts it
     systemd.services.libvirtd.wantedBy = lib.mkForce [ ];
     systemd.services.libvirt-guests.wantedBy = lib.mkForce [ "libvirtd.service" ];
+
+    home-manager.users.${username}.dconf.settings."org/virt-manager/virt-manager/connections" = {
+      uris = [ "qemu:///system" ];
+      autoconnect = [ "qemu:///system" ];
+    };
 
 
     # users
