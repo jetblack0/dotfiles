@@ -134,6 +134,23 @@ vm_resolution() {
     xres="${BASH_REMATCH[1]}" yres="${BASH_REMATCH[2]}"
 }
 
+graphical_session() {
+    if [ -n "${WAYLAND_DISPLAY:-}" ] || [ -n "${DISPLAY:-}" ]; then
+        return
+    fi
+    local var val found=()
+    for var in WAYLAND_DISPLAY DISPLAY; do
+        val="$(systemctl --user show-environment 2>/dev/null | sed -n "s/^$var=//p")" || true
+        [ -n "$val" ] || continue
+        export "$var=$val"
+        found+=("$var=$val")
+    done
+    [ "${#found[@]}" -gt 0 ] \
+        || die "no desktop session to open the window on (try --headless)"
+    echo "warning: this shell has no WAYLAND_DISPLAY or DISPLAY (ssh?)," \
+         "using the desktop session's: ${found[*]}" >&2
+}
+
 make_seed() {
     ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
     mkdir -p "$vm/seed"
@@ -195,6 +212,9 @@ start() {
     local cpus mem xres yres
     vm_size
     vm_resolution
+    if [ "$arg" != --headless ] && [ "$(uname -s)" = Linux ]; then
+        graphical_session
+    fi
     echo "sizing the vm at $cpus vcpus, $mem MiB, ${xres}x${yres}"
     running && stop
     rm -rf "$vm"
