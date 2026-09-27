@@ -29,6 +29,9 @@ instances:
   rm <name>              delete a stopped instance and its disk
   mv <name> <new-name>   rename a stopped instance (the guest keeps its
                          hostname)
+  cp <name> <new-name>   clone a stopped instance, snapshots included. The
+                         clone gets its own ssh port; the guest keeps the
+                         source's hostname
   list                   show the instances, their ports and state
 
   new and start take --headless to run without a window.
@@ -629,6 +632,27 @@ cmd_mv() {
     echo "renamed '$name' to '$new'"
 }
 
+# The clone is the source's directory minus its runtime files, with a new
+# ssh port. Everything else can stay the same.
+cmd_cp() {
+    need_stopped
+    local new="${1:-}"
+    [ -n "$new" ] || die "missing new name (try: ${0##*/} cp $name <new-name>)"
+    valid_name "$new" \
+        || die "instance names are lowercase letters, digits, dots and dashes, got '$new'"
+    [ ! -e "$CACHE/$new" ] || die "instance '$new' already exists"
+
+    echo "copying '$name' to '$new'"
+    # an instant copy where the filesystem can share blocks (apfs, btrfs)
+    case "$(uname -s)" in
+        Darwin) cp -Rpc "$vm" "$CACHE/$new" ;;
+        Linux)  cp -a --reflink=auto --sparse=always "$vm" "$CACHE/$new" ;;
+    esac
+    rm -f "$CACHE/$new"/{pid,qmp.sock,serial.sock,serial.log,qemu.log,screen.png}
+    free_port > "$CACHE/$new/port"
+    echo "cloned '$name' to '$new', ssh port $(cat "$CACHE/$new/port")"
+}
+
 cmd_list() {
     local n state
     printf '%-20s %-15s %-6s %s\n' NAME DISTRO PORT STATE
@@ -692,6 +716,7 @@ case "$cmd" in
     stop)       load_instance "${1:-}"; cmd_stop ;;
     rm)         load_instance "${1:-}"; cmd_rm ;;
     mv)         load_instance "${1:-}"; cmd_mv "${2:-}" ;;
+    cp)         load_instance "${1:-}"; cmd_cp "${2:-}" ;;
     screenshot) load_instance "${1:-}"; cmd_screenshot "${2:-}" ;;
     snapshot)   load_instance "${1:-}"; cmd_snapshot "${2:-}" ;;
     revert)     load_instance "${1:-}"; cmd_revert "${2:-}" ;;
