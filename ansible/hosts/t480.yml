@@ -31,3 +31,8 @@ greeter_output:
   width: 1920
   height: 1080
   scale: 1.2
+
+
+# Miscs
+# ---------------------------------------------
+singbox_dns_override: true
