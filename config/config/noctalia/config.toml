@@ -215,6 +215,9 @@ source = "wallpaper"
     builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
     community_ids = [ "zen-browser" ]
 
+[widget.battery.actions]
+right = "panel-toggle damian-ds7/battery-threshold:panel"
+
 [widget.battery-threshold]
 type = "damian-ds7/battery-threshold:battery-threshold"
 
