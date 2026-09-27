@@ -7,7 +7,8 @@
 # Displays
 # ---------------------------------------------
 monitors:
-  - mode: preferred
+  - output: Virtual-1
+    mode: preferred
     position: auto
     scale: 1.2
 
