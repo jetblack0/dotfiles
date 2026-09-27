@@ -5,7 +5,7 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/nixos"
-SSH_PORT=2223   # 2222 belongs to the ansible vm lab; both can run at once
+SSH_PORT=2223   # the ansible vm lab uses 2230 and up; both can run at once
 RELEASE=26.05   # the image's release; match stateVersion
 
 usage() {

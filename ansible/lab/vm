@@ -1,39 +1,58 @@
 #!/usr/bin/env bash
-# Disposable QEMU virtual machines for testing the playbooks end to end,
-# desktop included: a real boot, a real login and a real DRM display
-# (virtio-gpu).
+# QEMU virtual machines for testing the playbooks end to end, desktop
+# included: a real boot, a real login and a real DRM display (virtio-gpu).
+# Each vm is a named instance that keeps its disk between boots.
 
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO="$(cd "$HERE/../.." && pwd)"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/vm"
-SSH_PORT=2222
+
+# Each instance gets its own ssh port from here up, picked once by `new`.
+# 2223 is the nixos lab and 2224 the arm image builder.
+FIRST_PORT=2230
 
 usage() {
     cat <<EOF
-usage: ${0##*/} <command> <distro> [arg]
+usage: ${0##*/} <command> [args]
 
-commands:
-  start       boot a fresh vm, provision the primary user and ansible via
-              cloud-init, copy the repo to ~/dotfiles and open a shell
-              (pass --headless as the third argument to skip the window)
-  shell       open another shell in the running vm
-  screenshot  dump the virtual monitor to a png ([arg] = output file);
-              needs the 2d display (--headless or macos), qemu can't dump
-              the 3d one
-  stop        power the vm off and remove its state
+instances:
+  new <distro> [name]    create an instance (name defaults to the distro),
+                         boot it, provision the primary user and ansible
+                         via cloud-init, copy the repo to ~/dotfiles and
+                         open a shell
+  start <name>           boot an existing instance and open a shell
+  stop <name>            shut the instance down cleanly
+  rm <name>              delete a stopped instance and its disk
+  list                   show the instances, their ports and state
+
+  new and start take --headless to run without a window.
+
+in a running instance:
+  shell <name>           open another shell
+  sync <name>            copy the repo to ~/dotfiles again
+  screenshot <name> [file]
+                         dump the virtual monitor to a png. Needs the 2d
+                         display (--headless or macos), qemu can't dump
+                         the 3d one
+
+snapshots (the instance must be stopped):
+  snapshot <name> [tag]  save the disk as <tag>, or list the snapshots
+  revert <name> <tag>    put the disk back to <tag>
 
 distros:
-  archlinux   the official x86_64 cloud image -- mainline arch, so unlike
-              the container lab nothing needs to be excluded
-  archlinux-arm
-              an aarch64 image lib/build-arm-image assembles from the arch
-              linux arm rootfs tarball.
+  archlinux              the official x86_64 cloud image -- mainline
+                         arch, so unlike the container lab nothing needs
+                         to be excluded
+  archlinux-arm          an aarch64 image lib/build-arm-image assembles
+                         from the arch linux arm rootfs tarball
 
 The vm runs accelerated when host and guest architectures match (kvm on
 linux, hvf on macos) and falls back to slow emulation otherwise. State
-lives under $CACHE.
+lives under $CACHE: one directory per instance, and base/ for the
+downloaded images. Every instance disk is a thin layer on top of its base
+image, so never delete or replace a base image while instances use it.
 
 On a linux host the window opens fullscreen with 3d graphics and takes
 the keyboard. Ctrl+Alt+F leaves fullscreen and gives the keyboard back.
@@ -49,33 +68,74 @@ EOF
 
 die() { echo "${0##*/}: $*" >&2; exit 1; }
 
-cmd="${1:-}"
-distro="${2:-}"
-arg="${3:-}"
 
-case "$cmd" in ''|help|-h|--help) usage; exit 0 ;; esac
-[ -n "$distro" ] || die "missing distro (try: ${0##*/} help)"
+# Instances
+# ---------------------------------------------
+# Sets guest_arch and img_url for a distro.
+distro_info() {
+    case "$1" in
+        archlinux)
+            guest_arch=x86_64
+            img_url="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+            ;;
+        archlinux-arm)
+            guest_arch=aarch64
+            img_url=        # no upstream image, lib/build-arm-image makes one
+            ;;
+        *) die "unknown distro '$1' (try: ${0##*/} help)" ;;
+    esac
+}
 
-case "$distro" in
-    archlinux)
-        guest_arch=x86_64
-        img_url="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
-        ;;
-    archlinux-arm)
-        guest_arch=aarch64
-        img_url=            # no upstream image, lib/build-arm-image makes one
-        ;;
-    *) die "unknown distro '$distro' (try: ${0##*/} help)" ;;
-esac
+# Sets everything the other commands need to talk to instance $1.
+load_instance() {
+    name="${1:-}"
+    [ -n "$name" ] || die "missing instance name (try: ${0##*/} list)"
+    valid_name "$name" && [ -d "$CACHE/$name" ] || die "no instance '$name' (try: ${0##*/} list)"
+    vm="$CACHE/$name"
 
-vm="$CACHE/$distro"
-base="$CACHE/base/$distro.qcow2"
-qemu="qemu-system-$guest_arch"
-ssh_opts=(-p "$SSH_PORT" -i "$vm/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
-          -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
-          -o ServerAliveInterval=15)
+    # A directory from before instances existed: the name was the distro
+    # and the port was 2222.
+    if [ ! -f "$vm/distro" ]; then
+        ( distro_info "$name" ) 2>/dev/null || die "'$vm' is not an instance"
+        echo "$name" > "$vm/distro"
+        echo 2222 > "$vm/port"
+    fi
+
+    distro="$(cat "$vm/distro")"
+    port="$(cat "$vm/port")"
+    distro_info "$distro"
+    base="$CACHE/base/$distro.qcow2"
+    qemu="qemu-system-$guest_arch"
+    ssh_opts=(-p "$port" -i "$vm/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
+              -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+              -o ServerAliveInterval=15)
+}
+
+# Names become directory names, so they can't contain a slash or start
+# with a dot.
+valid_name() { [[ "$1" =~ ^[a-z0-9][a-z0-9.-]*$ ]] && [ "$1" != base ]; }
+
+instances() {
+    local d
+    for d in "$CACHE"/*/; do
+        d="${d%/}"; d="${d##*/}"
+        [ "$d" = base ] || [ "$d" = '*' ] || echo "$d"
+    done
+}
+
+# The first port from FIRST_PORT up that no instance has taken.
+free_port() {
+    local p="$FIRST_PORT"
+    while cat "$CACHE"/*/port 2>/dev/null | grep -qx "$p"; do
+        p=$(( p + 1 ))
+    done
+    echo "$p"
+}
 
 running() { [ -f "$vm/pid" ] && kill -0 "$(cat "$vm/pid")" 2>/dev/null; }
+
+need_running() { running || die "'$name' is not running -- run: ${0##*/} start $name"; }
+need_stopped() { ! running || die "'$name' is running -- run: ${0##*/} stop $name"; }
 
 vm_ssh() {  # vm_ssh [-t] cmd...
     local tty=()
@@ -83,6 +143,33 @@ vm_ssh() {  # vm_ssh [-t] cmd...
     ssh "${tty[@]}" "${ssh_opts[@]}" dev@127.0.0.1 "$@"
 }
 
+# qmp <command> [json arguments]: run one command on the instance's monitor.
+qmp() {
+    local args="${2:-}"
+    [ -n "$args" ] || args='{}'
+    python3 - "$vm/qmp.sock" "$1" "$args" <<'EOF'
+import json, socket, sys
+sock, command, args = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
+s = socket.socket(socket.AF_UNIX)
+s.connect(sock)
+f = s.makefile("rw")
+json.loads(f.readline())  # greeting
+def cmd(c):
+    f.write(json.dumps(c) + "\n"); f.flush()
+    while True:
+        r = json.loads(f.readline())
+        if "return" in r or "error" in r:
+            return r
+cmd({"execute": "qmp_capabilities"})
+r = cmd({"execute": command, "arguments": args})
+if "error" in r:
+    sys.exit(command + " failed: " + r["error"]["desc"])
+EOF
+}
+
+
+# Host
+# ---------------------------------------------
 firmware() {
     local f
     for f in /opt/homebrew/share/qemu/edk2-aarch64-code.fd \
@@ -151,6 +238,23 @@ graphical_session() {
          "using the desktop session's: ${found[*]}" >&2
 }
 
+# The window needs a linux host with a desktop; macos uses qemu's own.
+wants_gl() { [ "$headless" = false ] && [ "$(uname -s)" = Linux ]; }
+
+# Checks that can fail, run before anything is created or booted.
+preflight() {
+    command -v "$qemu" >/dev/null \
+        || die "$qemu not found (install qemu: brew install qemu / pacman -S qemu-desktop)"
+    vm_size
+    vm_resolution
+    if wants_gl; then
+        graphical_session
+    fi
+}
+
+
+# Provisioning
+# ---------------------------------------------
 make_seed() {
     ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
     mkdir -p "$vm/seed"
@@ -168,7 +272,7 @@ runcmd:
   - pacman -Syu --noconfirm ansible
 EOF
     printf 'instance-id: lab-vm-%s\nlocal-hostname: lab-vm-%s\n' \
-        "$distro" "$distro" > "$vm/seed/meta-data"
+        "$name" "$name" > "$vm/seed/meta-data"
 
     # cloud-init's nocloud source wants an iso labeled cidata
     if command -v hdiutil >/dev/null; then
@@ -180,6 +284,18 @@ EOF
         mkisofs -quiet -V cidata -J -r -o "$vm/seed.iso" "$vm/seed"
     else
         die "need hdiutil, xorriso or mkisofs to build the cloud-init seed"
+    fi
+}
+
+fetch_base() {
+    [ -f "$base" ] && return
+    mkdir -p "$CACHE/base"
+    if [ -n "$img_url" ]; then
+        echo "downloading $img_url"
+        curl -fL --progress-bar -o "$base.part" "$img_url" && mv "$base.part" "$base"
+    else
+        echo "no $distro image yet, building one"
+        "$HERE/lib/build-arm-image"
     fi
 }
 
@@ -197,41 +313,11 @@ copy_repo() {
         | vm_ssh 'rm -rf ~/dotfiles && mkdir -p ~/dotfiles && tar -xzf - -C ~/dotfiles'
 }
 
-shell() {
-    running || die "no running vm -- run: ${0##*/} start $distro"
-    if [ -t 0 ]; then
-        vm_ssh -t 'cd ~/dotfiles 2>/dev/null; exec bash'
-    else
-        vm_ssh bash
-    fi
-}
 
-start() {
-    command -v "$qemu" >/dev/null \
-        || die "$qemu not found (install qemu: brew install qemu / pacman -S qemu-desktop)"
-    local cpus mem xres yres
-    vm_size
-    vm_resolution
-    if [ "$arg" != --headless ] && [ "$(uname -s)" = Linux ]; then
-        graphical_session
-    fi
-    echo "sizing the vm at $cpus vcpus, $mem MiB, ${xres}x${yres}"
-    running && stop
-    rm -rf "$vm"
-    mkdir -p "$vm" "$CACHE/base"
-
-    if [ ! -f "$base" ]; then
-        if [ -n "$img_url" ]; then
-            echo "downloading $img_url"
-            curl -fL --progress-bar -o "$base.part" "$img_url" && mv "$base.part" "$base"
-        else
-            echo "no $distro image yet, building one"
-            "$HERE/lib/build-arm-image"
-        fi
-    fi
-
-    qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
-    make_seed
+# Booting
+# ---------------------------------------------
+boot() {
+    echo "booting $name at $cpus vcpus, $mem MiB, ${xres}x${yres}, ssh port $port"
 
     # the virt machine has no ide to hang the seed off, so there the seed
     # rides on virtio
@@ -239,7 +325,6 @@ start() {
     local gpu=virtio-vga
     if [ "$guest_arch" = aarch64 ]; then
         gpu=virtio-gpu-pci
-        dd if=/dev/zero of="$vm/vars.fd" bs=1m count=64 status=none
         platform=(-machine virt
                   -drive if=pflash,format=raw,readonly=on,file="$(firmware)"
                   -drive if=pflash,format=raw,file="$vm/vars.fd"
@@ -249,9 +334,9 @@ start() {
     local input=(-device qemu-xhci -device usb-kbd -device usb-tablet)
 
     local display=()
-    if [ "$arg" = --headless ]; then
+    if [ "$headless" = true ]; then
         display=(-display none)
-    elif [ "$(uname -s)" = Linux ]; then
+    elif wants_gl; then
         case "$gpu" in
             virtio-vga)     gpu=virtio-vga-gl ;;
             virtio-gpu-pci) gpu=virtio-gpu-gl-pci ;;
@@ -262,77 +347,186 @@ start() {
 
     # shellcheck disable=SC2046
     "$qemu" \
-        -name "lab-vm-$distro" -m "$mem" -smp "$cpus" \
+        -name "lab-vm-$name" -m "$mem" -smp "$cpus" \
         "${platform[@]}" \
         $(accel_args) \
         -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
         -device "$gpu",xres="$xres",yres="$yres" -device virtio-rng-pci \
         "${input[@]}" \
-        -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$SSH_PORT-:22" \
+        -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$port-:22" \
         -qmp "unix:$vm/qmp.sock,server,nowait" \
         -serial "file:$vm/serial.log" \
         -pidfile "$vm/pid" \
-        "${display[@]}" &
+        "${display[@]}" </dev/null >"$vm/qemu.log" 2>&1 &
 
     sleep 2
-    running || die "qemu did not start (see $vm/serial.log)"
+    if ! running; then
+        cat "$vm/qemu.log" >&2
+        die "qemu did not start (see $vm/qemu.log and $vm/serial.log)"
+    fi
 
     echo -n "waiting for ssh"
     local i
     for i in $(seq 1 120); do
-        vm_ssh -o ConnectTimeout=2 true 2>/dev/null && break
+        vm_ssh -o ConnectTimeout=2 true </dev/null 2>/dev/null && break
         echo -n .; sleep 5
         [ "$i" = 120 ] && die "vm never came up (see $vm/serial.log)"
     done
     echo " up"
-
-    echo "waiting for cloud-init to install ansible"
-    vm_ssh sudo cloud-init status --wait >/dev/null
-
-    copy_repo
-    echo "fresh $distro vm, repo copied to ~/dotfiles -- try:"
-    echo "    ansible-playbook ansible/base.yml"
-    shell
 }
 
-stop() {
-    if running; then
-        kill "$(cat "$vm/pid")"
-        echo "stopped lab-vm-$distro"
+
+# Commands
+# ---------------------------------------------
+cmd_new() {
+    local new_distro="${1:-}"
+    [ -n "$new_distro" ] || die "missing distro (try: ${0##*/} help)"
+    distro_info "$new_distro"
+    name="${2:-$new_distro}"
+    valid_name "$name" \
+        || die "instance names are lowercase letters, digits, dots and dashes, got '$name'"
+    vm="$CACHE/$name"
+    [ ! -e "$vm" ] || die "instance '$name' already exists (${0##*/} start $name, or ${0##*/} rm $name)"
+
+    distro="$new_distro"
+    qemu="qemu-system-$guest_arch"
+    base="$CACHE/base/$distro.qcow2"
+    local cpus mem xres yres
+    preflight
+    fetch_base
+
+    mkdir -p "$vm"
+    echo "$distro" > "$vm/distro"
+    free_port > "$vm/port"
+    load_instance "$name"
+    qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
+    if [ "$guest_arch" = aarch64 ]; then
+        dd if=/dev/zero of="$vm/vars.fd" bs=1m count=64 status=none
+    fi
+    make_seed
+
+    boot
+    echo "waiting for cloud-init to install ansible"
+    # The instance stays when this fails, so it can be fixed by hand (a slow
+    # mirror is the usual cause) and finished with `sync`.
+    vm_ssh sudo cloud-init status --wait </dev/null >/dev/null \
+        || die "cloud-init failed on '$name' (${0##*/} shell $name, then: cloud-init status --long)"
+    copy_repo
+    echo "new $distro instance '$name', repo copied to ~/dotfiles -- try:"
+    echo "    ansible-playbook ansible/base.yml"
+    cmd_shell
+}
+
+cmd_start() {
+    load_instance "$1"
+    running && die "'$name' is already running -- ${0##*/} shell $name"
+    local cpus mem xres yres
+    preflight
+    boot
+    cmd_shell
+}
+
+cmd_shell() {
+    need_running
+    if [ -t 0 ]; then
+        vm_ssh -t 'cd ~/dotfiles 2>/dev/null; exec bash'
     else
-        echo "nothing to stop"
+        vm_ssh bash
     fi
 }
 
-screenshot() {
-    running || die "no running vm -- run: ${0##*/} start $distro"
-    local out="${arg:-$vm/screen.png}"
-    python3 - "$vm/qmp.sock" "$out" <<'EOF'
-import json, socket, sys
-s = socket.socket(socket.AF_UNIX)
-s.connect(sys.argv[1])
-f = s.makefile("rw")
-json.loads(f.readline())  # greeting
-def cmd(c):
-    f.write(json.dumps(c) + "\n"); f.flush()
-    while True:
-        r = json.loads(f.readline())
-        if "return" in r or "error" in r:
-            return r
-cmd({"execute": "qmp_capabilities"})
-r = cmd({"execute": "screendump",
-         "arguments": {"filename": sys.argv[2], "format": "png"}})
-# a gl display has no surface to dump; say so instead of failing silently
-if "error" in r:
-    sys.exit("screendump failed: " + r["error"]["desc"])
-EOF
+cmd_sync() {
+    need_running
+    copy_repo
+    echo "repo copied to ~/dotfiles on '$name'"
+}
+
+cmd_stop() {
+    if ! running; then
+        echo "'$name' is not running"
+        return
+    fi
+    qmp system_powerdown
+    echo -n "shutting down $name"
+    local i
+    for i in $(seq 1 60); do
+        running || { echo " done"; return; }
+        echo -n .; sleep 1
+    done
+    echo " no response, killing it"
+    kill "$(cat "$vm/pid")"
+}
+
+cmd_rm() {
+    need_stopped
+    rm -rf "$vm"
+    echo "deleted '$name'"
+}
+
+cmd_list() {
+    local n state
+    printf '%-20s %-15s %-6s %s\n' NAME DISTRO PORT STATE
+    for n in $(instances); do
+        if [ ! -f "$CACHE/$n/distro" ] && ! ( distro_info "$n" ) 2>/dev/null; then
+            printf '%-20s %s\n' "$n" "(not an instance)"
+            continue
+        fi
+        load_instance "$n"
+        state=stopped; running && state=running
+        printf '%-20s %-15s %-6s %s\n' "$name" "$distro" "$port" "$state"
+    done
+}
+
+cmd_screenshot() {
+    need_running
+    local out="${1:-$vm/screen.png}"
+    qmp screendump "{\"filename\": \"$out\", \"format\": \"png\"}"
     echo "$out"
 }
 
+# Snapshots live inside the instance's disk (qcow2 internal snapshots).
+cmd_snapshot() {
+    need_stopped
+    if [ -z "${1:-}" ]; then
+        qemu-img snapshot -l "$vm/disk.qcow2"
+    else
+        qemu-img snapshot -c "$1" "$vm/disk.qcow2"
+        echo "saved '$name' as '$1'"
+    fi
+}
+
+cmd_revert() {
+    need_stopped
+    [ -n "${1:-}" ] || die "missing snapshot tag (try: ${0##*/} snapshot $name)"
+    qemu-img snapshot -a "$1" "$vm/disk.qcow2"
+    echo "'$name' is back at '$1'"
+}
+
+
+# Main
+# ---------------------------------------------
+# --headless can go anywhere on the command line
+headless=false
+args=()
+for a in "$@"; do
+    if [ "$a" = --headless ]; then headless=true; else args+=("$a"); fi
+done
+set -- "${args[@]}"
+
+cmd="${1:-}"
+[ $# -gt 0 ] && shift
+
 case "$cmd" in
-    start)      start ;;
-    shell)      shell ;;
-    stop)       stop ;;
-    screenshot) screenshot ;;
+    ''|help|-h|--help) usage ;;
+    new)        cmd_new "$@" ;;
+    list)       cmd_list ;;
+    start)      cmd_start "${1:-}" ;;
+    shell)      load_instance "${1:-}"; cmd_shell ;;
+    sync)       load_instance "${1:-}"; cmd_sync ;;
+    stop)       load_instance "${1:-}"; cmd_stop ;;
+    rm)         load_instance "${1:-}"; cmd_rm ;;
+    screenshot) load_instance "${1:-}"; cmd_screenshot "${2:-}" ;;
+    snapshot)   load_instance "${1:-}"; cmd_snapshot "${2:-}" ;;
+    revert)     load_instance "${1:-}"; cmd_revert "${2:-}" ;;
     *) die "unknown command '$cmd' (try: ${0##*/} help)" ;;
 esac
