@@ -22,6 +22,7 @@
   # ---------------------------------------------
   desktop.monitors = [
     {
+      output = "Virtual-1";
       mode = "preferred";
       scale = 1.2;
     }
