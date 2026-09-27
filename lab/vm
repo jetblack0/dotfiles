@@ -464,7 +464,7 @@ boot() {
         platform=(-machine virt)
         gpu=virtio-gpu-pci
     else
-        platform=(-machine q35 -vga none)
+        platform=(-machine q35,vmport=off -vga none)
         gpu=virtio-vga
     fi
     if [ -f "$vm/vars.fd" ]; then
