@@ -27,6 +27,8 @@ instances:
   start <name>           boot an existing instance and open a shell
   stop <name>            shut the instance down cleanly
   rm <name>              delete a stopped instance and its disk
+  mv <name> <new-name>   rename a stopped instance (the guest keeps its
+                         hostname)
   list                   show the instances, their ports and state
 
   new and start take --headless to run without a window.
@@ -616,6 +618,17 @@ cmd_rm() {
     echo "deleted '$name'"
 }
 
+cmd_mv() {
+    need_stopped
+    local new="${1:-}"
+    [ -n "$new" ] || die "missing new name (try: ${0##*/} mv $name <new-name>)"
+    valid_name "$new" \
+        || die "instance names are lowercase letters, digits, dots and dashes, got '$new'"
+    [ ! -e "$CACHE/$new" ] || die "instance '$new' already exists"
+    mv "$vm" "$CACHE/$new"
+    echo "renamed '$name' to '$new'"
+}
+
 cmd_list() {
     local n state
     printf '%-20s %-15s %-6s %s\n' NAME DISTRO PORT STATE
@@ -678,6 +691,7 @@ case "$cmd" in
     sync)       load_instance "${1:-}"; cmd_sync ;;
     stop)       load_instance "${1:-}"; cmd_stop ;;
     rm)         load_instance "${1:-}"; cmd_rm ;;
+    mv)         load_instance "${1:-}"; cmd_mv "${2:-}" ;;
     screenshot) load_instance "${1:-}"; cmd_screenshot "${2:-}" ;;
     snapshot)   load_instance "${1:-}"; cmd_snapshot "${2:-}" ;;
     revert)     load_instance "${1:-}"; cmd_revert "${2:-}" ;;
