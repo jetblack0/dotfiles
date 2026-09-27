@@ -15,7 +15,7 @@ ALARM_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-aarch64-latest.tar.gz"
 ALARM_KEY="68B3537F39A313B3E574D06777193F152BDBE6A6"
 DEBIAN_URL="https://cloud.debian.org/images/cloud/trixie/latest/debian-13-genericcloud-arm64.qcow2"
 
-# 2223 is the nixos lab, 2230 and up the vm lab instances
+# 2230 and up are the vm lab instances
 SSH_PORT=2224
 DISK_SIZE=12G
 

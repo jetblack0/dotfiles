@@ -6,11 +6,11 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="$(cd "$HERE/../.." && pwd)"
+REPO="$(cd "$HERE/.." && pwd)"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/vm"
 
 # Each instance gets its own ssh port from here up, picked once by `new`.
-# 2223 is the nixos lab and 2224 the arm image builder.
+# 2224 is the arm image builder.
 FIRST_PORT=2230
 
 usage() {

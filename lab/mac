@@ -6,7 +6,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="$(cd "$HERE/../.." && pwd)"
+REPO="$(cd "$HERE/.." && pwd)"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/mac"
 
 IMAGE=ghcr.io/cirruslabs/macos-sequoia-base:latest
