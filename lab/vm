@@ -13,15 +13,17 @@ CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/vm"
 # 2224 is the arm image builder.
 FIRST_PORT=2230
 
+# The nixos image release; match stateVersion in nix/hosts.
+NIXOS_RELEASE=26.05
+
 usage() {
     cat <<EOF
 usage: ${0##*/} <command> [args]
 
 instances:
   new <distro> [name]    create an instance (name defaults to the distro),
-                         boot it, provision the primary user and ansible
-                         via cloud-init, copy the repo to ~/dotfiles and
-                         open a shell
+                         boot it, set up ssh access, copy the repo to
+                         ~/dotfiles and open a shell
   start <name>           boot an existing instance and open a shell
   stop <name>            shut the instance down cleanly
   rm <name>              delete a stopped instance and its disk
@@ -47,6 +49,14 @@ distros:
                          to be excluded
   archlinux-arm          an aarch64 image lib/build-arm-image assembles
                          from the arch linux arm rootfs tarball
+  nixos                  the official x86_64 nixos incus vm image
+  nixos-arm              the same image for aarch64
+
+The archlinux guests get the user dev and ansible from cloud-init. The
+nixos image has no cloud-init: the script logs in as root on the serial
+console, brings the network up and plants an ssh key. It does that again
+on later boots only while ssh doesn't answer (a stock system; a rebuilt
+one brings its own network up).
 
 The vm runs accelerated when host and guest architectures match (kvm on
 linux, hvf on macos) and falls back to slow emulation otherwise. State
@@ -71,8 +81,22 @@ die() { echo "${0##*/}: $*" >&2; exit 1; }
 
 # Instances
 # ---------------------------------------------
-# Sets guest_arch and img_url for a distro.
 distro_info() {
+    base="$CACHE/base/$1.qcow2"
+    case "$1" in
+        archlinux|archlinux-arm)
+            user=dev
+            setup=cloud-init
+            hint="ansible-playbook ansible/base.yml"
+            ;;
+        nixos|nixos-arm)
+            user=root
+            setup=serial
+            base="$CACHE/base/$1-$NIXOS_RELEASE.qcow2"
+            # flakes are off in the stock image; the dotfiles turn them on
+            hint="nixos-rebuild switch --option experimental-features 'nix-command flakes' --flake ./nix#"
+            ;;
+    esac
     case "$1" in
         archlinux)
             guest_arch=x86_64
@@ -82,8 +106,19 @@ distro_info() {
             guest_arch=aarch64
             img_url=        # no upstream image, lib/build-arm-image makes one
             ;;
+        nixos)
+            guest_arch=x86_64
+            hint+=t480-vm
+            ;;
+        nixos-arm)
+            guest_arch=aarch64
+            hint+=vm-arm64
+            ;;
         *) die "unknown distro '$1' (try: ${0##*/} help)" ;;
     esac
+    if [ "$setup" = serial ]; then
+        img_url="https://hydra.nixos.org/job/nixos/release-$NIXOS_RELEASE/nixos.incusVirtualMachineImage.$guest_arch-linux/latest/download/1"
+    fi
 }
 
 # Sets everything the other commands need to talk to instance $1.
@@ -104,7 +139,6 @@ load_instance() {
     distro="$(cat "$vm/distro")"
     port="$(cat "$vm/port")"
     distro_info "$distro"
-    base="$CACHE/base/$distro.qcow2"
     qemu="qemu-system-$guest_arch"
     ssh_opts=(-p "$port" -i "$vm/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
               -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
@@ -140,7 +174,7 @@ need_stopped() { ! running || die "'$name' is running -- run: ${0##*/} stop $nam
 vm_ssh() {  # vm_ssh [-t] cmd...
     local tty=()
     [ "${1:-}" = -t ] && { tty=(-t); shift; }
-    ssh "${tty[@]}" "${ssh_opts[@]}" dev@127.0.0.1 "$@"
+    ssh "${tty[@]}" "${ssh_opts[@]}" "$user@127.0.0.1" "$@"
 }
 
 # qmp <command> [json arguments]: run one command on the instance's monitor.
@@ -170,15 +204,32 @@ EOF
 
 # Host
 # ---------------------------------------------
+# firmware code|vars: the uefi firmware for the guest architecture. vars is
+# the template for a new instance's settings (x86 only; on aarch64 an
+# empty file works).
 firmware() {
-    local f
-    for f in /opt/homebrew/share/qemu/edk2-aarch64-code.fd \
-             /usr/share/qemu/edk2-aarch64-code.fd \
-             /usr/share/AAVMF/AAVMF_CODE.fd \
-             /usr/share/edk2/aarch64/QEMU_EFI.fd; do
+    local f files=()
+    case "$guest_arch-$1" in
+        aarch64-code)
+            files=(/opt/homebrew/share/qemu/edk2-aarch64-code.fd
+                   /usr/share/qemu/edk2-aarch64-code.fd
+                   /usr/share/AAVMF/AAVMF_CODE.fd
+                   /usr/share/edk2/aarch64/QEMU_EFI.fd) ;;
+        x86_64-code)
+            files=(/opt/homebrew/share/qemu/edk2-x86_64-code.fd
+                   /usr/share/edk2/x64/OVMF_CODE.4m.fd
+                   /usr/share/OVMF/OVMF_CODE_4M.fd
+                   /usr/share/OVMF/OVMF_CODE.fd) ;;
+        x86_64-vars)
+            files=(/opt/homebrew/share/qemu/edk2-i386-vars.fd
+                   /usr/share/edk2/x64/OVMF_VARS.4m.fd
+                   /usr/share/OVMF/OVMF_VARS_4M.fd
+                   /usr/share/OVMF/OVMF_VARS.fd) ;;
+    esac
+    for f in "${files[@]}"; do
         [ -f "$f" ] && { echo "$f"; return; }
     done
-    die "no aarch64 uefi firmware found (install qemu's edk2 firmware)"
+    die "no $guest_arch uefi firmware found (install edk2-ovmf, or qemu's edk2 firmware)"
 }
 
 accel_args() {
@@ -256,7 +307,6 @@ preflight() {
 # Provisioning
 # ---------------------------------------------
 make_seed() {
-    ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
     mkdir -p "$vm/seed"
     # replaces the image's default user, so ours gets uid 1000
     cat > "$vm/seed/user-data" <<EOF
@@ -299,18 +349,101 @@ fetch_base() {
     fi
 }
 
+# For the nixos image: wait for the serial console login prompt. If ssh
+# already answers, there is nothing to do. Otherwise log in as root, bring the
+# nic up by hand and plant the key. qemu's user network is always 10.0.2.15,
+# gateway .2, dns .3.
+serial_setup() {
+    echo -n "waiting for the serial console"
+    python3 - "$vm/serial.sock" "$port" "$(cat "$vm/key.pub")" <<'EOF'
+import socket, sys, time
+
+sock, port, key = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+s = socket.socket(socket.AF_UNIX)
+s.connect(sock)
+s.settimeout(2.0)
+buf = b""
+
+def ssh_answers():
+    try:
+        c = socket.create_connection(("127.0.0.1", port), timeout=3)
+        c.settimeout(3)
+        ok = c.recv(8).startswith(b"SSH-")
+        c.close()
+        return ok
+    except OSError:
+        return False
+
+def wait_for(tokens, timeout, nudge=None):
+    global buf
+    deadline = time.monotonic() + timeout
+    nudged = 0.0
+    while time.monotonic() < deadline:
+        if nudge and time.monotonic() - nudged > 5:
+            s.sendall(nudge); nudged = time.monotonic()
+        try:
+            data = s.recv(4096)
+            if not data:
+                sys.exit("serial connection closed")
+            buf += data
+        except socket.timeout:
+            sys.stderr.write("."); sys.stderr.flush()
+        for t in tokens:
+            i = buf.find(t)
+            if i >= 0:
+                buf = buf[i + len(t):]
+                return t
+    sys.exit("\ntimed out waiting for %s" % tokens)
+
+wait_for([b"login:"], 600, nudge=b"\r")
+# sshd may need a moment after the prompt appears
+for _ in range(5):
+    if ssh_answers():
+        sys.exit(0)
+    time.sleep(2)
+
+s.sendall(b"root\r")
+# the prompt interleaves ansi escapes, so match the user@host it draws
+wait_for([b"root@"], 60)
+# the quotes keep the sentinels out of the tty's echo of the command
+s.sendall(b"mkdir -p /root/.ssh && chmod 700 /root/.ssh"
+          b" && echo '" + key.encode() + b"' > /root/.ssh/authorized_keys"
+          b" && chmod 600 /root/.ssh/authorized_keys"
+          b" && nic=$(ls /sys/class/net | grep -v '^lo$' | head -1)"
+          b" && ip addr replace 10.0.2.15/24 dev $nic && ip link set $nic up"
+          b" && ip route replace default via 10.0.2.2"
+          b" && { rm -f /etc/resolv.conf;"
+          b" printf 'nameserver 10.0.2.3\\n' > /etc/resolv.conf; }"
+          b" && echo LAB-'OK' || echo LAB-'FAIL'\r")
+if wait_for([b"LAB-OK", b"LAB-FAIL"], 60) == b"LAB-FAIL":
+    sys.exit("\nsetting up the network failed (see serial.log)")
+EOF
+    echo " done"
+}
+
 copy_repo() {
     # what a fresh clone would contain plus new files not yet committed;
     # macOS tar needs to be told not to smuggle in apple metadata
     local tarflags=(--no-xattrs)
     tar --version | grep -q bsdtar && tarflags+=(--no-mac-metadata)
 
+    local stage
+    stage="$(mktemp -d)"
     git -C "$REPO" ls-files -z --cached --others --exclude-standard \
         | while IFS= read -r -d '' f; do
               { [ -e "$REPO/$f" ] || [ -h "$REPO/$f" ]; } && printf '%s\0' "$f"
           done \
-        | tar -C "$REPO" "${tarflags[@]}" --null -T - -czf - \
-        | vm_ssh 'rm -rf ~/dotfiles && mkdir -p ~/dotfiles && tar -xzf - -C ~/dotfiles'
+        | tar -C "$REPO" "${tarflags[@]}" --null -T - -cf - \
+        | tar -xf - -C "$stage"
+    git -C "$stage" init -q -b main
+    git -C "$stage" add -A
+    git -C "$stage" -c user.name=lab -c user.email=lab@lab commit -q -m "lab copy"
+
+    # --no-same-owner: root would keep the host's uid, and nix refuses a
+    # git repo owned by someone else
+    tar -C "$stage" "${tarflags[@]}" -czf - . \
+        | vm_ssh 'rm -rf ~/dotfiles && mkdir -p ~/dotfiles && tar -xzf - --no-same-owner -C ~/dotfiles'
+    rm -rf "$stage"
 }
 
 
@@ -319,16 +452,27 @@ copy_repo() {
 boot() {
     echo "booting $name at $cpus vcpus, $mem MiB, ${xres}x${yres}, ssh port $port"
 
-    # the virt machine has no ide to hang the seed off, so there the seed
-    # rides on virtio
-    local platform=(-machine q35 -vga none -cdrom "$vm/seed.iso")
-    local gpu=virtio-vga
+    # x86 archlinux boots with the default bios. Everything else needs
+    # uefi, with the instance's own settings in vars.fd.
+    local platform=() gpu
     if [ "$guest_arch" = aarch64 ]; then
+        platform=(-machine virt)
         gpu=virtio-gpu-pci
-        platform=(-machine virt
-                  -drive if=pflash,format=raw,readonly=on,file="$(firmware)"
-                  -drive if=pflash,format=raw,file="$vm/vars.fd"
-                  -drive if=virtio,file="$vm/seed.iso",format=raw,readonly=on)
+    else
+        platform=(-machine q35 -vga none)
+        gpu=virtio-vga
+    fi
+    if [ -f "$vm/vars.fd" ]; then
+        platform+=(-drive if=pflash,format=raw,readonly=on,file="$(firmware code)"
+                   -drive if=pflash,format=raw,file="$vm/vars.fd")
+    fi
+
+    if [ -f "$vm/seed.iso" ]; then
+        if [ "$guest_arch" = aarch64 ]; then
+            platform+=(-drive if=virtio,file="$vm/seed.iso",format=raw,readonly=on)
+        else
+            platform+=(-cdrom "$vm/seed.iso")
+        fi
     fi
 
     local input=(-device qemu-xhci -device usb-kbd -device usb-tablet)
@@ -355,7 +499,8 @@ boot() {
         "${input[@]}" \
         -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$port-:22" \
         -qmp "unix:$vm/qmp.sock,server,nowait" \
-        -serial "file:$vm/serial.log" \
+        -chardev "socket,id=ser0,path=$vm/serial.sock,server=on,wait=off,logfile=$vm/serial.log" \
+        -serial chardev:ser0 \
         -pidfile "$vm/pid" \
         "${display[@]}" </dev/null >"$vm/qemu.log" 2>&1 &
 
@@ -363,6 +508,10 @@ boot() {
     if ! running; then
         cat "$vm/qemu.log" >&2
         die "qemu did not start (see $vm/qemu.log and $vm/serial.log)"
+    fi
+
+    if [ "$setup" = serial ]; then
+        serial_setup
     fi
 
     echo -n "waiting for ssh"
@@ -390,7 +539,6 @@ cmd_new() {
 
     distro="$new_distro"
     qemu="qemu-system-$guest_arch"
-    base="$CACHE/base/$distro.qcow2"
     local cpus mem xres yres
     preflight
     fetch_base
@@ -400,20 +548,25 @@ cmd_new() {
     free_port > "$vm/port"
     load_instance "$name"
     qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
+    ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
     if [ "$guest_arch" = aarch64 ]; then
         dd if=/dev/zero of="$vm/vars.fd" bs=1m count=64 status=none
+    elif [ "$setup" = serial ]; then
+        cp "$(firmware vars)" "$vm/vars.fd"
     fi
-    make_seed
+    if [ "$setup" = cloud-init ]; then
+        make_seed
+    fi
 
     boot
-    echo "waiting for cloud-init to install ansible"
-    # The instance stays when this fails, so it can be fixed by hand (a slow
-    # mirror is the usual cause) and finished with `sync`.
-    vm_ssh sudo cloud-init status --wait </dev/null >/dev/null \
-        || die "cloud-init failed on '$name' (${0##*/} shell $name, then: cloud-init status --long)"
+    if [ "$setup" = cloud-init ]; then
+        echo "waiting for cloud-init to install ansible"
+        vm_ssh sudo cloud-init status --wait </dev/null >/dev/null \
+            || die "cloud-init failed on '$name' (${0##*/} shell $name, then: cloud-init status --long)"
+    fi
     copy_repo
     echo "new $distro instance '$name', repo copied to ~/dotfiles -- try:"
-    echo "    ansible-playbook ansible/base.yml"
+    echo "    $hint"
     cmd_shell
 }
 
