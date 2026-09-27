@@ -4,4 +4,7 @@ config/config/*/example*
 # session context for ai assistants
 .ctx/
 
+# claude code: per-user settings stay local; skills are shared
+.claude/settings.local.json
+
 .DS_Store
