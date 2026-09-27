@@ -34,15 +34,31 @@ instances:
                          source's hostname
   list                   show the instances, their ports and state
 
-  new and start take --headless to run without a window.
+  new and start take --headless to run without a window. The screen is
+  still drawn (with 3d on a linux host) and served on <name>/vnc.sock, so
+  the commands below can see it, and a vnc viewer can watch.
 
 in a running instance:
   shell <name>           open another shell
   sync <name>            copy the repo to ~/dotfiles again
+
+driving the screen for ai agents:
   screenshot <name> [file]
-                         dump the virtual monitor to a png. Needs the 2d
-                         display (--headless or macos), qemu can't dump
-                         the 3d one
+                         save the screen as a png. With --headless it comes
+                         from vnc.sock and shows every screen. With the 3d
+                         window it comes from grim inside the guest, so it
+                         needs a logged-in desktop, and you can keep using
+                         the window meanwhile
+  click <name> <x> <y> [left|right|middle]
+                         click at screenshot pixel x,y
+  move <name> <x> <y>    move the pointer there (hover)
+  key <name> <combo>     press a key or combo, e.g. super+return, ctrl+alt+t
+  type <name> <text>     type text (us keyboard characters)
+
+  Input goes in as the vm's usb keyboard and tablet, so it works in every
+  mode and at every screen: boot, greeter, desktop. click and move take the
+  screen size from a screenshot, so with the window they need a logged-in
+  desktop too.
 
 snapshots (the instance must be stopped):
   snapshot <name> [tag]  save the disk as <tag>, or list the snapshots
@@ -482,9 +498,23 @@ boot() {
 
     local input=(-device qemu-xhci -device usb-kbd -device usb-tablet)
 
+    # Headless still draws the screen and serves it on vnc.sock. qemu's own
+    # screenshot can't read a 3d display, but its vnc server gets every
+    # frame. With a gpu render node on a linux host that includes 3d:
+    # egl-headless renders with virgl without a window.
     local display=()
+    rm -f "$vm/vnc.sock"
     if [ "$headless" = true ]; then
-        display=(-display none)
+        if [ "$(uname -s)" = Linux ] && [ -r /dev/dri/renderD128 ]; then
+            case "$gpu" in
+                virtio-vga)     gpu=virtio-vga-gl ;;
+                virtio-gpu-pci) gpu=virtio-gpu-gl-pci ;;
+            esac
+            display=(-display egl-headless)
+        else
+            display=(-display none)
+        fi
+        display+=(-vnc "unix:$vm/vnc.sock")
     elif wants_gl; then
         case "$gpu" in
             virtio-vga)     gpu=virtio-vga-gl ;;
@@ -648,7 +678,7 @@ cmd_cp() {
         Darwin) cp -Rpc "$vm" "$CACHE/$new" ;;
         Linux)  cp -a --reflink=auto --sparse=always "$vm" "$CACHE/$new" ;;
     esac
-    rm -f "$CACHE/$new"/{pid,qmp.sock,serial.sock,serial.log,qemu.log,screen.png}
+    rm -f "$CACHE/$new"/{pid,qmp.sock,serial.sock,vnc.sock,serial.log,qemu.log,screen.png,size.png}
     free_port > "$CACHE/$new/port"
     echo "cloned '$name' to '$new', ssh port $(cat "$CACHE/$new/port")"
 }
@@ -667,11 +697,59 @@ cmd_list() {
     done
 }
 
+# The logged-in desktop, captured with grim inside the guest: find the
+# wayland socket under /run/user and run grim as the user who owns it.
+# The greeter's compositor can't be captured this way (it has no screen
+# capture protocol), so this needs someone logged in.
+guest_shot() {  # guest_shot out.png
+    local rc=0
+    vm_ssh 'bash -s' >"$1" <<'EOF' || rc=$?
+sock=$(ls -1 /run/user/*/wayland-[0-9] 2>/dev/null | head -1)
+[ -n "$sock" ] || exit 3
+exec sudo -u "#$(stat -c %u "$sock")" \
+    env XDG_RUNTIME_DIR="$(dirname "$sock")" WAYLAND_DISPLAY="$(basename "$sock")" grim -
+EOF
+    [ "$rc" = 0 ] && return
+    rm -f "$1"
+    [ "$rc" = 3 ] \
+        && die "no screenshot from '$name': nobody is logged in to the desktop yet (use --headless to see the greeter)"
+    die "grim failed in '$name' (exit $rc)"
+}
+
 cmd_screenshot() {
     need_running
     local out="${1:-$vm/screen.png}"
-    qmp screendump "{\"filename\": \"$out\", \"format\": \"png\"}"
-    echo "$out"
+    if [ -S "$vm/vnc.sock" ]; then
+        python3 "$HERE/lib/agent.py" shot "$vm/vnc.sock" "$out"
+    elif [ "$(uname -s)" = Linux ]; then
+        # qemu can't capture the 3d window; the guest's compositor can
+        guest_shot "$out"
+        echo "$out ($(python3 "$HERE/lib/agent.py" size "$out"))"
+    else
+        # the macos window is 2d, which qemu can dump
+        qmp screendump "{\"filename\": \"$out\", \"format\": \"png\"}"
+        echo "$out"
+    fi
+}
+
+# click and move turn screenshot pixels into tablet positions, which needs
+# the screen size: from vnc.sock, or from a fresh screenshot.
+cmd_pointer() {  # cmd_pointer click|move x y [button]
+    need_running
+    [[ "${2:-}" =~ ^[0-9]+$ ]] && [[ "${3:-}" =~ ^[0-9]+$ ]] \
+        || die "usage: ${0##*/} $1 $name <x> <y>"
+    local screen="$vm/vnc.sock"
+    if [ ! -S "$screen" ]; then
+        cmd_screenshot "$vm/size.png" >/dev/null
+        screen="$(python3 "$HERE/lib/agent.py" size "$vm/size.png")"
+    fi
+    python3 "$HERE/lib/agent.py" "$1" "$vm/qmp.sock" "$screen" "$2" "$3" ${4:+"$4"}
+}
+
+cmd_keys() {  # cmd_keys key|type <combo or text>
+    need_running
+    [ -n "${2:-}" ] || die "usage: ${0##*/} $1 $name <$([ "$1" = key ] && echo combo || echo text)>"
+    python3 "$HERE/lib/agent.py" "$1" "$vm/qmp.sock" "$2"
 }
 
 # Snapshots live inside the instance's disk (qcow2 internal snapshots).
@@ -718,6 +796,10 @@ case "$cmd" in
     mv)         load_instance "${1:-}"; cmd_mv "${2:-}" ;;
     cp)         load_instance "${1:-}"; cmd_cp "${2:-}" ;;
     screenshot) load_instance "${1:-}"; cmd_screenshot "${2:-}" ;;
+    click)      load_instance "${1:-}"; cmd_pointer click "${2:-}" "${3:-}" "${4:-}" ;;
+    move)       load_instance "${1:-}"; cmd_pointer move "${2:-}" "${3:-}" ;;
+    key)        load_instance "${1:-}"; cmd_keys key "${2:-}" ;;
+    type)       load_instance "${1:-}"; cmd_keys type "${2:-}" ;;
     snapshot)   load_instance "${1:-}"; cmd_snapshot "${2:-}" ;;
     revert)     load_instance "${1:-}"; cmd_revert "${2:-}" ;;
     *) die "unknown command '$cmd' (try: ${0##*/} help)" ;;
