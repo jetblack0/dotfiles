@@ -47,6 +47,10 @@
         system = "aarch64-linux";
         hostDir = ./hosts/mac-vm;
       };
+      t480-vm = mkHost {
+        system = "x86_64-linux";
+        hostDir = ./hosts/t480-vm;
+      };
     };
   };
 }
