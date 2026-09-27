@@ -171,6 +171,7 @@ packages:
   - { name: hyprpicker, brew: false }
   - { name: grim, brew: false }
   - { name: slurp, brew: false }
+  - { name: still, aur: still, brew: false }
   - { name: tesseract, brew: false }
   - { name: tesseract-data-eng, brew: false }
   - { name: wl-clipboard, brew: false } # wl-copy
