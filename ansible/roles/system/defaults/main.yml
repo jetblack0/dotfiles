@@ -10,3 +10,7 @@ singbox_profile_dir: "{{ ansible_facts['user_dir'] }}/.config/sing-box"
 # Refresh the subscription outbounds on a timer. Off by default.
 singbox_providers_timer: false
 singbox_providers_schedule: daily
+
+# Point the system resolver at the sing-box tun (NetworkManager global dns).
+singbox_dns_override: false
+singbox_dns: 172.18.0.2

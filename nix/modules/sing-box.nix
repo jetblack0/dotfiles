@@ -13,10 +13,6 @@ let
   renderConfig = pkgs.writeShellScript "sing-box-render-config" ''
     set -e   # abort at the failing step; a bad render must not reach merge
     umask 077
-    # Either extension: profiles get written both ways and the unit should
-    # not care. yq treats its path argument as an EXPRESSION when it cannot
-    # stat the file, so a missing profile would otherwise surface as
-    # "lexer: invalid input text" rather than "no such file".
     profile=
     for ext in yaml yml; do
       if [ -r "${profileDir}/$1.$ext" ]; then
@@ -72,6 +68,22 @@ in
       Profiles started at boot, read from <profileDir>/<name>.yaml.
       Empty means nothing runs until `systemctl start sing-box@<name>`.
     '';
+  };
+
+  options.singBox.dnsOverride = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Point the system resolver at the tun (NetworkManager global dns), so
+      every DNS query is hijacked whatever resolvers the network hands out.
+      Off by default: with sing-box down the box has no DNS.
+    '';
+  };
+
+  options.singBox.dns = lib.mkOption {
+    type = lib.types.str;
+    default = "172.18.0.2";
+    description = "The tun's DNS address: the tun address plus one.";
   };
 
   config = {
@@ -163,5 +175,12 @@ in
     # the profile directory
     # ---------------------------------------------
     systemd.user.tmpfiles.users.${username}.rules = [ "d %h/.config/sing-box 0700" ];
+
+
+    # the resolver
+    # ---------------------------------------------
+    networking.networkmanager.settings = lib.mkIf config.singBox.dnsOverride {
+      "global-dns-domain-*".servers = config.singBox.dns;
+    };
   };
 }

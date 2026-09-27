@@ -51,3 +51,34 @@
     enabled: "{{ singbox_providers_timer | bool }}"
     state: "{{ 'started' if singbox_providers_timer | bool else 'stopped' }}"
   when: ansible_facts['service_mgr'] == 'systemd'
+
+- name: Point the system resolver at the sing-box tun
+  become: true
+  ansible.builtin.template:
+    src: sing-box-dns.conf.j2
+    dest: /etc/NetworkManager/conf.d/dns-sing-box.conf
+    mode: "0644"
+  when: singbox_dns_override | bool
+  register: singbox_dns_conf
+
+- name: Hand the resolver back to the network
+  become: true
+  ansible.builtin.file:
+    path: /etc/NetworkManager/conf.d/dns-sing-box.conf
+    state: absent
+  when: not singbox_dns_override | bool
+  register: singbox_dns_removed
+
+- name: Check whether NetworkManager is running
+  ansible.builtin.systemd_service:
+    name: NetworkManager.service
+  register: singbox_nm
+
+- name: Reload NetworkManager so the resolver change takes effect
+  become: true
+  ansible.builtin.systemd_service:
+    name: NetworkManager.service
+    state: reloaded
+  when:
+    - singbox_dns_conf is changed or singbox_dns_removed is changed
+    - singbox_nm.status.ActiveState == 'active'
