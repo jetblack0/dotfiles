@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <!-- Selected candidate. fcitx5 9-slices it by the Margin in theme.conf,
+       so the margin must be at least the corner radius. -->
+  <rect width="16" height="16" rx="4" fill="{{colors.primary.default.hex}}"/>
+</svg>

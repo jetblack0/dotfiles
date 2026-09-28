@@ -225,6 +225,23 @@ source = "wallpaper"
     builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
     community_ids = [ "zen-browser" ]
 
+    # fcitx5 theme, our copy of the community template (templates/fcitx5).
+    # The hook reloads fcitx5's candidate window so new colors show at once.
+    [theme.templates.user.fcitx5]
+    input_path = "templates/fcitx5/theme.conf"
+    output_path = "$XDG_DATA_HOME/fcitx5/themes/noctalia/theme.conf"
+    post_hook = "busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui"
+
+    [theme.templates.user.fcitx5-background]
+    input_path = "templates/fcitx5/background.svg"
+    output_path = "$XDG_DATA_HOME/fcitx5/themes/noctalia/background.svg"
+    post_hook = "busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui"
+
+    [theme.templates.user.fcitx5-highlight]
+    input_path = "templates/fcitx5/highlight.svg"
+    output_path = "$XDG_DATA_HOME/fcitx5/themes/noctalia/highlight.svg"
+    post_hook = "busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui"
+
 [widget.battery.actions]
 right = "panel-toggle damian-ds7/battery-threshold:panel"
 
