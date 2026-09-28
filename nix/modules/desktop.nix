@@ -256,6 +256,7 @@ in
       still
       hyprpicker
       wl-clipboard
+      wev
       (tesseract.override { enableLanguages = [ "eng" ]; })
 
       # xwayland dpi (autostart.lua xrdb-merges the state xresources)
