@@ -1,14 +1,9 @@
 #!/bin/sh
-# Toggle every touchpad on this machine, without pinning a device name.
+# Toggle the built-in touchpad, without pinning a device name. External
+# touchpads are left alone. udev labels each touchpad internal or external
+# in ID_INPUT_TOUCHPAD_INTEGRATION.
 #
 # Usage: ./trackpad-toggle.sh [toggle|on|off|init]     (default: toggle)
-#
-# Discovery is udev's ID_INPUT_TOUCHPAD tag, so it works for any touchpad on
-# any laptop, device names like "synaptics-tm3276-022" never appear in the
-# config.
-#
-# The result is written to $XDG_STATE_HOME/hypr/trackpad as on|off|none; the
-# Noctalia bar widget renders that file, and "none" hides it entirely.
 
 set -eu
 
@@ -29,8 +24,13 @@ notify() {
 touchpads=$(
 	for ev in /dev/input/event*; do
 		[ -e "$ev" ] || continue
-		udevadm info -q property -n "$ev" 2>/dev/null \
-			| grep -qx 'ID_INPUT_TOUCHPAD=1' || continue
+		props=$(udevadm info -q property -n "$ev" 2>/dev/null) || continue
+		printf '%s\n' "$props" | grep -qx 'ID_INPUT_TOUCHPAD=1' || continue
+		# Skip external touchpads rather than require internal ones. Only a
+		# device with no bus goes unlabelled, and USB and bluetooth devices
+		# always have one. So an unlabelled touchpad is almost surely
+		# built-in, and requiring "internal" would drop it.
+		printf '%s\n' "$props" | grep -qx 'ID_INPUT_TOUCHPAD_INTEGRATION=external' && continue
 		cat "/sys/class/input/${ev##*/}/device/name" 2>/dev/null || true
 	done | sort -u
 )
