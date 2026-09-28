@@ -9,6 +9,7 @@
     ../../modules/core.nix
     ../../modules/desktop.nix
     ../../modules/zen.nix
+    ../../modules/input-method.nix
     ../../modules/sing-box.nix
     ../../modules/virt.nix
     # ../../modules/data.nix
