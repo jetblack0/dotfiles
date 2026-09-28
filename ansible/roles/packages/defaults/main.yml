@@ -157,6 +157,14 @@ packages:
   - { name: rtkit, brew: false } # realtime audio threads; without it audio can crackle under load
   - { name: cava }
 
+  # input method: fcitx5 with rime
+  - { name: fcitx5, brew: false }
+  - { name: fcitx5-rime, brew: false }
+  - { name: rime-ice, aur: rime-ice-pinyin-git, brew: false }
+  - { name: fcitx5-gtk, brew: false } # gtk im module, for xwayland gtk apps
+  - { name: fcitx5-qt, brew: false } # qt im module (QT_IM_MODULE=fcitx)
+  - { name: fcitx5-configtool, brew: false }
+
   # portals
   - { name: xdg-desktop-portal-hyprland, brew: false }
   - { name: xdg-desktop-portal-gtk, brew: false } # file chooser + settings backends
@@ -175,10 +183,19 @@ packages:
   - { name: tesseract-data-eng, brew: false }
   - { name: wl-clipboard, brew: false } # wl-copy
   - { name: libnotify, brew: false } # notify-send
+  - { name: wev, brew: false }
 
   - { name: steam, brew: false }
   - { name: ntsync-autoload, brew: false }
   - { name: vulkan-tools, brew: false }
+  - { name: gamemode, brew: false }
+  - { name: lib32-gamemode, brew: false }
+  - { name: mangohud, brew: false }
+  - { name: lib32-mangohud, brew: false }
+  # Valve's small compositor for games. It can render the game at a lower
+  # resolution and upscale it with FSR, which is the biggest speedup on a
+  # weak gpu. Plain mangohud does not show inside it; use its --mangoapp.
+  - { name: gamescope, brew: false }
 
   # misc
   - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only

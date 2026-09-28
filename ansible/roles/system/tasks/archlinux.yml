@@ -135,6 +135,20 @@
   changed_when: true
   when: system_battery_udev is changed
 
+- name: Look up the gamemode group
+  ansible.builtin.getent:
+    database: group
+    key: gamemode
+    fail_key: false
+
+- name: Put the user in gamemode
+  become: true
+  ansible.builtin.user:
+    name: "{{ ansible_facts['user_id'] }}"
+    groups: gamemode
+    append: true
+  when: ansible_facts['getent_group']['gamemode'] | default(none) is not none
+
 - name: Turn on bluetooth at boot
   become: true
   ansible.builtin.systemd_service:

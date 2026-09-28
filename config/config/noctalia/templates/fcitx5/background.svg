@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <!-- Candidate window background. fcitx5 9-slices it by the Margin in theme.conf,
+       so the margin must be at least the corner radius. -->
+  <rect width="24" height="24" rx="6" fill="{{colors.surface_container_high.default.hex}}"/>
+</svg>

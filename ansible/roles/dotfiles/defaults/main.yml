@@ -32,6 +32,7 @@ dotfiles_mask:
   darwin:
     - dunst
     - environment.d
+    - fcitx5
     - fontconfig
     - foot
     - gtk-2.0

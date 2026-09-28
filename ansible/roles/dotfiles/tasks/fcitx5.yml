@@ -1,0 +1,18 @@
+---
+# Fcitx5 files that live in XDG data, not ~/.config.
+
+- name: Install the rime schema patch
+  when: "'fcitx5' not in (dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))"
+  block:
+    - name: Ensure the rime user directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.local/share/fcitx5/rime"
+        state: directory
+        mode: "0755"
+
+    - name: Copy default.custom.yaml from the repo
+      ansible.builtin.copy:
+        src: "{{ dotfiles_src | dirname }}/share/fcitx5/rime/default.custom.yaml"
+        dest: "{{ ansible_facts['user_dir'] }}/.local/share/fcitx5/rime/default.custom.yaml"
+        mode: "0644"
+        remote_src: true

@@ -13,6 +13,7 @@ order = [ "main" ]
     [bar.main]
     background_opacity = 0.91999995708465576
     end = [
+        "tray",
         "media",
         "volume",
         "brightness",
@@ -33,7 +34,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "workspaces", "tray" ]
+    start = [ "workspaces", "title" ]
     thickness = 32
     widget_spacing = 15
 
@@ -149,8 +150,17 @@ enabled = true
         format = "{:%A, %B %-d}"
         shadow = false
 
+# OSD
+# ---------------------------------------------
+[osd]
+
+    # fcitx5 mode switches would pop this up every time; the bar's tray
+    # glyph already shows the mode. Also covers xkb layout switches.
+    [osd.kinds]
+    keyboard_layout = false
+
 [plugins]
-enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr", "jetblack0/server" ]
+enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr", "jetblack0/server", "jetblack0/title" ]
 
 
 # Shell
@@ -215,6 +225,23 @@ source = "wallpaper"
     builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
     community_ids = [ "zen-browser" ]
 
+    # fcitx5 theme, our copy of the community template (templates/fcitx5).
+    # The hook reloads fcitx5's candidate window so new colors show at once.
+    [theme.templates.user.fcitx5]
+    input_path = "templates/fcitx5/theme.conf"
+    output_path = "$XDG_DATA_HOME/fcitx5/themes/noctalia/theme.conf"
+    post_hook = "busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui"
+
+    [theme.templates.user.fcitx5-background]
+    input_path = "templates/fcitx5/background.svg"
+    output_path = "$XDG_DATA_HOME/fcitx5/themes/noctalia/background.svg"
+    post_hook = "busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui"
+
+    [theme.templates.user.fcitx5-highlight]
+    input_path = "templates/fcitx5/highlight.svg"
+    output_path = "$XDG_DATA_HOME/fcitx5/themes/noctalia/highlight.svg"
+    post_hook = "busctl --user call org.fcitx.Fcitx5 /controller org.fcitx.Fcitx.Controller1 ReloadAddonConfig s classicui"
+
 [widget.battery.actions]
 right = "panel-toggle damian-ds7/battery-threshold:panel"
 
@@ -244,6 +271,9 @@ capsule = true
 capsule_fill = "primary"
 capsule_foreground = "on_primary"
 type = "jetblack0/server:indicator"
+
+[widget.title]
+type = "jetblack0/title:title"
 
 [widget.workspaces]
 scale = 1.25

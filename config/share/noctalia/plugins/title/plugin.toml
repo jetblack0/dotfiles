@@ -1,0 +1,39 @@
+# Window title
+# ---------------------------------------------
+# The focused window's title on the bar. noctalia's own active_window widget
+# only takes a width in pixels. This one takes a share of the bar instead,
+# so it fits any screen. A click opens a panel with the window's details
+# (class, initial title, ...), each one copied by a click.
+
+id = "jetblack0/title"
+name = "Window title"
+version = "1.0.0"
+plugin_api = 26
+description = "The focused window's title, sized as a share of the bar"
+icon = "app-window"
+
+[[widget]]
+id = "title"
+entry = "widget.luau"
+
+    [widget.actions]
+    left = "panel-toggle jetblack0/title:info"
+
+    # How much of the left half of the bar the title may take, in percent.
+    # A longer title is cut off with an ellipsis.
+    [[widget.setting]]
+    key = "share"
+    type = "int"
+    label_key = "settings.share"
+    description_key = "settings.share-desc"
+    default = 40
+    min = 10
+    max = 90
+
+[[panel]]
+id = "info"
+entry = "panel.luau"
+width = 440
+height = 520
+placement = "attached"
+open_near_click = true

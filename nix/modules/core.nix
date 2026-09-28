@@ -163,6 +163,7 @@ in
 
       # cloud & devops
       ansible
+      ansible-lint
       argocd
       awscli2
       cloudflared

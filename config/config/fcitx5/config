@@ -1,0 +1,7 @@
+# Fcitx5 global options
+# ---------------------------------------------
+
+[Behavior]
+# One input mode for every app. The default gives each app its own mode, so a
+# new window always starts in English.
+ShareInputState=All

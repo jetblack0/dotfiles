@@ -4,6 +4,13 @@
 #     ansible-playbook ansible/base.yml -e @ansible/hosts/t480-vm.yaml
 
 
+# Graphics
+# ---------------------------------------------
+# Software vulkan. Without a gpu_vendor, pacman picks steam's vulkan driver
+# by alphabet and installs nvidia's, which cannot work here.
+gpu_vendor: vm
+
+
 # Displays
 # ---------------------------------------------
 monitors:
