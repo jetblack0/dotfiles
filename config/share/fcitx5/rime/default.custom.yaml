@@ -1,0 +1,7 @@
+# Rime schema list
+# ---------------------------------------------
+# A patch over the default.yaml that rime-prelude/rime-data ships.
+
+patch:
+  schema_list:
+    - schema: rime_ice
