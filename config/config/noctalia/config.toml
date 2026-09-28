@@ -13,6 +13,7 @@ order = [ "main" ]
     [bar.main]
     background_opacity = 0.91999995708465576
     end = [
+        "tray",
         "media",
         "volume",
         "brightness",
@@ -33,7 +34,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "workspaces", "tray" ]
+    start = [ "workspaces" ]
     thickness = 32
     widget_spacing = 15
 
