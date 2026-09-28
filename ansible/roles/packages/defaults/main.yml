@@ -157,6 +157,14 @@ packages:
   - { name: rtkit, brew: false } # realtime audio threads; without it audio can crackle under load
   - { name: cava }
 
+  # input method: fcitx5 with rime
+  - { name: fcitx5, brew: false }
+  - { name: fcitx5-rime, brew: false }
+  - { name: rime-ice, aur: rime-ice-pinyin-git, brew: false }
+  - { name: fcitx5-gtk, brew: false } # gtk im module, for xwayland gtk apps
+  - { name: fcitx5-qt, brew: false } # qt im module (QT_IM_MODULE=fcitx)
+  - { name: fcitx5-configtool, brew: false }
+
   # portals
   - { name: xdg-desktop-portal-hyprland, brew: false }
   - { name: xdg-desktop-portal-gtk, brew: false } # file chooser + settings backends
