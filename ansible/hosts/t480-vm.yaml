@@ -7,7 +7,8 @@
 # Displays
 # ---------------------------------------------
 monitors:
-  - mode: preferred
+  - output: Virtual-1
+    mode: preferred
     position: auto
     scale: 1.2
 
@@ -20,3 +21,6 @@ greeter_output:
   width: 1920
   height: 1080
   scale: 1.2
+
+greeter_env:
+  WLR_NO_HARDWARE_CURSORS: 1

@@ -9,5 +9,5 @@
 vt = 1
 
 [default_session]
-command = "env XCURSOR_THEME=capitaine-cursors XCURSOR_SIZE=24 /usr/bin/noctalia-greeter-session"
+command = "env {% for k, v in (greeter_env | default({})).items() %}{{ k }}={{ v }} {% endfor %}XCURSOR_THEME=capitaine-cursors XCURSOR_SIZE=24 /usr/bin/noctalia-greeter-session"
 user = "greeter"

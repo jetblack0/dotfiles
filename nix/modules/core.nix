@@ -93,7 +93,6 @@ in
       uid = 1000;
       extraGroups = [
         "wheel"
-        "docker"
         "video"
         "input"
       ];
@@ -167,7 +166,6 @@ in
       argocd
       awscli2
       cloudflared
-      docker-compose
       kubernetes-helm
       kubectl
       linode-cli
@@ -197,19 +195,15 @@ in
       xdg-ninja
     ];
 
-    nixpkgs.config.allowUnfreePredicate =
-      pkg:
-      builtins.elem (lib.getName pkg) [
-        "claude-code"
-        "apple-color-emoji"
-        "apple-fonts-sf-pro"
-        "ventoy"
-      ];
+    # additive across modules: each declares the unfree names it pulls in
+    nixpkgs.config.allowUnfreePackages = [
+      "claude-code"
+      "ventoy"
+    ];
 
     # ventoy bundles prebuilt blobs nixpkgs will not vouch for (nixpkgs#404663).
     nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "ventoy";
 
-    virtualisation.docker.enable = true;
     programs.nix-ld.enable = true;
 
 

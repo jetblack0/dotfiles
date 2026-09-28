@@ -1,0 +1,4 @@
+# Send every DNS query into the sing-box tun, where hijack-dns answers it.
+# Overrides the DHCP resolvers on every connection, IPv4 and IPv6.
+[global-dns-domain-*]
+servers={{ singbox_dns }}

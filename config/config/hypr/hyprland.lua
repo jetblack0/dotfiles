@@ -6,6 +6,7 @@ require("conf.animation")
 require("conf.rules")
 require("conf.gaming")
 require("conf.binds")
+require("conf.passthrough")
 require("conf.autostart")
 
 pcall(function()

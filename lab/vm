@@ -1,0 +1,806 @@
+#!/usr/bin/env bash
+# QEMU virtual machines for testing the playbooks end to end, desktop
+# included: a real boot, a real login and a real DRM display (virtio-gpu).
+# Each vm is a named instance that keeps its disk between boots.
+
+set -euo pipefail
+
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO="$(cd "$HERE/.." && pwd)"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/dotfiles-lab/vm"
+
+# Each instance gets its own ssh port from here up, picked once by `new`.
+# 2224 is the arm image builder.
+FIRST_PORT=2230
+
+# The nixos image release; match stateVersion in nix/hosts.
+NIXOS_RELEASE=26.05
+
+usage() {
+    cat <<EOF
+usage: ${0##*/} <command> [args]
+
+instances:
+  new <distro> [name]    create an instance (name defaults to the distro),
+                         boot it, set up ssh access, copy the repo to
+                         ~/dotfiles and open a shell
+  start <name>           boot an existing instance and open a shell
+  stop <name>            shut the instance down cleanly
+  rm <name>              delete a stopped instance and its disk
+  mv <name> <new-name>   rename a stopped instance (the guest keeps its
+                         hostname)
+  cp <name> <new-name>   clone a stopped instance, snapshots included. The
+                         clone gets its own ssh port; the guest keeps the
+                         source's hostname
+  list                   show the instances, their ports and state
+
+  new and start take --headless to run without a window. The screen is
+  still drawn (with 3d on a linux host) and served on <name>/vnc.sock, so
+  the commands below can see it, and a vnc viewer can watch.
+
+in a running instance:
+  shell <name>           open another shell
+  sync <name>            copy the repo to ~/dotfiles again
+
+driving the screen for ai agents:
+  screenshot <name> [file]
+                         save the screen as a png. With --headless it comes
+                         from vnc.sock and shows every screen. With the 3d
+                         window it comes from grim inside the guest, so it
+                         needs a logged-in desktop, and you can keep using
+                         the window meanwhile
+  click <name> <x> <y> [left|right|middle]
+                         click at screenshot pixel x,y
+  move <name> <x> <y>    move the pointer there (hover)
+  key <name> <combo>     press a key or combo, e.g. super+return, ctrl+alt+t
+  type <name> <text>     type text (us keyboard characters)
+
+  Input goes in as the vm's usb keyboard and tablet, so it works in every
+  mode and at every screen: boot, greeter, desktop. click and move take the
+  screen size from a screenshot, so with the window they need a logged-in
+  desktop too.
+
+snapshots (the instance must be stopped):
+  snapshot <name> [tag]  save the disk as <tag>, or list the snapshots
+  revert <name> <tag>    put the disk back to <tag>
+
+distros:
+  archlinux              the official x86_64 cloud image -- mainline
+                         arch, so unlike the container lab nothing needs
+                         to be excluded
+  archlinux-arm          an aarch64 image lib/build-arm-image assembles
+                         from the arch linux arm rootfs tarball
+  nixos                  the official x86_64 nixos incus vm image
+  nixos-arm              the same image for aarch64
+
+The archlinux guests get the user dev and ansible from cloud-init. The
+nixos image has no cloud-init: the script logs in as root on the serial
+console, brings the network up and plants an ssh key. It does that again
+on later boots only while ssh doesn't answer (a stock system; a rebuilt
+one brings its own network up).
+
+The vm runs accelerated when host and guest architectures match (kvm on
+linux, hvf on macos) and falls back to slow emulation otherwise. State
+lives under $CACHE: one directory per instance, and base/ for the
+downloaded images. Every instance disk is a thin layer on top of its base
+image, so never delete or replace a base image while instances use it.
+
+On a linux host the window opens fullscreen with 3d graphics and takes
+the keyboard. Ctrl+Alt+F leaves fullscreen and gives the keyboard back.
+The guest screen then follows the window size.
+
+environment:
+  LAB_VM_CPUS  vcpus for the vm (default: half the host's cpus)
+  LAB_VM_MEM   memory for the vm in MiB (default: half the host's memory)
+  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 1920x1080);
+               the fullscreen linux window overrides it with the screen size
+EOF
+}
+
+die() { echo "${0##*/}: $*" >&2; exit 1; }
+
+
+# Instances
+# ---------------------------------------------
+distro_info() {
+    base="$CACHE/base/$1.qcow2"
+    case "$1" in
+        archlinux|archlinux-arm)
+            user=dev
+            setup=cloud-init
+            hint="ansible-playbook ansible/base.yml"
+            ;;
+        nixos|nixos-arm)
+            user=root
+            setup=serial
+            base="$CACHE/base/$1-$NIXOS_RELEASE.qcow2"
+            # flakes are off in the stock image; the dotfiles turn them on
+            hint="nixos-rebuild switch --option experimental-features 'nix-command flakes' --flake ./nix#"
+            ;;
+    esac
+    case "$1" in
+        archlinux)
+            guest_arch=x86_64
+            img_url="https://geo.mirror.pkgbuild.com/images/latest/Arch-Linux-x86_64-cloudimg.qcow2"
+            ;;
+        archlinux-arm)
+            guest_arch=aarch64
+            img_url=        # no upstream image, lib/build-arm-image makes one
+            ;;
+        nixos)
+            guest_arch=x86_64
+            hint+=t480-vm
+            ;;
+        nixos-arm)
+            guest_arch=aarch64
+            hint+=vm-arm64
+            ;;
+        *) die "unknown distro '$1' (try: ${0##*/} help)" ;;
+    esac
+    if [ "$setup" = serial ]; then
+        img_url="https://hydra.nixos.org/job/nixos/release-$NIXOS_RELEASE/nixos.incusVirtualMachineImage.$guest_arch-linux/latest/download/1"
+    fi
+}
+
+# Sets everything the other commands need to talk to instance $1.
+load_instance() {
+    name="${1:-}"
+    [ -n "$name" ] || die "missing instance name (try: ${0##*/} list)"
+    valid_name "$name" && [ -d "$CACHE/$name" ] || die "no instance '$name' (try: ${0##*/} list)"
+    vm="$CACHE/$name"
+
+    # A directory from before instances existed: the name was the distro
+    # and the port was 2222.
+    if [ ! -f "$vm/distro" ]; then
+        ( distro_info "$name" ) 2>/dev/null || die "'$vm' is not an instance"
+        echo "$name" > "$vm/distro"
+        echo 2222 > "$vm/port"
+    fi
+
+    distro="$(cat "$vm/distro")"
+    port="$(cat "$vm/port")"
+    distro_info "$distro"
+    qemu="qemu-system-$guest_arch"
+    ssh_opts=(-p "$port" -i "$vm/key" -o IdentitiesOnly=yes -o StrictHostKeyChecking=no
+              -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR
+              -o ServerAliveInterval=15)
+}
+
+# Names become directory names, so they can't contain a slash or start
+# with a dot.
+valid_name() { [[ "$1" =~ ^[a-z0-9][a-z0-9.-]*$ ]] && [ "$1" != base ]; }
+
+instances() {
+    local d
+    for d in "$CACHE"/*/; do
+        d="${d%/}"; d="${d##*/}"
+        [ "$d" = base ] || [ "$d" = '*' ] || echo "$d"
+    done
+}
+
+# The first port from FIRST_PORT up that no instance has taken.
+free_port() {
+    local p="$FIRST_PORT"
+    while cat "$CACHE"/*/port 2>/dev/null | grep -qx "$p"; do
+        p=$(( p + 1 ))
+    done
+    echo "$p"
+}
+
+running() { [ -f "$vm/pid" ] && kill -0 "$(cat "$vm/pid")" 2>/dev/null; }
+
+need_running() { running || die "'$name' is not running -- run: ${0##*/} start $name"; }
+need_stopped() { ! running || die "'$name' is running -- run: ${0##*/} stop $name"; }
+
+vm_ssh() {  # vm_ssh [-t] cmd...
+    local tty=()
+    [ "${1:-}" = -t ] && { tty=(-t); shift; }
+    ssh "${tty[@]}" "${ssh_opts[@]}" "$user@127.0.0.1" "$@"
+}
+
+# qmp <command> [json arguments]: run one command on the instance's monitor.
+qmp() {
+    local args="${2:-}"
+    [ -n "$args" ] || args='{}'
+    python3 - "$vm/qmp.sock" "$1" "$args" <<'EOF'
+import json, socket, sys
+sock, command, args = sys.argv[1], sys.argv[2], json.loads(sys.argv[3])
+s = socket.socket(socket.AF_UNIX)
+s.connect(sock)
+f = s.makefile("rw")
+json.loads(f.readline())  # greeting
+def cmd(c):
+    f.write(json.dumps(c) + "\n"); f.flush()
+    while True:
+        r = json.loads(f.readline())
+        if "return" in r or "error" in r:
+            return r
+cmd({"execute": "qmp_capabilities"})
+r = cmd({"execute": command, "arguments": args})
+if "error" in r:
+    sys.exit(command + " failed: " + r["error"]["desc"])
+EOF
+}
+
+
+# Host
+# ---------------------------------------------
+# firmware code|vars: the uefi firmware for the guest architecture. vars is
+# the template for a new instance's settings (x86 only; on aarch64 an
+# empty file works).
+firmware() {
+    local f files=()
+    case "$guest_arch-$1" in
+        aarch64-code)
+            files=(/opt/homebrew/share/qemu/edk2-aarch64-code.fd
+                   /usr/share/qemu/edk2-aarch64-code.fd
+                   /usr/share/AAVMF/AAVMF_CODE.fd
+                   /usr/share/edk2/aarch64/QEMU_EFI.fd) ;;
+        x86_64-code)
+            files=(/opt/homebrew/share/qemu/edk2-x86_64-code.fd
+                   /usr/share/edk2/x64/OVMF_CODE.4m.fd
+                   /usr/share/OVMF/OVMF_CODE_4M.fd
+                   /usr/share/OVMF/OVMF_CODE.fd) ;;
+        x86_64-vars)
+            files=(/opt/homebrew/share/qemu/edk2-i386-vars.fd
+                   /usr/share/edk2/x64/OVMF_VARS.4m.fd
+                   /usr/share/OVMF/OVMF_VARS_4M.fd
+                   /usr/share/OVMF/OVMF_VARS.fd) ;;
+    esac
+    for f in "${files[@]}"; do
+        [ -f "$f" ] && { echo "$f"; return; }
+    done
+    die "no $guest_arch uefi firmware found (install edk2-ovmf, or qemu's edk2 firmware)"
+}
+
+accel_args() {
+    # uname says arm64 where qemu says aarch64
+    local host="$(uname -m)"; [ "$host" = arm64 ] && host=aarch64
+    if [ "$host" = "$guest_arch" ]; then
+        case "$(uname -s)" in
+            Darwin) echo "-accel hvf -cpu host" ;;
+            Linux)  echo "-accel kvm -cpu host" ;;
+        esac
+    else
+        # cross-arch emulation: correct but slow, fine for occasional runs
+        echo "-accel tcg -cpu max"
+    fi
+}
+
+host_cpus() { getconf _NPROCESSORS_ONLN; }
+
+host_mem_mib() {
+    case "$(uname -s)" in
+        Darwin) echo $(( $(sysctl -n hw.memsize) / 1048576 )) ;;
+        Linux)  awk '/^MemTotal:/ { print int($2 / 1024) }' /proc/meminfo ;;
+    esac
+}
+
+# Half the host by default, so a build in the guest cannot starve it.
+vm_size() {
+    local half_cpus=$(( $(host_cpus) / 2 )) half_mem=$(( $(host_mem_mib) / 2 ))
+    cpus="${LAB_VM_CPUS:-$(( half_cpus > 0 ? half_cpus : 1 ))}"
+    mem="${LAB_VM_MEM:-$half_mem}"
+    [[ "$cpus" =~ ^[1-9][0-9]*$ ]] || die "LAB_VM_CPUS must be a positive integer, got '$cpus'"
+    [[ "$mem" =~ ^[1-9][0-9]*$ ]] || die "LAB_VM_MEM must be a positive integer (MiB), got '$mem'"
+}
+
+# The preferred mode virtio-gpu advertises over edid; qemu's own is 1280x800.
+vm_resolution() {
+    local res="${LAB_VM_RES:-1920x1080}"
+    [[ "$res" =~ ^([1-9][0-9]*)x([1-9][0-9]*)$ ]] \
+        || die "LAB_VM_RES must look like 1920x1080, got '$res'"
+    xres="${BASH_REMATCH[1]}" yres="${BASH_REMATCH[2]}"
+}
+
+graphical_session() {
+    if [ -n "${WAYLAND_DISPLAY:-}" ] || [ -n "${DISPLAY:-}" ]; then
+        return
+    fi
+    local var val found=()
+    for var in WAYLAND_DISPLAY DISPLAY; do
+        val="$(systemctl --user show-environment 2>/dev/null | sed -n "s/^$var=//p")" || true
+        [ -n "$val" ] || continue
+        export "$var=$val"
+        found+=("$var=$val")
+    done
+    [ "${#found[@]}" -gt 0 ] \
+        || die "no desktop session to open the window on (try --headless)"
+    echo "warning: this shell has no WAYLAND_DISPLAY or DISPLAY (ssh?)," \
+         "using the desktop session's: ${found[*]}" >&2
+}
+
+# The window needs a linux host with a desktop; macos uses qemu's own.
+wants_gl() { [ "$headless" = false ] && [ "$(uname -s)" = Linux ]; }
+
+# Checks that can fail, run before anything is created or booted.
+preflight() {
+    command -v "$qemu" >/dev/null \
+        || die "$qemu not found (install qemu: brew install qemu / pacman -S qemu-desktop)"
+    vm_size
+    vm_resolution
+    if wants_gl; then
+        graphical_session
+    fi
+}
+
+
+# Provisioning
+# ---------------------------------------------
+make_seed() {
+    mkdir -p "$vm/seed"
+    # replaces the image's default user, so ours gets uid 1000
+    cat > "$vm/seed/user-data" <<EOF
+#cloud-config
+users:
+  - name: dev
+    groups: wheel
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - $(cat "$vm/key.pub")
+runcmd:
+  - pacman -Syu --noconfirm ansible
+EOF
+    printf 'instance-id: lab-vm-%s\nlocal-hostname: lab-vm-%s\n' \
+        "$name" "$name" > "$vm/seed/meta-data"
+
+    # cloud-init's nocloud source wants an iso labeled cidata
+    if command -v hdiutil >/dev/null; then
+        hdiutil makehybrid -quiet -iso -joliet -default-volume-name cidata \
+            -o "$vm/seed.iso" "$vm/seed"
+    elif command -v xorriso >/dev/null; then
+        xorriso -as mkisofs -quiet -V cidata -J -r -o "$vm/seed.iso" "$vm/seed"
+    elif command -v mkisofs >/dev/null; then
+        mkisofs -quiet -V cidata -J -r -o "$vm/seed.iso" "$vm/seed"
+    else
+        die "need hdiutil, xorriso or mkisofs to build the cloud-init seed"
+    fi
+}
+
+fetch_base() {
+    [ -f "$base" ] && return
+    mkdir -p "$CACHE/base"
+    if [ -n "$img_url" ]; then
+        echo "downloading $img_url"
+        curl -fL --progress-bar -o "$base.part" "$img_url" && mv "$base.part" "$base"
+    else
+        echo "no $distro image yet, building one"
+        "$HERE/lib/build-arm-image"
+    fi
+}
+
+# For the nixos image: wait for the serial console login prompt. If ssh
+# already answers, there is nothing to do. Otherwise log in as root, bring the
+# nic up by hand and plant the key. qemu's user network is always 10.0.2.15,
+# gateway .2, dns .3.
+serial_setup() {
+    echo -n "waiting for the serial console"
+    python3 - "$vm/serial.sock" "$port" "$(cat "$vm/key.pub")" <<'EOF'
+import socket, sys, time
+
+sock, port, key = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+s = socket.socket(socket.AF_UNIX)
+s.connect(sock)
+s.settimeout(2.0)
+buf = b""
+
+def ssh_answers():
+    try:
+        c = socket.create_connection(("127.0.0.1", port), timeout=3)
+        c.settimeout(3)
+        ok = c.recv(8).startswith(b"SSH-")
+        c.close()
+        return ok
+    except OSError:
+        return False
+
+def wait_for(tokens, timeout, nudge=None):
+    global buf
+    deadline = time.monotonic() + timeout
+    nudged = 0.0
+    while time.monotonic() < deadline:
+        if nudge and time.monotonic() - nudged > 5:
+            s.sendall(nudge); nudged = time.monotonic()
+        try:
+            data = s.recv(4096)
+            if not data:
+                sys.exit("serial connection closed")
+            buf += data
+        except socket.timeout:
+            sys.stderr.write("."); sys.stderr.flush()
+        for t in tokens:
+            i = buf.find(t)
+            if i >= 0:
+                buf = buf[i + len(t):]
+                return t
+    sys.exit("\ntimed out waiting for %s" % tokens)
+
+wait_for([b"login:"], 600, nudge=b"\r")
+# sshd may need a moment after the prompt appears
+for _ in range(5):
+    if ssh_answers():
+        sys.exit(0)
+    time.sleep(2)
+
+s.sendall(b"root\r")
+# the prompt interleaves ansi escapes, so match the user@host it draws
+wait_for([b"root@"], 60)
+# the quotes keep the sentinels out of the tty's echo of the command
+s.sendall(b"mkdir -p /root/.ssh && chmod 700 /root/.ssh"
+          b" && echo '" + key.encode() + b"' > /root/.ssh/authorized_keys"
+          b" && chmod 600 /root/.ssh/authorized_keys"
+          b" && nic=$(ls /sys/class/net | grep -v '^lo$' | head -1)"
+          b" && ip addr replace 10.0.2.15/24 dev $nic && ip link set $nic up"
+          b" && ip route replace default via 10.0.2.2"
+          b" && { rm -f /etc/resolv.conf;"
+          b" printf 'nameserver 10.0.2.3\\n' > /etc/resolv.conf; }"
+          b" && echo LAB-'OK' || echo LAB-'FAIL'\r")
+if wait_for([b"LAB-OK", b"LAB-FAIL"], 60) == b"LAB-FAIL":
+    sys.exit("\nsetting up the network failed (see serial.log)")
+EOF
+    echo " done"
+}
+
+copy_repo() {
+    # what a fresh clone would contain plus new files not yet committed;
+    # macOS tar needs to be told not to smuggle in apple metadata
+    local tarflags=(--no-xattrs)
+    tar --version | grep -q bsdtar && tarflags+=(--no-mac-metadata)
+
+    local stage
+    stage="$(mktemp -d)"
+    git -C "$REPO" ls-files -z --cached --others --exclude-standard \
+        | while IFS= read -r -d '' f; do
+              { [ -e "$REPO/$f" ] || [ -h "$REPO/$f" ]; } && printf '%s\0' "$f"
+          done \
+        | tar -C "$REPO" "${tarflags[@]}" --null -T - -cf - \
+        | tar -xf - -C "$stage"
+    git -C "$stage" init -q -b main
+    git -C "$stage" add -A
+    git -C "$stage" -c user.name=lab -c user.email=lab@lab commit -q -m "lab copy"
+
+    # --no-same-owner: root would keep the host's uid, and nix refuses a
+    # git repo owned by someone else
+    tar -C "$stage" "${tarflags[@]}" -czf - . \
+        | vm_ssh 'rm -rf ~/dotfiles && mkdir -p ~/dotfiles && tar -xzf - --no-same-owner -C ~/dotfiles'
+    rm -rf "$stage"
+}
+
+
+# Booting
+# ---------------------------------------------
+boot() {
+    echo "booting $name at $cpus vcpus, $mem MiB, ${xres}x${yres}, ssh port $port"
+
+    # x86 archlinux boots with the default bios. Everything else needs
+    # uefi, with the instance's own settings in vars.fd.
+    local platform=() gpu
+    if [ "$guest_arch" = aarch64 ]; then
+        platform=(-machine virt)
+        gpu=virtio-gpu-pci
+    else
+        platform=(-machine q35,vmport=off -vga none)
+        gpu=virtio-vga
+    fi
+    if [ -f "$vm/vars.fd" ]; then
+        platform+=(-drive if=pflash,format=raw,readonly=on,file="$(firmware code)"
+                   -drive if=pflash,format=raw,file="$vm/vars.fd")
+    fi
+
+    if [ -f "$vm/seed.iso" ]; then
+        if [ "$guest_arch" = aarch64 ]; then
+            platform+=(-drive if=virtio,file="$vm/seed.iso",format=raw,readonly=on)
+        else
+            platform+=(-cdrom "$vm/seed.iso")
+        fi
+    fi
+
+    local input=(-device qemu-xhci -device usb-kbd -device usb-tablet)
+
+    # Headless still draws the screen and serves it on vnc.sock. qemu's own
+    # screenshot can't read a 3d display, but its vnc server gets every
+    # frame. With a gpu render node on a linux host that includes 3d:
+    # egl-headless renders with virgl without a window.
+    local display=()
+    rm -f "$vm/vnc.sock"
+    if [ "$headless" = true ]; then
+        if [ "$(uname -s)" = Linux ] && [ -r /dev/dri/renderD128 ]; then
+            case "$gpu" in
+                virtio-vga)     gpu=virtio-vga-gl ;;
+                virtio-gpu-pci) gpu=virtio-gpu-gl-pci ;;
+            esac
+            display=(-display egl-headless)
+        else
+            display=(-display none)
+        fi
+        display+=(-vnc "unix:$vm/vnc.sock")
+    elif wants_gl; then
+        case "$gpu" in
+            virtio-vga)     gpu=virtio-vga-gl ;;
+            virtio-gpu-pci) gpu=virtio-gpu-gl-pci ;;
+        esac
+        display=(-display sdl,gl=on -full-screen)
+        export SDL_VIDEO_WAYLAND_SCALE_TO_DISPLAY=1
+    fi
+
+    # shellcheck disable=SC2046
+    "$qemu" \
+        -name "lab-vm-$name" -m "$mem" -smp "$cpus" \
+        "${platform[@]}" \
+        $(accel_args) \
+        -drive if=virtio,file="$vm/disk.qcow2",format=qcow2 \
+        -device "$gpu",xres="$xres",yres="$yres" -device virtio-rng-pci \
+        "${input[@]}" \
+        -nic "user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:$port-:22" \
+        -qmp "unix:$vm/qmp.sock,server,nowait" \
+        -chardev "socket,id=ser0,path=$vm/serial.sock,server=on,wait=off,logfile=$vm/serial.log" \
+        -serial chardev:ser0 \
+        -pidfile "$vm/pid" \
+        "${display[@]}" </dev/null >"$vm/qemu.log" 2>&1 &
+
+    sleep 2
+    if ! running; then
+        cat "$vm/qemu.log" >&2
+        die "qemu did not start (see $vm/qemu.log and $vm/serial.log)"
+    fi
+
+    if [ "$setup" = serial ]; then
+        serial_setup
+    fi
+
+    echo -n "waiting for ssh"
+    local i
+    for i in $(seq 1 120); do
+        vm_ssh -o ConnectTimeout=2 true </dev/null 2>/dev/null && break
+        echo -n .; sleep 5
+        [ "$i" = 120 ] && die "vm never came up (see $vm/serial.log)"
+    done
+    echo " up"
+}
+
+
+# Commands
+# ---------------------------------------------
+cmd_new() {
+    local new_distro="${1:-}"
+    [ -n "$new_distro" ] || die "missing distro (try: ${0##*/} help)"
+    distro_info "$new_distro"
+    name="${2:-$new_distro}"
+    valid_name "$name" \
+        || die "instance names are lowercase letters, digits, dots and dashes, got '$name'"
+    vm="$CACHE/$name"
+    [ ! -e "$vm" ] || die "instance '$name' already exists (${0##*/} start $name, or ${0##*/} rm $name)"
+
+    distro="$new_distro"
+    qemu="qemu-system-$guest_arch"
+    local cpus mem xres yres
+    preflight
+    fetch_base
+
+    mkdir -p "$vm"
+    echo "$distro" > "$vm/distro"
+    free_port > "$vm/port"
+    load_instance "$name"
+    qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
+    ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
+    if [ "$guest_arch" = aarch64 ]; then
+        dd if=/dev/zero of="$vm/vars.fd" bs=1m count=64 status=none
+    elif [ "$setup" = serial ]; then
+        cp "$(firmware vars)" "$vm/vars.fd"
+    fi
+    if [ "$setup" = cloud-init ]; then
+        make_seed
+    fi
+
+    boot
+    if [ "$setup" = cloud-init ]; then
+        echo "waiting for cloud-init to install ansible"
+        vm_ssh sudo cloud-init status --wait </dev/null >/dev/null \
+            || die "cloud-init failed on '$name' (${0##*/} shell $name, then: cloud-init status --long)"
+    fi
+    copy_repo
+    echo "new $distro instance '$name', repo copied to ~/dotfiles -- try:"
+    echo "    $hint"
+    cmd_shell
+}
+
+cmd_start() {
+    load_instance "$1"
+    running && die "'$name' is already running -- ${0##*/} shell $name"
+    local cpus mem xres yres
+    preflight
+    boot
+    cmd_shell
+}
+
+cmd_shell() {
+    need_running
+    if [ -t 0 ]; then
+        vm_ssh -t 'cd ~/dotfiles 2>/dev/null; exec bash'
+    else
+        vm_ssh bash
+    fi
+}
+
+cmd_sync() {
+    need_running
+    copy_repo
+    echo "repo copied to ~/dotfiles on '$name'"
+}
+
+cmd_stop() {
+    if ! running; then
+        echo "'$name' is not running"
+        return
+    fi
+    qmp system_powerdown
+    echo -n "shutting down $name"
+    local i
+    for i in $(seq 1 60); do
+        running || { echo " done"; return; }
+        echo -n .; sleep 1
+    done
+    echo " no response, killing it"
+    kill "$(cat "$vm/pid")"
+}
+
+cmd_rm() {
+    need_stopped
+    rm -rf "$vm"
+    echo "deleted '$name'"
+}
+
+cmd_mv() {
+    need_stopped
+    local new="${1:-}"
+    [ -n "$new" ] || die "missing new name (try: ${0##*/} mv $name <new-name>)"
+    valid_name "$new" \
+        || die "instance names are lowercase letters, digits, dots and dashes, got '$new'"
+    [ ! -e "$CACHE/$new" ] || die "instance '$new' already exists"
+    mv "$vm" "$CACHE/$new"
+    echo "renamed '$name' to '$new'"
+}
+
+# The clone is the source's directory minus its runtime files, with a new
+# ssh port. Everything else can stay the same.
+cmd_cp() {
+    need_stopped
+    local new="${1:-}"
+    [ -n "$new" ] || die "missing new name (try: ${0##*/} cp $name <new-name>)"
+    valid_name "$new" \
+        || die "instance names are lowercase letters, digits, dots and dashes, got '$new'"
+    [ ! -e "$CACHE/$new" ] || die "instance '$new' already exists"
+
+    echo "copying '$name' to '$new'"
+    # an instant copy where the filesystem can share blocks (apfs, btrfs)
+    case "$(uname -s)" in
+        Darwin) cp -Rpc "$vm" "$CACHE/$new" ;;
+        Linux)  cp -a --reflink=auto --sparse=always "$vm" "$CACHE/$new" ;;
+    esac
+    rm -f "$CACHE/$new"/{pid,qmp.sock,serial.sock,vnc.sock,serial.log,qemu.log,screen.png,size.png}
+    free_port > "$CACHE/$new/port"
+    echo "cloned '$name' to '$new', ssh port $(cat "$CACHE/$new/port")"
+}
+
+cmd_list() {
+    local n state
+    printf '%-20s %-15s %-6s %s\n' NAME DISTRO PORT STATE
+    for n in $(instances); do
+        if [ ! -f "$CACHE/$n/distro" ] && ! ( distro_info "$n" ) 2>/dev/null; then
+            printf '%-20s %s\n' "$n" "(not an instance)"
+            continue
+        fi
+        load_instance "$n"
+        state=stopped; running && state=running
+        printf '%-20s %-15s %-6s %s\n' "$name" "$distro" "$port" "$state"
+    done
+}
+
+# The logged-in desktop, captured with grim inside the guest: find the
+# wayland socket under /run/user and run grim as the user who owns it.
+# The greeter's compositor can't be captured this way (it has no screen
+# capture protocol), so this needs someone logged in.
+guest_shot() {  # guest_shot out.png
+    local rc=0
+    vm_ssh 'bash -s' >"$1" <<'EOF' || rc=$?
+sock=$(ls -1 /run/user/*/wayland-[0-9] 2>/dev/null | head -1)
+[ -n "$sock" ] || exit 3
+exec sudo -u "#$(stat -c %u "$sock")" \
+    env XDG_RUNTIME_DIR="$(dirname "$sock")" WAYLAND_DISPLAY="$(basename "$sock")" grim -
+EOF
+    [ "$rc" = 0 ] && return
+    rm -f "$1"
+    [ "$rc" = 3 ] \
+        && die "no screenshot from '$name': nobody is logged in to the desktop yet (use --headless to see the greeter)"
+    die "grim failed in '$name' (exit $rc)"
+}
+
+cmd_screenshot() {
+    need_running
+    local out="${1:-$vm/screen.png}"
+    if [ -S "$vm/vnc.sock" ]; then
+        python3 "$HERE/lib/agent.py" shot "$vm/vnc.sock" "$out"
+    elif [ "$(uname -s)" = Linux ]; then
+        # qemu can't capture the 3d window; the guest's compositor can
+        guest_shot "$out"
+        echo "$out ($(python3 "$HERE/lib/agent.py" size "$out"))"
+    else
+        # the macos window is 2d, which qemu can dump
+        qmp screendump "{\"filename\": \"$out\", \"format\": \"png\"}"
+        echo "$out"
+    fi
+}
+
+# click and move turn screenshot pixels into tablet positions, which needs
+# the screen size: from vnc.sock, or from a fresh screenshot.
+cmd_pointer() {  # cmd_pointer click|move x y [button]
+    need_running
+    [[ "${2:-}" =~ ^[0-9]+$ ]] && [[ "${3:-}" =~ ^[0-9]+$ ]] \
+        || die "usage: ${0##*/} $1 $name <x> <y>"
+    local screen="$vm/vnc.sock"
+    if [ ! -S "$screen" ]; then
+        cmd_screenshot "$vm/size.png" >/dev/null
+        screen="$(python3 "$HERE/lib/agent.py" size "$vm/size.png")"
+    fi
+    python3 "$HERE/lib/agent.py" "$1" "$vm/qmp.sock" "$screen" "$2" "$3" ${4:+"$4"}
+}
+
+cmd_keys() {  # cmd_keys key|type <combo or text>
+    need_running
+    [ -n "${2:-}" ] || die "usage: ${0##*/} $1 $name <$([ "$1" = key ] && echo combo || echo text)>"
+    python3 "$HERE/lib/agent.py" "$1" "$vm/qmp.sock" "$2"
+}
+
+# Snapshots live inside the instance's disk (qcow2 internal snapshots).
+cmd_snapshot() {
+    need_stopped
+    if [ -z "${1:-}" ]; then
+        qemu-img snapshot -l "$vm/disk.qcow2"
+    else
+        qemu-img snapshot -c "$1" "$vm/disk.qcow2"
+        echo "saved '$name' as '$1'"
+    fi
+}
+
+cmd_revert() {
+    need_stopped
+    [ -n "${1:-}" ] || die "missing snapshot tag (try: ${0##*/} snapshot $name)"
+    qemu-img snapshot -a "$1" "$vm/disk.qcow2"
+    echo "'$name' is back at '$1'"
+}
+
+
+# Main
+# ---------------------------------------------
+# --headless can go anywhere on the command line
+headless=false
+args=()
+for a in "$@"; do
+    if [ "$a" = --headless ]; then headless=true; else args+=("$a"); fi
+done
+set -- "${args[@]}"
+
+cmd="${1:-}"
+[ $# -gt 0 ] && shift
+
+case "$cmd" in
+    ''|help|-h|--help) usage ;;
+    new)        cmd_new "$@" ;;
+    list)       cmd_list ;;
+    start)      cmd_start "${1:-}" ;;
+    shell)      load_instance "${1:-}"; cmd_shell ;;
+    sync)       load_instance "${1:-}"; cmd_sync ;;
+    stop)       load_instance "${1:-}"; cmd_stop ;;
+    rm)         load_instance "${1:-}"; cmd_rm ;;
+    mv)         load_instance "${1:-}"; cmd_mv "${2:-}" ;;
+    cp)         load_instance "${1:-}"; cmd_cp "${2:-}" ;;
+    screenshot) load_instance "${1:-}"; cmd_screenshot "${2:-}" ;;
+    click)      load_instance "${1:-}"; cmd_pointer click "${2:-}" "${3:-}" "${4:-}" ;;
+    move)       load_instance "${1:-}"; cmd_pointer move "${2:-}" "${3:-}" ;;
+    key)        load_instance "${1:-}"; cmd_keys key "${2:-}" ;;
+    type)       load_instance "${1:-}"; cmd_keys type "${2:-}" ;;
+    snapshot)   load_instance "${1:-}"; cmd_snapshot "${2:-}" ;;
+    revert)     load_instance "${1:-}"; cmd_revert "${2:-}" ;;
+    *) die "unknown command '$cmd' (try: ${0##*/} help)" ;;
+esac

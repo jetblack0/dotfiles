@@ -275,6 +275,11 @@ in
       (callPackage ../packages/apple-fonts.nix { })
     ];
 
+    nixpkgs.config.allowUnfreePackages = [
+      "apple-color-emoji"
+      "apple-fonts-sf-pro"
+    ];
+
     fonts.fontconfig.defaultFonts = {
       serif = [
         "Libertinus Serif"

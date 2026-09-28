@@ -36,8 +36,10 @@ local function lid(action)
 		end
 	end
 end
-hl.bind("switch:on:Lid Switch", lid("off"), { locked = true })
-hl.bind("switch:off:Lid Switch", lid("on"), { locked = true })
+
+local lid_opts = { locked = true, submap_universal = true, dont_inhibit = true }
+hl.bind("switch:on:Lid Switch", lid("off"), lid_opts)
+hl.bind("switch:off:Lid Switch", lid("on"), lid_opts)
 
 -- shell surfaces
 hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), d("launcher", nograb))

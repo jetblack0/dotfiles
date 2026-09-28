@@ -3,7 +3,7 @@
 set -euo pipefail
 
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="$(cd "$HERE/../.." && pwd)"
+REPO="$(cd "$HERE/.." && pwd)"
 
 LAB_TERM="${TERM:-xterm-256color}"
 LAB_COLORTERM="${COLORTERM:-truecolor}"

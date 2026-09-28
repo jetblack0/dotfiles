@@ -65,6 +65,10 @@
   retries: 3
   delay: 10
 
+- name: Install SF Pro
+  ansible.builtin.include_tasks: sf-pro.yml
+  when: "'apple-fonts' not in packages_exclude"
+
 # AUR
 # ---------------------------------------------
 - name: Install AUR build prerequisites

@@ -13,7 +13,8 @@ stdenvNoCC.mkDerivation {
   # Apple republishes every release at the same url, which breaks the hash
   # on every new install. The wayback snapshot is immutable, so it goes
   # first; fetchurl only moves on when a download fails, not when the hash
-  # is wrong. Bump both together: new snapshot, new hash.
+  # is wrong. Bump both together: new snapshot, new hash — and the arch
+  # pin, packages_sf_pro in ansible/roles/packages/defaults/main.yml.
   src = fetchurl {
     urls = [
       "https://web.archive.org/web/20260916202226id_/https://devimages-cdn.apple.com/design/resources/download/SF-Pro.dmg"

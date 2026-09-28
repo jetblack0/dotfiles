@@ -10,6 +10,7 @@
     ../../modules/desktop.nix
     ../../modules/zen.nix
     ../../modules/sing-box.nix
+    ../../modules/virt.nix
   ];
 
 

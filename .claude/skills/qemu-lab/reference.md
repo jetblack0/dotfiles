@@ -1,0 +1,116 @@
+# qemu lab reference
+
+Details behind [SKILL.md](SKILL.md): where things live, the exact input
+names, and what to do when something goes wrong.
+
+## Where an instance lives
+
+Each instance is one directory, `~/.cache/dotfiles-lab/vm/<name>/`:
+
+| file | what it is |
+|---|---|
+| `disk.qcow2` | the disk, with its snapshots inside |
+| `distro`, `port` | which distro it is, and its ssh port (fixed at `new`) |
+| `key`, `key.pub` | the ssh key the guest accepts |
+| `seed.iso` | cloud-init seed (Arch only) |
+| `vars.fd` | uefi settings (NixOS and aarch64 guests) |
+| `qemu.log` | qemu's own output: look here when qemu won't start |
+| `serial.log` | the guest's serial console: look here when boot hangs |
+| `qmp.sock`, `vnc.sock`, `serial.sock` | control sockets while it runs |
+
+`~/.cache/dotfiles-lab/vm/base/` holds the downloaded images. Every instance
+disk only stores its changes on top of its base image. **Never delete or
+replace a file in `base/`**: every instance built on it stops working.
+
+To ssh in by hand instead of `lab/vm shell`, take the port from
+`lab/vm list`. The user is `dev` on Arch and `root` on NixOS:
+
+```sh
+ssh -p <port> -i ~/.cache/dotfiles-lab/vm/<name>/key dev@127.0.0.1
+```
+
+## Screenshots
+
+- **Headless:** read from qemu's vnc server on `vnc.sock`. It works on every
+  screen, 3d included. Any vnc viewer that can open a unix socket can watch
+  the same screen.
+- **Window, on a linux host:** `grim` runs inside the guest, as the user who
+  owns the wayland session. It needs someone logged in; the lock screen
+  works too, the greeter doesn't.
+- **Window, on macOS:** qemu's own dump of its 2d window.
+
+qemu's built-in `screendump` can't read a 3d display at all, which is why
+the other two paths exist.
+
+## Input
+
+`click` and `move` take screenshot pixel coordinates and convert them for
+the vm's usb tablet. `click` takes an optional button: `left` (the default),
+`right` or `middle`. With the window, each click first takes a screenshot to
+learn the screen size, so a click costs about as long as a screenshot.
+
+`key` takes key names joined with `+`, pressed together:
+
+| name | also accepted as |
+|---|---|
+| `meta_l` | `super`, `win`, `meta`, `mod` |
+| `ctrl` | `control`, `ctl` |
+| `alt`, `shift`, `tab`, `backspace`, `up`, `down`, `left`, `right`, `home`, `end`, `f1` ... `f12` | |
+| `ret` | `enter`, `return` |
+| `esc` | `escape` |
+| `spc` | `space` |
+| `delete`, `insert`, `pgup`, `pgdn` | `del`, `ins`, `pageup`, `pagedown` |
+| letters and digits | themselves: `a`, `7` |
+| `minus`, `equal`, `slash`, `comma`, `dot`, ... | `-`, `=`, `/`, `,`, `.` |
+
+Anything else is passed to qemu as a key code as it is. qemu names the key
+in its error when it doesn't know one.
+
+`type` types text character by character on a us keyboard layout: letters,
+digits, the usual punctuation and space. A real newline or tab character in
+the text presses Return or Tab (the two characters `\n` are typed as they
+are).
+
+## When something goes wrong
+
+**`new` or `start` stays at "waiting for ssh".**
+Start the instance with `--headless` and take a screenshot: you'll see where
+the boot is stuck. `serial.log` shows the same from the serial console.
+One known cause: on a network that answers DNS with fake addresses (some
+proxies do), the guest's clock never syncs over NTP. The Arch cloud image
+waits for a synced clock before it starts sshd, so the boot never finishes.
+
+**`new` stops with "cloud-init failed".**
+Usually a package mirror was too slow. The instance stays. Fix it in the
+guest (`lab/vm shell <name>`, `cloud-init status --long` shows the error),
+then run `lab/vm sync <name>`.
+
+**"no desktop session to open the window on".**
+The shell has no display (ssh, for example) and no desktop session is
+running on the host either. Use `--headless`.
+
+**`screenshot` says nobody is logged in.**
+The vm has a window and is still at the greeter. Log in, or restart it with
+`--headless` to see the greeter.
+
+**A click lands in the wrong place, or does nothing.**
+Take a fresh screenshot: the target may have moved, or an animation hadn't
+finished. If clicks never land at all, the instance may have been started by
+an older version of `lab/vm`; restart it.
+
+**Typing on the lock screen failed three times.**
+pam_faillock locked the account for 10 minutes. Reset it over ssh:
+`sudo faillock --user <user> --reset`.
+
+**Headless screenshots have no 3d.**
+Rendering with 3d while headless needs the host's gpu render node
+(`/dev/dri/renderD128`). Without it the vm falls back to a 2d display;
+screenshots still work.
+
+**On macOS, qemu can't create a socket.**
+Unix socket paths must be shorter than 104 bytes. Keep `XDG_CACHE_HOME`
+short.
+
+**A `lab/vm` command fails with a syntax error in the middle of a run.**
+The script was edited while it ran; bash reads a script as it goes. Run the
+command again.
