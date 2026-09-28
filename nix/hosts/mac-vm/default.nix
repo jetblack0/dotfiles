@@ -10,6 +10,7 @@
     ../../modules/desktop.nix
     ../../modules/zen.nix
     ../../modules/sing-box.nix
+    ../../modules/virt.nix
     # ../../modules/data.nix
   ];
 
@@ -44,6 +45,11 @@
   # VM-only: real gpus do scan-out correctly
   services.greetd.settings.default_session.command = lib.mkForce
     "env WLR_SCENE_DISABLE_DIRECT_SCANOUT=1 ${config.programs.noctalia-greeter.package}/bin/noctalia-greeter-session";
+
+
+  # virt
+  # ---------------------------------------------
+  virt.dockerGroup = true;
 
 
   # networking

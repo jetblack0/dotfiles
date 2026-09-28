@@ -108,6 +108,9 @@ export AWS_PAGER=""
 # linode
 export LINODE_CLI_CONFIG="$HOME/.config/linode"
 
+# libvirt
+export LIBVIRT_DEFAULT_URI="qemu:///system"
+
 # loki
 export LOKI_ADDR="https://loki.ops.unazoomer.com"
 export LOKI_ORG_ID="ops"
