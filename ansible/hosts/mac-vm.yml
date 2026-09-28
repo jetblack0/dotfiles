@@ -13,6 +13,10 @@ packages_exclude:
   - vagrant
   - steam
   - ntsync-autoload
+  # not built for arch arm.
+  - lib32-gamemode
+  - mangohud
+  - lib32-mangohud
 
 
 # Displays
