@@ -1,0 +1,6 @@
+{
+  "settings": {
+    "share": "Width (percent)",
+    "share-desc": "How much of the left half of the bar the title may take. A longer title is cut off."
+  }
+}

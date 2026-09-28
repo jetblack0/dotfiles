@@ -34,7 +34,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "workspaces" ]
+    start = [ "workspaces", "title" ]
     thickness = 32
     widget_spacing = 15
 
@@ -151,7 +151,7 @@ enabled = true
         shadow = false
 
 [plugins]
-enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr", "jetblack0/server" ]
+enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr", "jetblack0/server", "jetblack0/title" ]
 
 
 # Shell
@@ -245,6 +245,9 @@ capsule = true
 capsule_fill = "primary"
 capsule_foreground = "on_primary"
 type = "jetblack0/server:indicator"
+
+[widget.title]
+type = "jetblack0/title:title"
 
 [widget.workspaces]
 scale = 1.25
