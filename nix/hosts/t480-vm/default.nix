@@ -11,6 +11,7 @@
     ../../modules/zen.nix
     ../../modules/input-method.nix
     ../../modules/sing-box.nix
+    ../../modules/virt.nix
   ];
 
 
