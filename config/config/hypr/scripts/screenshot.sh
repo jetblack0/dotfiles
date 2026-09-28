@@ -31,8 +31,13 @@ case "$mode" in
 		grim "$file"
 		;;
 	region)
-		region=$(slurp) || exit 0            # cancelled selection -> stay silent
-		grim -g "$region" "$file"
+		# frozen screen, so open panels survive the selection (region-grab.sh)
+		tmp="$file.part"
+		if ! "${0%/*}/region-grab.sh" >"$tmp"; then
+			rm -f "$tmp"                     # cancelled selection -> stay silent
+			exit 0
+		fi
+		mv "$tmp" "$file"
 		;;
 	*)
 		echo "usage: ${0##*/} full|region" >&2

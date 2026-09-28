@@ -14,3 +14,8 @@ hl.window_rule({
 	size  = { "monitor_w*0.55", "monitor_h*0.65" },
 	center = true,
 })
+
+hl.layer_rule({
+	match = { namespace = "still|selection" },
+	no_anim = true,
+})

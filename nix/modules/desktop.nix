@@ -253,6 +253,7 @@ in
       # screen pickers & clipboard (binds.lua)
       grim
       slurp
+      still
       hyprpicker
       wl-clipboard
       (tesseract.override { enableLanguages = [ "eng" ]; })
