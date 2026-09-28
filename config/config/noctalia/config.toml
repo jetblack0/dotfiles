@@ -150,6 +150,15 @@ enabled = true
         format = "{:%A, %B %-d}"
         shadow = false
 
+# OSD
+# ---------------------------------------------
+[osd]
+
+    # fcitx5 mode switches would pop this up every time; the bar's tray
+    # glyph already shows the mode. Also covers xkb layout switches.
+    [osd.kinds]
+    keyboard_layout = false
+
 [plugins]
 enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr", "jetblack0/server", "jetblack0/title" ]
 
