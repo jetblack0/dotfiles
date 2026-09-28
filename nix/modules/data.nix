@@ -97,6 +97,12 @@ in
       default = {
         ".local/share/zsh" = "state/zsh";
         ".claude" = "state/claude";
+        ".config/sing-box" = "config/sing-box";
+        ".config/aws" = "config/aws";
+        ".config/git/conf.d" = "config/git";
+        ".local/share/pass" = "state/pass";
+        ".local/share/gnupg" = "state/gnupg";
+        ".local/share/google" = "state/google";
       };
       description = ''
         Directories in $HOME replaced by symlinks into the data home.
