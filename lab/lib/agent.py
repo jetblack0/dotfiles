@@ -4,13 +4,19 @@ Called by ../vm, which passes the instance's sockets:
 
     agent.py shot  <vnc.sock> <out.png>
     agent.py size  <file.png>           prints WIDTHxHEIGHT
-    agent.py click <qmp.sock> <screen> <x> <y> [left|right|middle]
-    agent.py move  <qmp.sock> <screen> <x> <y>
-    agent.py key   <qmp.sock> <combo>   e.g. super+return, ctrl+alt+t
-    agent.py type  <qmp.sock> <text>
+    agent.py click  <qmp.sock> <screen> <x> <y> [button] [--double|--triple]
+    agent.py move   <qmp.sock> <screen> <x> <y>
+    agent.py drag   <qmp.sock> <screen> <x1> <y1> <x2> <y2> [button]
+    agent.py scroll <qmp.sock> <screen> <x> <y> up|down [clicks]
+    agent.py key    <qmp.sock> <combo>  e.g. super+return, ctrl+alt+t
+    agent.py type   <qmp.sock> <text>
 
 <screen> is the vnc socket, or the screen size as WIDTHxHEIGHT when the
 screenshots come from somewhere else (grim inside the guest).
+
+A button is left (the default), right, middle, side or extra. click, move,
+drag and scroll also take --with <keys>, e.g. --with super or
+--with ctrl+shift: those keys stay held down during the mouse action.
 
 Screenshots come from qemu's vnc server: qemu's own screendump can't read
 a 3d (virgl) display, but its vnc server gets every frame. Input goes in
@@ -181,11 +187,150 @@ def to_tablet(size, x, y):
     return (x * 32767 // max(w - 1, 1), y * 32767 // max(h - 1, 1))
 
 
+BUTTONS = ("left", "right", "middle", "side", "extra")
+
+# Pauses, in seconds.
+#
+# The keyboard and the tablet are separate usb devices. The guest puts each
+# one to sleep after 2 seconds without input, and a sleeping keyboard takes
+# about 75 ms to deliver its first key (measured in the lab vm). If the
+# button press comes sooner, the guest sees the button first, and a
+# Super+drag starts as a plain drag. So after pressing held keys we wait
+# HOLD, which covers the wake-up with room to spare.
+SETTLE = 0.05    # after moving the pointer or pressing a button
+HOLD = 0.2       # after pressing the keys held during a mouse action
+STEP = 0.015     # between the small moves of a drag
+CLICK_GAP = 0.06 # between the clicks of a double or triple click
+
+
 def move(qmp, ax, ay):
     qmp.run("input-send-event", events=[
         {"type": "abs", "data": {"axis": "x", "value": ax}},
         {"type": "abs", "data": {"axis": "y", "value": ay}},
     ])
+
+
+def button(qmp, name, down):
+    qmp.run("input-send-event", events=[
+        {"type": "btn", "data": {"down": down, "button": name}}])
+
+
+def hold(qmp, keys, down):
+    """Press (or release, in reverse order) keys held during a mouse action."""
+    pressed = []
+    for k in (keys if down else reversed(keys)):
+        try:
+            qmp.run("input-send-event", events=[
+                {"type": "key", "data": {"down": down, "key": k}}])
+        except SystemExit:
+            # An unknown key name fails here. Release the keys already
+            # pressed, or they stay held down in the guest.
+            for p in reversed(pressed):
+                qmp.run("input-send-event", events=[
+                    {"type": "key", "data": {"down": False, "key": p}}])
+            raise
+        pressed.append(k)
+    if keys:
+        time.sleep(HOLD if down else SETTLE)
+
+
+def pointer_args(cmd, args, ncoords):
+    """Split args into coordinates, other words and options."""
+    usage = {
+        "click": "<x> <y> [button] [--double|--triple] [--with <keys>]",
+        "move": "<x> <y> [--with <keys>]",
+        "drag": "<x1> <y1> <x2> <y2> [button] [--with <keys>]",
+        "scroll": "<x> <y> up|down [clicks] [--with <keys>]",
+    }[cmd]
+    count, keys, words = 1, [], []
+    rest = iter(args)
+    for a in rest:
+        if a == "--double":
+            count = 2
+        elif a == "--triple":
+            count = 3
+        elif a == "--with":
+            combo = next(rest, "")
+            if not combo:
+                sys.exit("--with needs keys, e.g. --with super")
+            keys = keycodes(combo)
+        elif a.startswith("--"):
+            sys.exit("unknown option %s (usage: %s %s)" % (a, cmd, usage))
+        else:
+            words.append(a)
+    coords, words = words[:ncoords], words[ncoords:]
+    if len(coords) < ncoords or not all(c.isdigit() for c in coords):
+        sys.exit("usage: %s %s" % (cmd, usage))
+    return [int(c) for c in coords], words, count, keys
+
+
+def pick_button(words, cmd):
+    name = words[0] if words else "left"
+    if name not in BUTTONS or len(words) > 1:
+        sys.exit("%s takes one button: %s" % (cmd, ", ".join(BUTTONS)))
+    return name
+
+
+def pointer(cmd, qmp, size, args):
+    if cmd == "click":
+        (x, y), words, count, keys = pointer_args(cmd, args, 2)
+        name = pick_button(words, cmd)
+        move(qmp, *to_tablet(size, x, y))
+        time.sleep(SETTLE)  # let the pointer arrive before pressing
+        hold(qmp, keys, True)
+        for i in range(count):
+            if i:
+                time.sleep(CLICK_GAP)
+            button(qmp, name, True)
+            time.sleep(0.03)
+            button(qmp, name, False)
+        time.sleep(SETTLE)
+        hold(qmp, keys, False)
+
+    elif cmd == "move":
+        (x, y), words, _, keys = pointer_args(cmd, args, 2)
+        if words:
+            sys.exit("move takes only <x> <y>")
+        hold(qmp, keys, True)
+        move(qmp, *to_tablet(size, x, y))
+        hold(qmp, keys, False)
+
+    elif cmd == "drag":
+        (x1, y1, x2, y2), words, _, keys = pointer_args(cmd, args, 4)
+        name = pick_button(words, cmd)
+        start, end = to_tablet(size, x1, y1), to_tablet(size, x2, y2)
+        move(qmp, *start)
+        time.sleep(SETTLE)
+        hold(qmp, keys, True)
+        button(qmp, name, True)
+        time.sleep(SETTLE)
+        # Move there in small steps, like a hand does. Apps only start a
+        # drag after the pointer has moved a few pixels with the button down.
+        steps = max(10, max(abs(x2 - x1), abs(y2 - y1)) // 20)
+        for i in range(1, steps + 1):
+            move(qmp, start[0] + (end[0] - start[0]) * i // steps,
+                 start[1] + (end[1] - start[1]) * i // steps)
+            time.sleep(STEP)
+        time.sleep(SETTLE)
+        button(qmp, name, False)
+        time.sleep(SETTLE)
+        hold(qmp, keys, False)
+
+    elif cmd == "scroll":
+        (x, y), words, _, keys = pointer_args(cmd, args, 2)
+        if not words or words[0] not in ("up", "down") or len(words) > 2 \
+                or (len(words) == 2 and not words[1].isdigit()):
+            sys.exit("usage: scroll <x> <y> up|down [clicks]")
+        wheel = "wheel-" + words[0]
+        clicks = int(words[1]) if len(words) == 2 else 1
+        move(qmp, *to_tablet(size, x, y))  # things scroll under the pointer
+        time.sleep(SETTLE)
+        hold(qmp, keys, True)
+        for _ in range(clicks):
+            button(qmp, wheel, True)
+            button(qmp, wheel, False)
+            time.sleep(0.03)
+        hold(qmp, keys, False)
 
 
 def main():
@@ -200,17 +345,8 @@ def main():
         if head[:8] != b"\x89PNG\r\n\x1a\n":
             sys.exit(args[0] + " is not a png")
         print("%dx%d" % struct.unpack(">II", head[16:24]))
-    elif cmd in ("click", "move"):
-        qmp = Qmp(args[0])
-        ax, ay = to_tablet(screen_size(args[1]), args[2], args[3])
-        move(qmp, ax, ay)
-        if cmd == "click":
-            button = args[4] if len(args) > 4 else "left"
-            time.sleep(0.05)  # let the pointer arrive before pressing
-            for down in (True, False):
-                qmp.run("input-send-event", events=[
-                    {"type": "btn", "data": {"down": down, "button": button}}])
-                time.sleep(0.05)
+    elif cmd in ("click", "move", "drag", "scroll"):
+        pointer(cmd, Qmp(args[0]), screen_size(args[1]), args[2:])
     elif cmd == "key":
         Qmp(args[0]).run("send-key", keys=keycodes(args[1]))
     elif cmd == "type":

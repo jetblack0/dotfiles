@@ -49,16 +49,26 @@ driving the screen for ai agents:
                          window it comes from grim inside the guest, so it
                          needs a logged-in desktop, and you can keep using
                          the window meanwhile
-  click <name> <x> <y> [left|right|middle]
-                         click at screenshot pixel x,y
+  click <name> <x> <y> [button] [--double|--triple]
+                         click at screenshot pixel x,y. The button is left
+                         (default), right, middle, side or extra
   move <name> <x> <y>    move the pointer there (hover)
+  drag <name> <x1> <y1> <x2> <y2> [button]
+                         press at x1,y1, move to x2,y2, release: select
+                         text, move a slider, drag a window
+  scroll <name> <x> <y> up|down [clicks]
+                         turn the wheel with the pointer at x,y
   key <name> <combo>     press a key or combo, e.g. super+return, ctrl+alt+t
   type <name> <text>     type text (us keyboard characters)
 
+  click, move, drag and scroll take --with <keys> to hold keys during the
+  action. For example, this moves a window with Hyprland's Super+drag:
+      drag <name> 900 500 1200 700 --with super
+
   Input goes in as the vm's usb keyboard and tablet, so it works in every
-  mode and at every screen: boot, greeter, desktop. click and move take the
-  screen size from a screenshot, so with the window they need a logged-in
-  desktop too.
+  mode and at every screen: boot, greeter, desktop. The mouse commands take
+  the screen size from a screenshot, so with the window they need a
+  logged-in desktop too.
 
 snapshots (the instance must be stopped):
   snapshot <name> [tag]  save the disk as <tag>, or list the snapshots
@@ -734,16 +744,17 @@ cmd_screenshot() {
 
 # click and move turn screenshot pixels into tablet positions, which needs
 # the screen size: from vnc.sock, or from a fresh screenshot.
-cmd_pointer() {  # cmd_pointer click|move x y [button]
+cmd_pointer() {  # cmd_pointer click|move|drag|scroll x y [more arguments]
     need_running
     [[ "${2:-}" =~ ^[0-9]+$ ]] && [[ "${3:-}" =~ ^[0-9]+$ ]] \
-        || die "usage: ${0##*/} $1 $name <x> <y>"
+        || die "usage: ${0##*/} $1 $name <x> <y> ... (try: ${0##*/} help)"
     local screen="$vm/vnc.sock"
     if [ ! -S "$screen" ]; then
         cmd_screenshot "$vm/size.png" >/dev/null
         screen="$(python3 "$HERE/lib/agent.py" size "$vm/size.png")"
     fi
-    python3 "$HERE/lib/agent.py" "$1" "$vm/qmp.sock" "$screen" "$2" "$3" ${4:+"$4"}
+    local action="$1"; shift
+    python3 "$HERE/lib/agent.py" "$action" "$vm/qmp.sock" "$screen" "$@"
 }
 
 cmd_keys() {  # cmd_keys key|type <combo or text>
@@ -796,8 +807,8 @@ case "$cmd" in
     mv)         load_instance "${1:-}"; cmd_mv "${2:-}" ;;
     cp)         load_instance "${1:-}"; cmd_cp "${2:-}" ;;
     screenshot) load_instance "${1:-}"; cmd_screenshot "${2:-}" ;;
-    click)      load_instance "${1:-}"; cmd_pointer click "${2:-}" "${3:-}" "${4:-}" ;;
-    move)       load_instance "${1:-}"; cmd_pointer move "${2:-}" "${3:-}" ;;
+    click|move|drag|scroll)
+                load_instance "${1:-}"; shift; cmd_pointer "$cmd" "$@" ;;
     key)        load_instance "${1:-}"; cmd_keys key "${2:-}" ;;
     type)       load_instance "${1:-}"; cmd_keys type "${2:-}" ;;
     snapshot)   load_instance "${1:-}"; cmd_snapshot "${2:-}" ;;
