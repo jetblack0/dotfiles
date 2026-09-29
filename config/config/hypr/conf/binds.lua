@@ -65,6 +65,24 @@ end
 hl.bind("ALT + C", clip("c"), d("copy"))
 hl.bind("ALT + V", clip("v"), d("paste"))
 
+-- More mac keys.
+local function mac(key, shift)
+	local extra = shift and " SHIFT" or ""
+	return function()
+		local w = hl.get_active_window()
+		local mods = (w and terminals[w.class]) and "ALT" or "CTRL"
+		hl.dispatch(hl.dsp.send_shortcut({ mods = mods .. extra, key = key }))
+	end
+end
+
+hl.bind("ALT + A", mac("a"), d("select all"))
+hl.bind("ALT + Z", mac("z"), d("undo"))
+hl.bind("ALT + SHIFT + Z", mac("z", true), d("redo"))
+hl.bind("ALT + X", mac("x"), d("cut"))
+hl.bind("ALT + S", mac("s"), d("save"))
+hl.bind("ALT + F", mac("f"), d("find"))
+hl.bind("ALT + R", mac("r"), d("reload"))
+
 -- window switcher: opens on the held SUPER, Tab advances (Shift+Tab back),
 -- releasing SUPER commits.
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("noctalia msg window-switcher"), d("window switcher", nograb))
