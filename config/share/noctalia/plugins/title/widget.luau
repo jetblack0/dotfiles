@@ -1,23 +1,25 @@
--- Window title -- bar widget
+-- Window class -- bar widget
 -- ---------------------------------------------
--- Shows the focused window's title, cut off at a share of the bar.
--- Plugins can't read the compositor, so the title is polled from hyprctl.
--- The widget hides itself when no window is focused.
+-- Shows the focused window's class (the program, e.g. kitty), cut off at a
+-- share of the bar. The title is often just "zsh", so it moved to the
+-- tooltip. Plugins can't read the compositor, so both are polled from
+-- hyprctl. The widget hides itself when no window is focused.
 
 -- The bar this widget sits on. Plugins can't ask which bar they are in,
 -- and this repo only has one.
 local BAR = "bar.main"
 
--- Space on each side of the title inside its background, and its corner
+-- Space on each side of the class inside its background, and its corner
 -- radius.
 local PAD = 8
 
 noctalia.setUpdateInterval(500)
 
+local class = ""
 local title = ""
 local width = 0
 
--- The widest the title may be, in the widget's own units.
+-- The widest the class may be, in the widget's own units.
 -- The left half of the bar runs from its edge to the middle, where the
 -- clock is. The bar scale multiplies every size inside the widget, so the
 -- result is divided by it to come out in screen (logical) pixels.
@@ -38,17 +40,17 @@ local function maxWidth()
 end
 
 local function draw()
-	barWidget.setVisible(title ~= "")
-	if title == "" then
+	barWidget.setVisible(class ~= "")
+	if class == "" then
 		return
 	end
 	barWidget.setTooltip(title)
-	-- A quiet pill behind the title. surface_variant comes from the
+	-- A quiet pill behind the class. surface_variant comes from the
 	-- wallpaper palette and sits just above the bar's own colour.
 	-- The padding counts against the width, so the pill as a whole keeps
 	-- to its share.
 	barWidget.render(ui.row({ align = "center", fill = "surface_variant", radius = PAD, paddingH = PAD, paddingV = 2 }, {
-		ui.label({ text = title, maxWidth = width - 2 * PAD, maxLines = 1 }),
+		ui.label({ text = class, maxWidth = width - 2 * PAD, maxLines = 1 }),
 	}))
 end
 
@@ -63,8 +65,14 @@ function update()
 		end
 		-- With no window focused, hyprctl prints {}.
 		local newTitle = (window and window.title) or ""
+		-- A few windows set no class; show their title instead.
+		local newClass = (window and window.class) or ""
+		if newClass == "" then
+			newClass = newTitle
+		end
 		-- Only redraw when something changed.
-		if newTitle ~= title or newWidth ~= width then
+		if newClass ~= class or newTitle ~= title or newWidth ~= width then
+			class = newClass
 			title = newTitle
 			width = newWidth
 			draw()
