@@ -14,7 +14,6 @@ order = [ "main" ]
     background_opacity = 0.91999995708465576
     end = [
         "tray",
-        "media",
         "volume",
         "brightness",
         "battery",
@@ -34,7 +33,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "workspaces", "title" ]
+    start = [ "workspaces", "title", "media" ]
     thickness = 32
     widget_spacing = 15
 
@@ -261,6 +260,7 @@ type = "launcher"
 
 [widget.media]
 hide_when_no_media = true
+max_length = 150
 
 [widget.network]
 show_label = false
