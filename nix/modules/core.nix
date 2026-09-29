@@ -45,6 +45,19 @@ let
           value.source = pkgs.yaziPlugins.${n};
         }) names
       ));
+
+  nvimDir = dotfiles + "/config/nvim";
+  nvimWritable = [
+    "lazy-lock.json"
+    "cheatsheet.json"
+  ];
+  # Take the entire nvim directory, then remove those writable files
+  nvimLinked = lib.fileset.toSource {
+    root = nvimDir;
+    fileset = lib.fileset.difference nvimDir (
+      lib.fileset.unions (map (f: nvimDir + "/${f}") nvimWritable)
+    );
+  };
 in
 {
   # per-host knobs
@@ -252,7 +265,10 @@ in
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.backupFileExtension = "hm-backup";
-    home-manager.users.${username} = {
+    # a function, so lib here is home-manager's (lib.hm.dag)
+    home-manager.users.${username} =
+      { lib, ... }:
+      {
       home.stateVersion = config.system.stateVersion;
 
       xdg.configFile =
@@ -266,7 +282,6 @@ in
             "glow"
             "lazygit"
             "newsboat"
-            "nvim"
             "opencode"
             "shell"
             "tmux"
@@ -279,7 +294,24 @@ in
         })
         # yazi's plugins/ is untracked (ya pkg owns it on arch), so the flake
         # never copies it -- deploy them from nixpkgs instead
-        // yaziPluginFiles;
+        // yaziPluginFiles
+        // {
+          nvim = {
+            source = nvimLinked;
+            recursive = true;
+          };
+        };
+
+      # Seed nvim's writable files from the repo once
+      home.activation.nvimWritableFiles = lib.hm.dag.entryAfter [ "linkGeneration" ] (
+        lib.concatMapStrings (f: ''
+          t="$HOME/.config/nvim/${f}"
+          if [ ! -e "$t" ] || [ -L "$t" ]; then
+            run rm -f "$t"
+            run install -Dm644 ${nvimDir + "/${f}"} "$t"
+          fi
+        '') nvimWritable
+      );
 
       home.file = binScripts "" // binScripts "/linux";
     };

@@ -53,3 +53,6 @@ dotfiles_mask:
 wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"
 # Empty means noctalia's default, the XDG Pictures directory.
 screenshot_directory: ""
+# Where screen recordings go. Empty means the recorder plugin's default,
+# ~/Videos/Recordings.
+recording_directory: ""

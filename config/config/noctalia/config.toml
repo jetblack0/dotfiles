@@ -14,7 +14,6 @@ order = [ "main" ]
     background_opacity = 0.91999995708465576
     end = [
         "tray",
-        "media",
         "volume",
         "brightness",
         "battery",
@@ -22,8 +21,9 @@ order = [ "main" ]
         "bluetooth",
         "clipboard",
         "notifications",
+        "recorder",
         "server",
-        "hypr",
+        "quick",
         "control-center",
         "session"
     ]
@@ -34,7 +34,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "workspaces", "title" ]
+    start = [ "workspaces", "title", "media" ]
     thickness = 32
     widget_spacing = 15
 
@@ -160,7 +160,10 @@ enabled = true
     keyboard_layout = false
 
 [plugins]
-enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr", "jetblack0/server", "jetblack0/title" ]
+enabled = [ "damian-ds7/battery-threshold", "jetblack0/quick", "jetblack0/server", "jetblack0/title", "noctalia/screen_recorder" ]
+
+[plugin_settings."noctalia/screen_recorder"]
+hide_inactive = true
 
 
 # Shell
@@ -252,19 +255,23 @@ type = "damian-ds7/battery-threshold:battery-threshold"
 glyph = "adjustments-horizontal"
 type = "control-center"
 
-[widget.hypr]
-type = "jetblack0/hypr:indicator"
-
 [widget.launcher]
 enabled = false
 type = "launcher"
 
 [widget.media]
 hide_when_no_media = true
+max_length = 300
 
 [widget.network]
 show_label = false
 type = "network"
+
+[widget.quick]
+type = "jetblack0/quick:indicator"
+
+[widget.recorder]
+type = "noctalia/screen_recorder:recorder"
 
 [widget.server]
 capsule = true

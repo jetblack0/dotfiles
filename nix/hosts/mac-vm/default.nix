@@ -35,6 +35,10 @@
   desktop.xwaylandDpi = 154;
   desktop.lockscreenHeight = 1000;
 
+  # media widget cap, for a screen 1600 logical px wide; with a long window
+  # class and a long song, about a fifth of the bar's left half stays free
+  desktop.mediaMaxLength = 150;
+
   # the parallels virtual display advertises a bogus preferred mode
   # (1448x906, no EDID size); pin the greeter to the real panel
   programs.noctalia-greeter.settings.output = {

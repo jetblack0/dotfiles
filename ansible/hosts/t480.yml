@@ -6,6 +6,8 @@
 # Noctalia
 # ---------------------------------------------
 wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"
+# gpu-screen-recorder creates it if missing
+recording_directory: "~/assets/media/vids/recording"
 
 
 # Graphics
@@ -26,6 +28,9 @@ monitors:
 xwayland_dpi: 115
 
 lockscreen_height: 900
+
+# Noctalia media widget cap.
+media_max_length: 150
 
 greeter_output:
   width: 1920

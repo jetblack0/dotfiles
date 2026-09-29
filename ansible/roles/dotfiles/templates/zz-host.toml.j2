@@ -9,6 +9,10 @@ directory = "{{ wallpaper_directory }}"
 [shell.screenshot]
 directory = "{{ screenshot_directory }}"
 
+# Empty resolves to the recorder plugin's ~/Videos/Recordings.
+[plugin_settings."noctalia/screen_recorder"]
+directory = "{{ recording_directory }}"
+
 # Lock screen login box
 # ---------------------------------------------
 {% for monitor in monitors | default([]) if monitor.output | default('') %}
@@ -51,4 +55,15 @@ box_height = {{ (lockscreen_height * 0.161) | round(1) }}
 
 [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
 box_height = {{ (lockscreen_height * 0.038) | round(1) }}
+{% endif %}
+
+# Media widget width
+# ---------------------------------------------
+# The media widget sits in the left half of the bar, after the window title.
+# Its cap is in pixels (times the bar scale), so it depends on the screen's
+# logical width. Unset keeps the value in config.toml.
+{% if media_max_length is defined %}
+
+[widget.media]
+max_length = {{ media_max_length }}
 {% endif %}

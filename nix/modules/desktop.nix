@@ -78,6 +78,13 @@ let
     box_height = ${builtins.toJSON (cfg.lockscreenHeight * 0.038)}
   '';
 
+  # media widget width (unset keeps the value in config.toml)
+  mediaToml = lib.optionalString (cfg.mediaMaxLength != null) ''
+
+    [widget.media]
+    max_length = ${toString cfg.mediaMaxLength}
+  '';
+
   xresources = ''
     ! Rendered by nix (modules/desktop.nix). Rebuilds replace it.
 
@@ -144,6 +151,12 @@ in
       description = "Noctalia screenshot directory; empty means XDG Pictures.";
     };
 
+    recordingDirectory = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "Screen recording directory; empty means the recorder plugin's ~/Videos/Recordings.";
+    };
+
     xwaylandDpi = lib.mkOption {
       type = lib.types.nullOr lib.types.int;
       default = null;
@@ -154,6 +167,12 @@ in
       type = lib.types.nullOr lib.types.int;
       default = null;
       description = "Logical height of the lock screen's output (mode height / scale); scales the lock clock.";
+    };
+
+    mediaMaxLength = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
+      default = null;
+      description = "Width cap of the bar's media widget, in noctalia units (times the bar scale); depends on the screen's logical width.";
     };
   };
 
@@ -170,6 +189,10 @@ in
     environment.sessionVariables.XDG_DATA_DIRS = [
       "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
     ];
+
+    # screen recording
+    # ---------------------------------------------
+    programs.gpu-screen-recorder.enable = true;
 
     # qt reads the qt5ct/qt6ct color schemes the noctalia template writes
     qt = {
@@ -343,7 +366,10 @@ in
 
             [shell.screenshot]
             directory = "${cfg.screenshotDirectory}"
-          '' + loginBoxToml + lockClockToml;
+
+            [plugin_settings."noctalia/screen_recorder"]
+            directory = "${cfg.recordingDirectory}"
+          '' + loginBoxToml + lockClockToml + mediaToml;
         };
 
       # swayimg is the default image viewer (arch sets this via mimeapps.list;
