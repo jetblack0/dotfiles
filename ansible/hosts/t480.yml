@@ -6,6 +6,8 @@
 # Noctalia
 # ---------------------------------------------
 wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"
+# gpu-screen-recorder creates it if missing
+recording_directory: "~/assets/media/vids/recording"
 
 
 # Graphics
