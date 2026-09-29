@@ -44,10 +44,34 @@ the other two paths exist.
 
 ## Input
 
-`click` and `move` take screenshot pixel coordinates and convert them for
-the vm's usb tablet. `click` takes an optional button: `left` (the default),
-`right` or `middle`. With the window, each click first takes a screenshot to
-learn the screen size, so a click costs about as long as a screenshot.
+The mouse commands take screenshot pixel coordinates and convert them for
+the vm's usb tablet. With the window, each one first takes a screenshot to
+learn the screen size, so it costs about as long as a screenshot.
+
+- **`click`** takes a button: `left` (the default), `right`, `middle`,
+  `side` or `extra` (the last two are back and forward in browsers).
+  `--double` and `--triple` click two or three times quickly: in a
+  terminal or text field that selects a word or a line.
+- **`move`** only moves the pointer. Use it to hover, and to park the
+  pointer before judging a control.
+- **`drag`** presses at the first point, moves to the second in small steps
+  (like a hand), and releases. It takes a button too; `right` with
+  `--with super` is Hyprland's resize.
+- **`scroll`** moves the pointer to the point first, because things scroll
+  under the pointer, then turns the wheel `up` or `down` (1 click by
+  default). In kitty one click is 5 lines.
+- **`--with <keys>`** holds keys during `click`, `move`, `drag` or `scroll`,
+  e.g. `--with super` or `--with ctrl+shift`. The keys go down before the
+  button and come up after it.
+
+Why the mouse commands pause between steps: the keyboard and the tablet are
+separate usb devices, and the guest puts each one to sleep after 2 seconds
+without input. A sleeping keyboard takes about 75 ms to deliver its first
+key. So `--with` waits 200 ms after pressing its keys; without that, the
+button can arrive first and a Super+drag becomes a plain drag. If a
+modifier action still misfires, that's the first thing to suspect.
+
+Kitty extends a selection with a right click, not with Shift+click.
 
 `key` takes key names joined with `+`, pressed together:
 

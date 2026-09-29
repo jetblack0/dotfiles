@@ -68,12 +68,22 @@ nobody is at the host. Switching modes needs a restart
 ## Seeing and driving the screen
 
 ```sh
-lab/vm screenshot my-test shot.png     # then read shot.png
-lab/vm click my-test 960 540           # left click; add right or middle
-lab/vm move my-test 900 850            # move the pointer (hover)
-lab/vm key my-test super+return        # a key or a combo
-lab/vm type my-test 'hello world'      # text, us keyboard characters
+lab/vm screenshot my-test shot.png          # then read shot.png
+lab/vm click my-test 960 540                # left click
+lab/vm click my-test 960 540 right          # or middle, side, extra
+lab/vm click my-test 530 917 --double       # double click: select a word
+lab/vm click my-test 300 917 --triple       # triple click: select a line
+lab/vm move my-test 900 850                 # move the pointer (hover)
+lab/vm drag my-test 136 917 398 917         # press, move, release: select text
+lab/vm scroll my-test 960 500 down 5        # turn the wheel 5 clicks, up or down
+lab/vm key my-test super+return             # a key or a combo
+lab/vm type my-test 'hello world'           # text, us keyboard characters
 ```
+
+`click`, `move`, `drag` and `scroll` take `--with <keys>` to hold keys
+during the action. For example, `lab/vm drag my-test 900 500 1200 700 --with
+super` moves a window with Hyprland's Super+drag, and `--with super` on a
+right-button drag resizes it.
 
 Coordinates are pixels in the screenshot. The input goes in as the vm's own
 usb keyboard and tablet, so it behaves like real hardware.
@@ -86,19 +96,22 @@ Work in small steps and look after every one.
    send any input, even a quick test. The screen may have changed since
    you last looked: the session locks itself when idle, and then your
    keys land in the lock screen's password field.
-2. **One action, then look again.** Wait a second or two for animations,
+2. **After logging in, wait for the desktop.** Hyprland starts before the
+   shell does. Keys sent in those first seconds go nowhere. Take a
+   screenshot and wait until the bar is there.
+3. **One action, then look again.** Wait a second or two for animations,
    then take a new screenshot. Don't chain several clicks you can't see.
-3. **Aim at the middle** of a button or list entry, not its edge.
-4. **Move the pointer away before judging a control.** Hovering changes how a
+4. **Aim at the middle** of a button or list entry, not its edge.
+5. **Move the pointer away before judging a control.** Hovering changes how a
    control looks: a hovered tile can look exactly like an active one. Use
    `lab/vm move` to park the pointer on empty space, then look.
-5. **Use keys for navigation** (keybinds, Tab, Return) and clicks for things
+6. **Use keys for navigation** (keybinds, Tab, Return) and clicks for things
    only the mouse can reach.
-6. **Check a password field before typing into it.** Take a screenshot, make
+7. **Check a password field before typing into it.** Take a screenshot, make
    sure the field is empty and has focus, then type the password and press
    Return. Three failed unlocks lock the account for 10 minutes
    (pam_faillock); see [reference.md](reference.md) for the reset.
-7. **Leave the guest as you found it.** Close the windows you opened, and put
+8. **Leave the guest as you found it.** Close the windows you opened, and put
    toggles back.
 
 ## Asking the desktop instead of reading pixels
@@ -147,6 +160,8 @@ repairing.
 - **The greeter in window mode.** Its compositor offers no screen capture;
   use `--headless` to see it.
 - **Text outside a us keyboard layout** with `lab/vm type`.
+- **Horizontal scrolling and trackpad gestures.** The vm's usb tablet has
+  no horizontal wheel, and qemu has no virtual touchpad.
 
 When something doesn't work (ssh never comes up, a click misses, a
 screenshot fails), check [reference.md](reference.md).
