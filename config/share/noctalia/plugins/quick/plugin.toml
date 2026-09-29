@@ -6,7 +6,7 @@ id = "jetblack0/quick"
 name = "Quick settings"
 version = "1.0.0"
 plugin_api = 23
-description = "Dropdown of the most used switches: server mode, caffeine, hypr toggles"
+description = "Dropdown of the most used switches: server mode, caffeine, hypr toggles, do not disturb, screen recording"
 icon = "toggle-left"
 
 [[widget]]
@@ -20,6 +20,6 @@ entry = "widget.luau"
 id = "menu"
 entry = "panel.luau"
 width = 300
-height = 180
+height = 270
 placement = "attached"
 open_near_click = true

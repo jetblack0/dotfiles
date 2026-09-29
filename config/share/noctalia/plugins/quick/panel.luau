@@ -1,8 +1,11 @@
 -- Quick settings -- dropdown
 -- ---------------------------------------------
--- Top: on/off tiles, styled like the control-center ones (primary when on).
--- Below: the hypr switchers, one row each, showing the current value; a
--- click moves to the next one.
+-- Top: the hypr switchers, one row each, showing the current value; a click
+-- moves to the next one.
+-- Mid: on/off tiles, styled like the control-center ones (primary when on),
+-- two to a row so the labels fit.
+-- Bottom: screen recording, through noctalia's official screen_recorder
+-- plugin. Its bar glyph shows while a recording runs.
 -- The panel is drawn when it opens and after each click.
 
 -- The server plugin owns server mode's state file and script.
@@ -16,7 +19,11 @@ end
 local scripts = home .. "/.config/hypr/scripts"
 
 local caffeine = false
+local dnd = false
+local recording = false
 local hovered = nil
+
+local recorder = { "noctalia", "msg", "plugin", "noctalia/screen_recorder:service", "all" }
 
 local function readState(name, default)
 	local v = noctalia.readFile(stateDir .. "/hypr/" .. name)
@@ -50,7 +57,40 @@ local function readCaffeine(done)
 	end)
 end
 
--- An on/off tile. All tiles share the row equally.
+-- Asks noctalia whether Do Not Disturb is on ("on" / "off"), then calls
+-- done().
+local function readDnd(done)
+	noctalia.runAsync({ "noctalia", "msg", "notification-dnd-status" }, function(result)
+		dnd = result.exitCode == 0 and result.stdout:match("^%s*on") ~= nil
+		done()
+	end)
+end
+
+-- Looks for a running gpu-screen-recorder, then calls done(). The recorder
+-- plugin keeps its state to itself, so this asks the process list instead.
+local function readRecording(done)
+	noctalia.runAsync({ "pgrep", "-f", "gpu-screen-recorder" }, function(result)
+		recording = result.exitCode == 0
+		done()
+	end)
+end
+
+-- Sends one command to the recorder, then closes the dropdown, so it is not
+-- in the recording and does not cover the region picker.
+local function record(action, source)
+	return function()
+		local cmd = table.clone(recorder)
+		table.insert(cmd, action)
+		if source then
+			table.insert(cmd, source)
+		end
+		noctalia.runAsync(cmd)
+		panel.close()
+	end
+end
+
+-- An on/off tile. The two tiles of a row share it equally; a lone last
+-- tile takes the whole row.
 local function tile(key, glyph, label, on, onClick)
 	return ui.button({
 		key = key,
@@ -85,6 +125,51 @@ local function switcher(key, glyph, label, value, onClick)
 	})
 end
 
+-- The recording row: two ways to start, sized and laid out like the tiles
+-- above so the edges line up. While recording, one stop button instead.
+local function recordRow()
+	if recording then
+		return ui.row({ gap = 8 }, {
+			ui.button({
+				key = "record-stop",
+				controlSize = "lg",
+				glyph = "player-stop",
+				text = "Stop",
+				variant = "primary",
+				flexGrow = 1,
+				onClick = record("stop"),
+			}),
+		})
+	end
+	return ui.row({ gap = 8 }, {
+		ui.button({
+			key = "record-screen",
+			controlSize = "lg",
+			glyph = "video",
+			text = "Screen",
+			flexGrow = 1,
+			onClick = record("start", "focused"),
+		}),
+		ui.button({
+			key = "record-region",
+			controlSize = "lg",
+			glyph = "video",
+			text = "Region",
+			flexGrow = 1,
+			onClick = record("start", "portal"),
+		}),
+	})
+end
+
+-- Lays tiles out two to a row.
+local function tileRows(tiles)
+	local rows = {}
+	for i = 1, #tiles, 2 do
+		rows[#rows + 1] = ui.row({ gap = 8 }, { tiles[i], tiles[i + 1] })
+	end
+	return ui.column({ gap = 8 }, rows)
+end
+
 function render()
 	local serverOn = server.read()
 	local tiles = {
@@ -107,9 +192,14 @@ function render()
 			end)
 	end
 
+	-- Do not disturb: no notification pop-ups, e.g. while recording.
+	tiles[#tiles + 1] = tile("dnd", dnd and "bell-off" or "bell", "DND", dnd, function()
+		noctalia.runAsync({ "noctalia", "msg", "notification-dnd-toggle" }, function()
+			readDnd(render)
+		end)
+	end)
+
 	panel.render(ui.column({ gap = 10, padding = 12 }, {
-		ui.row({ gap = 8 }, tiles),
-		ui.separator({}),
 		ui.column({ gap = 2 }, {
 			switcher("animation", "movie", "Animation", readState("animation", "macos"), function()
 				noctalia.runAsync(scripts .. "/animation-switcher.sh --next", render)
@@ -118,6 +208,9 @@ function render()
 				noctalia.runAsync(scripts .. "/layout-switcher.sh --next", render)
 			end),
 		}),
+		ui.separator({}),
+		tileRows(tiles),
+		recordRow(),
 	}))
 end
 
@@ -132,4 +225,6 @@ function onOpen()
 	-- logind has answered.
 	render()
 	readCaffeine(render)
+	readDnd(render)
+	readRecording(render)
 end
