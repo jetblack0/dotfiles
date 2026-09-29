@@ -24,6 +24,9 @@ xwayland_dpi: 115
 
 lockscreen_height: 900
 
+# Noctalia media widget cap.
+media_max_length: 150
+
 greeter_output:
   width: 1920
   height: 1080
