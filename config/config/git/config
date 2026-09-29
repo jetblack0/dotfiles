@@ -9,9 +9,6 @@
 ;     side-by-side = true
 ;     line-numbers = true
 
-[worktree]
-	useRelativePaths = true
-
 [credential]
 	helper = 
 	helper = store --file ~/.config/git/conf.d/credentials
