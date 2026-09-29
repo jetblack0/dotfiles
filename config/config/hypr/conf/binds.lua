@@ -54,11 +54,17 @@ hl.bind("ALT + SPACE", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), d(
 -- and sends the focused window the shortcut that app understands instead.
 local terminals = { kitty = true }
 
+-- Press and release the key right away.
+local function tap(mods, key)
+	hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "down" }))
+	hl.dispatch(hl.dsp.send_key_state({ mods = mods, key = key, state = "up" }))
+end
+
 local function clip(key)
 	return function()
 		local w = hl.get_active_window()
 		local mods = (w and terminals[w.class]) and "CTRL SHIFT" or "CTRL"
-		hl.dispatch(hl.dsp.send_shortcut({ mods = mods, key = key }))
+		tap(mods, key)
 	end
 end
 
@@ -71,7 +77,7 @@ local function mac(key, shift)
 	return function()
 		local w = hl.get_active_window()
 		local mods = (w and terminals[w.class]) and "ALT" or "CTRL"
-		hl.dispatch(hl.dsp.send_shortcut({ mods = mods .. extra, key = key }))
+		tap(mods .. extra, key)
 	end
 end
 
