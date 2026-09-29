@@ -48,6 +48,23 @@ hl.bind(mainMod .. " + N", hl.dsp.exec_cmd("noctalia msg panel-toggle control-ce
 hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard"), d("clipboard history", nograb))
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("noctalia msg bar-toggle"), d("toggle the bar"))
 
+hl.bind("ALT + SPACE", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), d("launcher", nograb))
+
+-- Alt+C / Alt+V copy and paste in every window. Hyprland catches the key
+-- and sends the focused window the shortcut that app understands instead.
+local terminals = { kitty = true }
+
+local function clip(key)
+	return function()
+		local w = hl.get_active_window()
+		local mods = (w and terminals[w.class]) and "CTRL SHIFT" or "CTRL"
+		hl.dispatch(hl.dsp.send_shortcut({ mods = mods, key = key }))
+	end
+end
+
+hl.bind("ALT + C", clip("c"), d("copy"))
+hl.bind("ALT + V", clip("v"), d("paste"))
+
 -- window switcher: opens on the held SUPER, Tab advances (Shift+Tab back),
 -- releasing SUPER commits.
 hl.bind(mainMod .. " + Tab", hl.dsp.exec_cmd("noctalia msg window-switcher"), d("window switcher", nograb))
