@@ -21,6 +21,7 @@ order = [ "main" ]
         "bluetooth",
         "clipboard",
         "notifications",
+        "recorder",
         "server",
         "quick",
         "control-center",
@@ -159,7 +160,10 @@ enabled = true
     keyboard_layout = false
 
 [plugins]
-enabled = [ "damian-ds7/battery-threshold", "jetblack0/quick", "jetblack0/server", "jetblack0/title" ]
+enabled = [ "damian-ds7/battery-threshold", "jetblack0/quick", "jetblack0/server", "jetblack0/title", "noctalia/screen_recorder" ]
+
+[plugin_settings."noctalia/screen_recorder"]
+hide_inactive = true
 
 
 # Shell
@@ -265,6 +269,9 @@ type = "network"
 
 [widget.quick]
 type = "jetblack0/quick:indicator"
+
+[widget.recorder]
+type = "noctalia/screen_recorder:recorder"
 
 [widget.server]
 capsule = true
