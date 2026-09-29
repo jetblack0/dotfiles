@@ -9,6 +9,10 @@ directory = "{{ wallpaper_directory }}"
 [shell.screenshot]
 directory = "{{ screenshot_directory }}"
 
+# Empty resolves to the recorder plugin's ~/Videos/Recordings.
+[plugin_settings."noctalia/screen_recorder"]
+directory = "{{ recording_directory }}"
+
 # Lock screen login box
 # ---------------------------------------------
 {% for monitor in monitors | default([]) if monitor.output | default('') %}
