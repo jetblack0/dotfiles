@@ -151,6 +151,12 @@ in
       description = "Noctalia screenshot directory; empty means XDG Pictures.";
     };
 
+    recordingDirectory = lib.mkOption {
+      type = lib.types.str;
+      default = "";
+      description = "Screen recording directory; empty means the recorder plugin's ~/Videos/Recordings.";
+    };
+
     xwaylandDpi = lib.mkOption {
       type = lib.types.nullOr lib.types.int;
       default = null;
@@ -183,6 +189,10 @@ in
     environment.sessionVariables.XDG_DATA_DIRS = [
       "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}"
     ];
+
+    # screen recording
+    # ---------------------------------------------
+    programs.gpu-screen-recorder.enable = true;
 
     # qt reads the qt5ct/qt6ct color schemes the noctalia template writes
     qt = {
@@ -356,6 +366,9 @@ in
 
             [shell.screenshot]
             directory = "${cfg.screenshotDirectory}"
+
+            [plugin_settings."noctalia/screen_recorder"]
+            directory = "${cfg.recordingDirectory}"
           '' + loginBoxToml + lockClockToml + mediaToml;
         };
 
