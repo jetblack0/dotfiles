@@ -1,0 +1,25 @@
+# Quick settings
+# ---------------------------------------------
+# A dropdown from the bar with the switches used most often.
+
+id = "jetblack0/quick"
+name = "Quick settings"
+version = "1.0.0"
+plugin_api = 23
+description = "Dropdown of the most used switches: server mode, caffeine, hypr toggles"
+icon = "toggle-left"
+
+[[widget]]
+id = "indicator"
+entry = "widget.luau"
+
+    [widget.actions]
+    left = "panel-toggle jetblack0/quick:menu"
+
+[[panel]]
+id = "menu"
+entry = "panel.luau"
+width = 300
+height = 180
+placement = "attached"
+open_near_click = true

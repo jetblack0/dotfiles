@@ -22,7 +22,7 @@ order = [ "main" ]
         "clipboard",
         "notifications",
         "server",
-        "hypr",
+        "quick",
         "control-center",
         "session"
     ]
@@ -159,7 +159,7 @@ enabled = true
     keyboard_layout = false
 
 [plugins]
-enabled = [ "damian-ds7/battery-threshold", "jetblack0/hypr", "jetblack0/server", "jetblack0/title" ]
+enabled = [ "damian-ds7/battery-threshold", "jetblack0/quick", "jetblack0/server", "jetblack0/title" ]
 
 
 # Shell
@@ -251,9 +251,6 @@ type = "damian-ds7/battery-threshold:battery-threshold"
 glyph = "adjustments-horizontal"
 type = "control-center"
 
-[widget.hypr]
-type = "jetblack0/hypr:indicator"
-
 [widget.launcher]
 enabled = false
 type = "launcher"
@@ -265,6 +262,9 @@ max_length = 300
 [widget.network]
 show_label = false
 type = "network"
+
+[widget.quick]
+type = "jetblack0/quick:indicator"
 
 [widget.server]
 capsule = true
