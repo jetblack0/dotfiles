@@ -260,7 +260,7 @@ type = "launcher"
 
 [widget.media]
 hide_when_no_media = true
-max_length = 150
+max_length = 300
 
 [widget.network]
 show_label = false

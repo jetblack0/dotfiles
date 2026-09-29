@@ -33,6 +33,10 @@
   desktop.xwaylandDpi = 115;
   desktop.lockscreenHeight = 900;
 
+  # media widget cap, for a screen 1600 logical px wide; with a long window
+  # class and a long song, about a fifth of the bar's left half stays free
+  desktop.mediaMaxLength = 150;
+
   programs.noctalia-greeter.settings.output = {
     width = 1920;
     height = 1080;

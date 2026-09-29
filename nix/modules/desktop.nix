@@ -78,6 +78,13 @@ let
     box_height = ${builtins.toJSON (cfg.lockscreenHeight * 0.038)}
   '';
 
+  # media widget width (unset keeps the value in config.toml)
+  mediaToml = lib.optionalString (cfg.mediaMaxLength != null) ''
+
+    [widget.media]
+    max_length = ${toString cfg.mediaMaxLength}
+  '';
+
   xresources = ''
     ! Rendered by nix (modules/desktop.nix). Rebuilds replace it.
 
@@ -154,6 +161,12 @@ in
       type = lib.types.nullOr lib.types.int;
       default = null;
       description = "Logical height of the lock screen's output (mode height / scale); scales the lock clock.";
+    };
+
+    mediaMaxLength = lib.mkOption {
+      type = lib.types.nullOr lib.types.int;
+      default = null;
+      description = "Width cap of the bar's media widget, in noctalia units (times the bar scale); depends on the screen's logical width.";
     };
   };
 
@@ -343,7 +356,7 @@ in
 
             [shell.screenshot]
             directory = "${cfg.screenshotDirectory}"
-          '' + loginBoxToml + lockClockToml;
+          '' + loginBoxToml + lockClockToml + mediaToml;
         };
 
       # swayimg is the default image viewer (arch sets this via mimeapps.list;
