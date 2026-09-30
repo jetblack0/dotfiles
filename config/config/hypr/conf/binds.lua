@@ -49,7 +49,7 @@ hl.bind(mainMod .. " + V", hl.dsp.exec_cmd("noctalia msg panel-toggle clipboard"
 hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("noctalia msg bar-toggle"), d("toggle the bar"))
 
 hl.bind("ALT + SPACE", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), d("launcher", nograb))
-hl.bind("ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle jetblack0/quick:menu"), d("quick settings", nograb))
+-- hl.bind("ALT + N", hl.dsp.exec_cmd("noctalia msg panel-toggle jetblack0/quick:menu"), d("quick settings", nograb))
 
 -- Alt+C / Alt+V copy and paste in every window. Hyprland catches the key
 -- and sends the focused window the shortcut that app understands instead.
