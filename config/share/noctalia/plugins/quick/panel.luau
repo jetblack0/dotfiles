@@ -119,8 +119,7 @@ local function record(action, source)
 	end
 end
 
--- An on/off tile. The two tiles of a row share it equally; a lone last
--- tile takes the whole row.
+-- An on/off tile. Every button is half the row wide (see buttonRows).
 local function tile(key, glyph, label, on, onClick)
 	return ui.button({
 		key = key,
@@ -155,11 +154,11 @@ local function switcher(key, glyph, label, value, onClick)
 	})
 end
 
--- The recording row: two ways to start, sized and laid out like the tiles
--- above so the edges line up. While recording, one stop button instead.
-local function recordRow()
+-- The recording buttons: two ways to start, or one stop button while
+-- recording.
+local function recordButtons()
 	if recording then
-		return ui.row({ gap = 8 }, {
+		return {
 			ui.button({
 				key = "record-stop",
 				controlSize = "lg",
@@ -169,9 +168,9 @@ local function recordRow()
 				flexGrow = 1,
 				onClick = record("stop"),
 			}),
-		})
+		}
 	end
-	return ui.row({ gap = 8 }, {
+	return {
 		ui.button({
 			key = "record-screen",
 			controlSize = "lg",
@@ -188,14 +187,17 @@ local function recordRow()
 			flexGrow = 1,
 			onClick = record("start", "portal"),
 		}),
-	})
+	}
 end
 
--- Lays tiles out two to a row.
-local function tileRows(tiles)
+-- Lays buttons out two to a row. A lone last button gets an empty spacer
+-- next to it, so it keeps the same width as the others. The spacer needs a
+-- see-through fill: a box is drawn solid by default.
+local function buttonRows(buttons)
 	local rows = {}
-	for i = 1, #tiles, 2 do
-		rows[#rows + 1] = ui.row({ gap = 8 }, { tiles[i], tiles[i + 1] })
+	for i = 1, #buttons, 2 do
+		local second = buttons[i + 1] or ui.box({ key = "spacer", flexGrow = 1, fill = "surface_variant/0" })
+		rows[#rows + 1] = ui.row({ gap = 8 }, { buttons[i], second })
 	end
 	return ui.column({ gap = 8 }, rows)
 end
@@ -213,6 +215,10 @@ function render()
 		end),
 	}
 
+	for _, button in ipairs(recordButtons()) do
+		tiles[#tiles + 1] = button
+	end
+
 	-- Do not disturb: no notification pop-ups, e.g. while recording.
 	tiles[#tiles + 1] = tile("dnd", dnd and "bell-off" or "bell", "DND", dnd, function()
 		noctalia.runAsync({ "noctalia", "msg", "notification-dnd-toggle" }, function()
@@ -220,13 +226,10 @@ function render()
 		end)
 	end)
 
-	-- The tiles that may not be there, kept at the bottom.
-	local extras = {}
-
 	-- The trackpad tile only on machines that have one (state "none").
 	local trackpad = readState("trackpad", "none")
 	if trackpad ~= "none" then
-		extras[#extras + 1] = tile("trackpad", trackpad == "off" and "hand-finger-off" or "hand-finger", "Trackpad",
+		tiles[#tiles + 1] = tile("trackpad", trackpad == "off" and "hand-finger-off" or "hand-finger", "Trackpad",
 			trackpad ~= "off", function()
 				noctalia.runAsync(scripts .. "/trackpad-toggle.sh", render)
 			end)
@@ -235,7 +238,7 @@ function render()
 	-- HDMI audio only while a TV or monitor with audio is plugged in.
 	if hdmi then
 		local h = hdmi
-		extras[#extras + 1] = tile("hdmi", "device-tv", "HDMI audio", h.on, function()
+		tiles[#tiles + 1] = tile("hdmi", "device-tv", "HDMI audio", h.on, function()
 			noctalia.runAsync({ "pactl", "set-card-profile", h.card, h.on and h.offProfile or h.onProfile }, function()
 				readHdmi(render)
 			end)
@@ -252,9 +255,7 @@ function render()
 			end),
 		}),
 		ui.separator({}),
-		tileRows(tiles),
-		recordRow(),
-		#extras > 0 and tileRows(extras) or nil,
+		buttonRows(tiles),
 	}))
 end
 
