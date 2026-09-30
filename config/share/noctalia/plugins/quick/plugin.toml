@@ -23,3 +23,7 @@ width = 300
 height = 270
 placement = "attached"
 open_near_click = true
+# Take the keyboard as soon as the panel opens, so Alt+N (binds.lua) can be
+# followed by Tab / Shift+Tab to move between buttons and Enter to press one.
+# The default ("on_demand") only takes it on a click.
+keyboard_focus = "exclusive"
