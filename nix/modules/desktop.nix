@@ -69,14 +69,62 @@ let
     ''
   ) (lib.filter (m: m.output != "") cfg.monitors);
 
-  lockClockToml = lib.optionalString (cfg.lockscreenHeight != null) ''
+  lockClockToml =
+    let
+      named = map (m: m.output) (lib.filter (m: m.output != "") cfg.monitors);
+      outputs = if named == [ ] then [ "" ] else named;
+      height = frac: fallback: if cfg.lockscreenHeight != null then cfg.lockscreenHeight * frac else fallback;
+      pair =
+        out:
+        let
+          sfx = lib.optionalString (out != "") "@${out}";
+          clock = builtins.toJSON "lockscreen-clock${sfx}";
+          date = builtins.toJSON "lockscreen-date${sfx}";
+        in
+        ''
 
-    [lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
-    box_height = ${builtins.toJSON (cfg.lockscreenHeight * 0.161)}
+          [lockscreen_widgets.widget.${clock}]
+          box_height = ${builtins.toJSON (height 0.161 161.0)}
+          box_width = 560.0
+          cx = 800.0
+          cy = 196.0
+          enabled = true
+          output = ${builtins.toJSON out}
+          placement_height = 1000.0
+          placement_width = 1600.0
+          rotation = 0.0
+          type = "clock"
 
-    [lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
-    box_height = ${builtins.toJSON (cfg.lockscreenHeight * 0.038)}
-  '';
+              [lockscreen_widgets.widget.${clock}.settings]
+              background = false
+              center_text = true
+              clock_style = "digital"
+              color = "#cfcfcfe6"
+              font_family = "SF Pro Display Clock"
+              shadow = false
+
+          [lockscreen_widgets.widget.${date}]
+          box_height = ${builtins.toJSON (height 0.038 38.0)}
+          box_width = 480.0
+          cx = 800.0
+          cy = 112.0
+          enabled = true
+          output = ${builtins.toJSON out}
+          placement_height = 1000.0
+          placement_width = 1600.0
+          rotation = 0.0
+          type = "clock"
+
+              [lockscreen_widgets.widget.${date}.settings]
+              background = false
+              center_text = true
+              color = "#bdbdbdd9"
+              font_family = "SF Pro Display Clock"
+              format = "{:%A, %B %-d}"
+              shadow = false
+        '';
+    in
+    lib.concatMapStrings pair outputs;
 
   # media widget width (unset keeps the value in config.toml)
   mediaToml = lib.optionalString (cfg.mediaMaxLength != null) ''
