@@ -27,11 +27,11 @@ Run everything from the repo root. `lab/vm help` lists every command.
 ## Getting a vm
 
 ```sh
-lab/vm new archlinux my-test         # or: nixos, archlinux-arm, nixos-arm
-lab/vm cp provisioned-box my-test    # clone a stopped instance instead
-lab/vm start my-test                 # boot an existing one
-lab/vm stop my-test                  # clean shutdown
-lab/vm rm my-test                    # delete it
+lab/vm new archlinux my-test --headless    # or: nixos, archlinux-arm, nixos-arm
+lab/vm cp provisioned-box my-test          # clone a stopped instance instead
+lab/vm start my-test --headless            # boot an existing one
+lab/vm stop my-test                        # clean shutdown
+lab/vm rm my-test                          # delete it
 ```
 
 `new` boots the vm, sets up ssh, copies the repo to `~/dotfiles` in the guest
@@ -50,19 +50,22 @@ lab/vm stop my-test && lab/vm snapshot my-test provisioned
 lab/vm revert my-test provisioned    # later, when the guest is in a bad state
 ```
 
-## Window or headless
+## Headless or window
 
-How you start a vm decides what you can see:
+**Start vms with `--headless` unless you're asked for a window.** How you
+start a vm decides what you can see:
 
-| | window (default) | `--headless` |
+| | `--headless` | window |
 |---|---|---|
-| who can watch | a person, in a fullscreen window | nobody, unless they open a vnc viewer on `<name>/vnc.sock` |
-| screenshots | from `grim` inside the guest: logged-in desktop and lock screen only (on a macOS host: every screen) | every screen: boot, greeter, desktop |
+| who can watch | a person, with `lab/vm attach <name>` | a person, in a fullscreen window |
+| screenshots | every screen: boot, greeter, desktop | from `grim` inside the guest: logged-in desktop and lock screen only (on a macOS host: every screen) |
+| screen size | stays at the vm's resolution | follows the window, so it drifts when the window isn't fullscreen |
 | clicks and keys | yes | yes |
 
-Use the window when a person wants to watch or use the vm while you work.
-Use `--headless` when you need to see the greeter or the boot screen, or when
-nobody is at the host. Switching modes needs a restart
+Headless sees more, keeps its size, and opens nothing on the host's
+screen. A person can still watch it, and use it, with `lab/vm attach`: it
+opens a vnc viewer that leaves the guest's size alone. Use the window only
+when a person asks for one. Switching modes needs a restart
 (`lab/vm stop` then `lab/vm start [--headless]`).
 
 ## Logging in
@@ -81,10 +84,9 @@ loginctl list-sessions
 EOF
 ```
 
-To log in, start with `--headless` so you can see the greeter, and type the
-password as step 7 of the loop says. In window mode you can't see the
-greeter, but its password box has focus when it starts, so this works
-blind:
+To log in headless, look at the greeter and type the password as step 7 of
+the loop says. In window mode you can't see the greeter, but its password
+box has focus when it starts, so this works blind:
 
 ```sh
 lab/vm type my-test '<password>'
