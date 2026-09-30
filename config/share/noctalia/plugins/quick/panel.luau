@@ -1,11 +1,5 @@
 -- Quick settings -- dropdown
 -- ---------------------------------------------
--- Top: the hypr switchers, one row each, showing the current value; a click
--- moves to the next one.
--- Mid: on/off tiles, styled like the control-center ones (primary when on),
--- two to a row so the labels fit.
--- Bottom: screen recording, through noctalia's official screen_recorder
--- plugin. Its bar glyph shows while a recording runs.
 -- The panel is drawn when it opens and after each click.
 
 -- The server plugin owns server mode's state file and script.
@@ -21,6 +15,7 @@ local scripts = home .. "/.config/hypr/scripts"
 local caffeine = false
 local dnd = false
 local recording = false
+local hdmi = nil
 local hovered = nil
 
 local recorder = { "noctalia", "msg", "plugin", "noctalia/screen_recorder:service", "all" }
@@ -62,6 +57,41 @@ end
 local function readDnd(done)
 	noctalia.runAsync({ "noctalia", "msg", "notification-dnd-status" }, function(result)
 		dnd = result.exitCode == 0 and result.stdout:match("^%s*on") ~= nil
+		done()
+	end)
+end
+
+-- Looks for a sound card that can play over HDMI, then calls done().
+local function readHdmi(done)
+	noctalia.runAsync({ "pactl", "-f", "json", "list", "cards" }, function(result)
+		local found = nil
+		local cards = result.exitCode == 0 and noctalia.json.decode(result.stdout) or nil
+		for _, card in ipairs(cards or {}) do
+			local active = card.active_profile or ""
+			local onName, onScore, offName, offPrio = nil, -1, nil, -1
+			for name, info in pairs(card.profiles or {}) do
+				if info.available then
+					if name:match("^output:hdmi%-stereo") then
+						-- Prefer the variant that keeps the laptop's microphone.
+						local score = info.priority + (name:find("+input:", 1, true) and 100000 or 0)
+						if score > onScore then
+							onName, onScore = name, score
+						end
+					elseif name ~= "off" and name:sub(1, 5) ~= "input" and info.priority > offPrio then
+						offName, offPrio = name, info.priority
+					end
+				end
+			end
+			if card.profiles and card.profiles["output:analog-stereo+input:analog-stereo"] then
+				offName = "output:analog-stereo+input:analog-stereo"
+			end
+			local isOn = active:match("^output:hdmi") ~= nil
+			if (onName or isOn) and offName then
+				found = { card = card.name, on = isOn, onProfile = onName or active, offProfile = offName }
+				break
+			end
+		end
+		hdmi = found
 		done()
 	end)
 end
@@ -183,21 +213,34 @@ function render()
 		end),
 	}
 
-	-- The trackpad tile only on machines that have one (state "none").
-	local trackpad = readState("trackpad", "none")
-	if trackpad ~= "none" then
-		tiles[#tiles + 1] = tile("trackpad", trackpad == "off" and "hand-finger-off" or "hand-finger", "Trackpad",
-			trackpad ~= "off", function()
-				noctalia.runAsync(scripts .. "/trackpad-toggle.sh", render)
-			end)
-	end
-
 	-- Do not disturb: no notification pop-ups, e.g. while recording.
 	tiles[#tiles + 1] = tile("dnd", dnd and "bell-off" or "bell", "DND", dnd, function()
 		noctalia.runAsync({ "noctalia", "msg", "notification-dnd-toggle" }, function()
 			readDnd(render)
 		end)
 	end)
+
+	-- The tiles that may not be there, kept at the bottom.
+	local extras = {}
+
+	-- The trackpad tile only on machines that have one (state "none").
+	local trackpad = readState("trackpad", "none")
+	if trackpad ~= "none" then
+		extras[#extras + 1] = tile("trackpad", trackpad == "off" and "hand-finger-off" or "hand-finger", "Trackpad",
+			trackpad ~= "off", function()
+				noctalia.runAsync(scripts .. "/trackpad-toggle.sh", render)
+			end)
+	end
+
+	-- HDMI audio only while a TV or monitor with audio is plugged in.
+	if hdmi then
+		local h = hdmi
+		extras[#extras + 1] = tile("hdmi", "device-tv", "HDMI audio", h.on, function()
+			noctalia.runAsync({ "pactl", "set-card-profile", h.card, h.on and h.offProfile or h.onProfile }, function()
+				readHdmi(render)
+			end)
+		end)
+	end
 
 	panel.render(ui.column({ gap = 10, padding = 12 }, {
 		ui.column({ gap = 2 }, {
@@ -211,6 +254,7 @@ function render()
 		ui.separator({}),
 		tileRows(tiles),
 		recordRow(),
+		#extras > 0 and tileRows(extras) or nil,
 	}))
 end
 
@@ -227,4 +271,5 @@ function onOpen()
 	readCaffeine(render)
 	readDnd(render)
 	readRecording(render)
+	readHdmi(render)
 end

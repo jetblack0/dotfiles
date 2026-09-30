@@ -6,7 +6,7 @@ id = "jetblack0/quick"
 name = "Quick settings"
 version = "1.0.0"
 plugin_api = 23
-description = "Dropdown of the most used switches: server mode, caffeine, hypr toggles, do not disturb, screen recording"
+description = "Dropdown of the most used switches: server mode, caffeine, hypr toggles, do not disturb, screen recording, hdmi audio"
 icon = "toggle-left"
 
 [[widget]]
@@ -20,7 +20,7 @@ entry = "widget.luau"
 id = "menu"
 entry = "panel.luau"
 width = 300
-height = 270
+height = 345
 placement = "attached"
 open_near_click = true
 # Take the keyboard as soon as the panel opens, so Alt+N (binds.lua) can be
