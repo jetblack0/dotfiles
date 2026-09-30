@@ -65,6 +65,36 @@ Use `--headless` when you need to see the greeter or the boot screen, or when
 nobody is at the host. Switching modes needs a restart
 (`lab/vm stop` then `lab/vm start [--headless]`).
 
+## Logging in
+
+Some hosts log their user in by themselves when the vm boots; the machine
+notes say which. That happens once per boot: after a logout, the greeter
+comes back.
+
+To know for sure whether a vm is at the greeter, ask over ssh. The user who
+owns `seat0` is the one at the screen: `greeter` means the greeter, the
+desktop user means a logged-in desktop.
+
+```sh
+lab/vm shell my-test <<'EOF'
+loginctl list-sessions
+EOF
+```
+
+To log in, start with `--headless` so you can see the greeter, and type the
+password as step 7 of the loop says. In window mode you can't see the
+greeter, but its password box has focus when it starts, so this works
+blind:
+
+```sh
+lab/vm type my-test '<password>'
+lab/vm key my-test ret
+```
+
+Try it once only, then check: the desktop user owns `seat0`, a screenshot
+works and shows the bar, and `sudo faillock --user <user>` over ssh shows no
+new failures. Typing blind again after a failure can lock the account.
+
 ## Seeing and driving the screen
 
 ```sh
@@ -87,6 +117,12 @@ right-button drag resizes it.
 
 Coordinates are pixels in the screenshot. The input goes in as the vm's own
 usb keyboard and tablet, so it behaves like real hardware.
+
+**Check a screenshot's size before you trust sizes in it.** `lab/vm
+screenshot` prints it. With a window, the guest takes its resolution from
+the window: only a fullscreen window gives a steady 1920x1080, and a smaller
+one makes the guest shrink with it (640x480 has been seen). If the size is
+off, see [reference.md](reference.md).
 
 ## The loop: look, act, look
 

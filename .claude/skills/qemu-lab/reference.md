@@ -114,8 +114,17 @@ The shell has no display (ssh, for example) and no desktop session is
 running on the host either. Use `--headless`.
 
 **`screenshot` says nobody is logged in.**
-The vm has a window and is still at the greeter. Log in, or restart it with
-`--headless` to see the greeter.
+The vm has a window and is still at the greeter; over ssh, `loginctl
+list-sessions` shows the `greeter` user on `seat0`. Log in (see "Logging
+in" in SKILL.md), or restart it with `--headless` to see the greeter.
+
+**The screenshot isn't 1920x1080, or its size keeps changing.**
+The guest's monitor rule is `mode = preferred`, and when the vm window isn't
+fullscreen, qemu offers the window's size as the preferred mode. Put the
+window back to fullscreen. `lab/vm key` can't do it: Ctrl+Alt+F belongs to
+qemu's window, and `lab/vm` input goes into the guest. Restart the vm, or
+have the host's window manager fullscreen the window (the machine notes may
+have the command).
 
 **A click lands in the wrong place, or does nothing.**
 Take a fresh screenshot: the target may have moved, or an animation hadn't
