@@ -48,6 +48,14 @@
   services.greetd.settings.default_session.command = lib.mkForce
     "env WLR_NO_HARDWARE_CURSORS=1 ${config.programs.noctalia-greeter.package}/bin/noctalia-greeter-session";
 
+  # VM-only: boot straight into the uwsm session, so a restart over ssh
+  # needs no password. greetd runs it once per boot; after a logout the
+  # greeter shows as usual.
+  services.greetd.settings.initial_session = {
+    command = "${config.programs.uwsm.package}/bin/uwsm start -e -D Hyprland hyprland.desktop";
+    user = config.core.username;
+  };
+
 
   # networking
   # ---------------------------------------------
