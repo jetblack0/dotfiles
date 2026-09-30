@@ -32,8 +32,11 @@ ssh -p <port> -i ~/.cache/dotfiles-lab/vm/<name>/key dev@127.0.0.1
 ## Screenshots
 
 - **Headless:** read from qemu's vnc server on `vnc.sock`. It works on every
-  screen, 3d included. Any vnc viewer that can open a unix socket can watch
-  the same screen.
+  screen, 3d included. `lab/vm attach` opens `vncviewer` (from tigervnc)
+  on the same socket, so a person sees what you see. It passes
+  `-RemoteResize=0`: by default the viewer asks qemu to resize the screen
+  to its window, and the guest's monitor follows, so its resolution drifts
+  (with the 1.2 scale, Hyprland then shows an invalid scale error).
 - **Window, on a linux host:** `grim` runs inside the guest, as the user who
   owns the wayland session. It needs someone logged in; the lock screen
   works too, the greeter doesn't.
