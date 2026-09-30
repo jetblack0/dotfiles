@@ -105,6 +105,7 @@ packages:
   - { name: qemu-desktop, brew: false }
   - { name: libvirt, brew: false }
   - { name: virt-manager, brew: false }
+  - { name: tigervnc, brew: false }
   - { name: dnsmasq, brew: false }
   - { name: edk2-ovmf, brew: false }
   - { name: vagrant, aur: vagrant, brew: false } # cask is a pkg, needs a tty for sudo
