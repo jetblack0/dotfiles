@@ -11,3 +11,11 @@ vt = 1
 [default_session]
 command = "env {% for k, v in (greeter_env | default({})).items() %}{{ k }}={{ v }} {% endfor %}XCURSOR_THEME=capitaine-cursors XCURSOR_SIZE=24 /usr/bin/noctalia-greeter-session"
 user = "greeter"
+{% if greeter_autologin_user | default('') %}
+
+# Log this user straight into the uwsm session, skipping the greeter. greetd
+# runs it once per boot; after a logout the greeter shows as usual.
+[initial_session]
+command = "/usr/bin/uwsm start -e -D Hyprland hyprland.desktop"
+user = "{{ greeter_autologin_user }}"
+{% endif %}

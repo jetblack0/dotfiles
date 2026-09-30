@@ -34,3 +34,6 @@ greeter_output:
 
 greeter_env:
   WLR_NO_HARDWARE_CURSORS: 1
+
+# Boot straight into the desktop, so a restart over ssh needs no password.
+greeter_autologin_user: dev
