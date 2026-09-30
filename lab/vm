@@ -36,11 +36,13 @@ instances:
 
   new and start take --headless to run without a window. The screen is
   still drawn (with 3d on a linux host) and served on <name>/vnc.sock, so
-  the commands below can see it, and a vnc viewer can watch.
+  the commands below can see it, and attach can watch.
 
 in a running instance:
   shell <name>           open another shell
   sync <name>            copy the repo to ~/dotfiles again
+  attach <name>          watch a --headless instance in a vnc viewer
+                         (vncviewer, from tigervnc).
 
 driving the screen for ai agents:
   screenshot <name> [file]
@@ -314,8 +316,7 @@ graphical_session() {
         export "$var=$val"
         found+=("$var=$val")
     done
-    [ "${#found[@]}" -gt 0 ] \
-        || die "no desktop session to open the window on (try --headless)"
+    [ "${#found[@]}" -gt 0 ] || return 1
     echo "warning: this shell has no WAYLAND_DISPLAY or DISPLAY (ssh?)," \
          "using the desktop session's: ${found[*]}" >&2
 }
@@ -330,7 +331,7 @@ preflight() {
     vm_size
     vm_resolution
     if wants_gl; then
-        graphical_session
+        graphical_session || die "no desktop session to open the window on (try --headless)"
     fi
 }
 
@@ -633,6 +634,21 @@ cmd_shell() {
     fi
 }
 
+# The viewer must not resize the remote screen: qemu would hand the new
+# size to the guest, and the guest's monitor would follow the viewer's
+# window instead of keeping its own resolution.
+cmd_attach() {
+    need_running
+    [ -S "$vm/vnc.sock" ] \
+        || die "'$name' has a window, not a vnc screen -- restart it with --headless to attach"
+    command -v vncviewer >/dev/null \
+        || die "vncviewer not found (install tigervnc)"
+    if [ "$(uname -s)" = Linux ]; then
+        graphical_session || die "no desktop session to open the viewer on"
+    fi
+    exec vncviewer -RemoteResize=0 "$vm/vnc.sock"
+}
+
 cmd_sync() {
     need_running
     copy_repo
@@ -802,6 +818,7 @@ case "$cmd" in
     start)      cmd_start "${1:-}" ;;
     shell)      load_instance "${1:-}"; cmd_shell ;;
     sync)       load_instance "${1:-}"; cmd_sync ;;
+    attach)     load_instance "${1:-}"; cmd_attach ;;
     stop)       load_instance "${1:-}"; cmd_stop ;;
     rm)         load_instance "${1:-}"; cmd_rm ;;
     mv)         load_instance "${1:-}"; cmd_mv "${2:-}" ;;
