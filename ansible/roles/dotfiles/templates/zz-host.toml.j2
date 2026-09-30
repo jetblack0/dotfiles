@@ -46,16 +46,56 @@ type = "login_box"
     show_weather = true
 {% endfor %}
 
-# Lock screen clock size
+# Lock screen clock and date
 # ---------------------------------------------
-{% if lockscreen_height is defined %}
+# One clock and one date per declared monitor, bound to it, so every screen
+# shows them (an unbound widget lands on just one screen). A widget bound to
+# a screen that is unplugged is hidden, not moved, so nothing doubles up on
+# the laptop panel. Without monitors, one unbound pair as before.
+{% set lock_outputs = (monitors | default([]) | map(attribute='output', default='') | select | list) or [''] %}
+{% for out in lock_outputs %}
+{% set sfx = ('@' ~ out) if out else '' %}
 
-[lockscreen_widgets.widget.lockscreen-widget-0000000000000001]
-box_height = {{ (lockscreen_height * 0.161) | round(1) }}
+[lockscreen_widgets.widget."lockscreen-clock{{ sfx }}"]
+box_height = {{ (lockscreen_height * 0.161) | round(1) if lockscreen_height is defined else 161.0 }}
+box_width = 560.0
+cx = 800.0
+cy = 196.0
+enabled = true
+output = "{{ out }}"
+placement_height = 1000.0
+placement_width = 1600.0
+rotation = 0.0
+type = "clock"
 
-[lockscreen_widgets.widget.lockscreen-widget-0000000000000002]
-box_height = {{ (lockscreen_height * 0.038) | round(1) }}
-{% endif %}
+    [lockscreen_widgets.widget."lockscreen-clock{{ sfx }}".settings]
+    background = false
+    center_text = true
+    clock_style = "digital"
+    color = "#cfcfcfe6"
+    font_family = "SF Pro Display Clock"
+    shadow = false
+
+[lockscreen_widgets.widget."lockscreen-date{{ sfx }}"]
+box_height = {{ (lockscreen_height * 0.038) | round(1) if lockscreen_height is defined else 38.0 }}
+box_width = 480.0
+cx = 800.0
+cy = 112.0
+enabled = true
+output = "{{ out }}"
+placement_height = 1000.0
+placement_width = 1600.0
+rotation = 0.0
+type = "clock"
+
+    [lockscreen_widgets.widget."lockscreen-date{{ sfx }}".settings]
+    background = false
+    center_text = true
+    color = "#bdbdbdd9"
+    font_family = "SF Pro Display Clock"
+    format = "{:%A, %B %-d}"
+    shadow = false
+{% endfor %}
 
 # Media widget width
 # ---------------------------------------------
