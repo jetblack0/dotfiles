@@ -60,6 +60,7 @@ in
     # ---------------------------------------------
     environment.systemPackages = with pkgs; [
       docker-compose
+      tigervnc
       vagrant
     ];
 
