@@ -314,6 +314,7 @@ in
       zathura
       cava
       pkgs-unstable.swayimg
+      mpv
 
       # themes
       adw-gtk3
