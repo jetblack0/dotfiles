@@ -97,6 +97,12 @@ right = [ "Right", "Alt+l" ]
 up = [ "Up", "Alt+k" ]
 
 
+# Location
+# ---------------------------------------------
+# found from the public IP via api.noctalia.dev.
+[location]
+auto_locate = true
+
 # Lock screen
 # ---------------------------------------------
 [lockscreen]
