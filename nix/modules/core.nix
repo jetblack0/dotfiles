@@ -207,6 +207,7 @@ in
       # misc
       ventoy
       xdg-ninja
+      android-tools
     ];
 
     # additive across modules: each declares the unfree names it pulls in
