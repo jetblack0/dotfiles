@@ -51,6 +51,10 @@
         system = "x86_64-linux";
         hostDir = ./hosts/t480-vm;
       };
+      t14p = mkHost {
+        system = "x86_64-linux";
+        hostDir = ./hosts/t14p;
+      };
     };
   };
 }
