@@ -316,6 +316,8 @@ in
       pkgs-unstable.swayimg
       mpv
 
+      chromium
+
       # themes
       adw-gtk3
       capitaine-cursors
