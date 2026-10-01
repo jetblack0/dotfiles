@@ -34,7 +34,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "workspaces", "title", "media" ]
+    start = [ "launcher", "workspaces", "title", "media" ]
     thickness = 32
     widget_spacing = 15
 
@@ -216,7 +216,7 @@ glyph = "adjustments-horizontal"
 type = "control-center"
 
 [widget.launcher]
-enabled = false
+enabled = true
 type = "launcher"
 
 [widget.media]
