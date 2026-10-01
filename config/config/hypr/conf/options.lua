@@ -33,6 +33,14 @@ hl.config({
 		sensitivity   = 0,
 		touchpad = {
 			natural_scroll = true,
+			-- two fingers anywhere is right-click, three is middle-click
+			clickfinger_behavior = true,
+			-- the default 1.0 scrolls too far per swipe
+			scroll_factor = 0.4,
+			-- three fingers drag like a held click: text, files, windows
+			drag_3fg = 1,
+			-- tap then touch-and-move no longer starts a drag
+			tap_and_drag = false,
 		},
 	},
 

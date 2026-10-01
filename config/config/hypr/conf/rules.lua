@@ -15,6 +15,12 @@ hl.window_rule({
 	center = true,
 })
 
+-- touchpad scrolling in the terminal is slow at the global scroll_factor
+hl.window_rule({
+	match = { class = "kitty" },
+	scroll_touchpad = 1.5,
+})
+
 hl.layer_rule({
 	match = { namespace = "still|selection" },
 	no_anim = true,
