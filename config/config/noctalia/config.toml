@@ -110,6 +110,13 @@ blur_intensity = 0.099999994039535522
 [lockscreen_widgets]
 enabled = true
 
+# Night light
+# ---------------------------------------------
+# colour temperature in Kelvin: lower is warmer, 6500 is neutral daylight.
+# noctalia's default night value is 4000.
+[nightlight]
+temperature_night = 5000
+
 # OSD
 # ---------------------------------------------
 [osd]
