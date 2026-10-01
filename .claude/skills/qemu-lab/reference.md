@@ -129,6 +129,15 @@ qemu's window, and `lab/vm` input goes into the guest. Restart the vm, or
 have the host's window manager fullscreen the window (the machine notes may
 have the command).
 
+**A headless screenshot is all black.**
+The guest turned its screen off after being idle, so qemu gets no picture.
+The session locks itself before that, so it's locked too. Wake it with
+`lab/vm move` (a key press would land in the password field), take a new
+screenshot, and unlock. `grim` inside the guest still works while the screen
+is off, because it asks the compositor to draw the screen instead of reading
+the monitor. But a grim picture doesn't mean the desktop is in use: the
+session is still locked.
+
 **A click lands in the wrong place, or does nothing.**
 Take a fresh screenshot: the target may have moved, or an animation hadn't
 finished. If clicks never land at all, the instance may have been started by

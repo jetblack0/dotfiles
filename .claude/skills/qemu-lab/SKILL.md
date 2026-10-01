@@ -133,7 +133,10 @@ Work in small steps and look after every one.
 1. **Look first, every time.** Take a screenshot and read it before you
    send any input, even a quick test. The screen may have changed since
    you last looked: the session locks itself when idle, and then your
-   keys land in the lock screen's password field.
+   keys land in the lock screen's password field. A little later the
+   screen turns off, and a headless screenshot comes back all black. That
+   isn't a lab bug: wake the screen with `lab/vm move`, which types
+   nothing, look again, and expect the lock screen.
 2. **After logging in, wait for the desktop.** Hyprland starts before the
    shell does. Keys sent in those first seconds go nowhere. Take a
    screenshot and wait until the bar is there.
