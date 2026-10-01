@@ -204,6 +204,7 @@ packages:
   # misc
   - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
   - { name: xdg-ninja, aur: xdg-ninja }
+  - { name: android-tools, brew: false }
 
 # Entries to skip by canonical name, e.g. on a distro that lacks them.
 # ---------------------------------------------
