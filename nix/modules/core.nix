@@ -5,12 +5,18 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
 let
   dotfiles = ../../config;
   username = config.core.username;
+
+  pkgs-unstable = import inputs.nixpkgs-unstable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+    config.allowUnfreePredicate = pkg: lib.getName pkg == "claude-code";
+  };
 
   # Executables from config/bin[/<subdir>] as ~/.local/bin entries
   binScripts =
@@ -196,7 +202,7 @@ in
       traceroute
 
       # ai
-      claude-code
+      pkgs-unstable.claude-code
       ollama
       opencode
 
