@@ -81,6 +81,7 @@ packages:
   - { name: python }
   - { name: python-pip, brew: false } # brew's python ships pip
   - { name: tree-sitter-cli } # NOT brew's tree-sitter: that is library-only
+  - { name: rust }
 
   # python tooling
   - { name: uv }
