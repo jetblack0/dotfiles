@@ -12,6 +12,8 @@ data_links:
   .local/share/pass: state/pass
   .local/share/gnupg: state/gnupg
   .local/share/google: state/google
+  .ssh/config.d: config/ssh/config.d
+  .ssh/keys: config/ssh/keys
 
 # xdg user dirs routed into the second home.
 #     xdg key (lowercase): path under data_home

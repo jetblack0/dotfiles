@@ -1,0 +1,16 @@
+---
+
+- name: Ensure the ssh directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_facts['user_dir'] }}/.ssh"
+    state: directory
+    mode: "0700"
+
+- name: Copy the ssh config from the repo
+  ansible.builtin.copy:
+    src: "{{ dotfiles_src | dirname }}/ssh/config"
+    dest: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+    mode: "0600"
+    remote_src: true
+    # a hand-written config on a fresh machine is kept beside it
+    backup: true
