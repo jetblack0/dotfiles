@@ -62,6 +62,10 @@ in
       docker-compose
       tigervnc
       vagrant
+
+      # builds the cloud-init seed for the qemu lab's arch guests; arch gets
+      # it with virt-install
+      xorriso
     ];
 
     nixpkgs.config.allowUnfreePackages = [ "vagrant" ];
