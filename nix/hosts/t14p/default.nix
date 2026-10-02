@@ -77,7 +77,8 @@
 
   # networking
   # ---------------------------------------------
-  networking.hostName = "t14p.kaicheng.local";
+  networking.hostName = "t14p";
+  networking.domain   = "kaicheng.local";
 
 
   # time
