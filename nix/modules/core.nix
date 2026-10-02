@@ -326,7 +326,12 @@ in
         '') nvimWritable
       );
 
-      home.file = binScripts "" // binScripts "/linux";
+      home.file =
+        binScripts ""
+        // binScripts "/linux"
+        // {
+          ".ssh/config".source = dotfiles + "/ssh/config";
+        };
     };
   };
 }
