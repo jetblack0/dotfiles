@@ -239,25 +239,30 @@ EOF
 # ---------------------------------------------
 # firmware code|vars: the uefi firmware for the guest architecture. vars is
 # the template for a new instance's settings (x86 only; on aarch64 an
-# empty file works).
+# empty file works). The last place to look is the firmware qemu ships
+# itself, next to its binary: on nixos that's the only one.
 firmware() {
-    local f files=()
+    local f files=() own
+    own="$(dirname "$(readlink -f "$(command -v "$qemu")")")/../share/qemu"
     case "$guest_arch-$1" in
         aarch64-code)
             files=(/opt/homebrew/share/qemu/edk2-aarch64-code.fd
                    /usr/share/qemu/edk2-aarch64-code.fd
                    /usr/share/AAVMF/AAVMF_CODE.fd
-                   /usr/share/edk2/aarch64/QEMU_EFI.fd) ;;
+                   /usr/share/edk2/aarch64/QEMU_EFI.fd
+                   "$own/edk2-aarch64-code.fd") ;;
         x86_64-code)
             files=(/opt/homebrew/share/qemu/edk2-x86_64-code.fd
                    /usr/share/edk2/x64/OVMF_CODE.4m.fd
                    /usr/share/OVMF/OVMF_CODE_4M.fd
-                   /usr/share/OVMF/OVMF_CODE.fd) ;;
+                   /usr/share/OVMF/OVMF_CODE.fd
+                   "$own/edk2-x86_64-code.fd") ;;
         x86_64-vars)
             files=(/opt/homebrew/share/qemu/edk2-i386-vars.fd
                    /usr/share/edk2/x64/OVMF_VARS.4m.fd
                    /usr/share/OVMF/OVMF_VARS_4M.fd
-                   /usr/share/OVMF/OVMF_VARS.fd) ;;
+                   /usr/share/OVMF/OVMF_VARS.fd
+                   "$own/edk2-i386-vars.fd") ;;
     esac
     for f in "${files[@]}"; do
         [ -f "$f" ] && { echo "$f"; return; }
