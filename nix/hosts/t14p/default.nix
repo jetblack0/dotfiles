@@ -67,7 +67,7 @@
 
   desktop.mediaMaxLength = 134;
 
-  desktop.inputDevices."tpps/2-synaptics-trackpoint".sensitivity = -0.2;
+  desktop.inputDevices."tpps/2-synaptics-trackpoint".sensitivity = -0.5;
 
   programs.noctalia-greeter.settings.output = {
     width = 3072;
@@ -94,6 +94,7 @@
   networking.hostName = "t14p";
   networking.domain   = "kaicheng.local";
 
+  networking.firewall.checkReversePath = "loose";
 
   # time
   # ---------------------------------------------

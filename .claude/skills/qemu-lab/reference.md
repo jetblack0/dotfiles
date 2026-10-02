@@ -121,7 +121,7 @@ The vm has a window and is still at the greeter; over ssh, `loginctl
 list-sessions` shows the `greeter` user on `seat0`. Log in (see "Logging
 in" in SKILL.md), or restart it with `--headless` to see the greeter.
 
-**The screenshot isn't 1920x1080, or its size keeps changing.**
+**The screenshot has the wrong size, or its size keeps changing.**
 The guest's monitor rule is `mode = preferred`, and when the vm window isn't
 fullscreen, qemu offers the window's size as the preferred mode. Put the
 window back to fullscreen. `lab/vm key` can't do it: Ctrl+Alt+F belongs to
@@ -151,6 +151,12 @@ pam_faillock locked the account for 10 minutes. Reset it over ssh:
 Rendering with 3d while headless needs the host's gpu render node
 (`/dev/dri/renderD128`). Without it the vm falls back to a 2d display;
 screenshots still work.
+
+**A program on a NixOS host fails with "version `GLIBC_2.xx' not found".**
+Claude Code from nixpkgs sets `LD_LIBRARY_PATH` to an alsa-lib built for a
+newer glibc, and every command you run inherits it. Programs that load alsa
+then fail to start: qemu, mpv. `lab/vm` already starts qemu without the
+variable; for anything else, run it as `env -u LD_LIBRARY_PATH <program>`.
 
 **On macOS, qemu can't create a socket.**
 Unix socket paths must be shorter than 104 bytes. Keep `XDG_CACHE_HOME`

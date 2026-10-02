@@ -138,8 +138,10 @@ start_builder() {
     make_seed
 
     log "booting the debian builder ($cpus vcpus, $mem MiB)"
+    # Without LD_LIBRARY_PATH: claude-code from nixpkgs puts an alsa-lib built
+    # for a newer glibc on it, and qemu loads alsa at startup and fails.
     # shellcheck disable=SC2046
-    qemu-system-aarch64 \
+    env -u LD_LIBRARY_PATH qemu-system-aarch64 \
         -name arm-image-builder -machine virt -m "$mem" -smp "$cpus" \
         $(accel_args) \
         -drive if=pflash,format=raw,readonly=on,file="$(firmware)" \

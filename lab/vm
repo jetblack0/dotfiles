@@ -104,7 +104,7 @@ The guest screen then follows the window size.
 environment:
   LAB_VM_CPUS  vcpus for the vm (default: half the host's cpus)
   LAB_VM_MEM   memory for the vm in MiB (default: half the host's memory)
-  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 1920x1080);
+  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 3072x1920);
                the fullscreen linux window overrides it with the screen size
 EOF
 }
@@ -239,25 +239,30 @@ EOF
 # ---------------------------------------------
 # firmware code|vars: the uefi firmware for the guest architecture. vars is
 # the template for a new instance's settings (x86 only; on aarch64 an
-# empty file works).
+# empty file works). The last place to look is the firmware qemu ships
+# itself, next to its binary: on nixos that's the only one.
 firmware() {
-    local f files=()
+    local f files=() own
+    own="$(dirname "$(readlink -f "$(command -v "$qemu")")")/../share/qemu"
     case "$guest_arch-$1" in
         aarch64-code)
             files=(/opt/homebrew/share/qemu/edk2-aarch64-code.fd
                    /usr/share/qemu/edk2-aarch64-code.fd
                    /usr/share/AAVMF/AAVMF_CODE.fd
-                   /usr/share/edk2/aarch64/QEMU_EFI.fd) ;;
+                   /usr/share/edk2/aarch64/QEMU_EFI.fd
+                   "$own/edk2-aarch64-code.fd") ;;
         x86_64-code)
             files=(/opt/homebrew/share/qemu/edk2-x86_64-code.fd
                    /usr/share/edk2/x64/OVMF_CODE.4m.fd
                    /usr/share/OVMF/OVMF_CODE_4M.fd
-                   /usr/share/OVMF/OVMF_CODE.fd) ;;
+                   /usr/share/OVMF/OVMF_CODE.fd
+                   "$own/edk2-x86_64-code.fd") ;;
         x86_64-vars)
             files=(/opt/homebrew/share/qemu/edk2-i386-vars.fd
                    /usr/share/edk2/x64/OVMF_VARS.4m.fd
                    /usr/share/OVMF/OVMF_VARS_4M.fd
-                   /usr/share/OVMF/OVMF_VARS.fd) ;;
+                   /usr/share/OVMF/OVMF_VARS.fd
+                   "$own/edk2-i386-vars.fd") ;;
     esac
     for f in "${files[@]}"; do
         [ -f "$f" ] && { echo "$f"; return; }
@@ -299,7 +304,7 @@ vm_size() {
 
 # The preferred mode virtio-gpu advertises over edid; qemu's own is 1280x800.
 vm_resolution() {
-    local res="${LAB_VM_RES:-1920x1080}"
+    local res="${LAB_VM_RES:-3072x1920}"
     [[ "$res" =~ ^([1-9][0-9]*)x([1-9][0-9]*)$ ]] \
         || die "LAB_VM_RES must look like 1920x1080, got '$res'"
     xres="${BASH_REMATCH[1]}" yres="${BASH_REMATCH[2]}"
@@ -535,8 +540,10 @@ boot() {
         export SDL_VIDEO_WAYLAND_SCALE_TO_DISPLAY=1
     fi
 
+    # Without LD_LIBRARY_PATH: claude-code from nixpkgs puts an alsa-lib built
+    # for a newer glibc on it, and qemu loads alsa at startup and fails.
     # shellcheck disable=SC2046
-    "$qemu" \
+    env -u LD_LIBRARY_PATH "$qemu" \
         -name "lab-vm-$name" -m "$mem" -smp "$cpus" \
         "${platform[@]}" \
         $(accel_args) \

@@ -1,0 +1,37 @@
+---
+# qemu lab vm on the t14p
+# ---------------------------------------------
+#     ansible-playbook ansible/base.yml -e @ansible/hosts/t14p-vm.yaml
+
+
+# Graphics
+# ---------------------------------------------
+gpu_vendor: vm
+
+
+# Displays
+# ---------------------------------------------
+monitors:
+  - output: Virtual-1
+    mode: preferred
+    position: auto
+    scale: 2
+
+# Xft.dpi for xwayland apps: 96 * scale.
+xwayland_dpi: 192
+
+# logical height: 1920 / scale
+lockscreen_height: 960
+
+# Noctalia media widget cap.
+media_max_length: 134
+
+greeter_output:
+  width: 3072
+  height: 1920
+  scale: 2
+
+greeter_env:
+  WLR_NO_HARDWARE_CURSORS: 1
+
+greeter_autologin_user: dev
