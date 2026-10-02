@@ -170,6 +170,8 @@ in
       tree-sitter
       gcc
       gnumake
+      cargo
+      rustc
 
       # python tooling
       uv

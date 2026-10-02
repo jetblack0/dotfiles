@@ -19,6 +19,24 @@
         dest: "{{ dotfiles_state }}/hypr/monitors.lua"
         mode: "0644"
 
+# Per-host input device options, for conf/devices.lua. Written on every run,
+# without input_devices the empty table then clears what an earlier run set.
+- name: Render the host's input device options
+  when:
+    - "'hypr' not in (dotfiles_mask[ansible_facts['os_family'] | lower] | default([]))"
+  block:
+    - name: Ensure the hypr state directory exists
+      ansible.builtin.file:
+        path: "{{ dotfiles_state }}/hypr"
+        state: directory
+        mode: "0755"
+
+    - name: Write the input device options
+      ansible.builtin.template:
+        src: devices.lua.j2
+        dest: "{{ dotfiles_state }}/hypr/devices.lua"
+        mode: "0644"
+
 - name: Render the host's xresources
   when:
     - xwayland_dpi is defined

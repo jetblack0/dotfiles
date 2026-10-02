@@ -42,6 +42,20 @@ greeter_output:
   scale: 1.2
 
 
+# Devices
+# ---------------------------------------------
+# input_devices:
+#   tpps/2-ibm-trackpoint:
+#     sensitivity: 0
+#     accel_profile: adaptive
+#   synaptics-tm3276-022:
+#     sensitivity: 0
+#     accel_profile: adaptive
+#   logitech-g-pro--1:
+#     sensitivity: 0
+#     accel_profile: adaptive
+
+
 # Miscs
 # ---------------------------------------------
 singbox_dns_override: true
