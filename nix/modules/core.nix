@@ -208,8 +208,6 @@ in
 
       # proxy
       sing-box
-      # the profile's `type: tor` outbound execs this at startup; without it
-      # sing-box refuses to start at all, not just .onion
       tor
 
       # misc
@@ -228,6 +226,12 @@ in
     nixpkgs.config.allowInsecurePredicate = pkg: lib.getName pkg == "ventoy";
 
     programs.nix-ld.enable = true;
+
+
+    # gnupg
+    # ---------------------------------------------
+    # nixpkgs' gnupg ships no pinentry.
+    programs.gnupg.agent.enable = true;
 
 
     # ssh

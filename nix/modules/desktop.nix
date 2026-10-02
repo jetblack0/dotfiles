@@ -260,6 +260,9 @@ in
     # ---------------------------------------------
     programs.gpu-screen-recorder.enable = true;
 
+    # noctalia pass needs a graphical pinentry
+    programs.gnupg.agent.pinentryPackage = pkgs.pinentry-gnome3;
+
     # qt reads the qt5ct/qt6ct color schemes the noctalia template writes
     qt = {
       enable = true;
