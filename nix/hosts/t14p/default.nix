@@ -94,6 +94,7 @@
   networking.hostName = "t14p";
   networking.domain   = "kaicheng.local";
 
+  networking.firewall.checkReversePath = "loose";
 
   # time
   # ---------------------------------------------
