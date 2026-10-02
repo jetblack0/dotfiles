@@ -18,6 +18,14 @@ fi
 bindkey -v
 
 
+# Private config, early
+# ---------------------------------------------
+for f in "$HOME"/assets/config/zsh/before/*.zsh(N); do
+	source "$f"
+done
+unset f
+
+
 # PATH
 # ---------------------------------------------
 typeset -U PATH path fpath
@@ -318,7 +326,9 @@ images() {
 }
 
 
-for f in "$HOME"/assets/config/zsh/*.zsh(N); do
+# Private config, late
+# ---------------------------------------------
+for f in "$HOME"/assets/config/zsh/after/*.zsh(N); do
 	source "$f"
 done
 unset f
