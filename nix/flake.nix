@@ -55,6 +55,10 @@
         system = "x86_64-linux";
         hostDir = ./hosts/t14p;
       };
+      t14p-vm = mkHost {
+        system = "x86_64-linux";
+        hostDir = ./hosts/t14p-vm;
+      };
     };
   };
 }
