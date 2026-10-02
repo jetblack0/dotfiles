@@ -122,8 +122,9 @@ usb keyboard and tablet, so it behaves like real hardware.
 
 **Check a screenshot's size before you trust sizes in it.** `lab/vm
 screenshot` prints it. With a window, the guest takes its resolution from
-the window: only a fullscreen window gives a steady 1920x1080, and a smaller
-one makes the guest shrink with it (640x480 has been seen). If the size is
+the window: only a fullscreen window gives a steady size (the host's
+screen), and a smaller one makes the guest shrink with it (640x480 has been
+seen). Headless, the size is `LAB_VM_RES`, 3072x1920 by default. If the size is
 off, see [reference.md](reference.md).
 
 ## The loop: look, act, look
