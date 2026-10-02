@@ -104,7 +104,7 @@ The guest screen then follows the window size.
 environment:
   LAB_VM_CPUS  vcpus for the vm (default: half the host's cpus)
   LAB_VM_MEM   memory for the vm in MiB (default: half the host's memory)
-  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 1920x1080);
+  LAB_VM_RES   display resolution as WIDTHxHEIGHT (default: 3072x1920);
                the fullscreen linux window overrides it with the screen size
 EOF
 }
@@ -304,7 +304,7 @@ vm_size() {
 
 # The preferred mode virtio-gpu advertises over edid; qemu's own is 1280x800.
 vm_resolution() {
-    local res="${LAB_VM_RES:-1920x1080}"
+    local res="${LAB_VM_RES:-3072x1920}"
     [[ "$res" =~ ^([1-9][0-9]*)x([1-9][0-9]*)$ ]] \
         || die "LAB_VM_RES must look like 1920x1080, got '$res'"
     xres="${BASH_REMATCH[1]}" yres="${BASH_REMATCH[2]}"
