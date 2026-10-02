@@ -20,6 +20,11 @@ end
 -- Steam windows
 -----------------------------------------------
 hl.window_rule({
+	match = { class = "steam" },
+	float = true,
+})
+
+hl.window_rule({
 	match = { class = "steam", initial_title = "Friends List" },
 	float = true,
 	min_size = { 460, 640 },
