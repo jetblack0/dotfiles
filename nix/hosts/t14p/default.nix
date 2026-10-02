@@ -36,6 +36,11 @@
   singBox.dnsOverride = true;
 
 
+  # virtualisation
+  # ---------------------------------------------
+  virt.dockerGroup = true;
+
+
   # swap
   # ---------------------------------------------
   # Default: zstd, up to half the RAM, and nothing reserved until it's used,
