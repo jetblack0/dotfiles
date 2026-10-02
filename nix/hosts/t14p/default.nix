@@ -53,6 +53,8 @@
 
   desktop.mediaMaxLength = 134;
 
+  desktop.inputDevices."tpps/2-synaptics-trackpoint".sensitivity = -0.2;
+
   programs.noctalia-greeter.settings.output = {
     width = 3072;
     height = 1920;
