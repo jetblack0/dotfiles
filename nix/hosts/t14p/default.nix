@@ -27,6 +27,12 @@
   data.enable = true;
 
 
+  # proxy
+  # ---------------------------------------------
+  # Start the tun profile at boot.
+  singBox.autostartProfiles = [ "tun" ];
+
+
   # swap
   # ---------------------------------------------
   # Default: zstd, up to half the RAM, and nothing reserved until it's used,

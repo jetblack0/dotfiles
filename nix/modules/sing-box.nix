@@ -142,11 +142,10 @@ in
             ExecStartPost = "+${pkgs.systemd}/bin/systemctl reload sing-box@*";
           };
         };
-      }
-      // lib.genAttrs (map (p: "sing-box@${p}") config.singBox.autostartProfiles) (_: {
-        overrideStrategy = "asDropin";
-        wantedBy = [ "multi-user.target" ];
-      });
+      };
+
+    # Start these profiles at boot.
+    systemd.targets.multi-user.wants = map (p: "sing-box@${p}.service") config.singBox.autostartProfiles;
 
 
     systemd.timers.sing-box-providers = lib.mkIf config.singBox.providersTimer {
