@@ -540,8 +540,10 @@ boot() {
         export SDL_VIDEO_WAYLAND_SCALE_TO_DISPLAY=1
     fi
 
+    # Without LD_LIBRARY_PATH: claude-code from nixpkgs puts an alsa-lib built
+    # for a newer glibc on it, and qemu loads alsa at startup and fails.
     # shellcheck disable=SC2046
-    "$qemu" \
+    env -u LD_LIBRARY_PATH "$qemu" \
         -name "lab-vm-$name" -m "$mem" -smp "$cpus" \
         "${platform[@]}" \
         $(accel_args) \
