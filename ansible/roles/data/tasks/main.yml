@@ -125,7 +125,7 @@
   ansible.builtin.file:
     path: "{{ (ansible_facts['user_dir'] ~ '/' ~ item.key) | dirname }}"
     state: directory
-    mode: "0755"
+    mode: "u+rwx"
   loop: "{{ data_links | dict2items }}"
   loop_control:
     label: "{{ item.key }}"
