@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  inputs,
   ...
 }:
 
@@ -87,6 +88,15 @@ in
   };
 
   config = {
+    # the package
+    # ---------------------------------------------
+    nixpkgs.overlays = [
+      (final: prev: {
+        sing-box = inputs.nixpkgs-unstable.legacyPackages.${prev.stdenv.hostPlatform.system}.sing-box;
+      })
+    ];
+
+
     # the service
     # ---------------------------------------------
     systemd.services =
