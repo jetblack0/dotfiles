@@ -32,6 +32,9 @@
   # Start the tun profile at boot.
   singBox.autostartProfiles = [ "tun" ];
 
+  # Send all DNS to the tun.
+  singBox.dnsOverride = true;
+
 
   # swap
   # ---------------------------------------------
