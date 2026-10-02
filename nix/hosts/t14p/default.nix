@@ -13,6 +13,7 @@
     ../../modules/input-method.nix
     ../../modules/sing-box.nix
     ../../modules/virt.nix
+    ../../modules/gaming.nix
     ../../modules/data.nix
   ];
 
