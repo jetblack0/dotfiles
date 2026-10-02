@@ -103,6 +103,8 @@ in
         ".local/share/pass" = "state/pass";
         ".local/share/gnupg" = "state/gnupg";
         ".local/share/google" = "state/google";
+        ".ssh/config.d" = "config/ssh/config.d";
+        ".ssh/keys" = "config/ssh/keys";
       };
       description = ''
         Directories in $HOME replaced by symlinks into the data home.
