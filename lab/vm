@@ -526,7 +526,7 @@ boot() {
                 virtio-vga)     gpu=virtio-vga-gl ;;
                 virtio-gpu-pci) gpu=virtio-gpu-gl-pci ;;
             esac
-            display=(-display egl-headless)
+            display=(-display egl-headless,rendernode=/dev/dri/renderD128)
         else
             display=(-display none)
         fi
