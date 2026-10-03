@@ -21,6 +21,7 @@ packages:
   - { name: kitty, cask: kitty }
   - { name: kitty-terminfo, brew: false }
   - { name: ouch }
+  - { name: unrar, cask: rar }
   - { name: ripgrep }
   - { name: tmux }
   - { name: yazi }
@@ -130,6 +131,7 @@ packages:
   - { name: hyprland, brew: false }
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
   - { name: chromium, brew: false }
+  - { name: transmission-gtk, cask: transmission }
   - { name: noctalia, brew: false }
   - { name: swayimg, brew: false }
   - { name: mpv, brew: false }
