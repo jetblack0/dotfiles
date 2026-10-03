@@ -203,6 +203,7 @@ packages:
   - { name: gamescope, brew: false }
   - { name: heroic-games-launcher, aur: heroic-games-launcher-bin, brew: false }
   - { name: umu-launcher, brew: false }
+  - { name: glu, brew: false }
 
   # misc
   - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
