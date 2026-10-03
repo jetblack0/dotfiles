@@ -17,6 +17,8 @@ packages_exclude:
   - lib32-gamemode
   - mangohud
   - lib32-mangohud
+  - heroic-games-launcher
+  - umu-launcher
 
 
 # Displays
