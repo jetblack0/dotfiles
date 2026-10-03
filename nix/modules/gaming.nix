@@ -32,7 +32,9 @@ in
   environment.systemPackages = with pkgs; [
     mangohud
     vulkan-tools
-    heroic
+    (heroic.override {
+      extraPkgs = pkgs: [ pkgs.mono ];
+    })
   ];
 
 
