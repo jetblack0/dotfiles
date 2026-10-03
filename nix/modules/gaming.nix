@@ -33,6 +33,7 @@ in
     mangohud
     vulkan-tools
     heroic
+    prismlauncher
   ];
 
 
