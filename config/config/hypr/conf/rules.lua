@@ -15,6 +15,13 @@ hl.window_rule({
 	center = true,
 })
 
+hl.window_rule({
+	match = { class = "xdg-desktop-portal-gtk" },
+	float = true,
+	size  = { "monitor_w*0.6", "monitor_h*0.6" },
+	center = true,
+})
+
 -- touchpad scrolling in the terminal is slow at the global scroll_factor
 hl.window_rule({
 	match = { class = "kitty" },
