@@ -132,6 +132,7 @@ in
       yq-go
       kitty.terminfo
       ouch
+      unrar
       ripgrep
       tmux
       yazi
@@ -219,6 +220,7 @@ in
     # additive across modules: each declares the unfree names it pulls in
     nixpkgs.config.allowUnfreePackages = [
       "claude-code"
+      "unrar"
       "ventoy"
     ];
 

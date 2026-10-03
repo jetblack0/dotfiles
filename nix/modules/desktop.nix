@@ -338,6 +338,7 @@ in
       mpv
 
       chromium
+      transmission_4-gtk
 
       # themes
       adw-gtk3
