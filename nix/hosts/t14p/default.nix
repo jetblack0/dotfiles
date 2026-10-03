@@ -89,6 +89,11 @@
   # ---------------------------------------------
   boot.kernelPackages = pkgs.linuxPackages_zen;
 
+  boot.kernelParams = [
+    "xe.enable_psr=0"
+    "xe.enable_panel_replay=0"
+  ];
+
 
   # networking
   # ---------------------------------------------
