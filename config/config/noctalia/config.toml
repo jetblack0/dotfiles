@@ -199,7 +199,7 @@ source = "wallpaper"
 
     [theme.templates]
     builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
-    community_ids = [ "zen-browser" ]
+    community_ids = [ "prismlauncher", "zen-browser" ]
 
     # fcitx5 theme, our copy of the community template (templates/fcitx5).
     # The hook reloads fcitx5's candidate window so new colors show at once.
