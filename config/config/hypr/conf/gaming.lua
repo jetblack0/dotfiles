@@ -20,7 +20,7 @@ end
 -- Steam windows
 -----------------------------------------------
 hl.window_rule({
-	match = { class = "steam" },
+	match = { class = "steam", initial_title = "negative:Steam" },
 	float = true,
 })
 
