@@ -351,7 +351,16 @@ in
       slurp
       still
       hyprpicker
-      wl-clipboard
+
+      # wl-copy guesses the mime type with xdg-mime, and nixpkgs' xdg-mime
+      # prefers perl's slow `mimetype`. Leave it out so xdg-mime uses `file`.
+      ((wl-clipboard.override {
+        xdg-utils = xdg-utils.override {
+          perlPackages = perlPackages // { FileMimeInfo = emptyDirectory; };
+        };
+      }).overrideAttrs (old: {
+        postInstall = lib.replaceStrings [ "--suffix" ] [ "--prefix" ] old.postInstall;
+      }))
       wev
       (tesseract.override { enableLanguages = [ "eng" ]; })
 
