@@ -95,6 +95,11 @@
   ];
 
 
+  # firmware
+  # ---------------------------------------------
+  services.fwupd.enable = true;
+
+
   # networking
   # ---------------------------------------------
   networking.hostName = "t14p";

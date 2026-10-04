@@ -600,7 +600,7 @@ cmd_new() {
     echo "$distro" > "$vm/distro"
     free_port > "$vm/port"
     load_instance "$name"
-    qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 40G
+    qemu-img create -q -f qcow2 -F qcow2 -b "$base" "$vm/disk.qcow2" 80G
     ssh-keygen -q -t ed25519 -N "" -f "$vm/key"
     if [ "$guest_arch" = aarch64 ]; then
         dd if=/dev/zero of="$vm/vars.fd" bs=1m count=64 status=none
