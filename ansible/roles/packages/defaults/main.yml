@@ -205,7 +205,6 @@ packages:
   - { name: gamescope, brew: false }
   - { name: heroic-games-launcher, aur: heroic-games-launcher-bin, brew: false }
   - { name: umu-launcher, brew: false }
-  - { name: glu, brew: false }
   - { name: prismlauncher, brew: false }
 
   # misc
