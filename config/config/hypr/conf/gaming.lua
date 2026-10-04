@@ -3,6 +3,7 @@
 -- Patterns are RE2, Hyprland matches them with RE2::FullMatch.
 local games = {
 	[[steam_app_\d+]],
+	[[com\.mojang\.minecraft]],
 }
 
 for _, class in ipairs(games) do
