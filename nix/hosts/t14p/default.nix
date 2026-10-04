@@ -99,8 +99,8 @@
   # ---------------------------------------------
   networking.hostName = "t14p";
   networking.domain   = "kaicheng.local";
-
-  networking.firewall.checkReversePath = "loose";
+  # no firewall
+  networking.firewall.enable = false;
 
   # time
   # ---------------------------------------------

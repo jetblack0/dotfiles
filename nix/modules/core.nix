@@ -246,6 +246,14 @@ in
       settings = {
         PasswordAuthentication = true; # the primary user logs in by password
         PermitRootLogin = "no";
+        # nixos's defaults plus the non-etm sha2 macs.
+        Macs = [
+          "hmac-sha2-512-etm@openssh.com"
+          "hmac-sha2-256-etm@openssh.com"
+          "umac-128-etm@openssh.com"
+          "hmac-sha2-512"
+          "hmac-sha2-256"
+        ];
       };
     };
 
