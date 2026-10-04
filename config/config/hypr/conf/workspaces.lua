@@ -101,4 +101,97 @@ function M.move_relative(delta, follow)
 	end
 end
 
+
+-- Hidden windows
+-----------------------------------------------
+-- The focused monitor's regular workspace and its stash. While a special
+-- workspace is shown, the monitor's active workspace is still the regular one.
+local function stash()
+	local monitor = hl.get_active_monitor()
+	if monitor == nil or monitor.active_workspace == nil then
+		return nil
+	end
+	local id = monitor.active_workspace.id
+	return id, "special:hidden-" .. id
+end
+
+local function in_stash(window, name)
+	local ws = window.workspace
+	return ws ~= nil and ws.special and ws.name == name
+end
+
+local function stashed(name)
+	local windows = {}
+	for _, window in ipairs(hl.get_windows()) do
+		if in_stash(window, name) then
+			table.insert(windows, window)
+		end
+	end
+	return windows
+end
+
+local function peeking(name)
+	local shown = hl.get_active_special_workspace()
+	return shown ~= nil and shown.name == name
+end
+
+-- toggle_special takes the name without the "special:" prefix.
+local function toggle(name)
+	hl.dispatch(hl.dsp.workspace.toggle_special(name:sub(#"special:" + 1)))
+end
+
+-- Close the peek once the stash is empty.
+local function close_if_empty(name)
+	if peeking(name) and #stashed(name) == 0 then
+		toggle(name)
+	end
+end
+
+-- Hide the active window in the current workspace's stash. While peeking,
+-- the focused stashed window goes back to the workspace instead.
+function M.hide()
+	return function()
+		local window = hl.get_active_window()
+		local id, name = stash()
+		if window == nil or id == nil then
+			return
+		end
+		if in_stash(window, name) then
+			hl.dispatch(hl.dsp.window.move({ workspace = id, follow = false, window = window }))
+			close_if_empty(name)
+		else
+			hl.dispatch(hl.dsp.window.move({ workspace = name, follow = false, window = window }))
+		end
+	end
+end
+
+-- Bring every window in the current workspace's stash back. The windows are
+-- picked by workspace name, so a stash that was never used matches nothing.
+function M.restore()
+	return function()
+		local id, name = stash()
+		if id == nil then
+			return
+		end
+		for _, window in ipairs(stashed(name)) do
+			hl.dispatch(hl.dsp.window.move({ workspace = id, follow = false, window = window }))
+		end
+		close_if_empty(name)
+	end
+end
+
+-- Show or hide the current workspace's stash on top of it. An empty stash
+-- has nothing to show, so it is not opened.
+function M.peek()
+	return function()
+		local _, name = stash()
+		if name == nil then
+			return
+		end
+		if peeking(name) or #stashed(name) > 0 then
+			toggle(name)
+		end
+	end
+end
+
 return M

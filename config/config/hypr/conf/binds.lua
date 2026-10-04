@@ -157,6 +157,12 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close(), d("close the window", nograb))
 hl.bind(mainMod .. " + slash", hl.dsp.window.float(), d("toggle floating", nograb))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen(), d("fullscreen", nograb))
 hl.bind(mainMod .. " + O", hl.dsp.window.pin(), d("pin the window", nograb))
+hl.bind(mainMod .. " + M", workspaces.hide(), d("hide the window", nograb))
+hl.bind(mainMod .. " + SHIFT + M", workspaces.restore(), d("bring back the hidden windows", nograb))
+-- When in peek mode, Super+M to bring back the focused window. Super+Shift+M
+-- while peeking brings everything back and closes it too. The peek stays open
+-- while anything is left. When the last one comes back, the peek closes by itself.
+hl.bind(mainMod .. " + CTRL + M", workspaces.peek(), d("peek at the hidden windows", nograb))
 
 if layout.binds then
 	layout.binds({ mod = mainMod, nograb = nograb, d = d })
