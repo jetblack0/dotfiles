@@ -13,6 +13,7 @@
     ../../modules/sing-box.nix
     ../../modules/virt.nix
     ../../modules/gaming.nix
+    ../../modules/winebox.nix
   ];
 
 
