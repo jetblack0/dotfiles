@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# run a Windows program with wine inside a bubblewrap sandbox. Each box is a
+# directory, $WINEBOX_HOME/<box> (default ~/.local/share/winebox/<box>),
+# holding the program's fake $HOME and its wine prefix: all it can write.
+#
+# Usage:
+#   winebox [--net] [--audio] [--gpu] [--share DIR]... [--exec]
+#           <box> <wine args...>
+#
+#   --net        internet access (off by default)
+#   --audio      the pulse socket: speakers AND microphone
+#   --gpu        the gpu device nodes (without it, mesa renders in software)
+#   --share DIR  bind DIR read-write at the same path (repeatable)
+#   --exec       run the arguments in the box instead of wine
+#
+# Examples:
+#   winebox work ~/Downloads/setup.exe     install into the box "work"
+#   winebox --net work 'C:\Program Files\App\app.exe'
+#   winebox --exec work bash               a shell inside the box
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+NET=0
+AUDIO=0
+GPU=0
+SHARE=()
+PROG=(wine)
+BOX=""
+ARGS=()          # what runs in the box, after PROG
+
+ROOT=""          # the box's directory
+RUNTIME=""       # $XDG_RUNTIME_DIR, recreated inside the box
+SOCK=""          # the sandboxed wayland socket
+BWRAP=()         # bwrap's arguments, built up step by step
+RUN=()           # the final command line
+
+# A made-up address the box sends DNS to; pasta forwards it (see build_command).
+DNS=169.254.1.53
+
+die() { printf '%s: %s\n' "${0##*/}" "$*" >&2; exit 1; }
+note() { printf '  %s\n' "$*" >&2; }
+
+# Prints the comment block under the shebang.
+usage() { awk 'NR>1 && /^#/ { sub(/^# ?/,""); print; next } NR>1 { exit }' "$0"; }
+
+parse_args() {
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --net)     NET=1; shift ;;
+      --audio)   AUDIO=1; shift ;;
+      --gpu)     GPU=1; shift ;;
+      --share)   [ $# -ge 2 ] || die "--share needs a directory"
+                 SHARE+=("$2"); shift 2 ;;
+      --exec)    PROG=(); shift ;;
+      -h|--help) usage; exit 0 ;;
+      --*)       die "unknown option: $1" ;;
+      *)         break ;;
+    esac
+  done
+  [ $# -ge 2 ] || { usage >&2; exit 2; }
+  BOX=$1
+  shift
+  ARGS=("$@")
+
+  # the name becomes a directory and part of a socket path
+  [[ $BOX =~ ^[A-Za-z0-9._-]+$ && $BOX != .* ]] \
+    || die "box names take letters, digits, '.', '_' and '-', and don't start with '.'"
+}
+
+require_tools() {
+  command -v bwrap      >/dev/null || die "bwrap not found (bubblewrap)"
+  command -v wl-sandbox >/dev/null || die "wl-sandbox not found (lib/winebox, built by the winebox role / nix module)"
+  if [ ${#PROG[@]} -gt 0 ]; then
+    command -v wine     >/dev/null || die "wine not found"
+  fi
+  if [ "$NET" = 1 ]; then
+    command -v pasta    >/dev/null || die "pasta not found (passt)"
+  fi
+  RUNTIME=${XDG_RUNTIME_DIR:-}
+  [ -n "$RUNTIME" ] || die "XDG_RUNTIME_DIR is unset"
+  [ -n "${WAYLAND_DISPLAY:-}" ] || die "WAYLAND_DISPLAY is unset: winebox needs a wayland session"
+}
+
+init_box() {
+  ROOT=${WINEBOX_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/winebox}/$BOX
+  mkdir -p "$ROOT/home"
+}
+
+# wl-sandbox asks the compositor for a socket whose clients count as
+# sandboxed (wp-security-context-v1): Hyprland hides screencopy, virtual
+# keyboards, clipboard managers, layer-shell and the window list from them.
+open_wayland_socket() {
+  local ready=""
+  SOCK=$RUNTIME/winebox-$BOX-$$.sock
+  coproc WL { exec wl-sandbox "$SOCK" "winebox.$BOX"; }
+  trap close_wayland_socket EXIT
+  read -r ready <&"${WL[0]}" || true
+  [ "$ready" = ready ] || die "no sandboxed wayland socket (see wl-sandbox's error above)"
+}
+
+close_wayland_socket() {
+  # EOF on wl-sandbox's stdin closes the socket
+  if [ -n "${WL[1]:-}" ]; then
+    eval "exec ${WL[1]}>&-"
+    wait "$WL_PID" 2>/dev/null || true
+  fi
+}
+
+# bwrap applies its arguments IN ORDER: a later mount covers an earlier one
+# at the same place. So the tmpfs mounts come first, the binds into them
+# after.
+add_filesystem() {
+  local p d
+  BWRAP+=(
+    --unshare-all --die-with-parent
+    # a new session: no TIOCSTI keystroke injection into the calling terminal
+    --new-session
+    --hostname winebox
+    --clearenv
+    --proc /proc --dev /dev --tmpfs /tmp --tmpfs /run
+    --ro-bind /etc /etc
+  )
+
+  # The system's programs and libraries, read-only.
+  for p in /usr /bin /sbin /lib /lib32 /lib64 /nix/store \
+           /run/current-system /run/opengl-driver /run/opengl-driver-32; do
+    if [ -L "$p" ]; then
+      BWRAP+=(--symlink "$(readlink "$p")" "$p")
+    elif [ -d "$p" ]; then
+      BWRAP+=(--ro-bind "$p" "$p")
+    fi
+  done
+
+  BWRAP+=(
+    --dir "$RUNTIME" --chmod 0700 "$RUNTIME"
+    --bind "$ROOT/home" "$HOME"
+    --bind "$SOCK" "$RUNTIME/wayland-0"
+  )
+
+  for p in "${SHARE[@]}"; do
+    d=$(realpath -e "$p" 2>/dev/null) || die "no such directory to share: $p"
+    BWRAP+=(--bind "$d" "$d")
+  done
+}
+
+add_devices() {
+  local d
+  # ntsync: wine's fast in-kernel sync primitives (gaming.nix loads the module)
+  if [ -e /dev/ntsync ]; then
+    BWRAP+=(--dev-bind /dev/ntsync /dev/ntsync)
+  fi
+
+  if [ "$GPU" = 1 ]; then
+    if [ -e /dev/dri ]; then
+      BWRAP+=(--dev-bind /dev/dri /dev/dri)
+    fi
+    for d in /dev/nvidia*; do
+      if [ -e "$d" ]; then
+        BWRAP+=(--dev-bind "$d" "$d")
+      fi
+    done
+  fi
+
+  # PipeWire's pulse socket. Note it carries the microphone too.
+  if [ "$AUDIO" = 1 ]; then
+    BWRAP+=(--ro-bind "$RUNTIME/pulse/native" "$RUNTIME/pulse/native")
+  fi
+}
+
+add_environment() {
+  BWRAP+=(
+    --setenv HOME "$HOME"
+    --setenv USER "$USER"
+    --setenv PATH "$PATH"
+    --setenv LANG "${LANG:-C.UTF-8}"
+    --setenv XDG_RUNTIME_DIR "$RUNTIME"
+    --setenv WAYLAND_DISPLAY wayland-0
+    --setenv WINEPREFIX "$HOME/.wine"
+    --setenv WINEDEBUG "${WINEDEBUG:--all}"
+    # e.g. WINEDLLOVERRIDES="mscoree,mshtml=" skips the mono and gecko prompts
+    --setenv WINEDLLOVERRIDES "${WINEDLLOVERRIDES:-}"
+  )
+  if [ "$AUDIO" = 1 ]; then
+    BWRAP+=(--setenv PULSE_SERVER "unix:$RUNTIME/pulse/native")
+  fi
+}
+
+build_command() {
+  local resolv
+  if [ "$NET" = 0 ]; then
+    RUN=(bwrap "${BWRAP[@]}" -- "${PROG[@]}" "${ARGS[@]}")
+    return 0
+  fi
+
+  printf 'nameserver %s\n' "$DNS" > "$ROOT/resolv.conf"
+  # bind at the symlink's target: bwrap follows a symlink at the destination
+  resolv=$(realpath -m /etc/resolv.conf)
+  RUN=(
+    pasta --config-net --quiet --no-map-gw -t none -u none -T none -U none
+          --dns-forward "$DNS" --
+    bwrap "${BWRAP[@]}" --share-net --uid "$(id -u)" --gid "$(id -g)"
+          --ro-bind "$ROOT/resolv.conf" "$resolv"
+          -- "${PROG[@]}" "${ARGS[@]}"
+  )
+}
+
+main() {
+  local rc=0
+  parse_args "$@"
+  require_tools
+  init_box
+  open_wayland_socket
+
+  add_filesystem
+  add_devices
+  add_environment
+  build_command
+
+  # the program's exit code is winebox's; the EXIT trap closes the socket
+  "${RUN[@]}" || rc=$?
+  return "$rc"
+}
+
+main "$@"
