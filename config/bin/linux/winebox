@@ -188,6 +188,11 @@ add_devices() {
         BWRAP+=(--dev-bind "$d" "$d")
       fi
     done
+    # mesa identifies the gpu behind /dev/dri through /sys; without it the
+    # driver fails to load and wine falls back to software rendering
+    for d in /sys/dev /sys/devices /sys/class /sys/bus; do
+      BWRAP+=(--ro-bind "$d" "$d")
+    done
   fi
 
   # PipeWire's pulse socket. Note it carries the microphone too.
