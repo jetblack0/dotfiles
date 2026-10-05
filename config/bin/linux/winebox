@@ -5,8 +5,8 @@
 # holding the program's fake $HOME and its wine prefix: all it can write.
 #
 # Usage:
-#   winebox [--net] [--audio] [--gpu] [--share SRC:DEST[:ro]]... [--exec]
-#           <box> <wine args...>
+#   winebox [--net] [--audio] [--gpu] [--share SRC:DEST[:ro]]... [--display MODE]
+#           [--exec] <box> <wine args...>
 #
 # Options go before the box name; everything after it goes to wine.
 #
@@ -18,6 +18,17 @@
 #                read-write unless :ro. DEST is absolute; the program sees
 #                it under Z: (/installers is Z:\installers). Paths can't
 #                contain ':'. Repeatable.
+#   --display MODE
+#                how the program reaches the screen (default: wayland):
+#                wayland      wine's wayland driver, windows like any other
+#                private-x11  an X server of the box's own, shown as one
+#                             window; for programs wine's wayland driver
+#                             can't draw
+#                x11          the host's X server (Hyprland's XWayland):
+#                             windows like any other, but X11 has no
+#                             isolation: the program can log keystrokes
+#                             and read the screen of every other X11
+#                             program on it
 #   --exec       run the arguments in the box instead of wine
 #
 # Examples:
@@ -31,9 +42,12 @@ NET=0
 AUDIO=0
 GPU=0
 SHARE=()
+DISPLAY_MODE=wayland    # wayland | private-x11 | x11
+X11_GEOMETRY=1280x800   # the private X server, and the wine desktop in it
 PROG=(wine)
 BOX=""
 ARGS=()          # what runs in the box, after PROG
+ENTRY=()         # the command line inside the box, from build_entry
 
 ROOT=""          # the box's directory
 RUNTIME=""       # $XDG_RUNTIME_DIR, recreated inside the box
@@ -43,6 +57,18 @@ RUN=()           # the final command line
 
 # A made-up address the box sends DNS to; pasta forwards it (see build_command).
 DNS=169.254.1.53
+
+# Runs inside the box for private-x11: the geometry as $1, the program after
+# it. Xwayland writes the display number to fd 3 once it accepts clients.
+# shellcheck disable=SC2016
+PRIVATE_X11='
+  geometry=$1; shift
+  Xwayland :0 -geometry "$geometry" -hidpi -noreset -displayfd 3 3>/tmp/x.ready & xpid=$!
+  until [ -s /tmp/x.ready ]; do kill -0 "$xpid" 2>/dev/null || exit 1; sleep 0.1; done
+  DISPLAY=:0 "$@"; rc=$?
+  kill "$xpid"
+  exit "$rc"
+'
 
 die() { printf '%s: %s\n' "${0##*/}" "$*" >&2; exit 1; }
 note() { printf '  %s\n' "$*" >&2; }
@@ -58,6 +84,8 @@ parse_args() {
       --gpu)     GPU=1; shift ;;
       --share)   [ $# -ge 2 ] || die "--share needs SRC:DEST[:ro]"
                  SHARE+=("$2"); shift 2 ;;
+      --display) [ $# -ge 2 ] || die "--display needs a mode"
+                 DISPLAY_MODE=$2; shift 2 ;;
       --exec)    PROG=(); shift ;;
       -h|--help) usage; exit 0 ;;
       --*)       die "unknown option: $1" ;;
@@ -72,6 +100,11 @@ parse_args() {
   # the name becomes a directory and part of a socket path
   [[ $BOX =~ ^[A-Za-z0-9._-]+$ && $BOX != .* ]] \
     || die "box names take letters, digits, '.', '_' and '-', and don't start with '.'"
+
+  case $DISPLAY_MODE in
+    wayland|private-x11|x11) ;;
+    *) die "unknown display mode: $DISPLAY_MODE (wayland, private-x11, x11)" ;;
+  esac
 }
 
 require_tools() {
@@ -82,6 +115,12 @@ require_tools() {
   fi
   if [ "$NET" = 1 ]; then
     command -v pasta    >/dev/null || die "pasta not found (passt)"
+  fi
+  if [ "$DISPLAY_MODE" = private-x11 ]; then
+    command -v Xwayland >/dev/null || die "Xwayland not found (xorg-xwayland)"
+  fi
+  if [ "$DISPLAY_MODE" = x11 ]; then
+    [ -n "${DISPLAY:-}" ] || die "DISPLAY is unset: --display x11 needs the host's X server"
   fi
   RUNTIME=${XDG_RUNTIME_DIR:-}
   [ -n "$RUNTIME" ] || die "XDG_RUNTIME_DIR is unset"
@@ -219,10 +258,43 @@ add_environment() {
   fi
 }
 
+# The screen, per display mode. wayland and private-x11 need nothing beyond
+# the sandboxed socket. x11 hands the box the host's X server.
+add_display() {
+  local n sock
+  case $DISPLAY_MODE in
+    x11)
+      n=${DISPLAY#*:}
+      n=${n%%.*}
+      sock=/tmp/.X11-unix/X$n
+      [ -S "$sock" ] || die "no X server socket at $sock"
+      BWRAP+=(--ro-bind "$sock" "$sock" --setenv DISPLAY ":$n")
+      if [ -n "${XAUTHORITY:-}" ] && [ -f "$XAUTHORITY" ]; then
+        BWRAP+=(--ro-bind "$XAUTHORITY" "$XAUTHORITY" --setenv XAUTHORITY "$XAUTHORITY")
+      fi ;;
+  esac
+}
+
+# What runs inside the box. wayland: the program itself, on wine's wayland
+# driver. private-x11: a rootful Xwayland of the box's own goes first, a
+# plain client of the sandboxed socket.
+build_entry() {
+  local prog=("${PROG[@]}")
+  case $DISPLAY_MODE in
+    wayland|x11)
+      ENTRY=("${prog[@]}" "${ARGS[@]}") ;;
+    private-x11)
+      if [ ${#prog[@]} -gt 0 ]; then
+        prog=(wine explorer "/desktop=$BOX,$X11_GEOMETRY")
+      fi
+      ENTRY=(bash -c "$PRIVATE_X11" winebox-x11 "$X11_GEOMETRY" "${prog[@]}" "${ARGS[@]}") ;;
+  esac
+}
+
 build_command() {
   local resolv
   if [ "$NET" = 0 ]; then
-    RUN=(bwrap "${BWRAP[@]}" -- "${PROG[@]}" "${ARGS[@]}")
+    RUN=(bwrap "${BWRAP[@]}" -- "${ENTRY[@]}")
     return 0
   fi
 
@@ -234,7 +306,7 @@ build_command() {
           --dns-forward "$DNS" --
     bwrap "${BWRAP[@]}" --share-net --uid "$(id -u)" --gid "$(id -g)"
           --ro-bind "$ROOT/resolv.conf" "$resolv"
-          -- "${PROG[@]}" "${ARGS[@]}"
+          -- "${ENTRY[@]}"
   )
 }
 
@@ -249,6 +321,8 @@ main() {
   add_shares
   add_devices
   add_environment
+  add_display
+  build_entry
   build_command
 
   # the program's exit code is winebox's; the EXIT trap closes the socket
