@@ -299,6 +299,7 @@ in
           coreDirs = [
             "aerc"
             "bat"
+            "bottom"
             "environment.d"
             "fastfetch"
             "git"
