@@ -1,0 +1,58 @@
+---
+# winebox's helper, wl-sandbox: a small C program that asks the compositor
+# for a sandboxed wayland socket. The script (config/bin/linux/winebox)
+# comes with the bin role; wine, bubblewrap, passt and the build tools come
+# from the package list.
+
+# Source
+# ---------------------------------------------
+- name: Ensure the build directory exists
+  ansible.builtin.file:
+    path: "{{ winebox_build }}"
+    state: directory
+    mode: "0755"
+
+# The copy reports a change only when the source differs, which is what
+# decides the rebuild below.
+- name: Copy the wl-sandbox source
+  ansible.builtin.copy:
+    src: "{{ winebox_src }}/wl-sandbox.c"
+    dest: "{{ winebox_build }}/wl-sandbox.c"
+    mode: "0644"
+    remote_src: true
+  register: winebox_source
+
+- name: Look for an installed wl-sandbox
+  ansible.builtin.stat:
+    path: "{{ winebox_dest }}/wl-sandbox"
+  register: winebox_binary
+
+
+# Build
+# ---------------------------------------------
+# As the user, in the build directory. wayland-scanner (from the wayland
+# package) generates the protocol glue from wayland-protocols' xml.
+- name: Build wl-sandbox
+  ansible.builtin.shell:
+    cmd: |
+      set -eu
+      xml=$(pkg-config --variable=pkgdatadir wayland-protocols)/staging/security-context/security-context-v1.xml
+      wayland-scanner client-header "$xml" security-context-v1-client-protocol.h
+      wayland-scanner private-code "$xml" security-context-v1-protocol.c
+      cc -O2 -Wall -I. wl-sandbox.c security-context-v1-protocol.c \
+        $(pkg-config --cflags --libs wayland-client) -o wl-sandbox
+    chdir: "{{ winebox_build }}"
+  when: winebox_source is changed or not winebox_binary.stat.exists
+  changed_when: true
+  register: winebox_built
+
+- name: Install wl-sandbox
+  become: true
+  ansible.builtin.copy:
+    src: "{{ winebox_build }}/wl-sandbox"
+    dest: "{{ winebox_dest }}/wl-sandbox"
+    mode: "0755"
+    owner: root
+    group: root
+    remote_src: true
+  when: winebox_built is changed

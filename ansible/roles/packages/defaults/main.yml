@@ -207,6 +207,14 @@ packages:
   - { name: umu-launcher, brew: false }
   - { name: prismlauncher, brew: false }
 
+  # Wine and sandbox
+  - { name: wine, brew: false }
+  - { name: bubblewrap, brew: false }
+  - { name: passt, brew: false } # pasta: the box's network with --net
+  - { name: gcc, brew: false }
+  - { name: pkgconf, brew: false }
+  - { name: wayland-protocols, brew: false }
+
   # misc
   - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
   - { name: xdg-ninja, aur: xdg-ninja }

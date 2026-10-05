@@ -1,0 +1,10 @@
+---
+# wl-sandbox's source, in the repo.
+winebox_src: "{{ playbook_dir | dirname }}/lib/winebox"
+
+# Where it gets built; kept so an unchanged source skips the rebuild.
+winebox_build: "{{ ansible_facts['user_dir'] }}/.cache/winebox-build"
+
+# System-wide, like wine and bwrap: the winebox script calls it by name, and
+# a desktop session's PATH has no ~/.local/bin (only zsh adds that).
+winebox_dest: /usr/local/bin
