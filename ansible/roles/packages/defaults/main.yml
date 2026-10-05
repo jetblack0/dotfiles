@@ -209,6 +209,7 @@ packages:
 
   # Wine and sandbox
   - { name: wine, brew: false }
+  - { name: winetricks, brew: false }
   - { name: bubblewrap, brew: false }
   - { name: passt, brew: false } # pasta: the box's network with --net
   - { name: gcc, brew: false }

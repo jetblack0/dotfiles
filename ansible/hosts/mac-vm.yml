@@ -20,6 +20,7 @@ packages_exclude:
   - heroic-games-launcher
   - umu-launcher
   - wine
+  - winetricks
 
 
 # Displays
