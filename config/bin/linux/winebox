@@ -5,17 +5,23 @@
 # holding the program's fake $HOME and its wine prefix: all it can write.
 #
 # Usage:
-#   winebox [--net] [--audio] [--gpu] [--share DIR]... [--exec]
+#   winebox [--net] [--audio] [--gpu] [--share SRC:DEST[:ro]]... [--exec]
 #           <box> <wine args...>
+#
+# Options go before the box name; everything after it goes to wine.
 #
 #   --net        internet access (off by default)
 #   --audio      the pulse socket: speakers AND microphone
 #   --gpu        the gpu device nodes (without it, mesa renders in software)
-#   --share DIR  bind DIR read-write at the same path (repeatable)
+#   --share SRC:DEST[:ro]
+#                bind the file or directory SRC at DEST inside the box,
+#                read-write unless :ro. DEST is absolute; the program sees
+#                it under Z: (/installers is Z:\installers). Paths can't
+#                contain ':'. Repeatable.
 #   --exec       run the arguments in the box instead of wine
 #
 # Examples:
-#   winebox work ~/Downloads/setup.exe     install into the box "work"
+#   winebox --share ~/Downloads/installers:/installers:ro work /installers/setup.exe
 #   winebox --net work 'C:\Program Files\App\app.exe'
 #   winebox --exec work bash               a shell inside the box
 # ---------------------------------------------------------------------------
@@ -50,7 +56,7 @@ parse_args() {
       --net)     NET=1; shift ;;
       --audio)   AUDIO=1; shift ;;
       --gpu)     GPU=1; shift ;;
-      --share)   [ $# -ge 2 ] || die "--share needs a directory"
+      --share)   [ $# -ge 2 ] || die "--share needs SRC:DEST[:ro]"
                  SHARE+=("$2"); shift 2 ;;
       --exec)    PROG=(); shift ;;
       -h|--help) usage; exit 0 ;;
@@ -111,7 +117,7 @@ close_wayland_socket() {
 # at the same place. So the tmpfs mounts come first, the binds into them
 # after.
 add_filesystem() {
-  local p d
+  local p
   BWRAP+=(
     --unshare-all --die-with-parent
     # a new session: no TIOCSTI keystroke injection into the calling terminal
@@ -137,10 +143,32 @@ add_filesystem() {
     --bind "$ROOT/home" "$HOME"
     --bind "$SOCK" "$RUNTIME/wayland-0"
   )
+}
 
-  for p in "${SHARE[@]}"; do
-    d=$(realpath -e "$p" 2>/dev/null) || die "no such directory to share: $p"
-    BWRAP+=(--bind "$d" "$d")
+# --share SRC:DEST[:ro], like docker's -v. Each one is a bind mount.
+add_shares() {
+  local spec rest src dest bind src_real
+  for spec in "${SHARE[@]}"; do
+    rest=$spec
+    bind=--bind
+    case $rest in
+      *:ro) bind=--ro-bind; rest=${rest%:ro} ;;
+      *:rw) rest=${rest%:rw} ;;
+    esac
+
+    src=${rest%%:*}
+    dest=${rest#*:}
+    [ "$src" != "$rest" ] && [ -n "$src" ] && [ -n "$dest" ] \
+      || die "--share takes SRC:DEST[:ro], got: $spec"
+    case $dest in
+      *:*) die "--share paths can't contain ':', got: $spec" ;;
+      /*)  ;;
+      *)   die "--share DEST must be an absolute path inside the box, got: $dest" ;;
+    esac
+
+    # relative SRC is relative to where winebox runs
+    src_real=$(realpath -e "$src" 2>/dev/null) || die "nothing to share at: $src"
+    BWRAP+=("$bind" "$src_real" "$dest")
   done
 }
 
@@ -213,6 +241,7 @@ main() {
   open_wayland_socket
 
   add_filesystem
+  add_shares
   add_devices
   add_environment
   build_command
