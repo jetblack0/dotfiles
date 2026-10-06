@@ -1,0 +1,336 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# run a program inside a bubblewrap sandbox. Each box is a directory,
+# $TUXBOX_HOME/<box> (default ~/.local/share/tuxbox/<box>), holding the
+# program's fake $HOME: all it can write. winebox builds on this.
+#
+# Usage:
+#   tuxbox [--net] [--audio] [--gpu] [--share SRC:DEST[:ro]]... [--env VAR=VALUE]...
+#          [--dev PATH]... [--display MODE] <box> <program> [args...]
+#
+# Options go before the box name; everything after the program goes to it.
+#
+#   --net        internet access (off by default)
+#   --audio      the pulse socket: speakers AND microphone
+#   --gpu        the gpu device nodes (without it, mesa renders in software)
+#   --share SRC:DEST[:ro]
+#                bind the file or directory SRC at DEST inside the box,
+#                read-write unless :ro. DEST is absolute. Paths can't
+#                contain ':'. Repeatable.
+#   --env VAR=VALUE
+#                set VAR in the box, which starts with a bare environment:
+#                HOME, USER, PATH, LANG and the display. Repeatable.
+#   --dev PATH   bind the device node PATH into the box. Repeatable.
+#   --display MODE
+#                how the program reaches the screen (default: wayland):
+#                wayland      a sandboxed wayland socket, windows like any
+#                             other; the compositor hides screen capture,
+#                             virtual keyboards and the like from it
+#                private-x11  an X server of the box's own, shown as one
+#                             window. It has no window manager: fine for
+#                             one window, awkward for more
+#                x11          the host's X server (Hyprland's XWayland):
+#                             windows like any other, but X11 has no
+#                             isolation: the program can log keystrokes
+#                             and read the screen of every other X11
+#                             program on it
+#
+# Examples:
+#   tuxbox --net --audio --gpu chat telegram-desktop
+#   tuxbox --share ~/Downloads/app.AppImage:/app:ro --net try /app
+#   tuxbox work bash                       a shell inside the box
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+NET=0
+AUDIO=0
+GPU=0
+SHARE=()
+ENV=()
+DEV=()
+DISPLAY_MODE=wayland    # wayland | private-x11 | x11
+X11_GEOMETRY=1280x800   # the private X server's size
+BOX=""
+ARGS=()          # the program and its arguments
+ENTRY=()         # the command line inside the box, from build_entry
+
+ROOT=""          # the box's directory
+RUNTIME=""       # $XDG_RUNTIME_DIR, recreated inside the box
+SOCK=""          # the sandboxed wayland socket
+BWRAP=()         # bwrap's arguments, built up step by step
+RUN=()           # the final command line
+
+# A made-up address the box sends DNS to; pasta forwards it (see build_command).
+DNS=169.254.1.53
+
+# Runs inside the box for private-x11: the geometry as $1, the program after
+# it. Xwayland writes the display number to fd 3 once it accepts clients.
+# shellcheck disable=SC2016
+PRIVATE_X11='
+  geometry=$1; shift
+  Xwayland :0 -geometry "$geometry" -hidpi -noreset -displayfd 3 3>/tmp/x.ready & xpid=$!
+  until [ -s /tmp/x.ready ]; do kill -0 "$xpid" 2>/dev/null || exit 1; sleep 0.1; done
+  DISPLAY=:0 "$@"; rc=$?
+  kill "$xpid"
+  exit "$rc"
+'
+
+die() { printf '%s: %s\n' "${0##*/}" "$*" >&2; exit 1; }
+note() { printf '  %s\n' "$*" >&2; }
+
+# Prints the comment block under the shebang.
+usage() { awk 'NR>1 && /^#/ { sub(/^# ?/,""); print; next } NR>1 { exit }' "$0"; }
+
+parse_args() {
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --net)     NET=1; shift ;;
+      --audio)   AUDIO=1; shift ;;
+      --gpu)     GPU=1; shift ;;
+      --share)   [ $# -ge 2 ] || die "--share needs SRC:DEST[:ro]"
+                 SHARE+=("$2"); shift 2 ;;
+      --env)     [ $# -ge 2 ] || die "--env needs VAR=VALUE"
+                 ENV+=("$2"); shift 2 ;;
+      --dev)     [ $# -ge 2 ] || die "--dev needs a path"
+                 DEV+=("$2"); shift 2 ;;
+      --display) [ $# -ge 2 ] || die "--display needs a mode"
+                 DISPLAY_MODE=$2; shift 2 ;;
+      -h|--help) usage; exit 0 ;;
+      --*)       die "unknown option: $1" ;;
+      *)         break ;;
+    esac
+  done
+  [ $# -ge 2 ] || { usage >&2; exit 2; }
+  BOX=$1
+  shift
+  ARGS=("$@")
+
+  # the name becomes a directory and part of a socket path
+  [[ $BOX =~ ^[A-Za-z0-9._-]+$ && $BOX != .* ]] \
+    || die "box names take letters, digits, '.', '_' and '-', and don't start with '.'"
+
+  case $DISPLAY_MODE in
+    wayland|private-x11|x11) ;;
+    *) die "unknown display mode: $DISPLAY_MODE (wayland, private-x11, x11)" ;;
+  esac
+}
+
+require_tools() {
+  command -v bwrap      >/dev/null || die "bwrap not found (bubblewrap)"
+  command -v wl-sandbox >/dev/null || die "wl-sandbox not found (lib/winebox, built by the winebox role / nix module)"
+  if [ "$NET" = 1 ]; then
+    command -v pasta    >/dev/null || die "pasta not found (passt)"
+  fi
+  if [ "$DISPLAY_MODE" = private-x11 ]; then
+    command -v Xwayland >/dev/null || die "Xwayland not found (xorg-xwayland)"
+  fi
+  if [ "$DISPLAY_MODE" = x11 ]; then
+    [ -n "${DISPLAY:-}" ] || die "DISPLAY is unset: --display x11 needs the host's X server"
+  fi
+  RUNTIME=${XDG_RUNTIME_DIR:-}
+  [ -n "$RUNTIME" ] || die "XDG_RUNTIME_DIR is unset"
+  [ -n "${WAYLAND_DISPLAY:-}" ] || die "WAYLAND_DISPLAY is unset: tuxbox needs a wayland session"
+}
+
+init_box() {
+  ROOT=${TUXBOX_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/tuxbox}/$BOX
+  mkdir -p "$ROOT/home"
+}
+
+# wl-sandbox asks the compositor for a socket whose clients count as
+# sandboxed (wp-security-context-v1): Hyprland hides screencopy, virtual
+# keyboards, clipboard managers, layer-shell and the window list from them.
+open_wayland_socket() {
+  local ready=""
+  SOCK=$RUNTIME/tuxbox-$BOX-$$.sock
+  coproc WL { exec wl-sandbox "$SOCK" "tuxbox.$BOX"; }
+  trap close_wayland_socket EXIT
+  read -r ready <&"${WL[0]}" || true
+  [ "$ready" = ready ] || die "no sandboxed wayland socket (see wl-sandbox's error above)"
+}
+
+close_wayland_socket() {
+  # EOF on wl-sandbox's stdin closes the socket
+  if [ -n "${WL[1]:-}" ]; then
+    eval "exec ${WL[1]}>&-"
+    wait "$WL_PID" 2>/dev/null || true
+  fi
+}
+
+# bwrap applies its arguments IN ORDER: a later mount covers an earlier one
+# at the same place. So the tmpfs mounts come first, the binds into them
+# after.
+add_filesystem() {
+  local p
+  BWRAP+=(
+    --unshare-all --die-with-parent
+    # a new session: no TIOCSTI keystroke injection into the calling terminal
+    --new-session
+    --hostname tuxbox
+    --clearenv
+    --proc /proc --dev /dev --tmpfs /tmp --tmpfs /run
+    --ro-bind /etc /etc
+  )
+
+  # The system's programs and libraries, read-only.
+  for p in /usr /bin /sbin /lib /lib32 /lib64 /nix/store \
+           /run/current-system /run/opengl-driver /run/opengl-driver-32; do
+    if [ -L "$p" ]; then
+      BWRAP+=(--symlink "$(readlink "$p")" "$p")
+    elif [ -d "$p" ]; then
+      BWRAP+=(--ro-bind "$p" "$p")
+    fi
+  done
+
+  BWRAP+=(
+    --dir "$RUNTIME" --chmod 0700 "$RUNTIME"
+    --bind "$ROOT/home" "$HOME"
+    --bind "$SOCK" "$RUNTIME/wayland-0"
+  )
+}
+
+# --share SRC:DEST[:ro], like docker's -v. Each one is a bind mount.
+add_shares() {
+  local spec rest src dest bind src_real
+  for spec in "${SHARE[@]}"; do
+    rest=$spec
+    bind=--bind
+    case $rest in
+      *:ro) bind=--ro-bind; rest=${rest%:ro} ;;
+      *:rw) rest=${rest%:rw} ;;
+    esac
+
+    src=${rest%%:*}
+    dest=${rest#*:}
+    [ "$src" != "$rest" ] && [ -n "$src" ] && [ -n "$dest" ] \
+      || die "--share takes SRC:DEST[:ro], got: $spec"
+    case $dest in
+      *:*) die "--share paths can't contain ':', got: $spec" ;;
+      /*)  ;;
+      *)   die "--share DEST must be an absolute path inside the box, got: $dest" ;;
+    esac
+
+    # relative SRC is relative to where tuxbox runs
+    src_real=$(realpath -e "$src" 2>/dev/null) || die "nothing to share at: $src"
+    BWRAP+=("$bind" "$src_real" "$dest")
+  done
+}
+
+add_devices() {
+  local d
+  for d in "${DEV[@]}"; do
+    [ -e "$d" ] || die "no device at: $d"
+    BWRAP+=(--dev-bind "$d" "$d")
+  done
+
+  if [ "$GPU" = 1 ]; then
+    if [ -e /dev/dri ]; then
+      BWRAP+=(--dev-bind /dev/dri /dev/dri)
+    fi
+    for d in /dev/nvidia*; do
+      if [ -e "$d" ]; then
+        BWRAP+=(--dev-bind "$d" "$d")
+      fi
+    done
+    # mesa identifies the gpu behind /dev/dri through /sys; without it the
+    # driver fails to load and everything falls back to software rendering
+    for d in /sys/dev /sys/devices /sys/class /sys/bus; do
+      BWRAP+=(--ro-bind "$d" "$d")
+    done
+  fi
+
+  # PipeWire's pulse socket. Note it carries the microphone too.
+  if [ "$AUDIO" = 1 ]; then
+    BWRAP+=(--ro-bind "$RUNTIME/pulse/native" "$RUNTIME/pulse/native")
+  fi
+}
+
+add_environment() {
+  local spec
+  BWRAP+=(
+    --setenv HOME "$HOME"
+    --setenv USER "$USER"
+    --setenv PATH "$PATH"
+    --setenv LANG "${LANG:-C.UTF-8}"
+    --setenv XDG_RUNTIME_DIR "$RUNTIME"
+    --setenv WAYLAND_DISPLAY wayland-0
+  )
+  if [ "$AUDIO" = 1 ]; then
+    BWRAP+=(--setenv PULSE_SERVER "unix:$RUNTIME/pulse/native")
+  fi
+
+  for spec in "${ENV[@]}"; do
+    [[ $spec =~ ^[A-Za-z_][A-Za-z0-9_]*= ]] || die "--env takes VAR=VALUE, got: $spec"
+    BWRAP+=(--setenv "${spec%%=*}" "${spec#*=}")
+  done
+}
+
+# The screen, per display mode. wayland and private-x11 need nothing beyond
+# the sandboxed socket. x11 hands the box the host's X server.
+add_display() {
+  local n sock
+  case $DISPLAY_MODE in
+    x11)
+      n=${DISPLAY#*:}
+      n=${n%%.*}
+      sock=/tmp/.X11-unix/X$n
+      [ -S "$sock" ] || die "no X server socket at $sock"
+      BWRAP+=(--ro-bind "$sock" "$sock" --setenv DISPLAY ":$n")
+      if [ -n "${XAUTHORITY:-}" ] && [ -f "$XAUTHORITY" ]; then
+        BWRAP+=(--ro-bind "$XAUTHORITY" "$XAUTHORITY" --setenv XAUTHORITY "$XAUTHORITY")
+      fi ;;
+  esac
+}
+
+# What runs inside the box. wayland and x11: the program itself. private-x11:
+# a rootful Xwayland of the box's own goes first, a plain client of the
+# sandboxed socket.
+build_entry() {
+  case $DISPLAY_MODE in
+    wayland|x11)
+      ENTRY=("${ARGS[@]}") ;;
+    private-x11)
+      ENTRY=(bash -c "$PRIVATE_X11" tuxbox-x11 "$X11_GEOMETRY" "${ARGS[@]}") ;;
+  esac
+}
+
+build_command() {
+  local resolv
+  if [ "$NET" = 0 ]; then
+    RUN=(bwrap "${BWRAP[@]}" -- "${ENTRY[@]}")
+    return 0
+  fi
+
+  printf 'nameserver %s\n' "$DNS" > "$ROOT/resolv.conf"
+  # bind at the symlink's target: bwrap follows a symlink at the destination
+  resolv=$(realpath -m /etc/resolv.conf)
+  RUN=(
+    pasta --config-net --quiet --no-map-gw -t none -u none -T none -U none
+          --dns-forward "$DNS" --
+    bwrap "${BWRAP[@]}" --share-net --uid "$(id -u)" --gid "$(id -g)"
+          --ro-bind "$ROOT/resolv.conf" "$resolv"
+          -- "${ENTRY[@]}"
+  )
+}
+
+main() {
+  local rc=0
+  parse_args "$@"
+  require_tools
+  init_box
+  open_wayland_socket
+
+  add_filesystem
+  add_shares
+  add_devices
+  add_environment
+  add_display
+  build_entry
+  build_command
+
+  # the program's exit code is tuxbox's; the EXIT trap closes the socket
+  "${RUN[@]}" || rc=$?
+  return "$rc"
+}
+
+main "$@"
