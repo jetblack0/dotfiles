@@ -11,6 +11,7 @@
     winetricks
     bubblewrap
     passt # pasta: the box's network with --net
+    appimage-run # AppImages in a tuxbox
     (callPackage ../packages/wl-sandbox.nix { })
   ];
 }
