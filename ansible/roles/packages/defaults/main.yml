@@ -83,6 +83,8 @@ packages:
   - { name: python-pip, brew: false } # brew's python ships pip
   - { name: tree-sitter-cli } # NOT brew's tree-sitter: that is library-only
   - { name: rust }
+  - { name: shellcheck }
+  - { name: shfmt }
 
   # python tooling
   - { name: uv }

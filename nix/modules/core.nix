@@ -179,6 +179,8 @@ in
       gnumake
       cargo
       rustc
+      shellcheck
+      shfmt
 
       # python tooling
       uv
