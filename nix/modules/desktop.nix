@@ -480,6 +480,12 @@ in
         recursive = true;
       };
 
+      # gtk key theme with just Ctrl+E and Ctrl+W (autostart.lua selects it)
+      xdg.dataFile."themes/emacs-lite" = {
+        source = dotfiles + "/share/themes/emacs-lite";
+        recursive = true;
+      };
+
       # per-host display rules for conf/monitors.lua, input device options for
       # conf/devices.lua, xresources for xwayland
       xdg.stateFile =
