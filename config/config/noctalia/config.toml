@@ -79,12 +79,14 @@ behavior_order = [ "lock", "screen-off", "suspend" ]
     [idle.behavior.screen-off]
     action = "screen_off"
     enabled = true
+    locked_timeout = 60.0
     timeout = 660.0
 
     [idle.behavior.suspend]
     action = "command"
     command = "$HOME/.config/hypr/scripts/suspend-on-battery.sh"
     enabled = true
+    locked_timeout = 300.0
     timeout = 900.0
 
 
