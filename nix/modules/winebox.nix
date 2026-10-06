@@ -13,8 +13,4 @@
     passt # pasta: the box's network with --net
     (callPackage ../packages/wl-sandbox.nix { })
   ];
-
-  # environment.d can't add this on NixOS: uwsm re-imports the login
-  # environment, which comes from here.
-  environment.sessionVariables.XDG_DATA_DIRS = [ "$HOME/assets/state" ];
 }
