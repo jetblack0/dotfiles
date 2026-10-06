@@ -22,6 +22,20 @@ hl.window_rule({
 	center = true,
 })
 
+-- wine names a window's class after its program (notepad.exe), in both the
+-- wayland and x11 modes; Windows programs expect to size their own windows
+hl.window_rule({
+	match = { class = [[(?i).*\.exe]] },
+	float = true,
+})
+
+-- winebox --display private-x11: one fixed-size X desktop per box
+hl.window_rule({
+	match = { class = [[org\.freedesktop\.Xwayland]] },
+	float = true,
+	center = true,
+})
+
 -- touchpad scrolling in the terminal is slow at the global scroll_factor
 hl.window_rule({
 	match = { class = "kitty" },
