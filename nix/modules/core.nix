@@ -179,6 +179,8 @@ in
       gnumake
       cargo
       rustc
+      shellcheck
+      shfmt
 
       # python tooling
       uv
@@ -299,6 +301,7 @@ in
           coreDirs = [
             "aerc"
             "bat"
+            "bottom"
             "environment.d"
             "fastfetch"
             "git"

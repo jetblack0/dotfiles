@@ -1,0 +1,10 @@
+# Graphical session environment, sourced by uwsm
+# ---------------------------------------------
+# uwsm sources this after the login profile, so it can extend what the
+# profile builds; environment.d can't, the profile replaces what it sets.
+
+# the scripts in config/bin, for launchers and keybinds too, not only zsh
+export PATH="$HOME/.local/bin:$PATH"
+
+# launchers for sandboxed apps in ~/assets/state/applications
+export XDG_DATA_DIRS="$HOME/assets/state:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"

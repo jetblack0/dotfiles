@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# run a Windows program with wine inside a tuxbox. Each box is a directory,
+# $WINEBOX_HOME/<box> (default ~/.local/share/winebox/<box>), holding the
+# program's fake $HOME and its wine prefix: all it can write.
+#
+# Usage:
+#   winebox [tuxbox options] [--exec] <box> <wine args...>
+#
+# Options go before the box name; everything after it goes to wine. The
+# options are tuxbox's (--net, --audio, --gpu, --share, --env, --dev,
+# --display; see tuxbox --help) plus one:
+#
+#   --exec       run the arguments in the box instead of wine
+#
+# Examples:
+#   winebox --share ~/Downloads/installers:/installers:ro work /installers/setup.exe
+#   winebox --net work 'C:\Program Files\App\app.exe'
+#   winebox --exec work bash               a shell inside the box
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+OPTS=()                 # tuxbox's options, passed through
+DISPLAY_MODE=wayland
+X11_GEOMETRY=1280x800   # tuxbox's private X server size; the wine desktop matches
+PROG=(wine)
+BOX=""
+ARGS=()
+
+die() { printf '%s: %s\n' "${0##*/}" "$*" >&2; exit 1; }
+
+# Prints the comment block under the shebang.
+usage() { awk 'NR>1 && /^#/ { sub(/^# ?/,""); print; next } NR>1 { exit }' "$0"; }
+
+# tuxbox checks the options; here only the ones taking a value matter, so
+# the value isn't taken for the box name.
+parse_args() {
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --display)  [ $# -ge 2 ] || die "--display needs a mode"
+                  DISPLAY_MODE=$2; OPTS+=("$1" "$2"); shift 2 ;;
+      --share|--env|--dev)
+                  [ $# -ge 2 ] || die "$1 needs a value"
+                  OPTS+=("$1" "$2"); shift 2 ;;
+      --exec)     PROG=(); shift ;;
+      -h|--help)  usage; exit 0 ;;
+      --*)        OPTS+=("$1"); shift ;;
+      *)          break ;;
+    esac
+  done
+  [ $# -ge 2 ] || { usage >&2; exit 2; }
+  BOX=$1
+  shift
+  ARGS=("$@")
+}
+
+require_tools() {
+  command -v tuxbox >/dev/null || die "tuxbox not found"
+  if [ ${#PROG[@]} -gt 0 ]; then
+    command -v wine >/dev/null || die "wine not found"
+  fi
+}
+
+main() {
+  parse_args "$@"
+  require_tools
+
+  # wine's layered windows need a desktop in the private X server
+  if [ "$DISPLAY_MODE" = private-x11 ] && [ ${#PROG[@]} -gt 0 ]; then
+    PROG=(wine explorer "/desktop=$BOX,$X11_GEOMETRY")
+  fi
+
+  # ntsync: wine's fast in-kernel sync primitives (gaming.nix loads the module)
+  if [ -e /dev/ntsync ]; then
+    OPTS+=(--dev /dev/ntsync)
+  fi
+
+  # WINE64 is read by winetricks only: both machines run wow64 wine, where
+  # plain wine runs 64- and 32-bit programs. NixOS's wine is a wrapper script
+  # winetricks can't inspect, so it would guess a wine64 that doesn't exist.
+  export TUXBOX_HOME=${WINEBOX_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/winebox}
+  exec tuxbox "${OPTS[@]}" \
+    --env "WINEPREFIX=$HOME/.wine" \
+    --env "WINEDEBUG=${WINEDEBUG:--all}" \
+    --env "WINEDLLOVERRIDES=${WINEDLLOVERRIDES:-}" \
+    --env "WINE64=wine" \
+    "$BOX" "${PROG[@]}" "${ARGS[@]}"
+}
+
+main "$@"

@@ -1,0 +1,5 @@
+# Theme
+# -----------------------------------------------
+# Built-in themes: default, gruvbox, nord (each with a -light variant).
+[styles]
+theme = "gruvbox"

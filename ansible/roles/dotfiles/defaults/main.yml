@@ -48,6 +48,7 @@ dotfiles_mask:
     - waybar
     - X11
     - swayimg
+    - uwsm
 
 # Per-host preferences, rendered into the noctalia overlay.
 wallpaper_directory: "~/assets/media/pics/wallpaper/landscape"

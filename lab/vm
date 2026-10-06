@@ -518,7 +518,7 @@ boot() {
     # screenshot can't read a 3d display, but its vnc server gets every
     # frame. With a gpu render node on a linux host that includes 3d:
     # egl-headless renders with virgl without a window.
-    local display=()
+    local display=() gbm_env=()
     rm -f "$vm/vnc.sock"
     if [ "$headless" = true ]; then
         if [ "$(uname -s)" = Linux ] && [ -r /dev/dri/renderD128 ]; then
@@ -527,6 +527,12 @@ boot() {
                 virtio-gpu-pci) gpu=virtio-gpu-gl-pci ;;
             esac
             display=(-display egl-headless,rendernode=/dev/dri/renderD128)
+            # With a second gpu, mesa's gbm loader can still hand that node
+            # to nvidia's backend, and the vm renders on the dGPU anyway. Pin
+            # mesa's own backend. With one gpu nothing changes.
+            if [ "$(ls /dev/dri/renderD* | wc -l)" -gt 1 ]; then
+                gbm_env=(GBM_BACKEND=dri)
+            fi
         else
             display=(-display none)
         fi
@@ -543,7 +549,7 @@ boot() {
     # Without LD_LIBRARY_PATH: claude-code from nixpkgs puts an alsa-lib built
     # for a newer glibc on it, and qemu loads alsa at startup and fails.
     # shellcheck disable=SC2046
-    env -u LD_LIBRARY_PATH "$qemu" \
+    env -u LD_LIBRARY_PATH "${gbm_env[@]}" "$qemu" \
         -name "lab-vm-$name" -m "$mem" -smp "$cpus" \
         "${platform[@]}" \
         $(accel_args) \

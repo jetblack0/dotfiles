@@ -431,6 +431,7 @@ in
             "kitty"
             "noctalia"
             "swayimg"
+            "uwsm"
             "zathura"
           ];
         in

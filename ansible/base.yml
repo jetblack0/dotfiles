@@ -8,5 +8,8 @@
     - { role: system, tags: system }
     - { role: home, tags: home }
     - { role: bin, tags: bin }
+    - role: winebox
+      tags: winebox
+      when: ansible_facts['os_family'] == 'Archlinux' and 'wine' not in packages_exclude
     - { role: dotfiles, tags: dotfiles }
     - { role: zen, tags: zen }

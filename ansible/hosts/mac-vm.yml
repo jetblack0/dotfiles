@@ -19,6 +19,8 @@ packages_exclude:
   - lib32-mangohud
   - heroic-games-launcher
   - umu-launcher
+  - wine
+  - winetricks
 
 
 # Displays

@@ -83,6 +83,8 @@ packages:
   - { name: python-pip, brew: false } # brew's python ships pip
   - { name: tree-sitter-cli } # NOT brew's tree-sitter: that is library-only
   - { name: rust }
+  - { name: shellcheck }
+  - { name: shfmt }
 
   # python tooling
   - { name: uv }
@@ -206,6 +208,15 @@ packages:
   - { name: heroic-games-launcher, aur: heroic-games-launcher-bin, brew: false }
   - { name: umu-launcher, brew: false }
   - { name: prismlauncher, brew: false }
+
+  # Wine and sandbox
+  - { name: wine, brew: false }
+  - { name: winetricks, brew: false }
+  - { name: bubblewrap, brew: false }
+  - { name: passt, brew: false } # pasta: the box's network with --net
+  - { name: gcc, brew: false }
+  - { name: pkgconf, brew: false }
+  - { name: wayland-protocols, brew: false }
 
   # misc
   - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
