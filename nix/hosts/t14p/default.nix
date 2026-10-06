@@ -69,6 +69,10 @@
   desktop.mediaMaxLength = 134;
   desktop.recordingDirectory = "~/assets/media/vids/recording";
   desktop.inputDevices."tpps/2-synaptics-trackpoint".sensitivity = -0.5;
+  desktop.inputDevices."elan06b0:00-04f3:3327-touchpad" = {
+    sensitivity = -0.15;
+    scroll_factor = 0.2;
+  };
 
   programs.noctalia-greeter.settings.output = {
     width = 3072;
