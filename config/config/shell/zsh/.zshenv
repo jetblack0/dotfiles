@@ -112,7 +112,10 @@ export LINODE_CLI_CONFIG="$HOME/.config/linode"
 export LIBVIRT_DEFAULT_URI="qemu:///system"
 
 # winebox
-[ -d "$HOME"/assets/state ] && export WINEBOX_HOME="$HOME"/assets/state/winebox
+[ -d "$HOME"/assets/state ] && {
+	export WINEBOX_HOME="$HOME"/assets/state/winebox
+	export TUXBOX_HOME="$HOME"/assets/state/tuxbox
+}
 
 # loki
 export LOKI_ADDR="https://loki.ops.unazoomer.com"
