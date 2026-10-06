@@ -7,7 +7,7 @@
 
 {
   environment.systemPackages = with pkgs; [
-    wineWow64Packages.waylandFull
+    wineWow64Packages.stableFull # x11 and wayland drivers; waylandFull has no x11
     winetricks
     bubblewrap
     passt # pasta: the box's network with --net
