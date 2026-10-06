@@ -1,0 +1,27 @@
+/*
+ * emacs-lite: a GTK 3 key theme with just two of the Emacs keys for text
+ * fields. GTK's own Emacs theme binds many more, Ctrl+A included, which
+ * would take select-all away.
+ *
+ * Selected with `gsettings set org.gnome.desktop.interface gtk-key-theme
+ * emacs-lite` (wayland apps, e.g. zen) and gtk-key-theme-name in
+ * gtk-3.0/settings.ini (xwayland apps).
+ */
+
+@binding-set emacs-lite
+{
+  /* end of line, and select to the end of line */
+  bind "<ctrl>e" { "move-cursor" (paragraph-ends, 1, 0) };
+  bind "<shift><ctrl>e" { "move-cursor" (paragraph-ends, 1, 1) };
+
+  /* delete the word before the cursor */
+  bind "<ctrl>w" { "delete-from-cursor" (word-ends, -1) };
+}
+
+entry {
+  -gtk-key-bindings: emacs-lite;
+}
+
+textview {
+  -gtk-key-bindings: emacs-lite;
+}
