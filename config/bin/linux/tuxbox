@@ -259,6 +259,19 @@ add_environment() {
     BWRAP+=(--setenv PULSE_SERVER "unix:$RUNTIME/pulse/native")
   fi
 
+  # Without --gpu, EGL must use mesa's software renderer. glvnd tries the
+  # vendors in name order, and NVIDIA's (10_nvidia) crashes rather than
+  # fails when its devices aren't in the box, taking Xwayland down with it.
+  if [ "$GPU" = 0 ]; then
+    for spec in /run/opengl-driver/share/glvnd/egl_vendor.d/50_mesa.json \
+                /usr/share/glvnd/egl_vendor.d/50_mesa.json; do
+      if [ -f "$spec" ]; then
+        BWRAP+=(--setenv __EGL_VENDOR_LIBRARY_FILENAMES "$spec")
+        break
+      fi
+    done
+  fi
+
   for spec in "${ENV[@]}"; do
     [[ $spec =~ ^[A-Za-z_][A-Za-z0-9_]*= ]] || die "--env takes VAR=VALUE, got: $spec"
     BWRAP+=(--setenv "${spec%%=*}" "${spec#*=}")
