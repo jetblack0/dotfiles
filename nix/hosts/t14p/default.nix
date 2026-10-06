@@ -66,9 +66,8 @@
 
   # logical height: 1920 / scale
   desktop.lockscreenHeight = 960;
-
   desktop.mediaMaxLength = 134;
-
+  desktop.recordingDirectory = "~/assets/media/vids/recording";
   desktop.inputDevices."tpps/2-synaptics-trackpoint".sensitivity = -0.5;
 
   programs.noctalia-greeter.settings.output = {
