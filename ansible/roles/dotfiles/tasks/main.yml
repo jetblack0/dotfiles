@@ -57,6 +57,9 @@
 - name: Install the fcitx5 data
   ansible.builtin.import_tasks: fcitx5.yml
 
+- name: Install the gtk data
+  ansible.builtin.import_tasks: gtk.yml
+
 - name: Install the ssh config
   ansible.builtin.import_tasks: ssh.yml
 
