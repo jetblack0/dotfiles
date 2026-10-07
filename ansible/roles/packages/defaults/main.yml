@@ -116,9 +116,12 @@ packages:
   - { name: qemu-desktop, brew: false }
   - { name: libvirt, brew: false }
   - { name: virt-manager, brew: false }
+  - { name: virt-viewer, brew: false }
   - { name: tigervnc, brew: false }
   - { name: dnsmasq, brew: false }
   - { name: edk2-ovmf, brew: false }
+  - { name: swtpm, brew: false } # emulated tpm 2.0 for windows 11
+  - { name: virtio-win, aur: virtio-win, brew: false } # /var/lib/libvirt/images/virtio-win.iso
   - { name: vagrant, aur: vagrant, brew: false } # cask is a pkg, needs a tty for sudo
 
   # networking
