@@ -74,6 +74,7 @@ in
       docker-compose
       tigervnc
       vagrant
+      virt-viewer
 
       # builds the cloud-init seed for the qemu lab's arch guests; arch gets
       # it with virt-install
