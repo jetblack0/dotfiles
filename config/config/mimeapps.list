@@ -1,0 +1,55 @@
+# Default applications
+# ---------------------------------------------
+# Shared by arch (the dotfiles role copies it) and nixos (home-manager links
+# it). Each type may list several desktop files: the first one installed
+# wins, so zen.desktop (arch) and zen-beta.desktop (nixos) can share a line.
+
+[Default Applications]
+# images
+image/png=swayimg.desktop;
+image/jpeg=swayimg.desktop;
+image/gif=swayimg.desktop;
+image/webp=swayimg.desktop;
+image/bmp=swayimg.desktop;
+image/tiff=swayimg.desktop;
+image/avif=swayimg.desktop;
+image/svg+xml=swayimg.desktop;
+image/jxl=swayimg.desktop;
+image/heif=swayimg.desktop;
+image/heic=swayimg.desktop;
+
+# documents
+application/pdf=org.pwmt.zathura.desktop;
+application/epub+zip=org.pwmt.zathura.desktop;
+image/vnd.djvu=org.pwmt.zathura.desktop;
+image/x-djvu=org.pwmt.zathura.desktop;
+
+# video
+video/mp4=mpv.desktop;
+video/x-matroska=mpv.desktop;
+video/webm=mpv.desktop;
+video/quicktime=mpv.desktop;
+video/x-msvideo=mpv.desktop;
+video/mpeg=mpv.desktop;
+video/ogg=mpv.desktop;
+
+# audio
+audio/mpeg=mpv.desktop;
+audio/flac=mpv.desktop;
+audio/ogg=mpv.desktop;
+audio/opus=mpv.desktop;
+audio/x-wav=mpv.desktop;
+audio/mp4=mpv.desktop;
+audio/aac=mpv.desktop;
+
+# web
+text/html=zen.desktop;zen-beta.desktop;
+application/xhtml+xml=zen.desktop;zen-beta.desktop;
+x-scheme-handler/http=zen.desktop;zen-beta.desktop;
+x-scheme-handler/https=zen.desktop;zen-beta.desktop;
+x-scheme-handler/about=zen.desktop;zen-beta.desktop;
+x-scheme-handler/unknown=zen.desktop;zen-beta.desktop;
+
+# torrents
+application/x-bittorrent=transmission-gtk.desktop;
+x-scheme-handler/magnet=transmission-gtk.desktop;

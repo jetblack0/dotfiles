@@ -1,0 +1,4 @@
+# Default terminal for xdg-terminal-exec, which xdg-open and gtk apps use to
+# start Terminal=true entries (nvim, yazi). One desktop file per line, the
+# first installed one wins.
+kitty.desktop
