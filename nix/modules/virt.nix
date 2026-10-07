@@ -37,8 +37,20 @@ in
     virtualisation.libvirtd = {
       enable = true;
       qemu.runAsRoot = false;
+
+      # emulated TPM 2.0, which windows 11 requires
+      qemu.swtpm.enable = true;
+
+      # virtiofsd, for virtiofs shared folders
+      qemu.vhostUserPackages = [ pkgs.virtiofsd ];
+
+      # resolve a running guest by its libvirt domain name
+      nss.enableGuest = true;
     };
     programs.virt-manager.enable = true;
+
+    # lets virt-manager hand a host usb device to a guest over spice
+    virtualisation.spiceUSBRedirection.enable = true;
 
     # the module hardwires libvirtd into multi-user.target; libvirtd.socket
     # stays, so the first virsh or virt-manager call starts it
