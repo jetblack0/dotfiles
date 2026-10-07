@@ -23,6 +23,16 @@ in
     '';
   };
 
+  options.virt.oemKey = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Copy the firmware's windows licence table (MSDM) to
+      /var/lib/libvirt/oem/MSDM, for a windows guest to activate with.
+      Off by default: the windows vm lives on the data drive, not in the repo.
+    '';
+  };
+
   config = {
     # docker
     # ---------------------------------------------
@@ -61,6 +71,20 @@ in
       uris = [ "qemu:///system" ];
       autoconnect = [ "qemu:///system" ];
     };
+
+
+    # windows guests
+    # ---------------------------------------------
+    # The virtio driver iso, at the path the arch package uses, so a domain
+    # xml can name it on both distros. pkgs.virtio-win is the unpacked iso;
+    # its src is the iso itself
+    systemd.tmpfiles.rules = [
+      "L+ /var/lib/libvirt/images/virtio-win.iso - - - - ${pkgs.virtio-win.src}"
+    ]
+    # The laptop's windows licence lives in the firmware's MSDM acpi table.
+    # Copy it where a guest's <acpi><table type='msdm'> can point at it
+    ++ lib.optional cfg.oemKey
+      "C /var/lib/libvirt/oem/MSDM 0644 root root - /sys/firmware/acpi/tables/MSDM";
 
 
     # users
