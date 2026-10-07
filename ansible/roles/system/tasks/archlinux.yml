@@ -306,6 +306,33 @@
     regexp: '^(hosts:(?!.*\blibvirt_guest\b).*?)\s+(resolve|files)\b'
     replace: '\1 libvirt_guest \2'
 
+# The laptop's windows licence lives in the firmware's MSDM acpi table.
+# Copy it where a guest's <acpi><table type='msdm'> can point at it.
+- name: Hand the windows licence to libvirt guests
+  when: system_libvirt_oem_key | bool
+  block:
+    - name: Check for a windows licence in the firmware
+      ansible.builtin.stat:
+        path: /sys/firmware/acpi/tables/MSDM
+      register: system_msdm
+
+    - name: Ensure the libvirt oem directory exists
+      become: true
+      ansible.builtin.file:
+        path: /var/lib/libvirt/oem
+        state: directory
+        mode: "0755"
+      when: system_msdm.stat.exists
+
+    - name: Copy the windows licence table for libvirt guests
+      become: true
+      ansible.builtin.copy:
+        src: /sys/firmware/acpi/tables/MSDM
+        dest: /var/lib/libvirt/oem/MSDM
+        remote_src: true
+        mode: "0644"
+      when: system_msdm.stat.exists
+
 - name: Join the docker group
   become: true
   ansible.builtin.user:

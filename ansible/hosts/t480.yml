@@ -59,3 +59,6 @@ greeter_output:
 # Miscs
 # ---------------------------------------------
 singbox_dns_override: true
+
+# Hand the laptop's windows licence to the windows vm.
+system_libvirt_oem_key: true
