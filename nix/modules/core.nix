@@ -133,6 +133,13 @@ in
       kitty.terminfo
       ouch
       unrar
+      # Same upstream as arch's 7zip, but nixpkgs names the command
+      # 7zz, so add a 7z link to match arch.
+      _7zz
+      (runCommand "7z" { } ''
+        mkdir -p $out/bin
+        ln -s ${_7zz}/bin/7zz $out/bin/7z
+      '')
       ripgrep
       tmux
       yazi
