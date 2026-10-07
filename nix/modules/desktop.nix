@@ -242,6 +242,17 @@ in
     };
   };
 
+  # fprintd turns on pam_fprintd in every pam stack by default. Keep them all
+  # password-only (logins, sudo, polkit), as on arch; noctalia's lock screen
+  # drives the reader over dbus without pam.
+  options.security.pam.services = lib.mkOption {
+    type = lib.types.attrsOf (
+      lib.types.submodule {
+        config.fprintAuth = lib.mkDefault false;
+      }
+    );
+  };
+
   config = {
     # hyprland
     # ---------------------------------------------
@@ -301,7 +312,7 @@ in
     hardware.bluetooth.enable = true;
     services.upower.enable = true;
     services.power-profiles-daemon.enable = true;
-    services.fprintd.enable = true;
+    services.fprintd.enable = true; # for the lock screen only, see the pam option above
     services.accounts-daemon.enable = true;
 
     # noctalia battery-threshold plugin
