@@ -30,15 +30,12 @@ in
 
       programs.zen-browser = {
         enable = true;
-        setAsDefaultBrowser = true;
 
         # extension installs
         policies = (lib.importJSON (dotfiles + "/zen/policies.json")).policies;
 
         profiles.default = { };
       };
-
-      xdg.mimeApps.enable = true;
 
       home.packages = [
         (pkgs.writeShellScriptBin "zen-browser" ''exec zen-beta "$@"'')

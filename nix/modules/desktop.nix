@@ -332,6 +332,8 @@ in
 
       # terminal & viewers
       kitty
+      # opens Terminal=true apps for xdg-open/gio, from xdg-terminals.list
+      xdg-terminal-exec
       zathura
       cava
       pkgs-unstable.swayimg
@@ -453,22 +455,11 @@ in
             [plugin_settings."noctalia/screen_recorder"]
             directory = "${cfg.recordingDirectory}"
           '' + loginBoxToml + lockClockToml + mediaToml;
-        };
 
-      # swayimg is the default image viewer (arch sets this via mimeapps.list;
-      # here home-manager owns ~/.config/mimeapps.list)
-      xdg.mimeApps = {
-        enable = true;
-        defaultApplications = lib.genAttrs [
-          "image/png"
-          "image/jpeg"
-          "image/gif"
-          "image/webp"
-          "image/bmp"
-          "image/tiff"
-          "image/avif"
-        ] (_: "swayimg.desktop");
-      };
+          # default applications and terminal
+          "mimeapps.list".source = dotfiles + "/config/mimeapps.list";
+          "xdg-terminals.list".source = dotfiles + "/config/xdg-terminals.list";
+        };
 
       # local plugins load from XDG data
       xdg.dataFile."noctalia/plugins" = {
