@@ -291,6 +291,21 @@
     groups: libvirt
     append: true
 
+- name: Start libvirt on demand
+  become: true
+  ansible.builtin.systemd_service:
+    name: libvirtd.socket
+    enabled: true
+    state: started
+
+# Resolve a running guest by its libvirt domain name.
+- name: Look up libvirt guests by name
+  become: true
+  ansible.builtin.replace:
+    path: /etc/nsswitch.conf
+    regexp: '^(hosts:(?!.*\blibvirt_guest\b).*?)\s+(resolve|files)\b'
+    replace: '\1 libvirt_guest \2'
+
 - name: Join the docker group
   become: true
   ansible.builtin.user:
