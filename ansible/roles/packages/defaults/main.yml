@@ -55,7 +55,13 @@ packages:
 
   # documents
   - { name: zathura, tap: homebrew-zathura/zathura }
-  - { name: zathura-pdf-poppler, tap: homebrew-zathura/zathura }
+  # mac keeps poppler; arch takes the same plugins as nixos' zathura
+  # (mupdf for pdf and epub, djvu, ps, comic books)
+  - { name: zathura-pdf-poppler, pacman: false, tap: homebrew-zathura/zathura }
+  - { name: zathura-pdf-mupdf, brew: false }
+  - { name: zathura-djvu, brew: false }
+  - { name: zathura-ps, brew: false }
+  - { name: zathura-cb, brew: false }
   - { name: girara, pacman: false, tap: homebrew-zathura/zathura }
 
   # mail & feeds
@@ -131,6 +137,9 @@ packages:
 
   # desktop
   - { name: hyprland, brew: false }
+  # opens Terminal=true apps (nvim, yazi) for xdg-open and gtk apps; picks
+  # the terminal from ~/.config/xdg-terminals.list
+  - { name: xdg-terminal-exec, brew: false }
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
   - { name: chromium, brew: false }
   - { name: transmission-gtk, cask: transmission }

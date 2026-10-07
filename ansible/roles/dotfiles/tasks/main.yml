@@ -63,20 +63,14 @@
 - name: Install the ssh config
   ansible.builtin.import_tasks: ssh.yml
 
-# swayimg as the default image viewer. The nix side owns mimeapps.list via
-# home-manager's xdg.mimeApps; here we own the same file. Linux only -- macos
-# has its own launch services.
-- name: Set swayimg as the default image viewer
+# Default applications and the default terminal.
+- name: Install the default applications and terminal
   ansible.builtin.copy:
-    dest: "{{ ansible_facts['user_dir'] }}/.config/mimeapps.list"
+    src: "{{ dotfiles_src }}/{{ item }}"
+    dest: "{{ ansible_facts['user_dir'] }}/.config/{{ item }}"
     mode: "0644"
-    content: |
-      [Default Applications]
-      image/png=swayimg.desktop
-      image/jpeg=swayimg.desktop
-      image/gif=swayimg.desktop
-      image/webp=swayimg.desktop
-      image/bmp=swayimg.desktop
-      image/tiff=swayimg.desktop
-      image/avif=swayimg.desktop
+    remote_src: true
+  loop:
+    - mimeapps.list
+    - xdg-terminals.list
   when: ansible_facts['os_family'] != 'Darwin'
