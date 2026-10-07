@@ -4,6 +4,7 @@
 local games = {
 	[[steam_app_\d+]],
 	[[com\.mojang\.minecraft]],
+	[[gamescope]],
 }
 
 for _, class in ipairs(games) do
