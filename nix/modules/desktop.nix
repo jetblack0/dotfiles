@@ -352,6 +352,10 @@ in
 
       chromium
       transmission_4-gtk
+      # remote desktop: the flutter ui, as arch (aur) and the mac (brew)
+      # ship. nixpkgs' plain `rustdesk` is the old sciter ui, which needs the
+      # unfree libsciter
+      pkgs-unstable.rustdesk-flutter
 
       # themes
       adw-gtk3
