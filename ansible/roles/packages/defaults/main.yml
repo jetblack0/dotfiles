@@ -144,6 +144,7 @@ packages:
   - { name: zen-browser, aur: zen-browser-bin, cask: zen }
   - { name: chromium, brew: false }
   - { name: transmission-gtk, cask: transmission }
+  - { name: rustdesk, aur: rustdesk-bin, cask: rustdesk }
   - { name: noctalia, brew: false }
   - { name: swayimg, brew: false }
   - { name: mpv, brew: false }
