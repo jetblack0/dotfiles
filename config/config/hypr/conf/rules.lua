@@ -8,6 +8,14 @@ hl.window_rule({
 	center = true,
 })
 
+-- satty, the screenshot editor
+hl.window_rule({
+	match = { class = [[com\.gabm\.satty]] },
+	float = true,
+	size  = { "monitor_w*0.7", "monitor_h*0.8" },
+	center = true,
+})
+
 hl.window_rule({
 	match = { class = [[zen(-beta)?]], initial_title = "Library" },
 	float = true,

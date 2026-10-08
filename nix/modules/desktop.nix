@@ -364,6 +364,7 @@ in
       grim
       slurp
       still
+      satty # screenshot editor
       hyprpicker
 
       # wl-copy guesses the mime type with xdg-mime, and nixpkgs' xdg-mime

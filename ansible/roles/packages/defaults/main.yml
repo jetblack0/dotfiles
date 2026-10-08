@@ -200,6 +200,7 @@ packages:
   - { name: grim, brew: false }
   - { name: slurp, brew: false }
   - { name: still, aur: still, brew: false }
+  - { name: satty, brew: false } # screenshot editor
   - { name: gpu-screen-recorder, brew: false } # noctalia's screen_recorder plugin
   - { name: tesseract, brew: false }
   - { name: tesseract-data-eng, brew: false }
