@@ -45,6 +45,9 @@
   # Hand the laptop's windows licence to the windows vm.
   virt.oemKey = true;
 
+  # Allow libvirt's qemu user to pass through user home.
+  virt.homeAccess = true;
+
 
   # swap
   # ---------------------------------------------

@@ -33,6 +33,15 @@ in
     '';
   };
 
+  options.virt.homeAccess = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = ''
+      Let libvirt's qemu user pass through the primary user's home (search
+      only, no listing), for vms whose disks live under it. Off by default.
+    '';
+  };
+
   config = {
     # docker
     # ---------------------------------------------
@@ -90,6 +99,15 @@ in
     # users
     # ---------------------------------------------
     users.users.${username}.extraGroups = [ "libvirtd" ] ++ lib.optional cfg.dockerGroup "docker";
+
+    # The home is 0700 and qemu runs as qemu-libvirtd, so it can't reach a
+    # disk under it. An acl grants it search.
+    system.activationScripts.libvirtHomeAccess = lib.mkIf cfg.homeAccess {
+      deps = [ "users" ];
+      text = ''
+        ${pkgs.acl}/bin/setfacl -m u:qemu-libvirtd:x ${lib.escapeShellArg config.users.users.${username}.home}
+      '';
+    };
 
 
     # packages
