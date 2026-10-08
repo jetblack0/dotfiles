@@ -88,6 +88,8 @@ hl.bind("ALT + SHIFT + Z", mac("z", true), d("redo"))
 hl.bind("ALT + X", mac("x"), d("cut"))
 hl.bind("ALT + S", mac("s"), d("save"))
 hl.bind("ALT + F", mac("f"), d("find"))
+hl.bind("ALT + G", mac("g"), d("find next"))
+hl.bind("ALT + SHIFT + G", mac("g", true), d("find previous"))
 hl.bind("ALT + R", mac("r"), d("reload"))
 
 -- window switcher: opens on the held SUPER, Tab advances (Shift+Tab back),
