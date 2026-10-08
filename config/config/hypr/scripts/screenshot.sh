@@ -9,6 +9,9 @@
 #
 # Usage: ./screenshot.sh full     capture all outputs
 #        ./screenshot.sh region   select a region interactively
+#        ./screenshot.sh edit     select a region and open it in satty, which
+#                                 saves to the same directory and copies on
+#                                 its own save and copy buttons
 
 set -eu
 
@@ -39,8 +42,19 @@ case "$mode" in
 		fi
 		mv "$tmp" "$file"
 		;;
+	edit)
+		tmp=$(mktemp --suffix=.png)
+		trap 'rm -f "$tmp"' EXIT
+		if ! "${0%/*}/region-grab.sh" >"$tmp"; then
+			exit 0                           # cancelled selection -> stay silent
+		fi
+		# opens on the blur tool for censoring; satty notifies on save/copy
+		satty --filename "$tmp" --output-filename "$file" \
+			--copy-command wl-copy --initial-tool blur --early-exit
+		exit 0
+		;;
 	*)
-		echo "usage: ${0##*/} full|region" >&2
+		echo "usage: ${0##*/} full|region|edit" >&2
 		exit 2
 		;;
 esac

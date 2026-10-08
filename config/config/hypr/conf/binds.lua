@@ -110,6 +110,7 @@ hl.bind(mainMod .. " + S", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/screensho
 hl.bind(mainMod .. " + SHIFT + S",
 	hl.dsp.exec_cmd("f=$(mktemp) && $HOME/.config/hypr/scripts/region-grab.sh >\"$f\" && wl-copy <\"$f\" && notify-send Screenshot \"Copied to clipboard\"; rm -f \"$f\""),
 	d("copy a region screenshot", nograb))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("$HOME/.config/hypr/scripts/screenshot.sh edit"), d("edit a region screenshot", nograb))
 
 -- wallpapers
 hl.bind(mainMod .. " + minus", hl.dsp.exec_cmd("noctalia msg wallpaper-random"), d("random wallpaper", nograb))
@@ -168,10 +169,10 @@ if layout.binds then
 	layout.binds({ mod = mainMod, nograb = nograb, d = d })
 end
 
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.group.toggle(), d("toggle grouping", nograb))
--- group cycling gave its keys to the window switcher; parked, not deleted
--- hl.bind(mainMod .. " + Tab", hl.dsp.group.next())
--- hl.bind(mainMod .. " + SHIFT + Tab", hl.dsp.group.prev())
+hl.bind(mainMod .. " + G", hl.dsp.group.toggle(), d("toggle grouping", nograb))
+-- cycle the group's windows
+hl.bind(mainMod .. " + bracketright", hl.dsp.group.next(), d("next window in the group", nograb))
+hl.bind(mainMod .. " + bracketleft", hl.dsp.group.prev(), d("previous window in the group", nograb))
 
 local notify_tag = "$HOME/.config/hypr/scripts/notify-tag.sh"
 local function submode(name, hint)
