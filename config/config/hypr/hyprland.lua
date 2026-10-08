@@ -1,6 +1,7 @@
 require("conf.env")
 require("conf.monitors")
 require("conf.options")
+require("conf.permissions")
 require("conf.devices")
 require("conf.gestures")
 require("conf.animation")
