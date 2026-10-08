@@ -9,9 +9,11 @@
 #
 # Options go before the box name; everything after it goes to wine. The
 # options are tuxbox's (--net, --audio, --gpu, --share, --env, --dev,
-# --display; see tuxbox --help) plus one:
+# --display; see tuxbox --help) plus two:
 #
 #   --exec       run the arguments in the box instead of wine
+#   --no-dpi     leave a new box at wine's 96 dpi instead of the host's
+#                Xft.dpi
 #
 # Examples:
 #   winebox --share ~/Downloads/installers:/installers:ro work /installers/setup.exe
@@ -24,6 +26,7 @@ OPTS=()                 # tuxbox's options, passed through
 DISPLAY_MODE=wayland
 X11_GEOMETRY=1280x800   # tuxbox's private X server size; the wine desktop matches
 PROG=(wine)
+DPI=1                   # new boxes take the host's Xft.dpi (--no-dpi: off)
 BOX=""
 ARGS=()
 
@@ -43,6 +46,7 @@ parse_args() {
                   [ $# -ge 2 ] || die "$1 needs a value"
                   OPTS+=("$1" "$2"); shift 2 ;;
       --exec)     PROG=(); shift ;;
+      --no-dpi)   DPI=0; shift ;;
       -h|--help)  usage; exit 0 ;;
       --*)        OPTS+=("$1"); shift ;;
       *)          break ;;
@@ -59,6 +63,25 @@ require_tools() {
   if [ ${#PROG[@]} -gt 0 ]; then
     command -v wine >/dev/null || die "wine not found"
   fi
+}
+
+# The host's Xft.dpi. Empty when the session sets none or no X is around.
+host_dpi() {
+  [ -n "${DISPLAY:-}" ] && command -v xrdb >/dev/null || return 0
+  xrdb -query 2>/dev/null | awk '$1 == "Xft.dpi:" { print $2; exit }'
+}
+
+# A new box gets the host's Xft.dpi value once, before its first program.
+# wineserver -w waits until wine has written the registry to disk.
+set_dpi_once() {
+  local dpi
+  [ "$DPI" = 1 ] && [ ${#PROG[@]} -gt 0 ] || return 0
+  [ -d "$TUXBOX_HOME/$BOX/home/.wine" ] && return 0   # not a new box
+  dpi=$(host_dpi)
+  [[ $dpi =~ ^[0-9]+$ ]] && [ "$dpi" != 96 ] || return 0
+  tuxbox "${OPTS[@]}" "${WINE_ENV[@]}" "$BOX" sh -c \
+    "wineboot -i && wine reg add 'HKCU\\Control Panel\\Desktop' \
+       /v LogPixels /t REG_DWORD /d $dpi /f && wineserver -w"
 }
 
 main() {
@@ -79,12 +102,14 @@ main() {
   # plain wine runs 64- and 32-bit programs. NixOS's wine is a wrapper script
   # winetricks can't inspect, so it would guess a wine64 that doesn't exist.
   export TUXBOX_HOME=${WINEBOX_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/winebox}
-  exec tuxbox "${OPTS[@]}" \
-    --env "WINEPREFIX=$HOME/.wine" \
-    --env "WINEDEBUG=${WINEDEBUG:--all}" \
-    --env "WINEDLLOVERRIDES=${WINEDLLOVERRIDES:-}" \
-    --env "WINE64=wine" \
-    "$BOX" "${PROG[@]}" "${ARGS[@]}"
+  WINE_ENV=(
+    --env "WINEPREFIX=$HOME/.wine"
+    --env "WINEDEBUG=${WINEDEBUG:--all}"
+    --env "WINEDLLOVERRIDES=${WINEDLLOVERRIDES:-}"
+    --env "WINE64=wine"
+  )
+  set_dpi_once
+  exec tuxbox "${OPTS[@]}" "${WINE_ENV[@]}" "$BOX" "${PROG[@]}" "${ARGS[@]}"
 }
 
 main "$@"
