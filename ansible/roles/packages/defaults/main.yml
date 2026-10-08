@@ -21,7 +21,8 @@ packages:
   - { name: kitty, cask: kitty }
   - { name: kitty-terminfo, brew: false }
   - { name: ouch }
-  - { name: unrar, cask: rar }
+  # homebrew disabled the rar cask on 2026-09-01 (fails gatekeeper)
+  - { name: unrar, brew: false }
   - { name: 7zip, brew: false }
   - { name: ripgrep }
   - { name: tmux }
