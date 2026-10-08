@@ -42,6 +42,9 @@
   # ---------------------------------------------
   virt.dockerGroup = true;
 
+  # Hand the laptop's windows licence to the windows vm.
+  virt.oemKey = true;
+
 
   # swap
   # ---------------------------------------------
