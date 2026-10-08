@@ -444,6 +444,7 @@ in
             "hypr"
             "kitty"
             "noctalia"
+            "qt6ct"
             "swayimg"
             "uwsm"
             "zathura"
