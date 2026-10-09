@@ -153,6 +153,18 @@ hl.bind(mainMod .. " + End", hl.dsp.exec_cmd("noctalia msg volume-up"), d("volum
 hl.bind(mainMod .. " + Delete", hl.dsp.exec_cmd("noctalia msg volume-down"), d("volume down", nograb))
 hl.bind(mainMod .. " + Home", hl.dsp.exec_cmd("noctalia msg volume-mute"), d("mute", nograb))
 
+-- media playback, whatever is playing (mpris), focused or not
+hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("noctalia msg media toggle"), d("play or pause", { locked = true, dont_inhibit = true }))
+hl.bind("XF86AudioPause", hl.dsp.exec_cmd("noctalia msg media toggle"), d("play or pause", { locked = true, dont_inhibit = true }))
+hl.bind("XF86AudioNext", hl.dsp.exec_cmd("noctalia msg media next"), d("next track", { locked = true, dont_inhibit = true }))
+hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("noctalia msg media previous"), d("previous track", { locked = true, dont_inhibit = true }))
+hl.bind("XF86AudioStop", hl.dsp.exec_cmd("noctalia msg media stop"), d("stop playback", { locked = true, dont_inhibit = true }))
+
+-- dedicated lock and search keys. The lock key (XF86ScreenSaver) never
+-- matches by name, so it binds by keycode: KEY_SCREENLOCK 152 + 8.
+hl.bind("code:160", hl.dsp.exec_cmd("noctalia msg session lock"), d("lock the session", nograb))
+hl.bind("XF86Search", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), d("launcher", nograb))
+
 
 -- Layout
 -----------------------------------------------
