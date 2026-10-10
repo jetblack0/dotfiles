@@ -175,6 +175,7 @@ in
       gawk
       man-pages
       rsync
+      sshfs
       unzip
 
       # nvim toolchain
