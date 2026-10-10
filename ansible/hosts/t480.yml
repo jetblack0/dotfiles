@@ -54,6 +54,9 @@ greeter_output:
 #   logitech-g-pro--1:
 #     sensitivity: 0
 #     accel_profile: adaptive
+input_devices:
+  logitech-g-pro--1:
+    sensitivity: -1.0
 
 
 # Miscs
