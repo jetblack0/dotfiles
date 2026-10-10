@@ -61,6 +61,7 @@ keymap = [
 	{ on = [ "d" ], run = "yank --cut", desc = "cut the selected files" },
 	{ on = [ "c" ], run = "unyank",     desc = "cancel the yank status of files" },
 	{ on = [ "p" ], run = "paste",      desc = "paste the files" },
+	{ on = [ "P" ], run = "plugin rsync-paste", desc = "paste the files with rsync, skipping unchanged ones" },
 
 	{ on = [ "D" ], run = "remove", desc = "move the files to the trash" },
 
