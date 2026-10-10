@@ -24,7 +24,9 @@ return {
 			return notify("nothing yanked", "warn")
 		end
 
-		local args = { "--archive", "--human-readable", "--info=progress2" }
+		-- --omit-link-times: over sshfs, setting a symlink's time follows the
+		-- link, so a link whose target doesn't exist there fails the whole run
+		local args = { "--archive", "--omit-link-times", "--human-readable", "--info=progress2" }
 		if cut then
 			args[#args + 1] = "--remove-source-files"
 		end
