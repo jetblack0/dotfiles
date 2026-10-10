@@ -325,6 +325,22 @@ images() {
 	find . -regextype awk -iregex ".*png|.*jpeg|.*jpg|.*gif|.*webp" -print0 | xargs -0 eza -1 --color=never --reverse --sort=time | swayimg -f /dev/stdin -e 'swayimg.imagelist.order = "none"'
 }
 
+# Mount a host's home, or one of its directories, at ~/mnt/<host> over sshfs.
+mnt() {
+	[ -z "$1" ] && echo "usage: mnt <host> [remote-dir]" && return 1
+	local dir="$HOME/mnt/${1#*@}"
+	mkdir -p "$dir" || return 1
+	sshfs "$1:${2:-}" "$dir" -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 &&
+		echo "mounted $1:${2:-~} at $dir"
+}
+
+# Unmount what mnt mounted, and drop the then-empty mount point.
+unmnt() {
+	[ -z "$1" ] && echo "usage: unmnt <host>" && return 1
+	local dir="$HOME/mnt/${1#*@}"
+	fusermount3 -u "$dir" && rmdir "$dir" && echo "unmounted $dir"
+}
+
 
 # Private config, late
 # ---------------------------------------------
