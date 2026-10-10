@@ -79,6 +79,7 @@
     sensitivity = -0.15;
     scroll_factor = 0.2;
   };
+  desktop.inputDevices."logitech-g-pro--1".sensitivity = -1.0;
 
   programs.noctalia-greeter.settings.output = {
     width = 3072;
