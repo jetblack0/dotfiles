@@ -24,6 +24,7 @@ packages:
   # homebrew disabled the rar cask on 2026-09-01 (fails gatekeeper)
   - { name: unrar, brew: false }
   - { name: 7zip, brew: false }
+  - { name: sshfs, brew: false }
   - { name: ripgrep }
   - { name: tmux }
   - { name: yazi }
