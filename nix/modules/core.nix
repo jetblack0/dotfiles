@@ -153,6 +153,7 @@ in
       # git & code
       git
       delta
+      gh
       lazygit
       tokei
 
