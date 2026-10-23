@@ -103,6 +103,25 @@
   boot.kernelParams = [
     "xe.enable_psr=0"
     "xe.enable_panel_replay=0"
+
+    # FRED is the new way Panther Lake CPUs hand faults to the kernel. Before
+    # Linux 7.2.8 it reports the wrong error code and instruction address
+    # when a program runs a rejected INT instruction. Wine relies on that
+    # for INT 0x2d, so Elden Ring (and some other Windows games) crash a
+    # minute or two after launch. Turning FRED off brings back the old
+    # mechanism. Games and graphics run the same; heavy disk, network and
+    # database work is somewhat slower (Phoronix, "FRED Benchmarks On
+    # Panther Lake").
+    #
+    # Remove this once the flake runs zen 7.2.8 or newer. nixos-26.05
+    # already ships zen 7.2.9, but updating is blocked by:
+    #   - the NVIDIA 595.71.05 open module not building on 7.2 (strncpy),
+    #     nixpkgs issue #554125. The fixed 595.104.02 is on master only, so
+    #     pin it with mkDriver in nvidia.nix until 26.05 catches up.
+    #   - tela-circle-icon-theme 2026-07-07 failing its broken-symlink check,
+    #     nixpkgs issue #571849. Wait for the backport PR #571518 to merge
+    #     into release-26.05.
+    "fred=off"
   ];
 
 

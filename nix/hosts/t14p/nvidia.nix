@@ -5,8 +5,6 @@
 # - modesetting: on by default for driver 535 and newer.
 # - driver branch: `stable`, which is 595.71.05 on nixos-26.05. RTX 50 cards
 #   need 570.86 or newer.
-# - dynamic boost (nvidia-powerd): off. Turn on with
-#   `hardware.nvidia.dynamicBoost.enable = true` if the laptop supports it.
 { ... }:
 
 {
@@ -22,6 +20,9 @@
     # while nothing uses it.
     powerManagement.enable = true;
     powerManagement.finegrained = true;
+
+    # Shift unused cpu power to the gpu (nvidia-powerd).
+    dynamicBoost.enable = true;
 
     prime = {
       offload.enable = true;
