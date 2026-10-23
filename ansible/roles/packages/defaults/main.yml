@@ -48,6 +48,7 @@ packages:
   # git & code
   - { name: git }
   - { name: git-delta }
+  - { name: github-cli, brew: gh }
   - { name: lazygit }
   - { name: tokei }
 
