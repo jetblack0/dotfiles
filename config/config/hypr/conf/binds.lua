@@ -169,6 +169,7 @@ hl.bind("XF86Search", hl.dsp.exec_cmd("noctalia msg panel-toggle launcher"), d("
 -- Layout
 -----------------------------------------------
 hl.bind(mainMod .. " + Q", hl.dsp.window.close(), d("close the window", nograb))
+hl.bind("ALT + Q", hl.dsp.window.close(), d("close the window", nograb))
 hl.bind(mainMod .. " + slash", hl.dsp.window.float(), d("toggle floating", nograb))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen(), d("fullscreen", nograb))
 hl.bind(mainMod .. " + O", hl.dsp.window.pin(), d("pin the window", nograb))
@@ -252,4 +253,3 @@ hl.bind(mainMod .. " + SHIFT + O", hl.dsp.window.move({ monitor = "+1", follow =
 -- Programs
 -----------------------------------------------
 hl.bind(mainMod .. " + Return", hl.dsp.exec_cmd("kitty"), d("terminal"))
-hl.bind(mainMod .. " + semicolon", hl.dsp.exec_cmd("zen-browser"), d("browser", nograb))
