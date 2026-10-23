@@ -167,6 +167,7 @@ in
       newsboat
 
       # secrets
+      age
       pass
 
       # basics other distros ship and nixos does not

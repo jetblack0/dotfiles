@@ -73,6 +73,7 @@ packages:
   - { name: newsboat }
 
   # secrets
+  - { name: age }
   - { name: pass }
 
   # basics macOS already ships
