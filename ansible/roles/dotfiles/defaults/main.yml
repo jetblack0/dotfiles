@@ -40,6 +40,7 @@ dotfiles_mask:
     - gtk-4.0
     - hypr
     - Kvantum
+    - mpv
     - noctalia
     - nsxiv
     - qt5ct
