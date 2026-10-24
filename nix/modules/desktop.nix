@@ -448,6 +448,7 @@ in
             "gtk-4.0"
             "hypr"
             "kitty"
+            "mpv"
             "noctalia"
             "qt6ct"
             "swayimg"
