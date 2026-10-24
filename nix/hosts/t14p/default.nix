@@ -113,15 +113,8 @@
     # database work is somewhat slower (Phoronix, "FRED Benchmarks On
     # Panther Lake").
     #
-    # Remove this once the flake runs zen 7.2.8 or newer. nixos-26.05
-    # already ships zen 7.2.9, but updating is blocked by:
-    #   - the NVIDIA 595.71.05 open module not building on 7.2 (strncpy),
-    #     nixpkgs issue #554125. The fixed 595.104.02 is on master only, so
-    #     pin it with mkDriver in nvidia.nix until 26.05 catches up.
-    #   - tela-circle-icon-theme 2026-07-07 failing its broken-symlink check,
-    #     nixpkgs issue #571849. Wait for the backport PR #571518 to merge
-    #     into release-26.05.
-    "fred=off"
+    # Solved in the current kernel: zen 7.2.11 has the fix.
+    # "fred=off"
   ];
 
 
