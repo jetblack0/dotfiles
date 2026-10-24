@@ -24,6 +24,9 @@ user_pref("privacy.clearOnShutdown_v2.cache", false);
 // button keeps Alt+N and swallows the new tab shortcut until a restart.
 user_pref("ui.key.chromeAccess", 0);
 
+// No password popup.
+user_pref("signon.rememberSignons", false);
+
 // No shortcut tiles in the new tab popup.
 user_pref("browser.newtabpage.activity-stream.feeds.system.topsites", false);
 
