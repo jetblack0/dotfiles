@@ -201,7 +201,10 @@ source = "wallpaper"
 
     [theme.templates]
     builtin_ids = [ "btop", "cava", "gtk3", "gtk4", "hyprland", "kcolorscheme", "qt" ]
-    community_ids = [ "prismlauncher", "zen-browser" ]
+    # needs a one-time manual step per machine: in chromium, open
+	# chrome://extensions, turn on Developer mode, and use "Load unpacked" on
+	# ~/.cache/noctalia/ungoogled-chromium/theme.
+    community_ids = [ "prismlauncher", "ungoogled-chromium", "zen-browser" ]
 
     # fcitx5 theme, our copy of the community template (templates/fcitx5).
     # The hook reloads fcitx5's candidate window so new colors show at once.
