@@ -46,11 +46,7 @@ hl.config({
 
 	misc = {
 		disable_hyprland_logo = true,
-		-- VRR off. On Panther Lake (the t14p) switching VRR on for a
-		-- fullscreen game floods the xe driver with "DSB 0 poll error"
-		-- and the screen flickers, e.g. Elden Ring under gamescope.
-		-- Fixed in Linux 7.3.
-		vrr = 0,
+		vrr = 3,
 		disable_autoreload = false,
 		mouse_move_enables_dpms = true,
 		key_press_enables_dpms  = true,
