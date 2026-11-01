@@ -131,8 +131,16 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"mrjones2014/smart-splits.nvim",
+		"smart-splits-nvim/smart-splits.nvim",
+    version = "^3.0.0",
     priority = 1000,
+    dependencies = {
+      {
+        "smart-splits-nvim/backend-tmux",
+        main = "smart-splits-backend-tmux",
+        opts = { disable_nav_when_zoomed = false },
+      },
+    },
     enabled = function()
       return os.getenv("TMUX_PANE") ~= nil
     end,

@@ -2,8 +2,7 @@ local helpers = require("utils.helpers")
 local smart_splits = helpers.safe_require("smart-splits")
 
 smart_splits.setup({
-  disable_multiplexer_nav_when_zoomed = false,
-  multiplexer_integration = os.getenv("SMART_SPLITS_DISABLE") == "1" and false or nil,
+  mux = { backend = os.getenv("SMART_SPLITS_DISABLE") ~= "1" and "smart-splits-backend-tmux" or nil },
 })
 
 -- vim.keymap.set({ 'n', 't' }, '<a-1>', smart_splits.resize_left)
