@@ -338,16 +338,17 @@ in
           };
         };
 
-      # Seed nvim's writable files from the repo once
-      home.activation.nvimWritableFiles = lib.hm.dag.entryAfter [ "linkGeneration" ] (
-        lib.concatMapStrings (f: ''
-          t="$HOME/.config/nvim/${f}"
-          if [ ! -e "$t" ] || [ -L "$t" ]; then
-            run rm -f "$t"
-            run install -Dm644 ${nvimDir + "/${f}"} "$t"
-          fi
-        '') nvimWritable
-      );
+      # Seed the cheatsheet once; reset the lockfile on every switch so the
+      # plugin pins always match the repo
+      home.activation.nvimWritableFiles = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+        t="$HOME/.config/nvim/cheatsheet.json"
+        if [ ! -e "$t" ] || [ -L "$t" ]; then
+          run rm -f "$t"
+          run install -Dm644 ${nvimDir + "/cheatsheet.json"} "$t"
+        fi
+        run rm -f "$HOME/.config/nvim/lazy-lock.json"
+        run install -Dm644 ${nvimDir + "/lazy-lock.json"} "$HOME/.config/nvim/lazy-lock.json"
+      '';
 
       home.file =
         binScripts ""
