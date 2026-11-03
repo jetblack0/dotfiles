@@ -242,6 +242,8 @@ packages:
   - { name: ventoy, aur: ventoy-bin, brew: false } # the source pkg is x86_64 only
   - { name: xdg-ninja, aur: xdg-ninja }
   - { name: android-tools, brew: false }
+  - { name: android-file-transfer, brew: false } # aft-mtp-mount: phone storage over usb
+  - { name: libmtp, brew: false } # its udev rules let the user open mtp phones
 
 # Entries to skip by canonical name, e.g. on a distro that lacks them.
 # ---------------------------------------------
