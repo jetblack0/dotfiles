@@ -227,7 +227,12 @@ in
       ventoy
       xdg-ninja
       android-tools
+      android-file-transfer # aft-mtp-mount
     ];
+
+    # libmtp's udev rules mark mtp phones as media players, which systemd
+    # opens to the logged-in user
+    services.udev.packages = [ pkgs.libmtp.out ];
 
     # additive across modules: each declares the unfree names it pulls in
     nixpkgs.config.allowUnfreePackages = [
