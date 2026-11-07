@@ -330,15 +330,30 @@ mnt() {
 	[ -z "$1" ] && echo "usage: mnt <host> [remote-dir]" && return 1
 	local dir="$HOME/mnt/${1#*@}"
 	mkdir -p "$dir" || return 1
-	sshfs "$1:${2:-}" "$dir" -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3 &&
+	sshfs "$1:${2:-}" "$dir" -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=3,ConnectTimeout=5 &&
 		echo "mounted $1:${2:-~} at $dir"
 }
 
 # Unmount what mnt mounted, and drop the then-empty mount point.
 unmnt() {
-	[ -z "$1" ] && echo "usage: unmnt <host>" && return 1
+	local force=0
+	[ "$1" = -f ] && force=1 && shift
+	[ -z "$1" ] && echo "usage: unmnt [-f] <host>" && return 1
 	local dir="$HOME/mnt/${1#*@}"
-	fusermount3 -u "$dir" && rmdir "$dir" && echo "unmounted $dir"
+	if (( force )); then
+		grep -q " $dir " /proc/mounts || { echo "not mounted: $dir"; return 1; }
+		local pid
+		for pid in $(pgrep -x sshfs); do
+			[[ "$(tr '\0' ' ' < /proc/$pid/cmdline)" == *" $dir "* ]] && kill "$pid"
+		done
+		sleep 1
+		fusermount3 -uz "$dir" 2>/dev/null
+		rmdir "$dir" 2>/dev/null
+		grep -q " $dir " /proc/mounts && echo "still mounted: $dir" && return 1
+		echo "force-unmounted $dir"
+	else
+		fusermount3 -u "$dir" && rmdir "$dir" && echo "unmounted $dir"
+	fi
 }
 
 
