@@ -133,6 +133,7 @@
   # time
   # ---------------------------------------------
   time.timeZone = "Asia/Shanghai";
+  networking.timeServers = [ "ntp.aliyun.com" "ntp.tencent.com" "ntp.ntsc.ac.cn" ];
 
   system.stateVersion = "26.05";
 }
