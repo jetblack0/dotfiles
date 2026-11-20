@@ -14,3 +14,26 @@
     remote_src: true
     # a hand-written config on a fresh machine is kept beside it
     backup: true
+
+# One ssh-agent per login, shared by every shell and tmux window: openssh
+# ships the user units. macOS has its own agent.
+- name: Run the ssh agent for the whole login
+  when: ansible_facts['os_family'] == 'Archlinux'
+  block:
+    - name: Enable openssh's agent socket
+      ansible.builtin.systemd_service:
+        name: ssh-agent.socket
+        scope: user
+        enabled: true
+        state: started
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ ansible_facts['user_uid'] }}"
+
+    # Not in the shared environment.d: nixos' agent socket has another name
+    - name: Point the session at the agent
+      ansible.builtin.copy:
+        dest: "{{ dotfiles_dest }}/environment.d/40-ssh-agent.conf"
+        mode: "0644"
+        content: |
+          # ssh-agent.socket, enabled by the ansible dotfiles role
+          SSH_AUTH_SOCK=${XDG_RUNTIME_DIR}/ssh-agent.socket
