@@ -255,6 +255,9 @@ in
 
     # ssh
     # ---------------------------------------------
+    # One ssh-agent per login (user service).
+    programs.ssh.startAgent = true;
+
     # Provisioned, not running: sshd_config and the host keys exist so a
     # `systemctl start sshd` is all it takes to reach a desktop from another
     # machine. Hosts that want it at boot set core.sshAutostart.
