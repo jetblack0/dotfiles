@@ -353,6 +353,8 @@ in
       chromium
       transmission_4-gtk
       localsend
+      # work chat; huddles need the desktop app, not the web one
+      slack
       # remote desktop: the flutter ui, as arch (aur) and the mac (brew)
       # ship. nixpkgs' plain `rustdesk` is the old sciter ui, which needs the
       # unfree libsciter.
@@ -404,6 +406,7 @@ in
     nixpkgs.config.allowUnfreePackages = [
       "apple-color-emoji"
       "apple-fonts-sf-pro"
+      "slack"
     ];
 
     fonts.fontconfig.defaultFonts = {
