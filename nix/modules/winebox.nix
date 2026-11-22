@@ -11,6 +11,7 @@
     winetricks
     bubblewrap
     passt # pasta: the box's network with --net
+    xdg-dbus-proxy # the box's filtered session bus with --ime
     appimage-run # AppImages in a tuxbox
     (callPackage ../packages/wl-sandbox.nix { })
   ];
