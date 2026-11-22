@@ -26,3 +26,12 @@ hl.permission({
 	type = "screencopy",
 	mode = "allow",
 })
+
+-- noctalia: the lock animation (lockscreen.transition) starts from a frame
+-- of the desktop.
+-- /usr/bin/noctalia on Arch, .../bin/.noctalia-wrapped on NixOS.
+hl.permission({
+	binary = [[(/usr|/nix/store/[^/]+)/bin/\.?noctalia(-wrapped)?]],
+	type = "screencopy",
+	mode = "allow",
+})
