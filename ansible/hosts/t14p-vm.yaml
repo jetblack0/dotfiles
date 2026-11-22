@@ -35,3 +35,12 @@ greeter_env:
   WLR_NO_HARDWARE_CURSORS: 1
 
 greeter_autologin_user: dev
+
+
+# Time
+# ---------------------------------------------
+# the t14p's servers: the guest's traffic goes through its sing-box tun.
+system_time_servers:
+  - ntp.aliyun.com
+  - ntp.tencent.com
+  - ntp.ntsc.ac.cn

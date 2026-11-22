@@ -100,6 +100,49 @@
     dest: /etc/systemd/journald.conf.d/size.conf
     mode: "0644"
 
+# Time
+# ---------------------------------------------
+- name: Ensure the timesyncd drop-in directory exists
+  become: true
+  ansible.builtin.file:
+    path: /etc/systemd/timesyncd.conf.d
+    state: directory
+    mode: "0755"
+  when: system_time_servers | length > 0
+
+- name: Point timesyncd at the host's time servers
+  become: true
+  ansible.builtin.copy:
+    content: |
+      [Time]
+      NTP={{ system_time_servers | join(' ') }}
+    dest: /etc/systemd/timesyncd.conf.d/servers.conf
+    mode: "0644"
+  when: system_time_servers | length > 0
+  register: system_timesyncd_conf
+
+- name: Hand timesyncd back to the default pool
+  become: true
+  ansible.builtin.file:
+    path: /etc/systemd/timesyncd.conf.d/servers.conf
+    state: absent
+  when: system_time_servers | length == 0
+  register: system_timesyncd_removed
+
+- name: Check whether timesyncd is running
+  ansible.builtin.systemd_service:
+    name: systemd-timesyncd.service
+  register: system_timesyncd
+
+- name: Restart timesyncd on the new servers
+  become: true
+  ansible.builtin.systemd_service:
+    name: systemd-timesyncd.service
+    state: restarted
+  when:
+    - system_timesyncd_conf is changed or system_timesyncd_removed is changed
+    - system_timesyncd.status.ActiveState == 'active'
+
 # The battery-threshold Noctalia plugin writes charge_control_end_threshold
 # directly without sudo.  
 - name: Create the battery_ctl group

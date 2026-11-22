@@ -63,5 +63,10 @@ input_devices:
 # ---------------------------------------------
 singbox_dns_override: true
 
+system_time_servers:
+  - ntp.aliyun.com
+  - ntp.tencent.com
+  - ntp.ntsc.ac.cn
+
 # Hand the laptop's windows licence to the windows vm.
 system_libvirt_oem_key: true
