@@ -34,7 +34,7 @@ order = [ "main" ]
     radius_top_left = 10
     radius_top_right = 10
     scale = 1.25
-    start = [ "launcher", "workspaces", "title", "media" ]
+    start = [ "launcher", "workspaces", "hidden", "title", "media" ]
     thickness = 32
     widget_spacing = 15
 
@@ -138,7 +138,7 @@ temperature_night = 5000
     keyboard_layout = false
 
 [plugins]
-enabled = [ "damian-ds7/battery-threshold", "jetblack0/quick", "jetblack0/server", "jetblack0/title", "noctalia/screen_recorder" ]
+enabled = [ "damian-ds7/battery-threshold", "jetblack0/hidden", "jetblack0/quick", "jetblack0/server", "jetblack0/title", "noctalia/screen_recorder" ]
 
 [plugin_settings."noctalia/screen_recorder"]
 hide_inactive = true
@@ -235,6 +235,9 @@ type = "damian-ds7/battery-threshold:battery-threshold"
 [widget.control-center]
 glyph = "adjustments-horizontal"
 type = "control-center"
+
+[widget.hidden]
+type = "jetblack0/hidden:indicator"
 
 [widget.launcher]
 enabled = true

@@ -1,0 +1,15 @@
+# Hidden windows
+# ---------------------------------------------
+# Which workspaces have windows hidden with Super+M (hypr/conf/workspaces.lua).
+# Sits next to the workspaces; shown only while something is hidden.
+
+id = "jetblack0/hidden"
+name = "Hidden windows"
+version = "1.0.0"
+plugin_api = 26
+description = "Workspaces with hidden windows, next to the workspaces"
+icon = "eye-off"
+
+[[widget]]
+id = "indicator"
+entry = "widget.luau"
