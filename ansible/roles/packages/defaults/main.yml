@@ -236,6 +236,7 @@ packages:
   - { name: winetricks, brew: false }
   - { name: bubblewrap, brew: false }
   - { name: passt, brew: false } # pasta: the box's network with --net
+  - { name: xdg-dbus-proxy, brew: false } # the box's filtered session bus with --ime
   - { name: gcc, brew: false }
   - { name: pkgconf, brew: false }
   - { name: wayland-protocols, brew: false }
