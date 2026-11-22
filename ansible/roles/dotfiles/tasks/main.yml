@@ -36,6 +36,11 @@
     quiet: true
   when: dotfiles_assert_ownership | bool
 
+# Plugins before their config: a running noctalia reloads as soon as
+# config.toml lands, and drops a widget whose plugin isn't there yet.
+- name: Install the noctalia plugins
+  ansible.builtin.import_tasks: noctalia-plugins.yml
+
 - name: Sync each managed directory
   ansible.builtin.include_tasks: sync.yml
   loop: >-
