@@ -109,6 +109,9 @@ auto_locate = true
 # ---------------------------------------------
 [lockscreen]
 blur_intensity = 0.099999994039535522
+# Off: the t14p's Synaptics reader (06cb:00f9) can hang fprintd when a scan
+# is stopped, and noctalia waits 25 s for it before checking the password.
+fingerprint = false
 
 
 # Lock screen widgets
