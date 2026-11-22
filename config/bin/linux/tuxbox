@@ -5,7 +5,7 @@
 # program's fake $HOME: all it can write. winebox builds on this.
 #
 # Usage:
-#   tuxbox [--net] [--audio] [--gpu] [--share SRC:DEST[:ro]]... [--env VAR=VALUE]...
+#   tuxbox [--net] [--audio] [--gpu] [--ime] [--share SRC:DEST[:ro]]... [--env VAR=VALUE]...
 #          [--dev PATH]... [--display MODE] <box> <program> [args...]
 #
 # Options go before the box name; everything after the program goes to it.
@@ -13,6 +13,10 @@
 #   --net        internet access (off by default)
 #   --audio      the pulse socket: speakers AND microphone
 #   --gpu        the gpu device nodes (without it, mesa renders in software)
+#   --ime        the input method (fcitx5) over D-Bus, for Qt programs that
+#                can't type through wayland (WeChat): a session bus on which
+#                only fcitx answers. Recent Qt programs type without it and
+#                lose their input with it
 #   --share SRC:DEST[:ro]
 #                bind the file or directory SRC at DEST inside the box,
 #                read-write unless :ro. DEST is absolute. Paths can't
@@ -45,6 +49,7 @@ set -euo pipefail
 NET=0
 AUDIO=0
 GPU=0
+IME=0
 SHARE=()
 ENV=()
 DEV=()
@@ -57,6 +62,7 @@ ENTRY=()         # the command line inside the box, from build_entry
 ROOT=""          # the box's directory
 RUNTIME=""       # $XDG_RUNTIME_DIR, recreated inside the box
 SOCK=""          # the sandboxed wayland socket
+BUS=""           # the filtered session bus (--ime)
 BWRAP=()         # bwrap's arguments, built up step by step
 RUN=()           # the final command line
 
@@ -87,6 +93,7 @@ parse_args() {
       --net)     NET=1; shift ;;
       --audio)   AUDIO=1; shift ;;
       --gpu)     GPU=1; shift ;;
+      --ime)     IME=1; shift ;;
       --share)   [ $# -ge 2 ] || die "--share needs SRC:DEST[:ro]"
                  SHARE+=("$2"); shift 2 ;;
       --env)     [ $# -ge 2 ] || die "--env needs VAR=VALUE"
@@ -121,6 +128,10 @@ require_tools() {
   if [ "$NET" = 1 ]; then
     command -v pasta    >/dev/null || die "pasta not found (passt)"
   fi
+  if [ "$IME" = 1 ]; then
+    command -v xdg-dbus-proxy >/dev/null || die "xdg-dbus-proxy not found"
+    [ -n "${DBUS_SESSION_BUS_ADDRESS:-}" ] || die "DBUS_SESSION_BUS_ADDRESS is unset: --ime needs the session bus"
+  fi
   if [ "$DISPLAY_MODE" = private-x11 ]; then
     command -v Xwayland >/dev/null || die "Xwayland not found (xorg-xwayland)"
   fi
@@ -144,7 +155,7 @@ open_wayland_socket() {
   local ready=""
   SOCK=$RUNTIME/tuxbox-$BOX-$$.sock
   coproc WL { exec wl-sandbox "$SOCK" "tuxbox.$BOX"; }
-  trap close_wayland_socket EXIT
+  trap cleanup EXIT
   read -r ready <&"${WL[0]}" || true
   [ "$ready" = ready ] || die "no sandboxed wayland socket (see wl-sandbox's error above)"
 }
@@ -155,6 +166,31 @@ close_wayland_socket() {
     eval "exec ${WL[1]}>&-"
     wait "$WL_PID" 2>/dev/null || true
   fi
+}
+
+# --ime: xdg-dbus-proxy serves the box a session bus on which only fcitx's
+# sandbox name answers (org.freedesktop.portal.Fcitx, what flatpak apps
+# use). Qt's fcitx module types through it.
+open_ime_bus() {
+  local ready=""
+  BUS=$RUNTIME/tuxbox-$BOX-$$.bus
+  exec {IME_FD}< <(exec xdg-dbus-proxy --fd=1 "$DBUS_SESSION_BUS_ADDRESS" "$BUS" \
+                     --filter --talk=org.freedesktop.portal.Fcitx)
+  IME_PID=$!
+  read -r -n 1 ready <&"$IME_FD" || true
+  [ "$ready" = x ] || die "no filtered session bus (see xdg-dbus-proxy's error above)"
+}
+
+close_ime_bus() {
+  if [ -n "${IME_FD:-}" ]; then
+    exec {IME_FD}<&-
+    wait "$IME_PID" 2>/dev/null || true
+  fi
+}
+
+cleanup() {
+  close_ime_bus
+  close_wayland_socket
 }
 
 # bwrap applies its arguments IN ORDER: a later mount covers an earlier one
@@ -245,6 +281,30 @@ add_devices() {
   fi
 }
 
+# --ime: the filtered bus becomes the box's session bus. Before
+# add_environment, so an --env can still override QT_IM_MODULE.
+add_ime() {
+  local conf themes
+  [ "$IME" = 1 ] || return 0
+  BWRAP+=(
+    --bind "$BUS" "$RUNTIME/bus"
+    --setenv DBUS_SESSION_BUS_ADDRESS "unix:path=$RUNTIME/bus"
+    --setenv QT_IM_MODULE fcitx
+  )
+
+  # Qt's fcitx module draws the candidate window itself, in the theme
+  # classicui.conf names. Read-only; the themes directory stays live, so
+  # a re-theme reaches the box.
+  conf=${XDG_CONFIG_HOME:-$HOME/.config}/fcitx5/conf/classicui.conf
+  themes=${XDG_DATA_HOME:-$HOME/.local/share}/fcitx5/themes
+  if [ -e "$conf" ]; then
+    BWRAP+=(--ro-bind "$conf" "$HOME/.config/fcitx5/conf/classicui.conf")
+  fi
+  if [ -d "$themes" ]; then
+    BWRAP+=(--ro-bind "$themes" "$HOME/.local/share/fcitx5/themes")
+  fi
+}
+
 add_environment() {
   local spec
   BWRAP+=(
@@ -332,17 +392,26 @@ main() {
   require_tools
   init_box
   open_wayland_socket
+  if [ "$IME" = 1 ]; then
+    open_ime_bus
+  fi
 
   add_filesystem
   add_shares
   add_devices
+  add_ime
   add_environment
   add_display
   build_entry
   build_command
 
   # the program's exit code is tuxbox's; the EXIT trap closes the socket
-  "${RUN[@]}" || rc=$?
+  # and stops the proxy. The proxy's pipe stays out of the box.
+  if [ -n "${IME_FD:-}" ]; then
+    "${RUN[@]}" {IME_FD}<&- || rc=$?
+  else
+    "${RUN[@]}" || rc=$?
+  fi
   return "$rc"
 }
 
