@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+# ---------------------------------------------------------------------------
+# move Claude Code sessions out of the /resume picker, or back. The picker
+# lists ~/.claude/projects/<project>/*.jsonl, so archiving moves a session's
+# files to ~/.claude/session-archive/, in the same layout:
+#
+#   projects/<project>/<id>.jsonl   the transcript
+#   projects/<project>/<id>/        its subagent transcripts and tool output
+#   file-history/<id>               /rewind checkpoints
+#   session-env/<id>
+#
+# Usage:
+#   claude-archive <session-id>...       archive
+#   claude-archive -r <session-id>...    restore
+#
+# An id can be shortened to any unique prefix of 8 or more characters.
+# Running sessions are left alone.
+# ---------------------------------------------------------------------------
+set -euo pipefail
+
+claude_dir=${CLAUDE_CONFIG_DIR:-$HOME/.claude}
+archive_dir=$claude_dir/session-archive
+
+src=$claude_dir dst=$archive_dir verb=archived
+if [ "${1:-}" = -r ] || [ "${1:-}" = --restore ]; then
+  src=$archive_dir dst=$claude_dir verb=restored
+  shift
+fi
+if [ $# -eq 0 ]; then
+  echo "usage: claude-archive [-r] <session-id>..." >&2
+  exit 1
+fi
+
+# sessions/<pid>.json exists for every claude process started, live or not
+running() {
+  local f
+  for f in "$claude_dir"/sessions/*.json; do
+    [ -e "$f" ] || continue
+    grep -q "\"sessionId\":\"$1\"" "$f" || continue
+    kill -0 "$(basename "$f" .json)" 2>/dev/null && return 0
+  done
+  return 1
+}
+
+status=0
+for arg in "$@"; do
+  skip() { echo "claude-archive: $arg: $*" >&2; status=1; }
+
+  if ! [[ $arg =~ ^[0-9a-f-]{8,36}$ ]]; then
+    skip "not a session id"; continue
+  fi
+  matches=("$src"/projects/*/"$arg"*.jsonl)
+  if [ ! -e "${matches[0]}" ]; then
+    skip "no such session in $src/projects"; continue
+  fi
+  if [ ${#matches[@]} -gt 1 ]; then
+    skip "matches ${#matches[@]} sessions, give more of the id"; continue
+  fi
+  id=$(basename "${matches[0]}" .jsonl)
+  project=$(basename "$(dirname "${matches[0]}")")
+  if running "$id"; then
+    skip "session is running"; continue
+  fi
+
+  paths=("projects/$project/$id.jsonl" "projects/$project/$id" "file-history/$id" "session-env/$id")
+  clash=
+  for p in "${paths[@]}"; do
+    if [ -e "$src/$p" ] && [ -e "$dst/$p" ]; then clash=$dst/$p; fi
+  done
+  if [ -n "$clash" ]; then
+    skip "$clash already exists"; continue
+  fi
+
+  for p in "${paths[@]}"; do
+    [ -e "$src/$p" ] || continue
+    mkdir -p "$(dirname "$dst/$p")"
+    mv "$src/$p" "$dst/$p"
+  done
+
+  name=$(grep -o '"customTitle":"[^"]*"' "$dst/projects/$project/$id.jsonl" | tail -n 1 | cut -d'"' -f4) || true
+  echo "$verb $id${name:+ ($name)}"
+done
+exit $status
