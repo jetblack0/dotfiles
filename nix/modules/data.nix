@@ -99,6 +99,7 @@ in
         ".claude" = "state/claude";
         ".config/sing-box" = "config/sing-box";
         ".config/aws" = "config/aws";
+        ".config/kube" = "config/kube";
         ".config/git/conf.d" = "config/git";
         ".local/share/pass" = "state/pass";
         ".local/share/gnupg" = "state/gnupg";
