@@ -99,6 +99,14 @@ export ANDROID_USER_HOME="$XDG_DATA_HOME"/android
 # kubernetes
 export KREW_ROOT="$XDG_DATA_HOME"/krew
 export MINIKUBE_HOME="$XDG_DATA_HOME"/minikube
+# every *.yaml / *.yml under config/kube, folders included, merged by
+# kubectl. The state file goes first, so use-context writes there.
+() {
+	local ctx="$XDG_STATE_HOME"/kube/config
+	[[ -e $ctx ]] || { mkdir -p ${ctx:h} && print 'apiVersion: v1\nkind: Config' > $ctx }
+	local files=($ctx "$XDG_CONFIG_HOME"/kube/**/*.(yaml|yml)(N))
+	export KUBECONFIG=${(j.:.)files}
+}
 
 # aws
 export AWS_SHARED_CREDENTIALS_FILE="$XDG_CONFIG_HOME"/aws/credentials
