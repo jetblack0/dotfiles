@@ -154,6 +154,8 @@ packages:
   - { name: localsend, aur: localsend-bin, cask: localsend }
   # the work mac has slack already
   - { name: slack, aur: slack-desktop, brew: false }
+  - { name: 1password, aur: 1password, brew: false }
+  - { name: 1password-cli, aur: 1password-cli, brew: false }
   # - { name: rustdesk, aur: rustdesk-bin, cask: rustdesk }
   - { name: noctalia, brew: false }
   - { name: swayimg, brew: false }
