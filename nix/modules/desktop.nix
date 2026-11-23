@@ -358,7 +358,12 @@ in
       pkgs-unstable.swayimg
       mpv
 
-      chromium
+      # sing-box fake-ip ranges count as public, not local network
+      (chromium.override {
+        commandLineArgs = [
+          "--ip-address-space-overrides=198.18.0.0/15=public,[2001:db8::]/32=public"
+        ];
+      })
       transmission_4-gtk
       localsend
       # work chat; huddles need the desktop app, not the web one
