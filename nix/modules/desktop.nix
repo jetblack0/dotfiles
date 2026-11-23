@@ -274,6 +274,14 @@ in
     # noctalia pass needs a graphical pinentry
     programs.gnupg.agent.pinentryPackage = pkgs.pinentry-gnome3;
 
+    # 1password: the modules, not bare packages. They add the polkit policy
+    # for system-password unlock and the setgid helper the cli talks through.
+    programs._1password.enable = true;
+    programs._1password-gui = {
+      enable = true;
+      polkitPolicyOwners = [ username ];
+    };
+
     # qt reads the qt5ct/qt6ct color schemes the noctalia template writes
     qt = {
       enable = true;
@@ -407,6 +415,8 @@ in
       "apple-color-emoji"
       "apple-fonts-sf-pro"
       "slack"
+      "1password"
+      "1password-cli"
     ];
 
     fonts.fontconfig.defaultFonts = {
