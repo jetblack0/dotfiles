@@ -41,14 +41,44 @@
     name: "{{ packages_brew }}"
     state: present
 
-- name: Install cask packages with Homebrew
+# check mode stops at the first missing cask; reports changed if any is
+- name: Check whether any cask is missing
   community.general.homebrew_cask:
     name: "{{ packages_casks }}"
     state: present
-    # adopt apps that were installed manually (dmg) before the playbook
-    # took over -- brew otherwise refuses to touch an app it does not own
     install_options: adopt
+  check_mode: true
+  register: packages_casks_check
   when: packages_casks | length > 0
+
+# pkg casks (karabiner) run the installer through brew's own sudo, which
+# has no terminal to ask on; passwordless sudo only for this step
+- name: Install the missing casks
+  when: packages_casks_check is changed
+  block:
+    - name: Allow passwordless sudo for the cask installers
+      ansible.builtin.copy:
+        content: "{{ ansible_facts['user_id'] }} ALL=(ALL) NOPASSWD: ALL\n"
+        dest: /etc/sudoers.d/ansible-casks
+        owner: root
+        group: wheel
+        mode: "0440"
+        validate: /usr/sbin/visudo -cf %s
+      become: true
+
+    - name: Install cask packages with Homebrew
+      community.general.homebrew_cask:
+        name: "{{ packages_casks }}"
+        state: present
+        # adopt apps that were installed manually (dmg) before the playbook
+        # took over -- brew otherwise refuses to touch an app it does not own
+        install_options: adopt
+  always:
+    - name: Remove the passwordless sudo rule
+      ansible.builtin.file:
+        path: /etc/sudoers.d/ansible-casks
+        state: absent
+      become: true
 
 - name: Check whether zathura still runs
   ansible.builtin.command: zathura --version

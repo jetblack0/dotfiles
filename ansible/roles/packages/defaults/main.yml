@@ -161,6 +161,8 @@ packages:
   - { name: chromium, brew: false }
   - { name: transmission-gtk, cask: transmission }
   - { name: localsend, aur: localsend-bin, cask: localsend }
+  # pkg cask: installs through the sudo rule in tasks/darwin.yml
+  - { name: karabiner-elements, pacman: false, cask: karabiner-elements }
   # the work mac has slack already
   - { name: slack, aur: slack-desktop, brew: false }
   - { name: 1password, aur: 1password, brew: false }
