@@ -34,6 +34,15 @@ let
       ) (lib.filterAttrs (_: type: type == "regular") (builtins.readDir root))
     );
 
+  # Just these commands from a package that ships more (a client next to
+  # its server), so the rest stays off PATH.
+  commandsFrom =
+    pkg: names:
+    pkgs.runCommand "${lib.getName pkg}-${lib.concatStringsSep "-" names}" { } ''
+      mkdir -p $out/bin
+      ${lib.concatMapStrings (n: "ln -s ${pkg}/bin/${n} $out/bin/${n}\n") names}
+    '';
+
   # yazi plugins. The list comes from config/yazi/package.toml
   yaziPluginFiles =
     let
@@ -171,11 +180,13 @@ in
       pass
 
       # basics other distros ship and nixos does not
+      bc
       curl
       diffutils
       file
       gawk
       man-pages
+      openssl
       rsync
       sshfs
       unzip
@@ -204,15 +215,22 @@ in
       kubernetes-helm
       kubectl
       linode-cli
+      (commandsFrom grafana-loki [ "logcli" ])
       opentofu
       sops
       steampipe
+
+      # databases
+      (commandsFrom postgresql [ "psql" ])
+      mariadb.client # mysql: talks to mysql 8 servers too
 
       # networking
       dig
       mtr
       tcpdump
+      (commandsFrom inetutils [ "telnet" ])
       traceroute
+      whois
 
       # ai
       pkgs-unstable.claude-code
