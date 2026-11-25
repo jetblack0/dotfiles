@@ -1,0 +1,10 @@
+---
+# Work MacBook
+# ---------------------------------------------
+#     ansible-playbook base.yml -e @hosts/mac.yml --ask-become-pass
+#     ansible-playbook data.yml -e @hosts/mac.yml
+
+
+# Second home
+# ---------------------------------------------
+data_require_mount: false
