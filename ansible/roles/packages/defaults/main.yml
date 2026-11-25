@@ -77,11 +77,13 @@ packages:
   - { name: pass }
 
   # basics macOS already ships
+  - { name: bc, brew: false }
   - { name: curl, brew: false }
   - { name: diffutils, brew: false } # git/nvim shell out to diff
   - { name: man-db, brew: false }
   - { name: man-pages, brew: false }
   - { name: openssh, brew: false }
+  - { name: openssl, brew: false }
   - { name: rsync, brew: false }
   - { name: unzip, brew: false } # mason unpacks LSP archives with it
   - { name: zsh, brew: false }
@@ -112,9 +114,14 @@ packages:
   - { name: helm }
   - { name: kubectl }
   - { name: linode-cli, aur: linode-cli }
+  - { name: logcli }
   - { name: opentofu }
   - { name: sops }
   - { name: steampipe, aur: steampipe-bin }
+
+  # database clients. brew's are keg-only; .zshrc puts them on PATH
+  - { name: postgresql-libs, brew: libpq } # psql
+  - { name: mariadb-clients, brew: mysql-client } # mysql
 
   # virtualization
   - { name: qemu-desktop, brew: false }
@@ -132,7 +139,9 @@ packages:
   - { name: bind, brew: false }
   - { name: mtr }
   - { name: tcpdump, brew: false }
+  - { name: inetutils, brew: telnet } # telnet
   - { name: traceroute, brew: false }
+  - { name: whois, brew: false } # macos ships one
 
   # ai
   - { name: claude-code, aur: claude-code, cask: claude-code@latest }
