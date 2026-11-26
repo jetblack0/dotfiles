@@ -22,5 +22,5 @@
 [mergetool "codediff"]
 	cmd = nvim \"$MERGED\" -c \"CodeDiff merge \\\"$MERGED\\\"\"
 
-[includeIf "gitdir:~/Development/work/"]
+[includeIf "gitdir:~/assets/devs/work/"]
 	path = ~/.config/git/conf.d/config.work
