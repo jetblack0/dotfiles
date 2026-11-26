@@ -35,9 +35,10 @@ export GRIMBLAST_EDITOR="pinta"
 # XDG paths: terminal and desktop
 # ---------------------------------------------
 export LESSHISTFILE="$XDG_CACHE_HOME"/less/history
+# Keep the inherited dirs: nixos keeps terminfo outside /usr/share, and
+# kitty on macos hands its own over in $TERMINFO, replaced below.
+export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:${TERMINFO:+$TERMINFO:}"${TERMINFO_DIRS:-/usr/share/terminfo}"
 export TERMINFO="$XDG_DATA_HOME"/terminfo
-# Keep the inherited dirs: nixos keeps terminfo outside /usr/share.
-export TERMINFO_DIRS="$XDG_DATA_HOME"/terminfo:"${TERMINFO_DIRS:-/usr/share/terminfo}"
 export GTK2_RC_FILES="$XDG_CONFIG_HOME"/gtk-2.0/gtkrc
 export PF_SOURCE="$XDG_CONFIG_HOME/pfetch/pfetch.sh"
 export FCEUX_HOME="$XDG_CONFIG_HOME"/fceux
