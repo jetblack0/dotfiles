@@ -116,6 +116,7 @@ packages:
   - { name: linode-cli, aur: linode-cli }
   - { name: logcli }
   - { name: opentofu }
+  - { name: s5cmd, aur: s5cmd-bin }
   - { name: sops }
   - { name: steampipe, aur: steampipe-bin }
 
@@ -138,6 +139,7 @@ packages:
   # networking
   - { name: bind, brew: false }
   - { name: mtr }
+  - { name: swaks }
   - { name: tcpdump, brew: false }
   - { name: inetutils, brew: telnet } # telnet
   - { name: traceroute, brew: false }
