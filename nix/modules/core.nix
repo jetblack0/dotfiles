@@ -217,6 +217,7 @@ in
       linode-cli
       (commandsFrom grafana-loki [ "logcli" ])
       opentofu
+      s5cmd
       sops
       steampipe
 
@@ -227,6 +228,7 @@ in
       # networking
       dig
       mtr
+      swaks
       tcpdump
       (commandsFrom inetutils [ "telnet" ])
       traceroute
